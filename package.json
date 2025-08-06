@@ -1,0 +1,24 @@
+{
+  "name": "minhvuong-nodepro",
+  "version": "1.0.0",
+  "description": "nodepro-minhvuong",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shen2806/laptopahop_vuong-huynnh.git"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "minhvuong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shen2806/laptopahop_vuong-huynnh/issues"
+  },
+  "homepage": "https://github.com/Shen2806/laptopahop_vuong-huynnh#readme"
+}
