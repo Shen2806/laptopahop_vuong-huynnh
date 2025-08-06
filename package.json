@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/Shen2806/laptopahop_vuong-huynnh/issues"
   },
-  "homepage": "https://github.com/Shen2806/laptopahop_vuong-huynnh#readme"
+  "homepage": "https://github.com/Shen2806/laptopahop_vuong-huynnh#readme",
+  "dependencies": {
+    "express": "5.0.1"
+  }
 }
