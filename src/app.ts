@@ -9,7 +9,8 @@ app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 //configure web routes
 webRoutes(app);
-
+//configure static files
+app.use(express.static('public'));
 const PORT = process.env.PORT || 8080;
 
 
