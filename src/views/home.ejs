@@ -18,7 +18,7 @@
     <div style="margin: 25px;">
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
             <h1>
-                List Users <%= name %>
+                List Users
             </h1>
             <div>
                 <a href="/create-user" class='btn btn-warning'>Create a new user</a>
@@ -35,15 +35,28 @@
                     <th>Action</th>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Alfreds Futterkiste</td>
-                        <td>Maria Anders</td>
-                        <td>Germany</td>
-                        <td></td>
-                        <td>
-                            <button class="btn btn-warning">Edit</button>
-                        </td>
-                    </tr>
+                    <% users.forEach( function (user) { %>
+
+                        <tr>
+                            <td>
+                                <%= user.id %>
+                            </td>
+                            <td>
+                                <%= user.name %>
+                            </td>
+                            <td>
+                                <%= user.email %>
+                            </td>
+                            <td>
+                                <%= user.address %>
+                            </td>
+
+                            <td>
+                                <button class="btn btn-warning">Edit</button>
+                            </td>
+                        </tr>
+                        <% }) %>
+
                 </tbody>
 
             </table>
