@@ -15,11 +15,40 @@
 </head>
 
 <body>
-    <h1>
-        Hello Minh Vuong - EJS Template from controller
-    </h1>
-    <!-- <img src="/images/image1.png" /> -->
-    <a href="/create-user" class='btn btn-warning'>Create a new user</a>
+    <div style="margin: 25px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+            <h1>
+                List Users <%= name %>
+            </h1>
+            <div>
+                <a href="/create-user" class='btn btn-warning'>Create a new user</a>
+            </div>
+        </div>
+        <hr />
+        <div>
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Action</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Alfreds Futterkiste</td>
+                        <td>Maria Anders</td>
+                        <td>Germany</td>
+                        <td></td>
+                        <td>
+                            <button class="btn btn-warning">Edit</button>
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
 </body>
 
 </html>

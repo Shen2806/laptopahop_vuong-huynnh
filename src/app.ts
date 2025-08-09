@@ -2,7 +2,6 @@
 import express from 'express';
 require('dotenv').config();
 import webRoutes from './routes/web';
-import getConnection from './config/database';
 const app = express();
 
 // Set up EJS as the view engine
@@ -18,7 +17,6 @@ const PORT = process.env.PORT || 8080;
 webRoutes(app);
 
 
-getConnection()
 app.listen(PORT, () => {
     console.log(`My app is running on port : ${PORT}`);
 });
