@@ -38,8 +38,9 @@ const getAllUsers = async () => {
 }
 
 const handleDeleteUser = async (id: number) => {
-    const connection = await getConnection();
+
     try {
+        const connection = await getConnection();
         const sql = 'DELETE FROM `users` WHERE id = ? LIMIT 1';
         const values = [id];
         const [result, fields] = await connection.execute(sql, values);
@@ -49,5 +50,19 @@ const handleDeleteUser = async (id: number) => {
         return [];
     }
 }
-export { handleCreateUser, getAllUsers, handleDeleteUser };
+
+const getUserById = async (id: number) => {
+
+    try {
+        const connection = await getConnection();
+        const sql = 'SELECT * FROM `users` WHERE id = ? LIMIT 1';
+        const values = [id];
+        const [result, fields] = await connection.execute(sql, values);
+        return result[0]; // Return the first user found
+    } catch (err) {
+        console.log(err);
+        return [];
+    }
+}
+export { handleCreateUser, getAllUsers, handleDeleteUser, getUserById };
 
