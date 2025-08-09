@@ -2,6 +2,7 @@
 import express from 'express';
 require('dotenv').config();
 import webRoutes from './routes/web';
+
 const app = express();
 
 // Set up EJS as the view engine
