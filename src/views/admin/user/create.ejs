@@ -10,6 +10,18 @@
     <title>Create Users - LaptopShop</title>
     <link href="/admin/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(() => {
+            const avatarFile = $("#avatarFile");
+            avatarFile.change(function (e) {
+                const imgURL = URL.createObjectURL(e.target.files[0]);
+                $("#avatarPreview").attr("src", imgURL);
+                $("#avatarPreview").css({ "display": "block" });
+            });
+        });
+    </script>
+
 </head>
 
 <body class="sb-nav-fixed">
@@ -28,7 +40,8 @@
                                 <div class="col-6 mx-auto">
                                     <div style="width: 600px ; margin: 0 auto">
                                         <h3 style="padding: 10px 0"> Create a new user</h3>
-                                        <form action="/handle-create-user" method="post">
+                                        <form action="/admin/handle-create-user" enctype="multipart/form-data"
+                                            method="post">
 
                                             <div class="mb-3">
                                                 <label class="form-label">Full Name:</label>
@@ -47,7 +60,7 @@
                                                 </div>
                                                 <div class="mb-3 col-6">
                                                     <label class="form-label">Role</label>
-                                                    <select class="form-select">
+                                                    <select name="role" class="form-select">
                                                         <% roles.forEach((role,index)=> { %>
                                                             <option value="<%-role.id %>">
                                                                 <%- role.name %>
@@ -56,13 +69,13 @@
                                                     </select>
                                                 </div>
                                             </div>
-
-
                                             <div class="mb-3">
                                                 <label for="formFile" class="form-label">Avatar</label>
-                                                <input class="form-control" type="file" id="formFile">
+                                                <input name="avatar" class="form-control" type="file" id="avatarFile"
+                                                    accept=".png, .jpg, .jpeg">
                                             </div>
-
+                                            <img style="max-height: 250px; display: none;" alt="avatar preview"
+                                                id="avatarPreview" />
                                             <div class="mb-3">
                                                 <label class="form-label">Address: </label>
                                                 <textarea name="address" class="form-control" rows="2"></textarea>
