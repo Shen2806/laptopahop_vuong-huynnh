@@ -27,15 +27,16 @@ const postDeleteUser = async (req: Request, res: Response) => {
     // handle delete user logic
     await handleDeleteUser(Number(id));
     // redirect to home page
-    return res.redirect("/");
+    return res.redirect("/admin/user");
 }
 const getViewUser = async (req: Request, res: Response) => {
     const { id } = req.params;
     // handle view user logic
     const user = await getUserById(Number(id));
-    return res.render("view-user", {
+    return res.render("admin/user/detail.ejs", {
         id: id,
-        user: user
+        user: user,
+        roles: await getAllRoles()
     });
 
 }
