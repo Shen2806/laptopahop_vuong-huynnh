@@ -2,10 +2,8 @@ import { Request, Response } from 'express';
 import { getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById } from 'services/user.service';
 
 const getHomePage = async (req: Request, res: Response) => {
-    const users = await getAllUsers();
-    return res.render("home", {
-        users: users
-    });
+
+    return res.render("client/home/show.ejs");
 }
 const getCreateUserPage = async (req: Request, res: Response) => {
     const roles = await getAllRoles();
@@ -40,13 +38,34 @@ const getViewUser = async (req: Request, res: Response) => {
     });
 
 }
+// const postUpdateUser = async (req: Request, res: Response) => {
+//     const { id, fullName, phone, role, address } = req.body;
+//     const file = req.file;
+//     const avatar = file?.filename ?? '';
+
+//     // handle view user logic
+//     await updateUserById(id, fullName, phone, role, address, avatar);
+
+//     return res.redirect("/admin/user");
+
+// }
 const postUpdateUser = async (req: Request, res: Response) => {
-    const { id, fullName, email, address } = req.body;
-    // handle view user logic
-    await updateUserById(id, fullName, email, address);
+    const { id, fullName, phone, role, address } = req.body;
+    const file = req.file;
+    const avatar = file?.filename ?? '';
 
-    return res.redirect("/");
+    // gọi service
+    await updateUserById(
+        Number(id),
+        fullName,
+        phone,
+        Number(role),   // role phải là số
+        address,
+        avatar
+    );
 
-}
+    return res.redirect("/admin/user");
+};
+
 
 export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser };

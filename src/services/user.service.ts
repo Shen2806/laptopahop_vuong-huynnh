@@ -63,19 +63,46 @@ const getUserById = async (id: number) => {
     });
     return user;
 }
-const updateUserById = async (id: number, fullName: string, email: string, address: string) => {
+// const updateUserById = async (id: string, fullName: string, phone: string, address: string, role: string, avatar: string) => {
 
-    const updateUser = await prisma.user.update({
-        where: { id: +id },
-        data: {
-            fullName: fullName,
-            username: email,
-            address: address,
-            password: '',
-            accountType: '',
-        },
-    });
-    return updateUser;
-}
+//     const updateUser = await prisma.user.update({
+//         where: { id: +id },
+//         data: {
+//             fullName: fullName,
+//             phone: phone,
+//             roleId: +role,
+//             address: address,
+//             ...(avatar !== undefined && { avatar: avatar })
+//         },
+//     });
+//     return updateUser;
+// }
+const updateUserById = async (
+    id: number,
+    fullName: string,
+    phone: string,
+    roleId: number,
+    address: string,
+    avatar: string
+) => {
+    try {
+        const updateUser = await prisma.user.update({
+            where: { id },
+            data: {
+                fullName,
+                phone,
+                address,
+                avatar,
+                role: {
+                    connect: { id: roleId }  // gán role qua quan hệ
+                }
+            }
+        });
+        return updateUser;
+    } catch (error) {
+        console.error("Error updating user:", error);
+        throw error;
+    }
+};
 export { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUserById, getAllRoles, hashPassword };
 

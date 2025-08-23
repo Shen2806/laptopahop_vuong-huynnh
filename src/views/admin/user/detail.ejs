@@ -40,9 +40,8 @@
                                 <div class="col-6 mx-auto">
                                     <div style="width: 600px ; margin: 0 auto">
                                         <h3 style="padding: 10px 0"> View detail a user</h3>
-                                        <form action="/admin/handle-create-user" enctype="multipart/form-data"
-                                            method="post">
-
+                                        <form action="/admin/update-user" enctype="multipart/form-data" method="post">
+                                            <input value="<%= user.id %>" name="id" type="text" style="display: none;">
                                             <div class="mb-3">
                                                 <label class="form-label">Full Name:</label>
                                                 <input value="<%= user.fullName %>" name="fullName" type="text"
@@ -50,8 +49,8 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Email:</label>
-                                                <input value="<%= user.username %>" name="username" type="email"
-                                                    class="form-control" placeholder="name@example.com">
+                                                <input disabled value="<%= user.username %>" name="username"
+                                                    type="email" class="form-control" placeholder="name@example.com">
                                             </div>
                                             <div class="row">
                                                 <div class="mb-3 col-6">
@@ -78,16 +77,25 @@
                                                 <input name="avatar" class="form-control" type="file" id="avatarFile"
                                                     accept=".png, .jpg, .jpeg">
                                             </div>
-                                            <img style="max-height: 250px; display: none;" alt="avatar preview"
-                                                id="avatarPreview" />
-                                            <div class="mb-3">
-                                                <label class="form-label">Address: </label>
-                                                <textarea name="address" class="form-control"
-                                                    rows="2"><%= user.address %></textarea>
-                                            </div>
-                                            <div class="mb-3">
-                                                <button class="btn btn-warning" type="submit">Submit</button>
-                                            </div>
+
+
+                                            <% if (user.avatar) { %>
+                                                <img style="max-height: 250px; display: block;" alt="avatar preview"
+                                                    id="avatarPreview" src='/images/<%=user.avatar%>' />
+                                                <% } else { %>
+                                                    <img style="max-height: 250px; display: none;" alt="avatar preview"
+                                                        id="avatarPreview" />
+                                                    <% } %>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Address: </label>
+                                                            <textarea name="address" class="form-control"
+                                                                rows="2"><%= user.address %></textarea>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <button class="btn btn-warning"
+                                                                type="submit">Submit</button>
+                                                        </div>
                                         </form>
                                     </div>
                                 </div>
