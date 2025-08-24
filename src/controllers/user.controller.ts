@@ -5,7 +5,7 @@ import { getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUs
 const getHomePage = async (req: Request, res: Response) => {
     const products = await getProducts();
     return res.render("client/home/show.ejs", {
-        products: products
+        products
     });
 }
 const getCreateUserPage = async (req: Request, res: Response) => {
@@ -41,17 +41,7 @@ const getViewUser = async (req: Request, res: Response) => {
     });
 
 }
-// const postUpdateUser = async (req: Request, res: Response) => {
-//     const { id, fullName, phone, role, address } = req.body;
-//     const file = req.file;
-//     const avatar = file?.filename ?? '';
 
-//     // handle view user logic
-//     await updateUserById(id, fullName, phone, role, address, avatar);
-
-//     return res.redirect("/admin/user");
-
-// }
 const postUpdateUser = async (req: Request, res: Response) => {
     const { id, fullName, phone, role, address } = req.body;
     const file = req.file;
