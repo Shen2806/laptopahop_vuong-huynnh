@@ -1,8 +1,11 @@
 // const express = require('express');
 import express from 'express';
 require('dotenv').config();
-import webRoutes from './routes/web';
+import webRoutes from 'src/routes/web';
 import initDatabase from 'config/seed';
+import passport from 'passport';
+import configPassportLocal from 'src/middleware/passport.local';
+import session from 'express-session';
 
 const app = express();
 
@@ -14,6 +17,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //configure static files
 app.use(express.static('public'));
+// config session
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true
+}))
+// configure passport
+app.use(passport.initialize());
+app.use(passport.authenticate('session'));
+configPassportLocal();
 const PORT = process.env.PORT || 8080;
 //configure web routes
 webRoutes(app);
@@ -21,6 +34,10 @@ webRoutes(app);
 // seeding data
 initDatabase()
 
+// handle 404 not found
+app.use((req, res) => {
+    res.send("404 Not Found !");
+})
 app.listen(PORT, () => {
     console.log(`My app is running on port : ${PORT}`);
 });
