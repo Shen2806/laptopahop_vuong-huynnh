@@ -43,6 +43,7 @@ const toPositiveNumber = (msg: string) =>
     }, z.number().gt(0, { message: msg }));
 
 export const ProductSchema = z.object({
+    id: z.string().optional(), // thêm id để phục vụ update
     name: toTrimmedString("Tên không được để trống !"),
 
     price: toPositiveNumber("Số tiền tối thiểu là 1"),
