@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        <%= product.name %>LaptopShop
+        Giỏ hàng - LaptopShop
     </title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
@@ -77,13 +77,13 @@
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
                             <div class="dropdown-menu m-0 bg-secondary rounded-0">
-                                <a href="cart.html" class="dropdown-item">Cart</a>
+                                <a href="cart.html" class="dropdown-item">Giỏ hàng</a>
                                 <a href="chackout.html" class="dropdown-item">Chackout</a>
                                 <a href="testimonial.html" class="dropdown-item">Testimonial</a>
                                 <a href="404.html" class="dropdown-item">404 Page</a>
                             </div>
                         </div>
-                        <a href="contact.html" class="nav-item nav-link">Contact</a>
+                        <a href="contact.html" class="nav-item nav-link">Liên hệ</a>
                     </div>
                     <div class="d-flex m-3 me-0">
                         <button
@@ -112,7 +112,7 @@
         <div class="modal-dialog modal-fullscreen">
             <div class="modal-content rounded-0">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Search by keyword</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Tìm kiếm từ khóa</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body d-flex align-items-center">
@@ -130,135 +130,125 @@
 
 
     <div class='py-5'></div>
-    <!-- Single Product Start -->
-    <div class="container-fluid py-5 mt-5">
+    <!-- Cart Page Start -->
+    <div class="container-fluid py-5">
         <div class="container py-5">
+
             <div class="mb-3">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><a href="/">Chi tiết sản phẩm</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Chi Tiết Giỏ Hàng</li>
                     </ol>
                 </nav>
             </div>
-            <div class="row g-4 mb-5">
-                <div class="col-lg-8 col-xl-9">
-                    <div class="row g-4">
-                        <div class="col-lg-6">
-                            <div class="border rounded">
-                                <a href="#">
-                                    <img src="/images/product/<%= product.image%>" class="img-fluid rounded"
-                                        alt="Image">
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <h4 class="fw-bold mb-3">
-                                <%= product.name %>
-                            </h4>
-                            <p class="mb-3">
-                                <%= product.shortDesc %>
-                            </p>
-                            <h5 class="fw-bold mb-3">
-                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                    }).format(product.price) %>
-                            </h5>
-                            <div class="d-flex mb-4">
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sản phẩm</th>
+                            <th scope="col">Tên</th>
+                            <th scope="col">Giá</th>
+                            <th scope="col">Số lượng</th>
+                            <th scope="col">Tổng tiền</th>
+                            <th scope="col">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% cartDetails.forEach( function (cartDetail) { %>
 
-                            <div class="input-group quantity mb-5" style="width: 100px;">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                </div>
-                                <input type="text" class="form-control form-control-sm text-center border-0" value="1">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <a href="#" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary"><i
-                                    class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>
-                        </div>
-                        <div class="col-lg-12">
-                            <nav>
-                                <div class="nav nav-tabs mb-3">
-                                    <button class="nav-link active border-white border-bottom-0" type="button"
-                                        role="tab" id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about"
-                                        aria-controls="nav-about" aria-selected="true">Description</button>
-
-                                </div>
-                            </nav>
-                            <div class="tab-content mb-5">
-                                <div class="tab-pane active" id="nav-about" role="tabpanel"
-                                    aria-labelledby="nav-about-tab">
-                                    <p>
-                                        <%= product.detailDesc %>
+                            <tr>
+                                <th scope="row">
+                                    <div class="d-flex align-items-center">
+                                        <img src="/images/product/<%= cartDetail.product.image%>"
+                                            class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;"
+                                            alt="">
+                                    </div>
+                                </th>
+                                <td>
+                                    <p class="mb-0 mt-4">
+                                        <a target="_blank" href="/product/<%= cartDetail.product.id %>">
+                                            <%= cartDetail.product.name%>
+                                        </a>
                                     </p>
+                                </td>
+                                <td>
+                                    <p class="mb-0 mt-4">
+                                        <%= new Intl.NumberFormat('vi-VN',{style: "currency" ,
+                                            currency:"VND"}).format(cartDetail.product.price)%>
+                                    </p>
+                                </td>
+                                <td>
+                                    <div class="input-group quantity mt-4" style="width: 100px;">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm text-center border-0"
+                                            value="<%= cartDetail.quantity%>">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p class="mb-0 mt-4">
+                                        <%= new Intl.NumberFormat('vi-VN',{style: "currency" ,
+                                            currency:"VND"}).format(cartDetail.quantity * cartDetail.price)%>
+                                    </p>
+                                </td>
+                                <td>
+                                    <button class="btn btn-md rounded-circle bg-light border mt-4">
+                                        <i class="fa fa-times text-danger"></i>
+                                    </button>
+                                </td>
+
+                            </tr>
+                            <% }) %>
 
 
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-5 row g-4 justify-content-start">
+                <div class="col-12 col-md-8">
+                    <div class="bg-light rounded">
+                        <div class="p-4">
+                            <h1 class="display-6 mb-4">Thông tin <span class="fw-normal">đơn hàng</span></h1>
+                            <div class="d-flex justify-content-between mb-4">
+                                <h5 class="mb-0 me-4">Tổng số tiền:</h5>
+                                <p class="mb-0">
+                                    <%= new Intl.NumberFormat('vi-VN',{style: "currency" ,
+                                        currency:"VND"}).format(totalPrice)%>
+                                </p>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <h5 class="mb-0 me-4">Phí vấn chuyển</h5>
+                                <div class="">
+                                    <p class="mb-0">0 đ</p>
                                 </div>
-
                             </div>
                         </div>
-
-                    </div>
-                </div>
-                <div class="col-lg-4 col-xl-3">
-                    <div class="row g-4 fruite">
-                        <div class="col-lg-12">
-
-                            <div class="mb-4">
-                                <h4>Categories</h4>
-                                <ul class="list-unstyled fruite-categorie">
-                                    <li>
-                                        <div class="d-flex justify-content-between fruite-name">
-                                            <a href="#"><i class="fas fa-apple-alt me-2"></i>Apples</a>
-                                            <span>(3)</span>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="d-flex justify-content-between fruite-name">
-                                            <a href="#"><i class="fas fa-apple-alt me-2"></i>Oranges</a>
-                                            <span>(5)</span>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="d-flex justify-content-between fruite-name">
-                                            <a href="#"><i class="fas fa-apple-alt me-2"></i>Strawbery</a>
-                                            <span>(2)</span>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="d-flex justify-content-between fruite-name">
-                                            <a href="#"><i class="fas fa-apple-alt me-2"></i>Banana</a>
-                                            <span>(8)</span>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="d-flex justify-content-between fruite-name">
-                                            <a href="#"><i class="fas fa-apple-alt me-2"></i>Pumpkin</a>
-                                            <span>(5)</span>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
+                            <h5 class="mb-0 ps-4 me-4">Tạm tính</h5>
+                            <p class="mb-0 pe-4">
+                                <%= new Intl.NumberFormat('vi-VN',{style: "currency" ,
+                                    currency:"VND"}).format(totalPrice)%>
+                            </p>
                         </div>
-
+                        <button
+                            class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4"
+                            type="button">Đặt hàng</button>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-    <!-- Single Product End -->
+    <!-- Cart Page End -->
 
 
     <!-- Footer Start -->

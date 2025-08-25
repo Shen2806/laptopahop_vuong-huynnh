@@ -160,4 +160,6 @@ const postUpdateProduct = async (req: Request, res: Response) => {
     )
     return res.redirect("/admin/product");
 }
+
+
 export { getAdminCreateProductPage, postAdminCreateProduct, postDeleteProduct, getViewProduct, postUpdateProduct };

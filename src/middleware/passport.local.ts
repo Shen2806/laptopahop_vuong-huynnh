@@ -44,7 +44,7 @@
 import { prisma } from "config/client";
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { getUserWithRoleById } from "services/client/auth.service";
+import { getUserSumCart, getUserWithRoleById } from "services/client/auth.service";
 import { comparePassword } from "services/user.service";
 
 const configPassportLocal = () => {
@@ -75,10 +75,11 @@ const configPassportLocal = () => {
     // Lấy user đầy đủ từ DB nhờ id
     passport.deserializeUser(async (id: number, done) => {
         try {
-            console.log(">>> deserialize id:", id); // debug ở đây
-            const userInDB = await getUserWithRoleById(Number(id));
+            const sumCart = await getUserSumCart(id)
+            console.log(">>> check sumCart: ", sumCart)
+            const userInDB: any = await getUserWithRoleById(Number(id));
             if (!userInDB) return done(null, false);
-            return done(null, userInDB as any);
+            return done(null, { ...userInDB, sumCart: sumCart });
         } catch (err) {
             return done(err);
         }
