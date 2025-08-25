@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getProductById } from "services/client/item.service";
+import { addProductToCard, getProductById } from "services/client/item.service";
 
 const getProductPage = async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -9,5 +9,17 @@ const getProductPage = async (req: Request, res: Response) => {
     });
 }
 
+const postAddProductToCart = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const user = req.user;
 
-export { getProductPage };
+    if (user) {
+        await addProductToCard(1, +id, user);
+    } else {
+        // not login
+        return res.redirect("/login");
+    }
+
+    return res.redirect("/")
+}
+export { getProductPage, postAddProductToCart };

@@ -78,7 +78,7 @@ const configPassportLocal = () => {
             console.log(">>> deserialize id:", id); // debug ở đây
             const userInDB = await getUserWithRoleById(Number(id));
             if (!userInDB) return done(null, false);
-            return done(null, userInDB);
+            return done(null, userInDB as any);
         } catch (err) {
             return done(err);
         }

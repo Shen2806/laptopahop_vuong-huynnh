@@ -1,11 +1,11 @@
-import { User, Role } from "@prisma/client";
+import { User as UserPrima, Role } from "@prisma/client";
 
 
 
 declare global {
     namespace Express {
-        interface User {
-            role: Role; // Thêm thuộc tính role vào User
+        interface User extends UserPrima {
+            role?: Role; // Thêm thuộc tính role vào User
         }
     }
 }
