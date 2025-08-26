@@ -1,4 +1,5 @@
 import { prisma } from "config/client";
+import { getOrderHistoryPage } from "controllers/client/product.controller";
 
 const getProducts = async () => {
     const products = await prisma.product.findMany()
@@ -169,4 +170,19 @@ const handlePlaceOrder = async (userId: number, receiverName: string, receiverAd
         })
     }
 }
-export { getProducts, getProductById, addProductToCard, getProductInCart, DeleteProductInCart, updateCartDetailBeforeCheckOut, handlePlaceOrder };
+const getOrderHistory = async (userId: number) => {
+    return await prisma.order.findMany({
+        where: { userId },
+        include: {
+            orderDetails: {
+                include: {
+                    product: true
+                }
+            }
+        }
+    })
+
+}
+
+
+export { getProducts, getProductById, addProductToCard, getProductInCart, DeleteProductInCart, updateCartDetailBeforeCheckOut, handlePlaceOrder, getOrderHistory };
