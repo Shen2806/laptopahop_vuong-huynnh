@@ -1,6 +1,6 @@
 import { prisma } from "config/client";
 import { Request, Response } from "express";
-import { addProductToCard, DeleteProductInCart, getProductById, getProductInCart, updateCartDetailBeforeCheckOut } from "services/client/item.service";
+import { addProductToCard, DeleteProductInCart, getProductById, getProductInCart, handlePlaceOrder, updateCartDetailBeforeCheckOut } from "services/client/item.service";
 
 const getProductPage = async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -75,6 +75,18 @@ const postHandleCartToCheckOut = async (req: Request, res: Response) => {
     await updateCartDetailBeforeCheckOut(currentCartDetail)
     return res.redirect("/checkout")
 }
+const postPlaceOrder = async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user) return res.redirect("/login");
+    const { receiverName, receiverAddress, receiverPhone, receiverNote, totalPrice } = req.body
+    await handlePlaceOrder(user.id, receiverName, receiverAddress, receiverPhone, receiverNote, +totalPrice)
+    return res.redirect("/thanks")
+}
+const getThanksPage = async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user) return res.redirect("/login")
 
+    return res.render("product/thanks.ejs")
+}
 
-export { getProductPage, postAddProductToCart, getCartPage, postDeleteProductInCart, getCheckOutPage, postHandleCartToCheckOut, };
+export { getProductPage, postAddProductToCart, getCartPage, postDeleteProductInCart, getCheckOutPage, postHandleCartToCheckOut, postPlaceOrder, getThanksPage };

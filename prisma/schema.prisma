@@ -96,6 +96,7 @@ model Order {
   receiverAddress String @db.VarChar(255)
   receiverName    String @db.VarChar(255)
   receiverPhone   String @db.VarChar(255)
+  receiverNote    String @db.VarChar(255)
   status          String @default("PENDING") // PEDING, CANCELED, COMPLETE,
 
   paymentMethod String //COD, BANKING...

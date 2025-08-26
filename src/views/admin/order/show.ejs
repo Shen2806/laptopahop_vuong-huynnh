@@ -26,7 +26,56 @@
                                 <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
                                 <li class="breadcrumb-item active">Orders</li>
                             </ol>
-                            <div>table order</div>
+                            <div>
+                                <table class="table table-hover table-bordered">
+                                    <thead>
+                                        <th>STT</th>
+                                        <th>Người dùng</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Trạng thái</th>
+                                        <th>Phương thức thanh toán</th>
+                                        <th>Trạng thái thanh toán</th>
+                                        <th>Hành động</th>
+                                    </thead>
+                                    <tbody>
+                                        <% orders.forEach( function (order) { %>
+
+                                            <tr>
+                                                <td>
+                                                    <%= order.id %>
+                                                </td>
+                                                <td>
+                                                    <%= order?.user?.fullName ?? "" %>
+                                                </td>
+                                                <td>
+                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                        currency: 'VND' }).format(order.totalPrice) %>
+                                                </td>
+                                                <td>
+                                                    <%= order.status %>
+                                                </td>
+                                                <td>
+                                                    <%= order.paymentMethod %>
+                                                </td>
+                                                <td>
+                                                    <%= order.paymentStatus %>
+                                                </td>
+
+                                                <td>
+                                                    <div style="display: flex; gap: 10px;">
+                                                        <form action="/admin/order/<%= order.id %>" method="get">
+                                                            <button type="submit" class="btn btn-warning">Xem chi tiết
+                                                            </button>
+                                                        </form>
+
+                                                    </div>
+
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                     </main>

@@ -144,149 +144,66 @@
     <!-- Navbar End -->
     <div class="py-5"></div>
 
-    <!-- Cart Page Start -->
-    <div class="container-fluid py-5">
-        <div class="container py-5">
-            <div class="mb-3">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Thanh Toán Giỏ Hàng</li>
-                    </ol>
-                </nav>
+    <div class="container" style="margin-top: 100px;">
+        <div class="row">
+            <div class="col-12 mt-5">
+                <div class="alert alert-success" role="alert">
+                    Cảm ơn bạn đã mua hàng, đơn hàng đã được xác nhận thành công !
+                </div>
             </div>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Sản phẩm</th>
-                            <th scope="col">Tên</th>
-                            <th scope="col">Giá cả</th>
-                            <th scope="col">Số lượng</th>
-                            <th scope="col">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% cartDetails.forEach( function (cartDetail) { %>
-                            <tr>
-                                <th scope="row">
-                                    <div class="d-flex align-items-center">
-                                        <img src="/images/product/<%=cartDetail.product.image %>"
-                                            class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;"
-                                            alt="">
-                                    </div>
-                                </th>
-                                <td>
-                                    <p class="mb-0 mt-4">
-                                        <a target="_blank" href="/product/<%=cartDetail.product.id %>">
-                                            <%=cartDetail.product.name %>
-                                        </a>
-                                    </p>
-                                </td>
-                                <td>
-                                    <p class="mb-0 mt-4">
-                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                            }).format(cartDetail.product.price) %>
-                                    </p>
-                                </td>
-                                <td>
-                                    <div class="input-group quantity mt-4" style="width: 100px;">
-                                        <input type="text" class="form-control form-control-sm text-center border-0"
-                                            value="<%=cartDetail.quantity %>" disabled />
-                                    </div>
-                                </td>
-                                <td>
-                                    <p class="mb-0 mt-4" data-cart-detail-id="<%=cartDetail.id %>">
-                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                            }).format(cartDetail.quantity * cartDetail.price) %>
-                                    </p>
-                                </td>
-
-                            </tr>
-                            <% }) %>
-                                <%if (user?.sumCart===0) { %>
-                                    <tr>
-                                        <td colspan="6"> Chưa có sản phẩm trong giỏ hàng</td>
-                                    </tr>
-                                    <% } %>
-                    </tbody>
-                </table>
-            </div>
-
-            <%if (user?.sumCart> 0) { %>
-                <form action="/place-order" method="post">
-                    <input value="<%=totalPrice%>" name="totalPrice" style="display: none;" />
-                    <div class="mt-5 row g-4 justify-content-start">
-                        <div class="col-12 col-md-6">
-                            <div class="p-4 ">
-                                <h5>Thông Tin Người Nhận</h5>
-                                <div class="row">
-                                    <div class="col-12 form-group mb-3">
-                                        <label>Tên người nhận</label>
-                                        <input class="form-control" name="receiverName" required />
-                                    </div>
-                                    <div class="col-12 form-group mb-3">
-                                        <label>Địa chỉ người nhận</label>
-                                        <input class="form-control" name="receiverAddress" required />
-                                    </div>
-                                    <div class="col-12 form-group mb-3">
-                                        <label>Số điện thoại</label>
-                                        <input class="form-control" name="receiverPhone" required />
-                                    </div>
-                                    <div class="col-12 form-group mb-3">
-                                        <label>Ghi chú khi giao hàng</label>
-                                        <textarea class="form-control" name="receiverNote" type="text"
-                                            required></textarea>
-                                    </div>
-                                    <div class="mt-4">
-                                        <i class="fas fa-arrow-left"></i>
-                                        <a href="/cart">Quay lại giỏ hàng</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="bg-light rounded">
-                                <div class="p-4">
-                                    <h1 class="display-6 mb-4">Thông Tin <span class="fw-normal">Thanh
-                                            Toán</span>
-                                    </h1>
-
-                                    <div class="d-flex justify-content-between">
-                                        <h5 class="mb-0 me-4">Phí vận chuyển</h5>
-                                        <div class="">
-                                            <p class="mb-0">0 đ</p>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3 d-flex justify-content-between">
-                                        <h5 class="mb-0 me-4">Hình thức</h5>
-                                        <div class="">
-                                            <p class="mb-0">Thanh toán khi nhận hàng (COD)</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
-                                    <h5 class="mb-0 ps-4 me-4">Tổng số tiền</h5>
-                                    <p class="mb-0 pe-4" data-cart-total-price="<%= totalPrice %>">
-                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                            }).format(totalPrice) %>
-                                    </p>
-                                </div>
-
-                                <button
-                                    class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4">
-                                    Xác nhận thanh toán
-                                </button>
-
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                <% } %>
         </div>
     </div>
-    <!-- Cart Page End -->
-
+    <!-- Feature -->
+    <div class="container-fluid featurs py-5">
+        <div class="container py-5">
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="featurs-item text-center rounded bg-light p-4">
+                        <div class="featurs-icon btn-square rounded-circle bg-secondary mb-5 mx-auto">
+                            <i class="fas fa-car-side fa-3x text-white"></i>
+                        </div>
+                        <div class="featurs-content text-center">
+                            <h5>Miễn phí giao hàng</h5>
+                            <p class="mb-0">Giao hỏa tốc trong 2 giờ</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="featurs-item text-center rounded bg-light p-4">
+                        <div class="featurs-icon btn-square rounded-circle bg-secondary mb-5 mx-auto">
+                            <i class="fas fa-user-shield fa-3x text-white"></i>
+                        </div>
+                        <div class="featurs-content text-center">
+                            <h5>Bảo mật thanh toán</h5>
+                            <p class="mb-0">Giao dịch an toàn</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="featurs-item text-center rounded bg-light p-4">
+                        <div class="featurs-icon btn-square rounded-circle bg-secondary mb-5 mx-auto">
+                            <i class="fas fa-exchange-alt fa-3x text-white"></i>
+                        </div>
+                        <div class="featurs-content text-center">
+                            <h5>Hoàn trả</h5>
+                            <p class="mb-0">Đổi trả miễn phí</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="featurs-item text-center rounded bg-light p-4">
+                        <div class="featurs-icon btn-square rounded-circle bg-secondary mb-5 mx-auto">
+                            <i class="fa fa-phone-alt fa-3x text-white"></i>
+                        </div>
+                        <div class="featurs-content text-center">
+                            <h5>Hỗ trợ</h5>
+                            <p class="mb-0">Hỗ trợ nhanh chóng , nhiệt tình</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
         <div class="container py-5">

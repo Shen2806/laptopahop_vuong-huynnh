@@ -1,8 +1,8 @@
 import express, { Express } from 'express';
 import { getCreateUserPage, getHomePage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser } from 'controllers/user.controller';
-import { getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controller';
+import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
-import { getCartPage, getCheckOutPage, getProductPage, postAddProductToCart, postDeleteProductInCart, postHandleCartToCheckOut } from 'controllers/client/product.controller';
+import { getCartPage, getCheckOutPage, getProductPage, getThanksPage, postAddProductToCart, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
 import { getLoginPage, getRegisterPage, getSuccessRedirectPage, postLogout, postRegister } from 'controllers/client/auth.controller';
 import passport from 'passport';
@@ -34,7 +34,10 @@ const webRoutes = (app: Express) => {
     router.post("/handle-cart-to-checkout", postHandleCartToCheckOut)
     //xem gio hang
     router.get("/cart", getCartPage)
-
+    // thanh toan san pham
+    router.post("/place-order", postPlaceOrder)
+    // cam on mua hang
+    router.get("/thanks", getThanksPage)
     // admin routes
     router.get("/admin", getDashboardPage);
     router.get("/admin/user", getAdminUserPage);
@@ -51,6 +54,7 @@ const webRoutes = (app: Express) => {
     router.get("/admin/view-product/:id", getViewProduct);
     router.post("/admin/update-product", fileUploadMiddleware("image", "images/product"), postUpdateProduct);
     router.get("/admin/order", getAdminOrderPage);
+    router.get("/admin/order/:id", getAdminOrderDetailPage);
     app.use("/", isAdmin, router);
 }
 
