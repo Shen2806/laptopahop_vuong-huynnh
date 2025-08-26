@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        Giỏ hàng - LaptopShop
+        Thanh toán - @hoidanit
     </title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
@@ -42,9 +42,8 @@
     </div>
     <!-- Spinner End -->
 
-
     <!-- Navbar start -->
-    <div class="container-fluid fixed-top">
+    <div class="container-fluid fixed-top" style="margin-top: 10px">
         <div class="container topbar bg-primary d-none d-lg-block">
             <div class="d-flex justify-content-between">
                 <div class="top-info ps-2">
@@ -64,14 +63,15 @@
                             <small class="me-3"><i class="fas fa-voicemail me-2 text-secondary"></i>
                             </small>
                             <% } %>
+
                 </div>
                 <div class="top-link pe-2">
-                    <a href="#" class="text-white"><small class="text-white mx-2">Privacy Policy</small>/</a>
-                    <a href="#" class="text-white"><small class="text-white mx-2">Terms of Use</small>/</a>
-                    <a href="#" class="text-white"><small class="text-white ms-2">Sales and Refunds</small></a>
+                    <a href="#" class="text-white"><small class="text-white mx-2">Điều khoản sử dụng</small>/</a>
+                    <a href="#" class="text-white"><small class="text-white mx-2">Hỗ trợ</small></a>
                 </div>
             </div>
         </div>
+
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
                 <a href="index.html" class="navbar-brand">
@@ -81,18 +81,16 @@
                     data-bs-target="#navbarCollapse">
                     <span class="fa fa-bars text-primary"></span>
                 </button>
+
                 <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
                     <div class="navbar-nav mx-auto">
-                        <a href="/" class="nav-item nav-link">Trang chủ</a>
+                        <a href="/" class="nav-item nav-link active">Trang chủ</a>
                         <a href="/products" class="nav-item nav-link">Sản phẩm</a>
-
                     </div>
-                    <div class="d-flex m-3 me-0">
-                        <button
-                            class="btn-search btn border border-secondary btn-md-square rounded-circle bg-white me-4"
-                            data-bs-toggle="modal" data-bs-target="#searchModal"><i
-                                class="fas fa-search text-primary"></i></button>
-                        <a href="#" class="position-relative me-4 my-auto">
+
+                    <!-- Icon giỏ hàng & account nằm trong navbar-collapse -->
+                    <div class="d-flex ms-auto">
+                        <a href="/cart" class="position-relative me-4 my-auto">
                             <i class="fa fa-shopping-bag fa-2x"></i>
                             <span
                                 class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
@@ -135,46 +133,25 @@
                                     <i class="fas fa-user fa-2x"></i>
                                 </a>
                                 <% } %>
+
+
+
                     </div>
                 </div>
             </nav>
         </div>
     </div>
     <!-- Navbar End -->
+    <div class="py-5"></div>
 
-
-    <!-- Modal Search Start -->
-    <div class="modal fade" id="searchModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen">
-            <div class="modal-content rounded-0">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Tìm kiếm từ khóa</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body d-flex align-items-center">
-                    <div class="input-group w-75 mx-auto d-flex">
-                        <input type="search" class="form-control p-3" placeholder="keywords"
-                            aria-describedby="search-icon-1">
-                        <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal Search End -->
-
-
-
-    <div class='py-5'></div>
     <!-- Cart Page Start -->
     <div class="container-fluid py-5">
         <div class="container py-5">
-
             <div class="mb-3">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Chi Tiết Giỏ Hàng</li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Thanh Toán Giỏ Hàng</li>
                     </ol>
                 </nav>
             </div>
@@ -184,142 +161,127 @@
                         <tr>
                             <th scope="col">Sản phẩm</th>
                             <th scope="col">Tên</th>
-                            <th scope="col">Giá</th>
+                            <th scope="col">Giá cả</th>
                             <th scope="col">Số lượng</th>
-                            <th scope="col">Tổng tiền</th>
-                            <th scope="col">Hành động</th>
+                            <th scope="col">Thành tiền</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% cartDetails.forEach( function (cartDetail, index) { %>
-
+                        <% cartDetails.forEach( function (cartDetail) { %>
                             <tr>
                                 <th scope="row">
                                     <div class="d-flex align-items-center">
-                                        <img src="/images/product/<%= cartDetail.product.image%>"
+                                        <img src="/images/product/<%=cartDetail.product.image %>"
                                             class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;"
                                             alt="">
                                     </div>
                                 </th>
                                 <td>
                                     <p class="mb-0 mt-4">
-                                        <a target="_blank" href="/product/<%= cartDetail.product.id %>">
-                                            <%= cartDetail.product.name%>
+                                        <a target="_blank" href="/product/<%=cartDetail.product.id %>">
+                                            <%=cartDetail.product.name %>
                                         </a>
                                     </p>
                                 </td>
                                 <td>
                                     <p class="mb-0 mt-4">
-                                        <%= new Intl.NumberFormat('vi-VN',{style: "currency" ,
-                                            currency:"VND"}).format(cartDetail.product.price)%>
+                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                            }).format(cartDetail.product.price) %>
                                     </p>
                                 </td>
                                 <td>
                                     <div class="input-group quantity mt-4" style="width: 100px;">
-                                        <div class="input-group-btn">
-                                            <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                                <i class="fa fa-minus"></i>
-                                            </button>
-                                        </div>
                                         <input type="text" class="form-control form-control-sm text-center border-0"
-                                            value="<%=cartDetail.quantity %>" data-cart-detail-id="<%=cartDetail.id %>"
-                                            data-cart-detail-price="<%=cartDetail.price %>"
-                                            data-cart-detail-index="<%= index %>" />
-
-
-                                        <div class="input-group-btn">
-                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                                <i class="fa fa-plus"></i>
-                                            </button>
-                                        </div>
+                                            value="<%=cartDetail.quantity %>" disabled />
                                     </div>
                                 </td>
                                 <td>
-                                    <p class="mb-0 mt-4 " data-cart-detail-id="<%= cartDetail.id %>">
-                                        <%= new Intl.NumberFormat('vi-VN',{style: "currency" ,
-                                            currency:"VND"}).format(cartDetail.quantity * cartDetail.price)%>
+                                    <p class="mb-0 mt-4" data-cart-detail-id="<%=cartDetail.id %>">
+                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                            }).format(cartDetail.quantity * cartDetail.price) %>
                                     </p>
-                                </td>
-                                <td>
-                                    <form action="/delete-product-in-cart/<%=cartDetail.id %>" method="post">
-                                        <button class="btn btn-md rounded-circle bg-light border mt-4">
-                                            <i class="fa fa-times text-danger"></i>
-                                        </button>
-                                    </form>
                                 </td>
 
                             </tr>
                             <% }) %>
-                                <% if (user?.sumCart===0) { %>
+                                <%if (user?.sumCart===0) { %>
                                     <tr>
-                                        <td colspan="=6">Chưa có sản phẩm nào trong giỏ hàng </td>
+                                        <td colspan="6"> Chưa có sản phẩm trong giỏ hàng</td>
                                     </tr>
                                     <% } %>
-
                     </tbody>
                 </table>
             </div>
-            <% if(user?.sumCart>0) {%>
+
+            <%if (user?.sumCart> 0) { %>
                 <div class="mt-5 row g-4 justify-content-start">
-                    <div class="col-12 col-md-8">
+                    <div class="col-12 col-md-6">
+                        <div class="p-4 ">
+                            <h5>Thông Tin Người Nhận</h5>
+                            <div class="row">
+                                <div class="col-12 form-group mb-3">
+                                    <label>Tên người nhận</label>
+                                    <input class="form-control" name="receiverName" required />
+                                </div>
+                                <div class="col-12 form-group mb-3">
+                                    <label>Địa chỉ người nhận</label>
+                                    <input class="form-control" name="receiverAddress" required />
+                                </div>
+                                <div class="col-12 form-group mb-3">
+                                    <label>Số điện thoại</label>
+                                    <input class="form-control" name="receiverPhone" required />
+                                </div>
+                                <div class="col-12 form-group mb-3">
+                                    <label>Ghi chú khi giao hàng</label>
+                                    <textarea class="form-control" name="note" type="text" required></textarea>
+                                </div>
+                                <div class="mt-4">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <a href="/cart">Quay lại giỏ hàng</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
                         <div class="bg-light rounded">
                             <div class="p-4">
-                                <h1 class="display-6 mb-4">Thông tin <span class="fw-normal">đơn hàng</span></h1>
-                                <div class="d-flex justify-content-between mb-4">
-                                    <h5 class="mb-0 me-4">Tạm tính:</h5>
-                                    <p class="mb-0" data-cart-total-price="<%= totalPrice %>">
-                                        <%= new Intl.NumberFormat('vi-VN',{style: "currency" ,
-                                            currency:"VND"}).format(totalPrice)%>
-                                    </p>
+                                <h1 class="display-6 mb-4">Thông Tin <span class="fw-normal">Thanh
+                                        Toán</span>
+                                </h1>
 
-                                </div>
                                 <div class="d-flex justify-content-between">
-                                    <h5 class="mb-0 me-4">Phí vấn chuyển</h5>
+                                    <h5 class="mb-0 me-4">Phí vận chuyển</h5>
                                     <div class="">
                                         <p class="mb-0">0 đ</p>
                                     </div>
                                 </div>
+                                <div class="mt-3 d-flex justify-content-between">
+                                    <h5 class="mb-0 me-4">Hình thức</h5>
+                                    <div class="">
+                                        <p class="mb-0">Thanh toán khi nhận hàng (COD)</p>
+                                    </div>
+                                </div>
                             </div>
                             <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
-                                <h5 class="mb-0 ps-4 me-4">Tổng số tiền: </h5>
+                                <h5 class="mb-0 ps-4 me-4">Tổng số tiền</h5>
                                 <p class="mb-0 pe-4" data-cart-total-price="<%= totalPrice %>">
-                                    <%= new Intl.NumberFormat('vi-VN',{style: "currency" ,
-                                        currency:"VND"}).format(totalPrice)%>
+                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                        }).format(totalPrice) %>
                                 </p>
                             </div>
-                            <form action="/handle-cart-to-checkout" method="post">
-                                <div style="display: none">
-                                    <% cartDetails.forEach( function (cartDetail, index) { %>
-                                        <div class="mb-3">
-                                            <div class="form-group">
-                                                <label>Id:</label>
-                                                <input class="form-control" type="text" value="<%=cartDetail.id %>"
-                                                    name="cartDetails[<%= index %>][id]" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Quantity:</label>
-                                                <input class="form-control" type="text"
-                                                    value="<%=cartDetail.quantity %>"
-                                                    name="cartDetails[<%= index %>][quantity]"
-                                                    id="cartDetails[<%= index %>]" />
-                                            </div>
-                                        </div>
-                                        <% }) %>
-                                </div>
-                                <button
-                                    class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4"
-                                    type="submit">Xác nhận đặt hàng</button>
-                            </form>
+
+                            <button
+                                class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4">
+                                Xác nhận thanh toán
+                            </button>
 
                         </div>
                     </div>
                 </div>
-                <%}%>
-
+                <% } %>
         </div>
     </div>
     <!-- Cart Page End -->
-
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
@@ -400,9 +362,6 @@
     </div>
     <!-- Footer End -->
 
-
-
-
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
             class="fa fa-arrow-up"></i></a>
@@ -418,71 +377,6 @@
 
     <!-- Template Javascript -->
     <script src="/client/js/main.js"></script>
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const formatCurrency = (value) =>
-                new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                }).format(value);
-
-            function updateCartTotal() {
-                let total = 0;
-                document.querySelectorAll("p[data-cart-detail-id]").forEach((p) => {
-                    const value = Number(
-                        p.getAttribute("data-line-total") || "0"
-                    );
-                    total += value;
-                });
-
-                document.querySelectorAll("[data-cart-total-price]").forEach((el) => {
-                    el.textContent = formatCurrency(total);
-                    el.setAttribute("data-cart-total-price", total);
-                });
-            }
-
-            document.querySelectorAll(".btn-plus, .btn-minus").forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    const input = btn.closest(".quantity").querySelector("input");
-                    let qty = parseInt(input.value) || 0;
-                    const price = Number(input.dataset.cartDetailPrice);
-
-                    if (btn.classList.contains("btn-plus")) {
-                        qty++;
-                    } else if (btn.classList.contains("btn-minus") && qty > 1) {
-                        qty--;
-                    }
-
-                    input.value = qty;
-
-                    // Cập nhật tổng tiền từng dòng
-                    const lineTotalEl = document.querySelector(
-                        `p[data-cart-detail-id='${input.dataset.cartDetailId}']`
-                    );
-                    const lineTotal = price * qty;
-                    lineTotalEl.textContent = formatCurrency(lineTotal);
-                    lineTotalEl.setAttribute("data-line-total", lineTotal);
-
-                    // Cập nhật tổng giỏ hàng
-                    updateCartTotal();
-                });
-            });
-
-            // Khởi tạo tổng ban đầu
-            document.querySelectorAll("p[data-cart-detail-id]").forEach((p) => {
-                const id = p.dataset.cartDetailId;
-                const input = document.querySelector(
-                    `input[data-cart-detail-id='${id}']`
-                );
-                const price = Number(input.dataset.cartDetailPrice);
-                const qty = Number(input.value);
-                const lineTotal = price * qty;
-                p.setAttribute("data-line-total", lineTotal);
-            });
-            updateCartTotal();
-        });
-    </script> -->
-
 </body>
 
 </html>

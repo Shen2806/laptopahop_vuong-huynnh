@@ -89,4 +89,41 @@ const getProductInCart = async (userId: number) => {
     }
     return [];
 }
-export { getProducts, getProductById, addProductToCard, getProductInCart };
+
+const DeleteProductInCart = async (cartDetailId: number, userId: number, sumCart: number) => {
+    // xoa cart detail
+    await prisma.cartDetail.delete({
+        where: { id: cartDetailId }
+    })
+
+    if (sumCart === 1) {
+        //xoa cart
+        await prisma.cart.delete({
+            where: { userId }
+        })
+    } else {
+        // update cart
+        await prisma.cart.update({
+            where: { userId },
+            data: {
+                sum: {
+                    decrement: 1
+                }
+            }
+        })
+    }
+}
+
+const updateCartDetailBeforeCheckOut = async (data: { id: String, quantity: string }[]) => {
+    for (let i = 0; i < data.length; i++) {
+        await prisma.cartDetail.update({
+            where: {
+                id: +(data[i].id)
+            },
+            data: {
+                quantity: +data[i].quantity
+            }
+        })
+    }
+}
+export { getProducts, getProductById, addProductToCard, getProductInCart, DeleteProductInCart, updateCartDetailBeforeCheckOut };

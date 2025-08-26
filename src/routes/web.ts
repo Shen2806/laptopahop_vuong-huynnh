@@ -2,7 +2,7 @@ import express, { Express } from 'express';
 import { getCreateUserPage, getHomePage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser } from 'controllers/user.controller';
 import { getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
-import { getCartPage, getProductPage, postAddProductToCart } from 'controllers/client/product.controller';
+import { getCartPage, getCheckOutPage, getProductPage, postAddProductToCart, postDeleteProductInCart, postHandleCartToCheckOut } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
 import { getLoginPage, getRegisterPage, getSuccessRedirectPage, postLogout, postRegister } from 'controllers/client/auth.controller';
 import passport from 'passport';
@@ -24,8 +24,14 @@ const webRoutes = (app: Express) => {
     router.get("/register", getRegisterPage);
     router.post("/register", postRegister);
 
-    // Them san pham vao cart
+    // Them san pham vao gio hang
     router.post("/add-product-to-cart/:id", postAddProductToCart)
+    // Xoa san pham tu gio hang
+    router.post("/delete-product-in-cart/:id", postDeleteProductInCart)
+    // Xac nhan dat hang
+    router.get("/checkout", getCheckOutPage)
+    // Cap nhat gio hang truoc khi thanh toan
+    router.post("/handle-cart-to-checkout", postHandleCartToCheckOut)
     //xem gio hang
     router.get("/cart", getCartPage)
 
