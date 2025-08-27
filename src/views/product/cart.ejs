@@ -66,9 +66,8 @@
                             <% } %>
                 </div>
                 <div class="top-link pe-2">
-                    <a href="#" class="text-white"><small class="text-white mx-2">Privacy Policy</small>/</a>
-                    <a href="#" class="text-white"><small class="text-white mx-2">Terms of Use</small>/</a>
-                    <a href="#" class="text-white"><small class="text-white ms-2">Sales and Refunds</small></a>
+                    <a href="#" class="text-white"><small class="text-white mx-2">Điều khoản sử dụng</small>/</a>
+                    <a href="#" class="text-white"><small class="text-white mx-2">Hỗ trợ</small></a>
                 </div>
             </div>
         </div>
@@ -289,6 +288,7 @@
                             </div>
                             <form action="/handle-cart-to-checkout" method="post">
                                 <div style="display: none">
+                                    <input name="cartId" value="<%=cartId%>" />
                                     <% cartDetails.forEach( function (cartDetail, index) { %>
                                         <div class="mb-3">
                                             <div class="form-group">
