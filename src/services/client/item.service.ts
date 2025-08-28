@@ -1,8 +1,13 @@
 import { prisma } from "config/client";
+import { TOTAL_ITEM_PER_PAGE } from "config/constant";
 import { getOrderHistoryPage } from "controllers/client/product.controller";
 
-const getProducts = async () => {
-    const products = await prisma.product.findMany()
+const getProducts = async (page: number, pageSize: number) => {
+    const skip = (page - 1) * pageSize;
+    const products = await prisma.product.findMany({
+        skip: skip,
+        take: pageSize,
+    })
     return products;
 }
 
@@ -218,6 +223,14 @@ const handlePlaceOrder = async (userId: number, receiverName: string, receiverAd
 
 
 }
+const countTotalProductClientPages = async (pageSize: number) => {
+
+    const totalItems = await prisma.product.count();
+
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    return totalPages;
+}
 const getOrderHistory = async (userId: number) => {
     return await prisma.order.findMany({
         where: { userId },
@@ -233,4 +246,4 @@ const getOrderHistory = async (userId: number) => {
 }
 
 
-export { getProducts, getProductById, addProductToCart, getProductInCart, DeleteProductInCart, updateCartDetailBeforeCheckOut, handlePlaceOrder, getOrderHistory };
+export { getProducts, getProductById, addProductToCart, getProductInCart, DeleteProductInCart, updateCartDetailBeforeCheckOut, handlePlaceOrder, getOrderHistory, countTotalProductClientPages };

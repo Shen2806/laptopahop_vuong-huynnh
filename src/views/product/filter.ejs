@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title> Sản Phẩm - Laptopshop</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="/client/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+
+    <!-- Header start -->
+    <div class="container-fluid fixed-top" style="margin-top: 10px">
+        <div class="container topbar bg-primary d-none d-lg-block">
+            <div class="d-flex justify-content-between">
+                <div class="top-info ps-2">
+                    <% if(user){ %>
+                        <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i>
+                            <a href="#" class="text-white">
+                                <!-- <%= user?.address ?? "" %> -->
+                                <%= user?.address || "" %>
+                            </a>
+                        </small>
+                        <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i>
+                            <a href="#" class="text-white">
+                                <%= user?.username || "" %>
+                            </a>
+                        </small>
+                        <% } else { %>
+                            <small class="me-3"><i class="fas fa-voicemail me-2 text-secondary"></i>
+                            </small>
+                            <% } %>
+
+                </div>
+                <div class="top-link pe-2">
+                    <a href="#" class="text-white"><small class="text-white mx-2">Điều khoản sử dụng</small>/</a>
+                    <a href="#" class="text-white"><small class="text-white mx-2">Hỗ trợ</small></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="container px-0">
+            <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                <a href="index.html" class="navbar-brand">
+                    <h1 class="text-primary display-6">LaptopShop-VH</h1>
+                </a>
+                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars text-primary"></span>
+                </button>
+
+                <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                    <div class="navbar-nav mx-auto">
+                        <a href="/" class="nav-item nav-link active">Trang chủ</a>
+                        <a href="/products" class="nav-item nav-link">Sản phẩm</a>
+                    </div>
+
+                    <!-- Icon giỏ hàng & account nằm trong navbar-collapse -->
+                    <div class="d-flex ms-auto">
+                        <a href="/cart" class="position-relative me-4 my-auto">
+                            <i class="fa fa-shopping-bag fa-2x"></i>
+                            <span
+                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
+                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;">
+                                <%= user?.sumCart ?? 0%>
+                            </span>
+                        </a>
+                        <% if(user){ %>
+                            <div class="dropdown my-auto">
+                                <a href="#" class="dropdown" role="button" id="dropdownMenuLink"
+                                    data-bs-toggle="dropdown" aria-expanded="false" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    <i class="fas fa-user fa-2x"></i>
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end p-4" aria-labelledby="dropdownMenuLink">
+                                    <li class="d-flex align-items-center flex-column" style="min-width: 300px;">
+                                        <img style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden;"
+                                            src="/images/<%= user.avatar %>" />
+                                        <div class="text-center my-3">
+                                            <%= user.fullName %>
+                                        </div>
+                                    </li>
+
+                                    <li><a class="dropdown-item" href="#">Quản lý tài khoản</a></li>
+
+                                    <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <form method="post" action="/logout">
+                                            <button class="dropdown-item">Đăng xuất</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                            <% }else { %>
+                                <a href="/login">
+                                    <i class="fas fa-user fa-2x"></i>
+                                </a>
+                                <% } %>
+
+
+
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Header end -->
+    <div class="py-1"></div>
+    <!-- Single Product Start -->
+    <div class="container-fluid py-5 mt-5">
+        <div class="container py-5">
+            <div class="row g-4 mb-5">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Danh Sách Sản Phẩm
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <div class="row g-4 fruite">
+                    <div class="col-12 col-md-4">
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <div class="mb-2"><b>Hãng sản xuất</b></div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="factory-1" value="APPLE">
+                                    <label class="form-check-label" for="factory-1">Apple</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="factory-2" value="ASUS">
+                                    <label class="form-check-label" for="factory-2">Asus</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="factory-3" value="LENOVO">
+                                    <label class="form-check-label" for="factory-3">Lenovo</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="factory-4" value="DELL">
+                                    <label class="form-check-label" for="factory-4">Dell</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="factory-5" value="LG">
+                                    <label class="form-check-label" for="factory-5">LG</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="factory-6" value="ACER">
+                                    <label class="form-check-label" for="factory-6">Acer</label>
+                                </div>
+
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-2"><b>Mục đích sử dụng</b></div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="target-1" value="GAMING">
+                                    <label class="form-check-label" for="target-1">Gaming</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="target-2"
+                                        value="SINHVIEN-VANPHONG">
+                                    <label class="form-check-label" for="target-2">Sinh viên - văn
+                                        phòng</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="target-3"
+                                        value="THIET-KE-DO-HOA">
+                                    <label class="form-check-label" for="target-3">Thiết kế đồ
+                                        họa</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="target-4" value="MONG-NHE">
+                                    <label class="form-check-label" for="target-4">Mỏng nhẹ</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="target-5" value="DOANH-NHAN">
+                                    <label class="form-check-label" for="target-5">Doanh nhân</label>
+                                </div>
+
+
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-2"><b>Mức giá</b></div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="price-2" value="duoi-10-trieu">
+                                    <label class="form-check-label" for="price-2">Dưới 10 triệu</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="price-3" value="10-15-trieu">
+                                    <label class="form-check-label" for="price-3">Từ 10 - 15
+                                        triệu</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="price-4" value="15-20-trieu">
+                                    <label class="form-check-label" for="price-4">Từ 15 - 20
+                                        triệu</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" id="price-5" value="tren-20-triệu">
+                                    <label class="form-check-label" for="price-5">Trên 20 triệu</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-2"><b>Sắp xếp</b></div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="sort-1" value="gia-tang-dan"
+                                        name="radio-sort">
+                                    <label class="form-check-label" for="sort-1">Giá tăng dần</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="sort-2" value="gia-giam-dan"
+                                        name="radio-sort">
+                                    <label class="form-check-label" for="sort-2">Giá giảm dần</label>
+                                </div>
+
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="sort-3" value="gia-nothing"
+                                        name="radio-sort">
+                                    <label class="form-check-label" for="sort-3">Không sắp xếp</label>
+                                </div>
+
+                            </div>
+                            <div class="col-12">
+                                <button
+                                    class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4">
+                                    Lọc Sản Phẩm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-8 text-center">
+                        <div class="row g-4">
+                            <% products.forEach( function (product) { %>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="rounded position-relative fruite-item">
+                                        <div class="fruite-img">
+                                            <img src="/images/product/<%=product.image %>"
+                                                class="img-fluid w-100 rounded-top" alt="">
+                                        </div>
+                                        <div class="text-white bg-secondary px-3 py-1 rounded position-absolute"
+                                            style="top: 10px; left: 10px;">Laptop</div>
+                                        <div class="p-4 border border-secondary border-top-0 rounded-bottom">
+                                            <h4 style="font-size: 15px;">
+                                                <a href="/product/<%= product.id %>">
+                                                    <%=product.name %>
+                                                </a>
+                                            </h4>
+                                            <p style="font-size: 13px;">
+                                                <%=product.shortDesc %>
+                                            </p>
+                                            <div class="d-flex flex-lg-wrap justify-content-center">
+                                                <p style="font-size: 15px; text-align: center; width: 100%;"
+                                                    class="text-dark fs-5 fw-bold mb-3">
+                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                        currency: 'VND' }).format(product.price) %>
+                                                </p>
+                                                <form method="post" action="/add-product-to-cart/<%= product.id %>">
+                                                    <button
+                                                        class="mx-auto btn border border-secondary rounded-pill px-3 text-primary">
+                                                        <i class="fa fa-shopping-bag me-2 text-primary"></i>
+                                                        Add to cart
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+
+                                    <div class="pagination d-flex justify-content-center mt-5">
+                                        <li class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
+                                            <a class="page-link" href="/products?page=<%= page - 1  %>"
+                                                aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                        <% for(var i=1; i <=totalPages; i++) {%>
+                                            <li class="page-item">
+                                                <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
+                                                    href="/products?page=<%= i  %>">
+                                                    <%= i %>
+                                                </a>
+                                            </li>
+                                            <% } %>
+                                                <li
+                                                    class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
+                                                    <a class="page-link" href="/products?page=<%= page + 1  %>"
+                                                        aria-label="Next">
+                                                        <span aria-hidden="true">&raquo;</span>
+                                                    </a>
+                                                </li>
+                                    </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Single Product End -->
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+        <div class="container py-5">
+            <div class="pb-4 mb-4" style="border-bottom: 1px solid rgba(226, 175, 24, 0.5) ;">
+                <div class="row g-4">
+                    <div class="col-lg-3">
+                        <a href="#">
+                            <h1 class="text-primary mb-0">LaptopShop-VH</h1>
+                        </a>
+                    </div>
+
+
+                </div>
+            </div>
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Chất lượng là ưu tiên hàng đầu</h4>
+
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex flex-column text-start footer-item">
+                        <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
+                        <a class="btn-link" href="">Về chúng tôi</a>
+                        <!-- <a class="btn-link" href="">Contact Us</a>
+                    <a class="btn-link" href="">Privacy Policy</a>
+                    <a class="btn-link" href="">Terms & Condition</a>
+                    <a class="btn-link" href="">Return Policy</a>
+                    <a class="btn-link" href="">FAQs & Help</a> -->
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex flex-column text-start footer-item">
+                        <h4 class="text-light mb-3">Tài khoản</h4>
+                        <a class="btn-link" href="">Tài khoản của tôi</a>
+                        <!-- <a class="btn-link" href="">Shop details</a>
+                    <a class="btn-link" href="">Shopping Cart</a>
+                    <a class="btn-link" href="">Wishlist</a>
+                    <a class="btn-link" href="">Order History</a>
+                    <a class="btn-link" href="">International Orders</a> -->
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="footer-item">
+                        <h4 class="text-light mb-3">Liên hệ</h4>
+                        <p>Địa chỉ: 99 ABC, Thống nhất , Gò vấp</p>
+                        <p>Email: vuonghuynhitk3@gmail.com</p>
+                        <p>Điện thoại: 0999 887 744</p>
+                        <p>Thời gian làm việc</p>
+                        <p>Cả Tuần (8:00 - 20:00)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid copyright bg-dark py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <span class="text-light"><a href="#"><i
+                                class="fas fa-copyright text-light me-2"></i>VuongHuynh-LaptopShop</a>, All right
+                        reserved.</span>
+                </div>
+                <div class="col-md-6 my-auto text-center text-md-end text-white">
+                    <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
+                    <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
+                    <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
+                    Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a>
+                    Distributed
+                    By
+                    <a class="border-bottom" href="https://themewagon.com">ThemeWagon</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+            class="fa fa-arrow-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/client/lib/easing/easing.min.js"></script>
+    <script src="/client/lib/waypoints/waypoints.min.js"></script>
+    <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+    <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="/client/js/main.js"></script>
+</body>
+
+</html>

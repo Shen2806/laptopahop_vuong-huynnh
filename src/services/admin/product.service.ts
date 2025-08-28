@@ -1,33 +1,5 @@
-// import { prisma } from "config/client";
-
-
-// const createProduct = async (data: {
-//     name: string;
-//     price: number;
-//     detailDesc: string;
-//     shortDesc: string;
-//     quantity: number;
-//     factory: string;
-//     target: string;
-//     imageUpload?: string;
-// }) => {
-//     const { name, price, detailDesc, shortDesc, factory, quantity, target, imageUpload } = data;
-//     return await prisma.product.create({
-//         data: {
-//             name,
-//             price,
-//             detailDesc,
-//             shortDesc,
-//             quantity,
-//             factory,
-//             target,
-//             ...(imageUpload && { image: imageUpload })  //nếu có image thì mới gán
-//         }
-//     });
-// }
-// export { createProduct };
-
 import { prisma } from "config/client";
+import { TOTAL_ITEM_PER_PAGE } from "config/constant";
 
 // Định nghĩa input cho hàm createProduct
 interface CreateProductInput {
@@ -66,8 +38,14 @@ const createProduct = async (data: CreateProductInput) => {
         },
     });
 };
-const getProductList = async () => {
-    return await prisma.product.findMany();
+const getProductList = async (page: number) => {
+    const pageSize = TOTAL_ITEM_PER_PAGE;
+    const skip = (page - 1) * pageSize;
+    const products = await prisma.product.findMany({
+        skip: skip,
+        take: pageSize
+    })
+    return products;
 }
 
 const deleteProductById = async (id: number) => {
