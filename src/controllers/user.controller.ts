@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { countTotalProductClientPages, getProducts } from 'services/client/item.service';
-import { userFilter } from 'services/client/product.filter';
+import { getSortIncProduct, userFilter } from 'services/client/product.filter';
 import { getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById } from 'services/user.service';
 
 const getHomePage = async (req: Request, res: Response) => {
@@ -83,8 +83,18 @@ const getProductFilterPage = async (req: Request, res: Response) => {
     // });
     const { username } = req.query;
     const users = await userFilter(username as string)
-    return res.status(200).json({
-        data: users
+
+    const { minPrice, maxPrice, factory, price, sort } = req.query
+
+    // const products = await getMinPrice(+minPrice);
+    // const products = await getMaxPrice(+maxPrice);
+    // const products = await getFactory(factory as string);
+    // const products = await getManyFactory((factory as string).split(","));
+    // const products = await getAboutPrice(10000000, 15000000);
+    // const products = await getRangePrice();
+    const products = await getSortIncProduct();
+    res.status(200).json({
+        data: products
     })
 }
 export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage };
