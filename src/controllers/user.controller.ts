@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { countTotalProductClientPages, getProducts } from 'services/client/item.service';
-import { getSortIncProduct, userFilter } from 'services/client/product.filter';
+import { getProductWithFilter, getSortIncProduct, userFilter } from 'services/client/product.filter';
 import { getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById } from 'services/user.service';
 
 const getHomePage = async (req: Request, res: Response) => {
@@ -69,22 +69,31 @@ const postUpdateUser = async (req: Request, res: Response) => {
 };
 
 const getProductFilterPage = async (req: Request, res: Response) => {
-    const { page } = req.query;
+    const { page, factory = "", target = "", price = "", sort = "", } = req.query as {
+        page?: string,
+        factory: string,
+        target: string,
+        price: string,
+        sort: string
+    };
 
     let currentPage = page ? +page : 1;
     if (currentPage <= 0) currentPage = 1;
-    const totalPages = await countTotalProductClientPages(6);
+    // const totalPages = await countTotalProductClientPages(6);
     // const products = await getProducts(currentPage, 6);
-    // return res.render("product/filter.ejs", {
-    //     products,
-    //     totalPages: +totalPages,
-    //     page: +currentPage
+    const data = await getProductWithFilter(currentPage, 6, factory, target, price, sort)
+    return res.render("product/filter.ejs", {
+        products: data.products,
+        totalPages: +data.totalPages,
+        page: +currentPage
 
-    // });
-    const { username } = req.query;
-    const users = await userFilter(username as string)
+    });
 
-    const { minPrice, maxPrice, factory, price, sort } = req.query
+
+    // const { username } = req.query;
+    // const users = await userFilter(username as string)
+
+    // const { minPrice, maxPrice, factory, price, sort } = req.query
 
     // const products = await getMinPrice(+minPrice);
     // const products = await getMaxPrice(+maxPrice);
@@ -92,9 +101,9 @@ const getProductFilterPage = async (req: Request, res: Response) => {
     // const products = await getManyFactory((factory as string).split(","));
     // const products = await getAboutPrice(10000000, 15000000);
     // const products = await getRangePrice();
-    const products = await getSortIncProduct();
-    res.status(200).json({
-        data: products
-    })
+    // const products = await getSortIncProduct();
+    // res.status(200).json({
+    //     data: products
+    // })
 }
 export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage };

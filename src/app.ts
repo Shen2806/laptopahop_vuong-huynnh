@@ -8,6 +8,7 @@ import configPassportLocal from 'src/middleware/passport.local';
 import session from 'express-session';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
+import apiRoutes from './routes/api';
 const app = express();
 
 // Set up EJS as the view engine
@@ -49,6 +50,8 @@ const PORT = process.env.PORT || 8080;
 //configure web routes
 webRoutes(app);
 
+// api routes
+apiRoutes(app);
 // seeding data
 initDatabase()
 

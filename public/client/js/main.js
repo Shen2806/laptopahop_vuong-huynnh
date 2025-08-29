@@ -169,11 +169,13 @@
         const index = input.attr("data-cart-detail-index")
         const el = document.getElementById(`cartDetails[${index}]`);
         $(el).val(newVal);
+
         //set quantity for detail page
-        const elDetail = document.getElementById('quantityDetail');
-        if(elDetail){
-            $(elDetail).val(newVal)
+        const elDetail = document.getElementById(`quantityDetail`);
+        if (elDetail) {
+            $(elDetail).val(newVal);
         }
+
         //get price
         const price = input.attr("data-cart-detail-price");
         const id = input.attr("data-cart-detail-id");
@@ -215,6 +217,8 @@
             style: 'currency', currency: 'VND'
         }).format(value)
     }
+
+    //add active class to header
     const navElement = $("#navbarCollapse");
     const currentUrl = window.location.pathname;
     navElement.find('a.nav-link').each(function () {
@@ -228,4 +232,177 @@
         }
     });
 
+
+    //handle filter products
+    $('#btnFilter').click(function (event) {
+        event.preventDefault();
+
+        let factoryArr = [];
+        let targetArr = [];
+        let priceArr = [];
+        //factory filter
+        $("#factoryFilter .form-check-input:checked").each(function () {
+            factoryArr.push($(this).val());
+        });
+
+        //target filter
+        $("#targetFilter .form-check-input:checked").each(function () {
+            targetArr.push($(this).val());
+        });
+
+        //price filter
+        $("#priceFilter .form-check-input:checked").each(function () {
+            priceArr.push($(this).val());
+        });
+
+        //sort order
+        let sortValue = $('input[name="radio-sort"]:checked').val();
+
+        const currentUrl = new URL(window.location.href);
+        const searchParams = currentUrl.searchParams;
+
+        const currentPage = searchParams?.get("page") ?? "1"
+        // Add or update query parameters
+        searchParams.set('page', currentPage);
+        searchParams.set('sort', sortValue);
+
+        //reset
+        searchParams.delete('factory');
+        searchParams.delete('target');
+        searchParams.delete('price');
+
+        if (factoryArr.length > 0) {
+            searchParams.set('factory', factoryArr.join(','));
+        }
+
+        if (targetArr.length > 0) {
+            searchParams.set('target', targetArr.join(','));
+        }
+
+        if (priceArr.length > 0) {
+            searchParams.set('price', priceArr.join(','));
+        }
+
+        // Update the URL and reload the page
+        window.location.href = currentUrl.toString();
+    });
+
+    //handle auto checkbox after page loading
+    // Parse the URL parameters
+    const params = new URLSearchParams(window.location.search);
+
+    // Set checkboxes for 'factory'
+    if (params.has('factory')) {
+        const factories = params.get('factory').split(',');
+        factories.forEach(factory => {
+            $(`#factoryFilter .form-check-input[value="${factory}"]`).prop('checked', true);
+        });
+    }
+
+    // Set checkboxes for 'target'
+    if (params.has('target')) {
+        const targets = params.get('target').split(',');
+        targets.forEach(target => {
+            $(`#targetFilter .form-check-input[value="${target}"]`).prop('checked', true);
+        });
+    }
+
+    // Set checkboxes for 'price'
+    if (params.has('price')) {
+        const prices = params.get('price').split(',');
+        prices.forEach(price => {
+            $(`#priceFilter .form-check-input[value="${price}"]`).prop('checked', true);
+        });
+    }
+
+    // Set radio buttons for 'sort'
+    if (params.has('sort')) {
+        const sort = params.get('sort');
+        $(`input[type="radio"][name="radio-sort"][value="${sort}"]`).prop('checked', true);
+    }
+
+
+    // handle add to cart wit ajax
+    $(".btnAddToCartHomePage").click(function(event){
+        event.preventDefault();
+
+        if(!isLogin()){
+            $.toast({
+                heading: "Lỗi thao tác !",
+                text: "Bạn cần đăng nhập vào tài khoản.",
+                position: "top-right",
+                icon: "error"
+            })
+            return;
+        }
+        const productId = $(this).attr('data-product-id');
+        $.ajax({
+            url: `${window.location.origin}/api/add-product-to-cart`,
+            type: "POST",
+            data: JSON.stringify({quantity: 1, productId: productId}),
+            contentType: "application/json",
+
+            success: function(response){
+                const sum = +response.data;
+
+                // update cart 
+                $("#sumCart").text(sum)
+                //show message
+                $.toast({
+                    heading: "Giỏ hàng",
+                    text: "Thêm sản phẩm vào giỏ hàng thành công !",
+                    position: "top-right",
+                })
+            }
+            
+        })
+    })
+    $(".btnAddToCartDetail").click(function(event){
+        event.preventDefault();
+
+        if(!isLogin()){
+            $.toast({
+                heading: "Lỗi thao tác !",
+                text: "Bạn cần đăng nhập vào tài khoản.",
+                position: "top-right",
+                icon: "error"
+            })
+            return;
+        }
+        const productId = $(this).attr('data-product-id');
+        const quantity = $("#quantityDetail").val()
+        $.ajax({
+            url: `${window.location.origin}/api/add-product-to-cart`,
+            type: "POST",
+            data: JSON.stringify({quantity: quantity, productId: productId}),
+            contentType: "application/json",
+
+            success: function(response){
+                const sum = +response.data;
+
+                // update cart 
+                $("#sumCart").text(sum)
+                //show message
+                $.toast({
+                     heading: "Giỏ hàng",
+                text: "Thêm sản phẩm vào giỏ hàng thành công !",
+                position: "top-right",
+                })
+            },
+            error: function (response){
+                alert("Có lỗi xảy ra , vui lòng kiểm tra lại code.")
+                console.log("error: ", response)
+            }
+            
+        })
+    })
+
+    function isLogin(){
+        const navElement = $("#navbarCollapse");
+        const childLogin = navElement.find('a.a-login');
+        if(childLogin.length > 0 ){
+            return false;
+        }
+        return true;
+    }
 })(jQuery);
