@@ -130,5 +130,6 @@ const updateUserById = async (
         throw error;
     }
 };
+
 export { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUserById, getAllRoles, hashPassword, comparePassword, countTotalUserPages, countTotalProductPages, countTotalOrderPages };
 

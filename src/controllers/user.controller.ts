@@ -1,3 +1,4 @@
+import { prisma } from 'config/client';
 import { Request, Response } from 'express';
 import { countTotalProductClientPages, getProducts } from 'services/client/item.service';
 import { getProductWithFilter, getSortIncProduct, userFilter } from 'services/client/product.filter';
@@ -106,4 +107,58 @@ const getProductFilterPage = async (req: Request, res: Response) => {
     //     data: products
     // })
 }
-export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage };
+const getRegisterPage = async (req: Request, res: Response) => {
+    return res.render("client/auth/register.ejs",
+        {
+            errors: [],
+            oldData: {}
+        }
+    );
+}
+// Hiển thị trang profile
+const updateProfilePage = async (req: Request, res: Response) => {
+    const userId = req.user?.id;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    // Lấy ra và xoá liền
+    const successMessage = req.session.successMessage || null;
+    req.session.successMessage = null; // ✅ xoá ngay để reload lại không hiện nữa
+
+    res.render("client/profiles/profile", {
+        user,
+        successMessage
+    });
+};
+
+// Xử lý cập nhật profile
+
+const handleUpdateProfile = async (req: Request, res: Response) => {
+    const userId = req.user?.id;
+    const { fullName, phone, address } = req.body;
+    let avatar = req.file ? req.file.filename : undefined;
+
+    try {
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                fullName,
+                phone,
+                address,
+                ...(avatar && { avatar })
+            }
+        });
+
+        // Lưu thông báo vào session
+        req.session.successMessage = "Cập nhật thông tin thành công!";
+
+        res.redirect("/profile");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Lỗi khi cập nhật thông tin.");
+    }
+};
+
+
+
+
+export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage, getRegisterPage, updateProfilePage, handleUpdateProfile };

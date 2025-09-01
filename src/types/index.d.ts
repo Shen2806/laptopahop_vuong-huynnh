@@ -1,5 +1,5 @@
 import { User as UserPrima, Role } from "@prisma/client";
-
+import "express-session";
 
 
 declare global {
@@ -8,5 +8,14 @@ declare global {
             role?: Role;
             sumCart?: number;
         }
+    }
+}
+
+
+
+
+declare module "express-session" {
+    interface SessionData {
+        successMessage?: string | null;
     }
 }

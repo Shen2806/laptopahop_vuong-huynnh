@@ -18,14 +18,7 @@ const getTermPage = async (req: Request, res: Response) => {
     });
 }
 
-const getRegisterPage = async (req: Request, res: Response) => {
-    return res.render("client/auth/register.ejs",
-        {
-            errors: [],
-            oldData: {}
-        }
-    );
-}
+
 
 const postRegister = async (req: Request, res: Response) => {
     const { fullName, email, password, confirmPassword } = req.body as TRegisterSchema;
@@ -63,4 +56,4 @@ const postLogout = async (req: Request, res: Response, next: NextFunction) => {
 
 
 
-export { getLoginPage, getRegisterPage, postRegister, getSuccessRedirectPage, postLogout, getTermPage };
+export { getLoginPage, postRegister, getSuccessRedirectPage, postLogout, getTermPage };

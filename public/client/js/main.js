@@ -405,4 +405,16 @@
         }
         return true;
     }
+    // Hiển thị thông báo cập nhật thành công
+$(document).ready(function () {
+    if (typeof window.successMessage !== "undefined" && window.successMessage) {
+        $.toast({
+            heading: "Thông báo",
+            text: window.successMessage,
+            position: "top-right",
+            icon: "success",
+            hideAfter: 3000
+        });
+    }
+});
 })(jQuery);

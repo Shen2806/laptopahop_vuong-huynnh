@@ -1,12 +1,13 @@
 import express, { Express, Request, Response } from 'express';
-import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser } from 'controllers/user.controller';
+import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile } from 'controllers/user.controller';
 import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
 import { getCartPage, getCheckOutPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
-import { getLoginPage, getRegisterPage, getSuccessRedirectPage, getTermPage, postLogout, postRegister } from 'controllers/client/auth.controller';
+import { getLoginPage, getSuccessRedirectPage, getTermPage, postLogout, postRegister } from 'controllers/client/auth.controller';
 import passport from 'passport';
 import { isAdmin, isLogin } from 'src/middleware/auth';
+import multer from 'multer';
 
 const router = express.Router();
 
@@ -25,6 +26,24 @@ const webRoutes = (app: Express) => {
     router.get("/register", getRegisterPage);
     router.post("/register", postRegister);
 
+    //cập nhật thông tin hồ sơ
+    const storage = multer.diskStorage({
+        destination: function (req, file, callback) {
+            callback(null, "public/images"); // thư mục lưu avatar
+        },
+        filename: function (req, file, callback) {
+            const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+            callback(null, uniqueSuffix + "-" + file.originalname);
+        }
+    });
+    const upload = multer({ storage: storage });
+    // GET profile page
+    router.get("/profile", updateProfilePage);
+
+    // POST update profile
+    router.post("/profile/update", upload.single("avatar"), handleUpdateProfile);
+
+    // Điều khoản chính sách
     router.get("/terms", getTermPage);
     // Them san pham vao gio hang
     router.post("/add-product-to-cart/:id", postAddProductToCart)

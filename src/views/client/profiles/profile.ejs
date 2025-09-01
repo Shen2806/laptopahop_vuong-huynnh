@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Thông tin cá nhân</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Google Fonts & Bootstrap  -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/client/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+
+    <!-- Navbar -->
+    <%- include('../layout/header'); -%>
+
+        <!-- Banner -->
+
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="card shadow p-4">
+                        <h2 class="mb-4 text-center text-success">Cập nhật thông tin</h2>
+
+                        <!-- Hiển thị flash message -->
+                        <% if (successMessage) { %>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <%= successMessage %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <% } %>
+
+                                <form action="/profile/update" method="POST" enctype="multipart/form-data">
+                                    <div class="mb-3 text-center">
+                                        <img id="avatarPreview"
+                                            src="<%= user.avatar ? '/images/' + user.avatar : 'https://via.placeholder.com/120x120?text=Avatar' %>"
+                                            class="rounded-circle border border-3 border-success shadow" width="120"
+                                            height="120">
+                                        <input type="file" id="avatar" name="avatar" class="form-control mt-3">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Họ và tên</label>
+                                        <input type="text" name="fullName" class="form-control"
+                                            value="<%= user.fullName %>" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Số điện thoại</label>
+                                        <input type="text" name="phone" class="form-control" value="<%= user.phone %>"
+                                            required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Địa chỉ</label>
+                                        <textarea name="address" class="form-control" rows="3"
+                                            required><%= user.address %></textarea>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-success btn-lg">Cập nhật</button>
+                                    </div>
+                                </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+        <!-- Footer -->
+        <%- include('../layout/footer'); -%>
+
+
+
+            <!-- JS -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/js/main.js"></script>
+
+            <script>
+                // Xem trước avatar mới chọn
+                document.getElementById("avatar").addEventListener("change", function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const preview = document.getElementById("avatarPreview");
+                        preview.src = URL.createObjectURL(file);
+                    }
+                });
+            </script>
+            <script>
+                window.successMessage = "<%= successMessage ? successMessage : '' %>";
+            </script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    // Lấy message từ server
+                    var successMessage = "<%= successMessage ? successMessage : '' %>";
+
+                    if (successMessage) {
+                        var toastEl = document.getElementById('liveToast');
+                        var toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+                        toast.show();
+                    }
+                });
+            </script>
+
+
+
+</body>
+
+</html>
