@@ -20,7 +20,8 @@ const postAddProductToCartAPI = async (req: Request, res: Response) => {
 }
 const getAllUsersAPI = async (req: Request, res: Response) => {
     const users = await handleGetAllUser()
-
+    const user = req.user;
+    console.log(user)
     res.status(200).json({
         data: users
     })
@@ -91,5 +92,18 @@ const loginAPI = async (req: Request, res: Response) => {
     }
 
 }
+const fetchAccountAPI = async (req: Request, res: Response) => {
+    const user = req.user;
 
-export { postAddProductToCartAPI, getAllUsersAPI, getUsersByIdAPI, createUserAPI, updateUserByIdAPI, deleteUserByIdAPI, loginAPI }
+    res.status(200).json({
+        data: {
+            user
+        }
+
+    })
+
+
+
+}
+
+export { postAddProductToCartAPI, getAllUsersAPI, getUsersByIdAPI, createUserAPI, updateUserByIdAPI, deleteUserByIdAPI, loginAPI, fetchAccountAPI }

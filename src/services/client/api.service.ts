@@ -27,7 +27,10 @@ const handleDeleteUserById = async (id: number) => {
 const handleUserLogin = async (username: string, password: string) => {
     // check user
     const user = await prisma.user.findUnique({
-        where: { username }
+        where: { username },
+        include: {
+            role: true
+        }
     })
     if (!user) {
         throw new Error(`Tài khoản ${username} không tìm thấy !`)
@@ -39,12 +42,17 @@ const handleUserLogin = async (username: string, password: string) => {
     }
     const payload = {
         id: user.id,
-        email: user.username,
-        roleId: user.roleId
+        username: user.username,
+        roleId: user.roleId,
+        role: user.role,
+        accountType: user.accountType,
+        avatar: user.avatar
     }
     const secret = process.env.JWT_TOKEN;
+    const expiresIn: any = process.env.JWT_EXPIRES_IN;
+
     const access_token = jwt.sign(payload, secret, {
-        expiresIn: "1d"
+        expiresIn: expiresIn
     })
     return access_token;
 }

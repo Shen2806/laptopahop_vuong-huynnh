@@ -1,10 +1,10 @@
-import express, { Express } from 'express';
+import express, { Express, Request, Response } from 'express';
 import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser } from 'controllers/user.controller';
 import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
 import { getCartPage, getCheckOutPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
-import { getLoginPage, getRegisterPage, getSuccessRedirectPage, postLogout, postRegister } from 'controllers/client/auth.controller';
+import { getLoginPage, getRegisterPage, getSuccessRedirectPage, getTermPage, postLogout, postRegister } from 'controllers/client/auth.controller';
 import passport from 'passport';
 import { isAdmin, isLogin } from 'src/middleware/auth';
 
@@ -25,6 +25,7 @@ const webRoutes = (app: Express) => {
     router.get("/register", getRegisterPage);
     router.post("/register", postRegister);
 
+    router.get("/terms", getTermPage);
     // Them san pham vao gio hang
     router.post("/add-product-to-cart/:id", postAddProductToCart)
     // Xoa san pham tu gio hang

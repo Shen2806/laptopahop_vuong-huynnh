@@ -10,6 +10,14 @@ const getLoginPage = async (req: Request, res: Response) => {
     });
 }
 
+const getTermPage = async (req: Request, res: Response) => {
+    const { session } = req as any;
+    const messages = session?.messages ?? [];
+    return res.render("client/terms/terms.ejs", {
+        messages
+    });
+}
+
 const getRegisterPage = async (req: Request, res: Response) => {
     return res.render("client/auth/register.ejs",
         {
@@ -54,4 +62,5 @@ const postLogout = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 
-export { getLoginPage, getRegisterPage, postRegister, getSuccessRedirectPage, postLogout };
+
+export { getLoginPage, getRegisterPage, postRegister, getSuccessRedirectPage, postLogout, getTermPage };
