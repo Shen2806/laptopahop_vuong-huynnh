@@ -34,6 +34,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css"
         integrity="sha512-wJgJNTBBkLit7ymC6vvzM1EcSWeM9mmOu+1USHaRBbHkm6W9EgM0HY27+UtUaprntaYQJF75rc8gjxllKs5OIQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        /* Trạng thái thu gọn */
+        #desc-wrapper.desc-collapsed {
+            max-height: 150px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Hiệu ứng mờ dưới */
+        #desc-wrapper.desc-collapsed::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to top, #fff, transparent);
+        }
+
+        /* Trạng thái mở rộng */
+        #desc-wrapper {
+            transition: max-height 0.3s ease;
+        }
+    </style>
 </head>
 
 <body>
@@ -119,7 +144,7 @@
                                         </div>
                                     </li>
 
-                                    <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
+                                    <li><a class="dropdown-item" href="#">Quản lý tài khoản</a></li>
 
                                     <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
                                     <li>
@@ -190,70 +215,104 @@
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <h4 class="fw-bold mb-3">
+                            <!-- Tên sản phẩm -->
+                            <h3 class="fw-bold mb-2">
                                 <%= product.name %>
-                            </h4>
-                            <p class="mb-3">
+                            </h3>
+                            <p class="text-muted mb-3">
                                 <%= product.shortDesc %>
                             </p>
-                            <h5 class="fw-bold mb-3">
-                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                    }).format(product.price) %>
-                            </h5>
-                            <div class="d-flex mb-4">
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                            </div>
 
-                            <div class="input-group quantity mb-5" style="width: 100px;">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
+                            <!-- Giá bán -->
+                            <% let discountPercents=16; let originalPriced=Math.round(product.price / (1 -
+                                discountPercents / 100)); %>
+
+                                <h2 class="text-danger fw-bold">
+                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                        }).format(product.price) %>
+                                </h2>
+                                <p class="text-muted">
+                                    <del>
+                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                            }).format(originalPriced) %>
+                                    </del>
+                                    <span class="text-success ms-2">(-<%= discountPercents %>%)</span>
+                                </p>
+
+
+                                <!-- Rating -->
+                                <div class="d-flex align-items-center mb-3">
+                                    <i class="fa fa-star text-warning"></i>
+                                    <i class="fa fa-star text-warning"></i>
+                                    <i class="fa fa-star text-warning"></i>
+                                    <i class="fa fa-star text-warning"></i>
+                                    <i class="fa fa-star text-secondary"></i>
+                                    <span class="ms-2 small text-muted">(128 đánh giá)</span>
                                 </div>
-                                <input type="text" class="form-control form-control-sm text-center border-0" value="1">
-                                <div class="input-group-btn">
-                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
+
+                                <!-- Số lượng -->
+                                <div class="d-flex align-items-center mb-4">
+                                    <span class="me-3 fw-bold">Số lượng:</span>
+                                    <div class="input-group quantity" style="width: 120px;">
+                                        <button class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                        <input type="text" class="form-control form-control-sm text-center border-0"
+                                            value="1">
+                                        <button class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <form method="post" action="/add-to-cart-from-detail-page/<%= product.id %>">
-                                <input value="1" style="display: none;" id="quantityDetail" name="quantity" />
-                                <button type="submit" data-product-id="<%=product.id%>"
-                                    class=" btnAddToCartDetail btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary"><i
-                                        class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ hàng</button>
-                            </form>
+
+                                <!-- Nút thêm giỏ -->
+                                <form method="post" action="/add-to-cart-from-detail-page/<%= product.id %>">
+                                    <input value="1" type="hidden" id="quantityDetail" name="quantity" />
+                                    <button type="submit" data-product-id="<%= product.id %>"
+                                        class="btnAddToCartDetail btn btn-primary rounded-pill px-4 py-2 mb-4">
+                                        <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ hàng
+                                    </button>
+                                </form>
 
                         </div>
+
                         <div class="col-lg-12">
                             <nav>
                                 <div class="nav nav-tabs mb-3">
                                     <button class="nav-link active border-white border-bottom-0" type="button"
                                         role="tab" id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about"
-                                        aria-controls="nav-about" aria-selected="true">Description</button>
-
+                                        aria-controls="nav-about" aria-selected="true">
+                                        Mô tả chi tiết
+                                    </button>
                                 </div>
                             </nav>
+
                             <div class="tab-content mb-5">
                                 <div class="tab-pane active" id="nav-about" role="tabpanel"
                                     aria-labelledby="nav-about-tab">
-                                    <p>
-                                        <%= product.detailDesc %>
-                                    </p>
 
+                                    <!-- Nội dung mô tả -->
+                                    <div id="desc-wrapper" class="desc-collapsed">
+                                        <p>
+                                            <%= product.detailDesc %>
+                                        </p>
 
+                                    </div>
+
+                                    <!-- Nút xem thêm -->
+                                    <div class="text-center mt-2">
+                                        <button type="button" id="toggle-desc" class="btn btn-outline-primary btn-sm">
+                                            Xem thêm
+                                        </button>
+                                    </div>
                                 </div>
-
                             </div>
                         </div>
 
                     </div>
                 </div>
-                <div class="col-lg-4 col-xl-3">
+                <!-- /Categories -->
+                <!-- <div class="col-lg-4 col-xl-3">
                     <div class="row g-4 fruite">
                         <div class="col-lg-12">
 
@@ -295,7 +354,59 @@
                         </div>
 
                     </div>
+                </div> -->
+                <div class="col-lg-4 col-xl-3">
+                    <div class="row g-4 fruite">
+                        <div class="col-lg-12">
+
+                            <div class="mb-4 p-3 border rounded shadow-sm" style="background: #fff;">
+                                <!-- Giá và thời gian -->
+                                <h5 class="text-danger fw-bold">🔥 Online Giá Rẻ Quá</h5>
+                                <% let discountPercent=16; let originalPrice=Math.round(product.price / (1 -
+                                    discountPercent / 100)); %>
+
+                                    <h2 class="text-danger fw-bold">
+                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                            }).format(product.price) %>
+                                    </h2>
+                                    <p class="text-muted">
+                                        <del>
+                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                }).format(originalPrice) %>
+                                        </del>
+                                        <span class="text-success ms-2">(-<%= discountPercent %>%)</span>
+                                    </p>
+
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="badge bg-warning text-dark">Kết thúc sau</span>
+                                        <span id="countdown" class="fw-bold text-danger">00:00:00</span>
+                                    </div>
+
+                                    <!-- Khuyến mãi -->
+                                    <div class="p-2 border rounded mb-3">
+                                        <h6 class="fw-bold">Khuyến mãi trị giá 2.190.000đ</h6>
+                                        <ul class="list-unstyled small">
+                                            <li>1. Chọn 1 trong các khuyến mãi:
+                                                <ul>
+                                                    <li>Giảm ngay 700.000đ</li>
+                                                    <li>Tặng Microsoft 365 Personal</li>
+                                                </ul>
+                                            </li>
+                                            <li>2. Tặng balo laptop cao cấp trị giá 500.000đ.</li>
+                                            <li>3. Tặng phiếu mua chuột hoặc bàn phím không dây trị giá 300.000đ.</li>
+                                            <li>4. Tặng phiếu mua màn hình rời trị giá 300.000đ.</li>
+                                            <li>5. Tặng phiếu mua tai nghe hoặc loa bluetooth trị giá 200.000đ.</li>
+                                            <li>6. Tặng gói vệ sinh & bảo dưỡng laptop miễn phí 1 năm.</li>
+                                        </ul>
+                                    </div>
+                                    </form>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
+
+
             </div>
 
         </div>
@@ -404,6 +515,78 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
         integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const desc = document.getElementById("desc-wrapper");
+            const btn = document.getElementById("toggle-desc");
+
+            btn.addEventListener("click", function () {
+                desc.classList.toggle("desc-collapsed");
+
+                if (desc.classList.contains("desc-collapsed")) {
+                    btn.innerText = "Xem thêm";
+                } else {
+                    btn.innerText = "Thu gọn";
+                }
+            });
+        });
+        // Cài đặt thời gian kết thúc (ví dụ: 14 tiếng sau kể từ khi load trang)
+        let endTime = new Date().getTime() + (14 * 60 * 60 * 1000);
+
+        function updateCountdown() {
+            let now = new Date().getTime();
+            let distance = endTime - now;
+
+            if (distance < 0) {
+                document.getElementById("countdown").innerHTML = "Hết hạn";
+                clearInterval(timer);
+                return;
+            }
+
+            // Tính giờ, phút, giây
+            let hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+            let minutes = Math.floor((distance / (1000 * 60)) % 60);
+            let seconds = Math.floor((distance / 1000) % 60);
+
+            // Format 2 chữ số
+            hours = hours.toString().padStart(2, '0');
+            minutes = minutes.toString().padStart(2, '0');
+            seconds = seconds.toString().padStart(2, '0');
+
+            document.getElementById("countdown").innerHTML = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Cập nhật mỗi giây
+        let timer = setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // khác
+        document.getElementById("cartForm").addEventListener("submit", function () {
+            let slotEl = document.getElementById("slots");
+            if (slotEl) {
+                let slots = parseInt(slotEl.textContent);
+                if (slots > 0) {
+                    slotEl.textContent = slots - 1; // Giảm 1 suất hiển thị
+                }
+            }
+        });
+
+        //Xem thêm
+        const desc = document.getElementById("description");
+        const toggleBtn = document.getElementById("toggleDesc");
+        let expanded = false;
+
+        toggleBtn.addEventListener("click", () => {
+            expanded = !expanded;
+            if (expanded) {
+                desc.style.maxHeight = "none"; // hiển thị full
+                toggleBtn.innerText = "Thu gọn";
+            } else {
+                desc.style.maxHeight = "150px"; // ẩn bớt
+                toggleBtn.innerText = "Xem thêm";
+            }
+        });
+    </script>
 </body>
 
 </html>
