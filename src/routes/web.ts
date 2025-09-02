@@ -4,7 +4,7 @@ import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdm
 import fileUploadMiddleware from 'src/middleware/multer';
 import { getCartPage, getCheckOutPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
-import { getLoginPage, getSuccessRedirectPage, getTermPage, postLogout, postRegister } from 'controllers/client/auth.controller';
+import { getAboutUsPage, getContactPage, getLoginPage, getPrivacyPage, getReturnPage, getSuccessRedirectPage, getSupportPage, getTermPage, getWarrantyPage, postLogout, postRegister } from 'controllers/client/auth.controller';
 import passport from 'passport';
 import { isAdmin, isLogin } from 'src/middleware/auth';
 import multer from 'multer';
@@ -43,8 +43,23 @@ const webRoutes = (app: Express) => {
     // POST update profile
     router.post("/profile/update", upload.single("avatar"), handleUpdateProfile);
 
-    // Điều khoản chính sách
+    // Chính sách sử dụng
     router.get("/terms", getTermPage);
+    // Chính sách bảo hành
+    router.get("/warranty", getWarrantyPage);
+    // Chính sách đổi trả
+    router.get("/return", getReturnPage);
+    // Chính sách bảo mật 
+    router.get("/privacy", getPrivacyPage);
+
+    // Liên hệ
+    router.get("/contact", getContactPage);
+
+    // Giới thiệu
+    router.get("/about", getAboutUsPage);
+    // Hỗ trợ
+    router.get("/support", getSupportPage);
+
     // Them san pham vao gio hang
     router.post("/add-product-to-cart/:id", postAddProductToCart)
     // Xoa san pham tu gio hang

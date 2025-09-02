@@ -59,7 +59,7 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Mô tả chi tiết </label>
-                                                <textarea name="detailDesc" class="form-control"
+                                                <textarea name="detailDesc" id="description" class="form-control"
                                                     rows="2"><%=product.detailDesc %></textarea>
                                             </div>
                                             <div class="row">
@@ -144,6 +144,20 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
             crossorigin="anonymous"></script>
         <script src="/admin/js/scripts.js"></script>
+        <script src="https://cdn.tiny.cloud/1/1dtzi1n2b488rghqj103opvbjkkyk3kvz7mmh0fm99xh95hq/tinymce/8/tinymce.min.js"
+            referrerpolicy="origin" crossorigin="anonymous"></script>
+        <script>
+            tinymce.init({
+                selector: '#description',   // textarea nào sẽ thành editor
+                plugins: 'lists link image table code',
+                toolbar: 'undo redo | bold italic underline | bullist numlist | link image | table | code',
+                menubar: false,             // ẩn menu bar trên cùng
+                height: 400,                // chỉnh chiều cao cho rộng rãi
+                branding: false,            // tắt logo TinyMCE
+                content_style: "body { font-family: Arial, sans-serif; font-size:14px; }"
+            });
+        </script>
+
 
 
 </body>

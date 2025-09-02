@@ -13,12 +13,52 @@ const getLoginPage = async (req: Request, res: Response) => {
 const getTermPage = async (req: Request, res: Response) => {
     const { session } = req as any;
     const messages = session?.messages ?? [];
-    return res.render("client/terms/terms.ejs", {
+    return res.render("client/policies/terms.ejs", {
         messages
     });
 }
-
-
+const getWarrantyPage = async (req: Request, res: Response) => {
+    const { session } = req as any;
+    const messages = session?.messages ?? [];
+    return res.render("client/policies/warranty.ejs", {
+        messages
+    });
+}
+const getReturnPage = async (req: Request, res: Response) => {
+    const { session } = req as any;
+    const messages = session?.messages ?? [];
+    return res.render("client/policies/return.ejs", {
+        messages
+    });
+}
+const getPrivacyPage = async (req: Request, res: Response) => {
+    const { session } = req as any;
+    const messages = session?.messages ?? [];
+    return res.render("client/policies/privacy.ejs", {
+        messages
+    });
+}
+const getContactPage = async (req: Request, res: Response) => {
+    const { session } = req as any;
+    const messages = session?.messages ?? [];
+    return res.render("client/contacts/contact.ejs", {
+        messages
+    });
+}
+const getAboutUsPage = async (req: Request, res: Response) => {
+    const { session } = req as any;
+    const messages = session?.messages ?? [];
+    return res.render("client/about/us.ejs", {
+        messages
+    });
+}
+const getSupportPage = async (req: Request, res: Response) => {
+    const { session } = req as any;
+    const messages = session?.messages ?? [];
+    return res.render("client/supports/support.ejs", {
+        messages
+    });
+}
 
 const postRegister = async (req: Request, res: Response) => {
     const { fullName, email, password, confirmPassword } = req.body as TRegisterSchema;
@@ -56,4 +96,4 @@ const postLogout = async (req: Request, res: Response, next: NextFunction) => {
 
 
 
-export { getLoginPage, postRegister, getSuccessRedirectPage, postLogout, getTermPage };
+export { getLoginPage, postRegister, getSuccessRedirectPage, postLogout, getTermPage, getWarrantyPage, getReturnPage, getPrivacyPage, getContactPage, getAboutUsPage, getSupportPage };
