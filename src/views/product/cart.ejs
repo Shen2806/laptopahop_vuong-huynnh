@@ -347,22 +347,14 @@
                     <div class="d-flex flex-column text-start footer-item">
                         <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
                         <a class="btn-link" href="">Về chúng tôi</a>
-                        <!-- <a class="btn-link" href="">Contact Us</a>
-                    <a class="btn-link" href="">Privacy Policy</a>
-                    <a class="btn-link" href="">Terms & Condition</a>
-                    <a class="btn-link" href="">Return Policy</a>
-                    <a class="btn-link" href="">FAQs & Help</a> -->
+
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="d-flex flex-column text-start footer-item">
                         <h4 class="text-light mb-3">Tài khoản</h4>
                         <a class="btn-link" href="">Tài khoản của tôi</a>
-                        <!-- <a class="btn-link" href="">Shop details</a>
-                    <a class="btn-link" href="">Shopping Cart</a>
-                    <a class="btn-link" href="">Wishlist</a>
-                    <a class="btn-link" href="">Order History</a>
-                    <a class="btn-link" href="">International Orders</a> -->
+
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -419,70 +411,7 @@
 
     <!-- Template Javascript -->
     <script src="/client/js/main.js"></script>
-    <!-- <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const formatCurrency = (value) =>
-                new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                }).format(value);
 
-            function updateCartTotal() {
-                let total = 0;
-                document.querySelectorAll("p[data-cart-detail-id]").forEach((p) => {
-                    const value = Number(
-                        p.getAttribute("data-line-total") || "0"
-                    );
-                    total += value;
-                });
-
-                document.querySelectorAll("[data-cart-total-price]").forEach((el) => {
-                    el.textContent = formatCurrency(total);
-                    el.setAttribute("data-cart-total-price", total);
-                });
-            }
-
-            document.querySelectorAll(".btn-plus, .btn-minus").forEach((btn) => {
-                btn.addEventListener("click", () => {
-                    const input = btn.closest(".quantity").querySelector("input");
-                    let qty = parseInt(input.value) || 0;
-                    const price = Number(input.dataset.cartDetailPrice);
-
-                    if (btn.classList.contains("btn-plus")) {
-                        qty++;
-                    } else if (btn.classList.contains("btn-minus") && qty > 1) {
-                        qty--;
-                    }
-
-                    input.value = qty;
-
-                    // Cập nhật tổng tiền từng dòng
-                    const lineTotalEl = document.querySelector(
-                        `p[data-cart-detail-id='${input.dataset.cartDetailId}']`
-                    );
-                    const lineTotal = price * qty;
-                    lineTotalEl.textContent = formatCurrency(lineTotal);
-                    lineTotalEl.setAttribute("data-line-total", lineTotal);
-
-                    // Cập nhật tổng giỏ hàng
-                    updateCartTotal();
-                });
-            });
-
-            // Khởi tạo tổng ban đầu
-            document.querySelectorAll("p[data-cart-detail-id]").forEach((p) => {
-                const id = p.dataset.cartDetailId;
-                const input = document.querySelector(
-                    `input[data-cart-detail-id='${id}']`
-                );
-                const price = Number(input.dataset.cartDetailPrice);
-                const qty = Number(input.value);
-                const lineTotal = price * qty;
-                p.setAttribute("data-line-total", lineTotal);
-            });
-            updateCartTotal();
-        });
-    </script> -->
 
 </body>
 

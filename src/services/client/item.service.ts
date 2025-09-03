@@ -96,22 +96,56 @@ const getProductInCart = async (userId: number) => {
     return [];
 }
 
+// const DeleteProductInCart = async (cartDetailId: number, userId: number, sumCart: number) => {
+//     // xoa cart detail
+//     const currentCartDetail = await prisma.cartDetail.delete({
+//         where: { id: cartDetailId }
+//     })
+//     const quantity = currentCartDetail.quantity;
+//     await prisma.cartDetail.delete({
+//         where: { id: cartDetailId }
+//     })
+//     if (sumCart === 1) {
+//         //xoa cart
+//         await prisma.cart.delete({
+//             where: { userId }
+//         })
+//     } else {
+//         // update cart
+//         await prisma.cart.update({
+//             where: { userId },
+//             data: {
+//                 sum: {
+//                     decrement: quantity
+//                 }
+//             }
+//         })
+//     }
+// }
 const DeleteProductInCart = async (cartDetailId: number, userId: number, sumCart: number) => {
-    // xoa cart detail
-    const currentCartDetail = await prisma.cartDetail.delete({
+    // Lấy cartDetail trước khi xóa
+    const currentCartDetail = await prisma.cartDetail.findUnique({
         where: { id: cartDetailId }
-    })
+    });
+
+    if (!currentCartDetail) {
+        throw new Error(`CartDetail with id ${cartDetailId} does not exist`);
+    }
+
     const quantity = currentCartDetail.quantity;
+
+    // Xóa cartDetail
     await prisma.cartDetail.delete({
         where: { id: cartDetailId }
-    })
+    });
+
     if (sumCart === 1) {
-        //xoa cart
+        // Xóa cart nếu chỉ còn 1 sản phẩm
         await prisma.cart.delete({
             where: { userId }
-        })
+        });
     } else {
-        // update cart
+        // Update cart sum
         await prisma.cart.update({
             where: { userId },
             data: {
@@ -119,9 +153,10 @@ const DeleteProductInCart = async (cartDetailId: number, userId: number, sumCart
                     decrement: quantity
                 }
             }
-        })
+        });
     }
 }
+
 
 const updateCartDetailBeforeCheckOut = async (data: { id: String, quantity: string }[], cartId: string) => {
     let quantity = 0;

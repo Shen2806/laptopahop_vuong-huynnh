@@ -185,11 +185,12 @@
                             <th scope="col">Giá</th>
                             <th scope="col">Số lượng</th>
                             <th scope="col">Tổng tiền</th>
+                            <th scope="col">Ngày đặt hàng</th>
                             <th scope="col">Trạng thái</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% if (orders?.length===0) {%>
+                        <!-- <% if (orders?.length===0) {%>
                             <tr>
                                 <td colspan="6">
                                     Không có đơn hàng nào được tạo !
@@ -251,8 +252,80 @@
                                             </td>
                                         </tr>
                                         <% }) %>
-                                            <% }) %>
+                                            <% }) %> -->
+                        <% if (orders?.length===0) { %>
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    Không có đơn hàng nào được tạo !
+                                </td>
+                            </tr>
+                            <% } else { %>
+                                <% orders.forEach(function (order) { %>
+                                    <!-- Hàng thông tin đơn -->
+                                    <tr class="table-light">
+                                        <td colspan="2"><strong>Order ID:</strong>
+                                            <%= order.id %>
+                                        </td>
+                                        <td colspan="2">
+                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                }).format(order.totalPrice) %>
+                                        </td>
+                                        <td colspan="1">
+                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                }).format(order.totalPrice) %>
+                                        </td>
+                                        <td colspan="1">
+                                            <%= new Date(order.createdAt).toLocaleDateString('vi-VN', { day: '2-digit' ,
+                                                month: '2-digit' , year: 'numeric' }) %>
+                                        </td>
+                                        <td colspan="1">
+                                            <% if(order.status==='PENDING' ) { %>
+                                                <span class="badge bg-warning text-dark fs-6 px-3 py-2">Đang chờ xác
+                                                    nhận</span>
+                                                <% } else if(order.status==='COMPLETE' ) { %>
+                                                    <span class="badge bg-success fs-6 px-3 py-2">Đã hoàn tất</span>
+                                                    <% } else if(order.status==='CANCELED' ) { %>
+                                                        <span class="badge bg-danger fs-6 px-3 py-2">Đã hủy</span>
+                                                        <% } else { %>
+                                                            <span class="badge bg-secondary">
+                                                                <%= order.status %>
+                                                            </span>
+                                                            <% } %>
+                                        </td>
 
+                                    </tr>
+
+                                    <!-- Hàng chi tiết sản phẩm -->
+                                    <% order.orderDetails.forEach(function (orderDetail) { %>
+                                        <tr>
+                                            <th scope="row">
+                                                <div class="d-flex align-items-center">
+                                                    <img src="/images/product/<%= orderDetail.product.image%>"
+                                                        class="img-fluid me-3 rounded-circle"
+                                                        style="width: 60px; height: 60px;" alt="">
+                                                </div>
+                                            </th>
+                                            <td>
+                                                <a target="_blank" href="/product/<%= orderDetail.product.id %>">
+                                                    <%= orderDetail.product.name %>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                    }).format(orderDetail.price) %>
+                                            </td>
+                                            <td>
+                                                <%= orderDetail.quantity %>
+                                            </td>
+                                            <td>
+                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                    }).format(orderDetail.price * orderDetail.quantity) %>
+                                            </td>
+                                            <td></td> <!-- cột trống vì status đã hiển thị ở trên -->
+                                        </tr>
+                                        <% }) %>
+                                            <% }) %>
+                                                <% } %>
 
                     </tbody>
                 </table>

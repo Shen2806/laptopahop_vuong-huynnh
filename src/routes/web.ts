@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile } from 'controllers/user.controller';
-import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage } from 'controllers/admin/dashboard.controller';
+import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage, postCancelOrder, postConfirmOrder } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
 import { getCartPage, getCheckOutPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
@@ -95,6 +95,9 @@ const webRoutes = (app: Express) => {
     router.post("/admin/update-product", fileUploadMiddleware("image", "images/product"), postUpdateProduct);
     router.get("/admin/order", getAdminOrderPage);
     router.get("/admin/order/:id", getAdminOrderDetailPage);
+    // xác nhận trạng thái đơn hàng
+    router.post("/admin/order/:id/confirm", postConfirmOrder);
+    router.post("/admin/order/:id/cancel", postCancelOrder);
     app.use("/", isAdmin, router);
 }
 

@@ -90,6 +90,27 @@ model CartDetail {
   @@map("cart_detail")
 }
 
+// model Order {
+//   id              Int    @id @default(autoincrement())
+//   totalPrice      Int
+//   receiverAddress String @db.VarChar(255)
+//   receiverName    String @db.VarChar(255)
+//   receiverPhone   String @db.VarChar(255)
+//   receiverNote    String @db.VarChar(255)
+//   status          String @default("PENDING") // PEDING, CANCELED, COMPLETE,
+
+//   paymentMethod String //COD, BANKING...
+//   paymentStatus String //PAYMENT_UNPAID, PAYMENT_SUCCED, PAYMENT_FAILED
+//   paymentRef    String?
+
+//   user   User @relation(fields: [userId], references: [id])
+//   userId Int
+
+//   orderDetails OrderDetail[]
+
+//   @@map("orders")
+// }
+
 model Order {
   id              Int    @id @default(autoincrement())
   totalPrice      Int
@@ -97,16 +118,19 @@ model Order {
   receiverName    String @db.VarChar(255)
   receiverPhone   String @db.VarChar(255)
   receiverNote    String @db.VarChar(255)
-  status          String @default("PENDING") // PEDING, CANCELED, COMPLETE,
+  status          String @default("PENDING") // PENDING, CANCELED, COMPLETE,
 
-  paymentMethod String //COD, BANKING...
-  paymentStatus String //PAYMENT_UNPAID, PAYMENT_SUCCED, PAYMENT_FAILED
+  paymentMethod String // COD, BANKING...
+  paymentStatus String // PAYMENT_UNPAID, PAYMENT_SUCCED, PAYMENT_FAILED
   paymentRef    String?
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
 
   orderDetails OrderDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@map("orders")
 }
