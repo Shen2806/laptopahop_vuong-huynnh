@@ -108,4 +108,43 @@ const postAddToCartFromDetailPage = async (req: Request, res: Response) => {
 
     return res.redirect(`/product/${id}`)
 }
-export { getProductPage, postAddProductToCart, getCartPage, postDeleteProductInCart, getCheckOutPage, postHandleCartToCheckOut, postPlaceOrder, getThanksPage, getOrderHistoryPage, postAddToCartFromDetailPage };
+
+
+// Xử lý hủy đơn
+const postCancelOrder = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const userId = req.user?.id; // lấy user từ session (passport)
+
+    try {
+        const order = await prisma.order.findUnique({ where: { id: +id } });
+        if (!order) {
+            return res.status(404).json({ message: "Đơn hàng không tồn tại" });
+        }
+
+        // check quyền: user chỉ hủy đơn của chính mình
+        if (order.userId !== userId) {
+            return res.status(403).json({ message: "Bạn không có quyền hủy đơn này" });
+        }
+
+        // chỉ cho phép hủy khi đang chờ xác nhận
+        if (order.status !== "PENDING") {
+            return res.status(400).json({ message: "Chỉ có thể hủy đơn đang chờ xác nhận" });
+        }
+
+        await prisma.order.update({
+            where: { id: +id },
+            data: {
+                status: "CANCELED",
+                receiverNote: reason,
+            },
+        });
+
+        return res.json({ success: true, message: "Hủy đơn hàng thành công" });
+    } catch (err) {
+        console.error("Cancel order error:", err);
+        return res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại" });
+    }
+};
+
+export { getProductPage, postAddProductToCart, getCartPage, postDeleteProductInCart, getCheckOutPage, postHandleCartToCheckOut, postPlaceOrder, getThanksPage, getOrderHistoryPage, postAddToCartFromDetailPage, postCancelOrder };

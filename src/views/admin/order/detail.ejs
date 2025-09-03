@@ -71,9 +71,10 @@
                         <%= order.id %>
                     </p>
                     <p><strong>Ngày đặt:</strong>
-                        <%= new Intl.DateTimeFormat('vi-VN', { dateStyle: 'full' , timeStyle: 'short'
-                            }).format(order.createdAt) %>
+                        <%= formattedCreatedAtVN %>
                     </p>
+
+
                     <p><strong>Trạng thái đơn:</strong>
                         <% if(order.status==='PENDING' ){ %>
                             <span class="badge bg-warning">Chờ xử lý</span>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hủy đơn hàng - LaptopShop</title>
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="p-5">
+    <div class="container">
+        <h3>Hủy đơn hàng #<%= order.id %>
+        </h3>
+        <p>Chọn lý do hủy đơn:</p>
+        <form action="/order-history/<%= order.id %>/cancel" method="post">
+            <div class="mb-3">
+                <select name="reason" class="form-select" required>
+                    <option value="">-- Chọn lý do --</option>
+                    <option value="Thay đổi quyết định">Thay đổi quyết định</option>
+                    <option value="Sản phẩm giao chậm">Sản phẩm giao chậm</option>
+                    <option value="Đặt nhầm sản phẩm">Đặt nhầm sản phẩm</option>
+                    <option value="Khác">Khác</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-danger">Hủy đơn</button>
+            <a href="/order-history" class="btn btn-secondary">Quay lại</a>
+        </form>
+    </div>
+</body>
+
+</html>

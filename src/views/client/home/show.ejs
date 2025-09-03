@@ -132,17 +132,24 @@
                                                                             }).format(product.price) %>
 
                                                                     </p>
-                                                                    <form method="post"
-                                                                        action="/add-product-to-cart/<%= product.id %>">
-                                                                        <button data-product-id="<%=product.id%>"
-                                                                            class="btnAddToCartHomePage mx-auto btn border border-secondary rounded-pill px-3 text-primary">
-                                                                            <i
-                                                                                class="fa fa-shopping-bag me-2 text-primary"></i>
-                                                                            Thêm vào giỏ hàng
-                                                                        </button>
-                                                                    </form>
+                                                                    <div
+                                                                        class="d-flex justify-content-between align-items-center mt-1">
+                                                                        <form method="post"
+                                                                            action="/add-product-to-cart/<%= product.id %>">
+                                                                            <button data-product-id="<%=product.id%>"
+                                                                                class="btnAddToCartHomePage mx-auto btn border border-secondary rounded-pill px-3 text-primary">
+                                                                                <i
+                                                                                    class="fa fa-shopping-bag me-2 text-primary"></i>
+                                                                                Thêm vào giỏ hàng
+                                                                            </button>
+                                                                        </form>
+                                                                        <span class="badge bg-primary ms-3">
+                                                                            Còn: <%= product.quantity %>
+                                                                        </span>
+                                                                    </div>
 
                                                                 </div>
+
                                                             </div>
                                                         </div>
                                                     </div>

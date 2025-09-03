@@ -190,69 +190,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- <% if (orders?.length===0) {%>
-                            <tr>
-                                <td colspan="6">
-                                    Không có đơn hàng nào được tạo !
-                                </td>
-                            </tr>
-                            <% } %>
-                                <% orders.forEach( function (order, index) { %>
-                                    <tr>
-                                        <td colspan="2">
-                                            Order ID = <%=order.id %>
-                                        </td>
-                                        <td colspan="2">
-                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                                }).format(order.totalPrice) %>
-                                        </td>
-                                        <td colspan="1">
-                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                                }).format(order.totalPrice) %>
-                                        </td>
-                                        <td colspan="1">
-                                            <%=order.status %>
-                                        </td>
-                                    </tr>
-                                    <% order.orderDetails.forEach( function (orderDetail, index) { %>
-                                        <tr>
-                                            <th scope="row">
-                                                <div class="d-flex align-items-center">
-                                                    <img src="/images/product/<%= orderDetail.product.image%>"
-                                                        class="img-fluid me-5 rounded-circle"
-                                                        style="width: 80px; height: 80px;" alt="">
-                                                </div>
-                                            </th>
-                                            <td>
-                                                <p class="mb-0 mt-4">
-                                                    <a target="_blank" href="/product/<%= orderDetail.product.id %>">
-                                                        <%= orderDetail.product.name%>
-                                                    </a>
-                                                </p>
-                                            </td>
-                                            <td>
-                                                <p class="mb-0 mt-4">
-                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                        currency: 'VND' }).format(orderDetail.price) %>
-                                                </p>
-                                            </td>
-                                            <td>
-                                                <div class="input-group quantity mt-4" style="width: 100px;">
-                                                    <input type="text"
-                                                        class="form-control form-control-sm text-center border-0"
-                                                        value="<%=orderDetail.quantity %>">
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <p class="mb-0 mt-4">
-                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                        currency: 'VND' }).format(orderDetail.price *
-                                                        orderDetail.quantity) %>
-                                                </p>
-                                            </td>
-                                        </tr>
-                                        <% }) %>
-                                            <% }) %> -->
                         <% if (orders?.length===0) { %>
                             <tr>
                                 <td colspan="6" class="text-center">
@@ -282,6 +219,9 @@
                                             <% if(order.status==='PENDING' ) { %>
                                                 <span class="badge bg-warning text-dark fs-6 px-3 py-2">Đang chờ xác
                                                     nhận</span>
+                                                <button type="button" class="btn btn-danger btn-sm ms-2 btn-cancel"
+                                                    data-order-id="<%= order.id %>" data-bs-toggle="modal"
+                                                    data-bs-target="#cancelOrderModal">Hủy đơn</button>
                                                 <% } else if(order.status==='COMPLETE' ) { %>
                                                     <span class="badge bg-success fs-6 px-3 py-2">Đã hoàn tất</span>
                                                     <% } else if(order.status==='CANCELED' ) { %>
@@ -327,6 +267,7 @@
                                             <% }) %>
                                                 <% } %>
 
+
                     </tbody>
                 </table>
             </div>
@@ -338,6 +279,36 @@
     </div>
     <!-- Cart Page End -->
 
+    <!-- Modal Hủy đơn hàng -->
+    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="cancelOrderForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cancelOrderLabel">Hủy đơn hàng</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="cancelOrderId">
+                        <div class="mb-3">
+                            <label for="cancelReason" class="form-label">Chọn lý do hủy:</label>
+                            <select class="form-select" id="cancelReason" required>
+                                <option value="">-- Chọn lý do --</option>
+                                <option value="Khách đổi ý">Khách đổi ý</option>
+                                <option value="Sản phẩm hết hàng">Sản phẩm hết hàng</option>
+                                <option value="Giao hàng lâu">Giao hàng lâu</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-danger">Hủy đơn</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
@@ -364,22 +335,14 @@
                     <div class="d-flex flex-column text-start footer-item">
                         <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
                         <a class="btn-link" href="">Về chúng tôi</a>
-                        <!-- <a class="btn-link" href="">Contact Us</a>
-                    <a class="btn-link" href="">Privacy Policy</a>
-                    <a class="btn-link" href="">Terms & Condition</a>
-                    <a class="btn-link" href="">Return Policy</a>
-                    <a class="btn-link" href="">FAQs & Help</a> -->
+
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="d-flex flex-column text-start footer-item">
                         <h4 class="text-light mb-3">Tài khoản</h4>
                         <a class="btn-link" href="">Tài khoản của tôi</a>
-                        <!-- <a class="btn-link" href="">Shop details</a>
-                    <a class="btn-link" href="">Shopping Cart</a>
-                    <a class="btn-link" href="">Wishlist</a>
-                    <a class="btn-link" href="">Order History</a>
-                    <a class="btn-link" href="">International Orders</a> -->
+
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -436,6 +399,101 @@
 
     <!-- Template Javascript -->
     <script src="/client/js/main.js"></script>
+    <!-- AJAX HỦY ĐƠN HÀNG -->
+    <script>
+        (function () {
+            // Elements
+            const modalEl = document.getElementById('cancelOrderModal');
+            const cancelForm = document.getElementById('cancelOrderForm');
+            const cancelIdInput = document.getElementById('cancelOrderId');
+            const cancelReason = document.getElementById('cancelReason');
+
+            // helper: escape HTML for title attribute
+            const escapeHtml = (str = '') => String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+
+            // Delegated click: set order id into hidden input when a cancel button is clicked
+            document.addEventListener('click', (e) => {
+                const btn = e.target.closest('.btn-cancel');
+                if (!btn) return;
+                const orderId = btn.dataset.orderId || btn.getAttribute('data-order-id');
+                if (!orderId) return;
+                // set id into modal hidden field and reset reason selection
+                if (cancelIdInput) cancelIdInput.value = orderId;
+                if (cancelReason) cancelReason.selectedIndex = 0;
+            });
+
+            if (!cancelForm) return; // nothing to do
+
+            cancelForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const orderId = (cancelIdInput && cancelIdInput.value) ? cancelIdInput.value.trim() : '';
+                const reason = (cancelReason && cancelReason.value) ? cancelReason.value.trim() : '';
+
+                if (!orderId) {
+                    alert('Không xác định được mã đơn hàng. Vui lòng thử lại.');
+                    return;
+                }
+                if (!reason) {
+                    alert('Vui lòng chọn lý do hủy!');
+                    return;
+                }
+
+                const submitBtn = cancelForm.querySelector('button[type="submit"]');
+                if (submitBtn) submitBtn.disabled = true;
+
+                try {
+                    // NOTE: endpoint dùng /order-history/:id/cancel — đổi nếu server của bạn nhận ở route khác
+                    const res = await fetch(`/order-history/${encodeURIComponent(orderId)}/cancel`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ reason })
+                    });
+
+                    // parse JSON safely
+                    let data = {};
+                    try { data = await res.json(); } catch (err) { /* non-json response */ }
+
+                    if (res.ok && data && (data.success === true || data.message)) {
+                        // find the cancel button for this order and update its cell
+                        const btn = document.querySelector(`button.btn-cancel[data-order-id="${orderId}"]`);
+                        if (btn) {
+                            const cell = btn.closest('td') || btn.parentElement;
+                            if (cell) {
+                                // show badge, set title to reason so user can hover to see lý do
+                                const title = escapeHtml(reason);
+                                cell.innerHTML = `<span class="badge bg-danger fs-6 px-3 py-2" title="${title}">Đã hủy</span>`;
+                            }
+                        }
+
+                        // hide modal (use getOrCreateInstance to be safe)
+                        if (modalEl && typeof bootstrap !== 'undefined') {
+                            bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+                        }
+
+                        alert(data.message || 'Hủy đơn hàng thành công!');
+                    } else {
+                        // server returned error status
+                        const msg = (data && data.message) ? data.message : 'Có lỗi xảy ra!';
+                        alert(msg);
+                    }
+                } catch (err) {
+                    console.error('Cancel order error:', err);
+                    alert('Có lỗi xảy ra. Vui lòng kiểm tra console server.');
+                } finally {
+                    if (submitBtn) submitBtn.disabled = false;
+                }
+            });
+        })();
+    </script>
+
+
+
 
 
 </body>

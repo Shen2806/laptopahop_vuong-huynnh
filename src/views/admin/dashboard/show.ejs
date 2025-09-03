@@ -57,7 +57,137 @@
                                         </div>
                                     </div>
                                 </div>
+                                <!-- Thêm mục Tổng doanh thu -->
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card bg-warning text-white mb-4">
+                                        <div class="card-body">
+                                            Tổng doanh thu:
+                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                }).format(info?.totalRevenue ?? 0) %>
+                                        </div>
+                                        <div class="card-footer d-flex align-items-center justify-content-between">
+                                            <span class="small text-white">Chỉ tính đơn đã thanh toán</span>
+                                            <div class="small text-white"><i class="fas fa-money-bill-wave"></i></div>
+                                        </div>
+                                    </div>
+                                    <!-- Thêm bảng báo cáo bán chạy -->
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <i class="fas fa-chart-line me-1"></i>
+                                            Top sản phẩm bán chạy
+                                        </div>
+                                        <div class="card-body">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sản phẩm</th>
+                                                        <th>Số lượng đã bán</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% if(info?.topProducts?.length> 0) { %>
+                                                        <% info.topProducts.forEach(p=> { %>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= p.name %>
+                                                                </td>
+                                                                <td>
+                                                                    <%= p.quantitySold %>
+                                                                </td>
+                                                            </tr>
+                                                            <% }) %>
+                                                                <% } else { %>
+                                                                    <tr>
+                                                                        <td colspan="2">Chưa có dữ liệu bán hàng</td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- Bảng sản phẩm sắp hết hàng -->
+                                    <div class="card mb-4 mt-4">
+                                        <div class="card-header bg-danger text-white">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            Sản phẩm sắp hết hàng (dưới 10 sản phẩm)
+                                        </div>
+                                        <div class="card-body">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Sản phẩm</th>
+                                                        <th>Số lượng tồn</th>
+                                                        <th>Hành động</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% if(info?.lowStockProducts?.length> 0) { %>
+                                                        <% info.lowStockProducts.forEach(p=> { %>
+                                                            <tr>
+                                                                <td>
+                                                                    <%= p.name %>
+                                                                </td>
+                                                                <td class="text-danger fw-bold">
+                                                                    <%= p.quantity %>
+                                                                </td>
+                                                                <td>
+                                                                    <button class="btn btn-sm btn-success"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#restockModal"
+                                                                        data-product-id="<%= p.id %>"
+                                                                        data-product-name="<%= p.name %>">
+                                                                        Nhập thêm
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                            <% }) %>
+                                                                <% } else { %>
+                                                                    <tr>
+                                                                        <td colspan="3">Không có sản phẩm nào sắp hết
+                                                                            hàng</td>
+                                                                    </tr>
+                                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <!-- Modal nhập thêm hàng -->
+                                    <div class="modal fade" id="restockModal" tabindex="-1"
+                                        aria-labelledby="restockModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <form id="restockForm" method="post" action="/admin/product/restock">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="restockModalLabel">Nhập thêm hàng
+                                                        </h5>
+                                                        <button type="button" class="btn-close"
+                                                            data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="productId" id="restockProductId">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Sản phẩm</label>
+                                                            <input type="text" class="form-control"
+                                                                id="restockProductName" disabled>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Số lượng thêm</label>
+                                                            <input type="number" name="quantity" class="form-control"
+                                                                min="1" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Hủy</button>
+                                                        <button type="submit" class="btn btn-primary">Xác nhận</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
 
+
+                                </div>
                             </div>
 
                         </div>
@@ -75,6 +205,18 @@
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
             crossorigin="anonymous"></script>
         <script src="/admin/js/datatables-simple-demo.js"></script>
+        <script>
+            const restockModal = document.getElementById('restockModal');
+            restockModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const productId = button.getAttribute('data-product-id');
+                const productName = button.getAttribute('data-product-name');
+
+                document.getElementById('restockProductId').value = productId;
+                document.getElementById('restockProductName').value = productName;
+            });
+        </script>
+
 </body>
 
 </html>

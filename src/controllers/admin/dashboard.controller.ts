@@ -4,6 +4,7 @@ import { getDashBoardInfo } from 'services/admin/dashboard.service';
 import { getOrderAdmin, getOrderDetailAdmin } from 'services/admin/order.service';
 import { getProductList } from 'services/admin/product.service';
 import { countTotalOrderPages, countTotalProductPages, countTotalUserPages, getAllUsers } from 'services/user.service';
+import { format, toZonedTime } from 'date-fns-tz';
 
 const getDashboardPage = async (req: Request, res: Response) => {
     const info = await getDashBoardInfo();
@@ -40,28 +41,6 @@ const getAdminProductPage = async (req: Request, res: Response) => {
     });
 }
 
-// const getAdminOrderPage = async (req: Request, res: Response) => {
-//     const { page } = req.query;
-
-//     let currentPage = page ? +page : 1;
-//     if (currentPage <= 0) currentPage = 1;
-//     const orders = await getOrderAdmin(currentPage);
-//     const totalPages = await countTotalOrderPages();
-
-//     return res.render('admin/order/show.ejs', {
-//         orders,
-//         totalPages: +totalPages,
-//         page: +currentPage
-//     })
-// }
-// const getAdminOrderDetailPage = async (req: Request, res: Response) => {
-//     const { id } = req.params;
-//     const orderDetails = await getOrderDetailAdmin(+id)
-
-//     return res.render("admin/order/detail.ejs", {
-//         orderDetails, id
-//     })
-// }
 
 const getAdminOrderPage = async (req: Request, res: Response) => {
     const { page } = req.query;
@@ -80,35 +59,27 @@ const getAdminOrderPage = async (req: Request, res: Response) => {
 
 const getAdminOrderDetailPage = async (req: Request, res: Response) => {
     const { id } = req.params;
-    // const orderDetails = await getOrderDetailAdmin(+id);
-    // const order = await prisma.order.findUnique({
-    //     where: { id: +id },
-    //     include: { user: true }
-    // });
 
-    // return res.render("admin/order/detail.ejs", {
-    //     orderDetails,
-    //     order,
-    //     id
-    // });
     const order = await prisma.order.findUnique({
         where: { id: +id },
         include: {
             user: true,
-            orderDetails: {
-                include: { product: true }
-            }
+            orderDetails: { include: { product: true } }
         }
     });
 
-    if (!order) {
-        return res.status(404).send("Order not found");
-    }
+    if (!order) return res.status(404).send("Order not found");
+
+    // Chuyển sang giờ Việt Nam
+    const timeZone = 'Asia/Ho_Chi_Minh';
+    const orderCreatedAtVN = toZonedTime(order.createdAt, timeZone);
+    const formattedCreatedAtVN = format(orderCreatedAtVN, "dd/MM/yyyy HH:mm:ss", { timeZone });
 
     return res.render("admin/order/detail.ejs", {
         order,
         orderDetails: order.orderDetails,
-        id
+        id,
+        formattedCreatedAtVN
     });
 };
 
@@ -139,5 +110,21 @@ const postCancelOrder = async (req: Request, res: Response) => {
         return res.status(500).send("Lỗi hủy đơn");
     }
 };
+const postRestockProduct = async (req: Request, res: Response) => {
+    const { productId, quantity } = req.body;
+    const qty = parseInt(quantity, 10);
 
-export { getDashboardPage, getAdminUserPage, getAdminProductPage, getAdminOrderPage, getAdminOrderDetailPage, postConfirmOrder, postCancelOrder };
+    if (!productId || isNaN(qty) || qty <= 0) {
+        return res.status(400).send("Dữ liệu không hợp lệ");
+    }
+
+    await prisma.product.update({
+        where: { id: Number(productId) },
+        data: {
+            quantity: { increment: qty }
+        }
+    });
+
+    res.redirect("/admin"); // quay lại dashboard sau khi nhập thêm
+};
+export { getDashboardPage, getAdminUserPage, getAdminProductPage, getAdminOrderPage, getAdminOrderDetailPage, postConfirmOrder, postCancelOrder, postRestockProduct };

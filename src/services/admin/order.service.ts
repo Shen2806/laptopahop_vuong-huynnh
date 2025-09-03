@@ -3,13 +3,6 @@ import { TOTAL_ITEM_PER_PAGE } from "config/constant";
 
 const getOrderAdmin = async (page: number) => {
     const pageSize = TOTAL_ITEM_PER_PAGE;
-    // const skip = (page - 1) * pageSize;
-    // const orders = await prisma.order.findMany({
-    //     skip: skip,
-    //     take: pageSize,
-    //     include: { user: true }
-
-    // })
     const orders = await prisma.order.findMany({
         skip: (page - 1) * pageSize,
         take: pageSize,
