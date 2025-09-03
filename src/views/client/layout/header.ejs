@@ -1,3 +1,57 @@
+<style>
+    /* Style dropdown menu */
+    .navbar .dropdown-menu {
+        border-radius: 8px;
+        /* bo góc */
+        padding: 8px 0;
+        /* khoảng cách bên trong */
+        border: none;
+        /* bỏ viền */
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        /* đổ bóng nhẹ */
+        min-width: 220px;
+        /* độ rộng tối thiểu */
+    }
+
+    /* Style item trong dropdown */
+    .navbar .dropdown-menu .dropdown-item {
+        padding: 10px 18px;
+        color: #333;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+        border-radius: 6px;
+        /* bo góc item */
+    }
+
+    /* Hover item */
+    .navbar .dropdown-menu .dropdown-item:hover {
+        background-color: #8BC34A;
+        /* xanh lá nhạt */
+        color: #fff;
+        /* chữ trắng */
+    }
+
+    /* Dropdown mở khi hover */
+    .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0;
+        animation: fadeIn 0.3s ease-in-out;
+        /* hiệu ứng mượt */
+    }
+
+    /* Hiệu ứng fade */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
 <div class="container-fluid shadow" style="margin-top: 10px">
     <div class="container topbar bg-primary d-none d-lg-block">
         <div class="d-flex justify-content-between">
@@ -41,6 +95,21 @@
                 <div class="navbar-nav mx-auto">
                     <a href="/" class="nav-item nav-link active">Trang chủ</a>
                     <a href="/products" class="nav-item nav-link">Sản phẩm</a>
+                    <a href="/about" class="nav-item nav-link">Giới thiệu</a>
+                    <a href="/contact" class="nav-item nav-link">Liên hệ</a>
+                    <a href="/terms" class="nav-item nav-link active" hidden>Điều khoản</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Thông tin và chính sách
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="policyDropdown">
+                            <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
+                            <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
+                            <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
+                        </ul>
+                    </li>
+
                 </div>
 
                 <!-- Icon giỏ hàng & account nằm trong navbar-collapse -->
