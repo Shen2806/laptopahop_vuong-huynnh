@@ -97,19 +97,25 @@ const postConfirmOrder = async (req: Request, res: Response) => {
     }
 };
 
-const postCancelOrder = async (req: Request, res: Response) => {
+const postCancelOrderByAdmin = async (req: Request, res: Response) => {
     const { id } = req.params;
+    const { cancelReason } = req.body;
+
     try {
         await prisma.order.update({
             where: { id: +id },
-            data: { status: "CANCELED" }
+            data: {
+                status: "CANCELED",
+                cancelReason
+            }
         });
-        return res.redirect("/admin/order");
+        return res.redirect("/admin/order/" + id);
     } catch (err) {
         console.error(err);
         return res.status(500).send("Lỗi hủy đơn");
     }
 };
+
 const postRestockProduct = async (req: Request, res: Response) => {
     const { productId, quantity } = req.body;
     const qty = parseInt(quantity, 10);
@@ -127,4 +133,4 @@ const postRestockProduct = async (req: Request, res: Response) => {
 
     res.redirect("/admin"); // quay lại dashboard sau khi nhập thêm
 };
-export { getDashboardPage, getAdminUserPage, getAdminProductPage, getAdminOrderPage, getAdminOrderDetailPage, postConfirmOrder, postCancelOrder, postRestockProduct };
+export { getDashboardPage, getAdminUserPage, getAdminProductPage, getAdminOrderPage, getAdminOrderDetailPage, postConfirmOrder, postRestockProduct, postCancelOrderByAdmin };

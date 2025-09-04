@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
-import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile } from 'controllers/user.controller';
-import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage, postCancelOrder, postConfirmOrder, postRestockProduct } from 'controllers/admin/dashboard.controller';
+import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser } from 'controllers/user.controller';
+import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage, postCancelOrderByAdmin, postConfirmOrder, postRestockProduct } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
 import { getCartPage, getCheckOutPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
@@ -80,7 +80,7 @@ const webRoutes = (app: Express) => {
 
 
     // Xử lý hủy đơn với lý do
-    router.post("/order-history/:id/cancel", postCancelOrder);
+    router.post("/order-history/:id/cancel", postCancelOrderByUser);
     // them trang chi tiet tu gio hang
     router.post("/add-to-cart-from-detail-page/:id", postAddToCartFromDetailPage)
     // admin routes
@@ -105,7 +105,7 @@ const webRoutes = (app: Express) => {
     router.get("/admin/order/:id", getAdminOrderDetailPage);
     // xác nhận trạng thái đơn hàng
     router.post("/admin/order/:id/confirm", postConfirmOrder);
-    router.post("/admin/order/:id/cancel", postCancelOrder);
+    router.post("/admin/order/:id/cancel", postCancelOrderByAdmin);
     app.use("/", isAdmin, router);
     // routes cho client
     app.use("/", router);

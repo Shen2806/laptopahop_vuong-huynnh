@@ -131,7 +131,6 @@ const updateProfilePage = async (req: Request, res: Response) => {
 };
 
 // Xử lý cập nhật profile
-
 const handleUpdateProfile = async (req: Request, res: Response) => {
     const userId = req.user?.id;
     const { fullName, phone, address } = req.body;
@@ -157,8 +156,24 @@ const handleUpdateProfile = async (req: Request, res: Response) => {
         res.status(500).send("Lỗi khi cập nhật thông tin.");
     }
 };
+const postCancelOrderByUser = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { reason } = req.body; // lấy lý do từ fetch
+
+    try {
+        await prisma.order.update({
+            where: { id: +id },
+            data: {
+                status: "CANCELED",
+                cancelReason: reason || "Không có lý do"
+            }
+        });
+        return res.json({ success: true, message: "Hủy đơn hàng thành công!" });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: "Lỗi hủy đơn" });
+    }
+};
 
 
-
-
-export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage, getRegisterPage, updateProfilePage, handleUpdateProfile };
+export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser };

@@ -64,28 +64,20 @@
                                                 <td>
                                                     <div style="display: flex; gap: 10px;">
                                                         <form action="/admin/order/<%= order.id %>" method="get">
-                                                            <button type="submit" class="btn btn-warning">Xem chi tiết
-                                                            </button>
+                                                            <button type="submit" class="btn btn-warning">Xem chi
+                                                                tiết</button>
                                                         </form>
-                                                        <% if(order.status==='PENDING' ) { %>
-                                                            <form action="/admin/order/<%= order.id %>/confirm"
-                                                                method="post">
-                                                                <button type="submit" class="btn btn-success">Xác
-                                                                    nhận</button>
-                                                            </form>
-                                                            <form action="/admin/order/<%= order.id %>/cancel"
-                                                                method="post">
-                                                                <button type="submit"
-                                                                    class="btn btn-danger">Hủy</button>
-                                                            </form>
-                                                            <% } else if(order.status==='COMPLETE' ) { %>
-                                                                <span class="badge bg-success">Đã hoàn tất</span>
-                                                                <% } else if(order.status==='CANCELED' ) { %>
-                                                                    <span class="badge bg-danger">Đã hủy</span>
+
+                                                        <% if(order.status==='COMPLETE' ) { %>
+                                                            <span class="badge bg-success">Đã hoàn tất</span>
+                                                            <% } else if(order.status==='CANCELED' ) { %>
+                                                                <span class="badge bg-danger">Đã hủy</span>
+                                                                <% } else if(order.status==='PENDING' ) { %>
+                                                                    <span class="badge bg-warning">Chờ xử lý</span>
                                                                     <% } %>
                                                     </div>
-
                                                 </td>
+
                                             </tr>
                                             <% }) %>
                                     </tbody>

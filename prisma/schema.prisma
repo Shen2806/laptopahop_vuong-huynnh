@@ -124,6 +124,8 @@ model Order {
   paymentStatus String // PAYMENT_UNPAID, PAYMENT_SUCCED, PAYMENT_FAILED
   paymentRef    String?
 
+  cancelReason String? @db.VarChar(255)
+
   user   User @relation(fields: [userId], references: [id])
   userId Int
 

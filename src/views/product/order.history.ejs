@@ -177,8 +177,8 @@
                 </nav>
             </div>
             <div class="table-responsive">
-                <table class="table">
-                    <thead>
+                <table class="table align-middle">
+                    <thead class="table-light">
                         <tr>
                             <th scope="col">Sản phẩm</th>
                             <th scope="col">Tên</th>
@@ -187,13 +187,14 @@
                             <th scope="col">Tổng tiền</th>
                             <th scope="col">Ngày đặt hàng</th>
                             <th scope="col">Trạng thái</th>
+                            <th scope="col">Lý do hủy</th> <!-- Cột mới -->
                         </tr>
                     </thead>
                     <tbody>
-                        <% if (orders?.length===0) { %>
+                        <% if (!orders || orders.length===0) { %>
                             <tr>
-                                <td colspan="6" class="text-center">
-                                    Không có đơn hàng nào được tạo !
+                                <td colspan="8" class="text-center">
+                                    Không có đơn hàng nào được tạo!
                                 </td>
                             </tr>
                             <% } else { %>
@@ -225,14 +226,20 @@
                                                 <% } else if(order.status==='COMPLETE' ) { %>
                                                     <span class="badge bg-success fs-6 px-3 py-2">Đã hoàn tất</span>
                                                     <% } else if(order.status==='CANCELED' ) { %>
-                                                        <span class="badge bg-danger fs-6 px-3 py-2">Đã hủy</span>
+                                                        <span class="badge bg-danger fs-6 px-3 py-2"
+                                                            title="<%= order.cancelReason || '' %>">
+                                                            Đã hủy
+                                                        </span>
                                                         <% } else { %>
                                                             <span class="badge bg-secondary">
                                                                 <%= order.status %>
                                                             </span>
                                                             <% } %>
                                         </td>
-
+                                        <td colspan="1">
+                                            <%= order.status==='CANCELED' ? (order.cancelReason || 'Không có lý do' )
+                                                : '' %>
+                                        </td>
                                     </tr>
 
                                     <!-- Hàng chi tiết sản phẩm -->
@@ -240,7 +247,7 @@
                                         <tr>
                                             <th scope="row">
                                                 <div class="d-flex align-items-center">
-                                                    <img src="/images/product/<%= orderDetail.product.image%>"
+                                                    <img src="/images/product/<%= orderDetail.product.image %>"
                                                         class="img-fluid me-3 rounded-circle"
                                                         style="width: 60px; height: 60px;" alt="">
                                                 </div>
@@ -261,16 +268,17 @@
                                                 <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
                                                     }).format(orderDetail.price * orderDetail.quantity) %>
                                             </td>
-                                            <td></td> <!-- cột trống vì status đã hiển thị ở trên -->
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                         <% }) %>
                                             <% }) %>
                                                 <% } %>
-
-
                     </tbody>
                 </table>
             </div>
+
             <a href="/admin/order" class="btn btn-success mt-3">
                 Trở về
             </a>
@@ -294,8 +302,8 @@
                             <label for="cancelReason" class="form-label">Chọn lý do hủy:</label>
                             <select class="form-select" id="cancelReason" required>
                                 <option value="">-- Chọn lý do --</option>
-                                <option value="Khách đổi ý">Khách đổi ý</option>
-                                <option value="Sản phẩm hết hàng">Sản phẩm hết hàng</option>
+                                <option value="Đổi ý - không mua nữa">Đối ý - không mua nữa</option>
+                                <option value="Đặt nhầm">Đặt nhầm</option>
                                 <option value="Giao hàng lâu">Giao hàng lâu</option>
                                 <option value="Khác">Khác</option>
                             </select>
@@ -310,6 +318,19 @@
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <div id="notifyToast" class="toast align-items-center text-white bg-success border-0" role="alert"
+            aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body" id="notifyToastBody">
+                    Thông báo ở đây
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
         <div class="container py-5">
@@ -401,14 +422,43 @@
     <script src="/client/js/main.js"></script>
     <!-- AJAX HỦY ĐƠN HÀNG -->
     <script>
+        // Hàm toast đếm ngược
+        function showToastCountdown(message, isSuccess = true, seconds = 3) {
+            const toastEl = document.getElementById('notifyToast');
+            const toastBody = document.getElementById('notifyToastBody');
+
+            if (!toastEl || !toastBody) return;
+
+            toastEl.classList.remove('bg-success', 'bg-danger');
+            toastEl.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
+
+            let remaining = seconds;
+            toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
+
+            let toast = bootstrap.Toast.getInstance(toastEl);
+            if (!toast) {
+                toast = new bootstrap.Toast(toastEl, { autohide: false });
+            }
+
+            toast.show();
+
+            const interval = setInterval(() => {
+                remaining--;
+                if (remaining > 0) {
+                    toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
+                } else {
+                    clearInterval(interval);
+                    toast.hide();
+                }
+            }, 1000);
+        }
+
         (function () {
-            // Elements
             const modalEl = document.getElementById('cancelOrderModal');
             const cancelForm = document.getElementById('cancelOrderForm');
             const cancelIdInput = document.getElementById('cancelOrderId');
             const cancelReason = document.getElementById('cancelReason');
 
-            // helper: escape HTML for title attribute
             const escapeHtml = (str = '') => String(str)
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
@@ -416,18 +466,17 @@
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
 
-            // Delegated click: set order id into hidden input when a cancel button is clicked
+            // Gán orderId vào hidden input khi bấm nút hủy
             document.addEventListener('click', (e) => {
                 const btn = e.target.closest('.btn-cancel');
                 if (!btn) return;
                 const orderId = btn.dataset.orderId || btn.getAttribute('data-order-id');
                 if (!orderId) return;
-                // set id into modal hidden field and reset reason selection
                 if (cancelIdInput) cancelIdInput.value = orderId;
                 if (cancelReason) cancelReason.selectedIndex = 0;
             });
 
-            if (!cancelForm) return; // nothing to do
+            if (!cancelForm) return;
 
             cancelForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -436,11 +485,11 @@
                 const reason = (cancelReason && cancelReason.value) ? cancelReason.value.trim() : '';
 
                 if (!orderId) {
-                    alert('Không xác định được mã đơn hàng. Vui lòng thử lại.');
+                    showToastCountdown('Không xác định được mã đơn hàng. Vui lòng thử lại.', false, 3);
                     return;
                 }
                 if (!reason) {
-                    alert('Vui lòng chọn lý do hủy!');
+                    showToastCountdown('Vui lòng chọn lý do hủy!', false, 3);
                     return;
                 }
 
@@ -448,54 +497,47 @@
                 if (submitBtn) submitBtn.disabled = true;
 
                 try {
-                    // NOTE: endpoint dùng /order-history/:id/cancel — đổi nếu server của bạn nhận ở route khác
                     const res = await fetch(`/order-history/${encodeURIComponent(orderId)}/cancel`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ reason })
                     });
 
-                    // parse JSON safely
                     let data = {};
-                    try { data = await res.json(); } catch (err) { /* non-json response */ }
+                    try { data = await res.json(); } catch (err) { }
 
-                    if (res.ok && data && (data.success === true || data.message)) {
-                        // find the cancel button for this order and update its cell
+                    if (res.ok) {
+                        // Update UI
                         const btn = document.querySelector(`button.btn-cancel[data-order-id="${orderId}"]`);
                         if (btn) {
                             const cell = btn.closest('td') || btn.parentElement;
                             if (cell) {
-                                // show badge, set title to reason so user can hover to see lý do
                                 const title = escapeHtml(reason);
                                 cell.innerHTML = `<span class="badge bg-danger fs-6 px-3 py-2" title="${title}">Đã hủy</span>`;
                             }
                         }
 
-                        // hide modal (use getOrCreateInstance to be safe)
+                        // Đóng modal (Bootstrap 5.0)
                         if (modalEl && typeof bootstrap !== 'undefined') {
-                            bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+                            let modal = bootstrap.Modal.getInstance(modalEl);
+                            if (!modal) modal = new bootstrap.Modal(modalEl);
+                            modal.hide();
                         }
 
-                        alert(data.message || 'Hủy đơn hàng thành công!');
+                        showToastCountdown(data.message || 'Hủy đơn hàng thành công!', true, 4);
                     } else {
-                        // server returned error status
                         const msg = (data && data.message) ? data.message : 'Có lỗi xảy ra!';
-                        alert(msg);
+                        showToastCountdown(msg, false, 3);
                     }
                 } catch (err) {
                     console.error('Cancel order error:', err);
-                    alert('Có lỗi xảy ra. Vui lòng kiểm tra console server.');
+                    showToastCountdown('Có lỗi xảy ra. Vui lòng kiểm tra console server.', false, 4);
                 } finally {
                     if (submitBtn) submitBtn.disabled = false;
                 }
             });
         })();
     </script>
-
-
-
-
-
 </body>
 
 </html>
