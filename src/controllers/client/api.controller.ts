@@ -3,6 +3,7 @@ import { Response, Request } from "express";
 import { handleDeleteUserById, handleGetAllUser, handleGetUserById, handleUpdateUserById, handleUserLogin } from "services/client/api.service";
 import { RegisterSchema, TRegisterSchema } from "src/validation/register.shema";
 import { registerNewUser } from "services/client/auth.service";
+import getConnection from "config/database";
 
 const postAddProductToCartAPI = async (req: Request, res: Response) => {
     const { quantity, productId } = req.body;
@@ -101,9 +102,46 @@ const fetchAccountAPI = async (req: Request, res: Response) => {
         }
 
     })
-
-
-
 }
+
+ // đường dẫn tới file db.ts của bạn
+
+export const createReview = async (req: Request, res: Response) => {
+    const { product_id, rating, comment } = req.body;
+
+    try {
+        const conn = await getConnection();
+        await conn.execute(
+            'INSERT INTO product_reviews (product_id, rating, comment) VALUES (?, ?, ?)',
+            [product_id, rating, comment]
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Lỗi khi thêm đánh giá:', error);
+        res.status(500).json({ error: 'Lỗi server' });
+    }
+};
+
+export const getReviews = async (req: Request, res: Response) => {
+    const productId = req.params.productId;
+
+    try {
+        const conn = await getConnection();
+        const [rows]: any = await conn.execute(
+            'SELECT rating, comment FROM product_reviews WHERE product_id = ?',
+            [productId]
+        );
+
+        const avgRating =
+            rows.reduce((sum: number, r: any) => sum + r.rating, 0) / rows.length || 0;
+
+        res.json({ reviews: rows, avgRating, reviewCount: rows.length });
+    } catch (error) {
+        console.error('Lỗi khi lấy đánh giá:', error);
+        res.status(500).json({ error: 'Lỗi server' });
+    }
+};
+
+
 
 export { postAddProductToCartAPI, getAllUsersAPI, getUsersByIdAPI, createUserAPI, updateUserByIdAPI, deleteUserByIdAPI, loginAPI, fetchAccountAPI }

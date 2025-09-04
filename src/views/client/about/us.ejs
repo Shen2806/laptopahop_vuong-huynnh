@@ -24,11 +24,64 @@
         .about-section {
             line-height: 1.8;
         }
+
+        /* Style dropdown menu */
+        .navbar .dropdown-menu {
+            border-radius: 8px;
+            /* bo góc */
+            padding: 8px 0;
+            /* khoảng cách bên trong */
+            border: none;
+            /* bỏ viền */
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            /* đổ bóng nhẹ */
+            min-width: 220px;
+            /* độ rộng tối thiểu */
+        }
+
+        /* Style item trong dropdown */
+        .navbar .dropdown-menu .dropdown-item {
+            padding: 10px 18px;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            border-radius: 6px;
+            /* bo góc item */
+        }
+
+        /* Hover item */
+        .navbar .dropdown-menu .dropdown-item:hover {
+            background-color: #8BC34A;
+            /* xanh lá nhạt */
+            color: #fff;
+            /* chữ trắng */
+        }
+
+        /* Dropdown mở khi hover */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+            animation: fadeIn 0.3s ease-in-out;
+            /* hiệu ứng mượt */
+        }
+
+        /* Hiệu ứng fade */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
 <body>
-<!-- HEADER START -->
+    <!-- HEADER START -->
     <div class="container-fluid shadow" style="margin-top: 10px">
         <div class="container topbar bg-primary d-none d-lg-block">
             <div class="d-flex justify-content-between">
@@ -143,55 +196,55 @@
     </div>
     <!-- HEADER END -->
 
-        <div class="container my-4">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-3">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Giới thiệu</li>
-                </ol>
-            </nav>
+    <div class="container my-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Giới thiệu</li>
+            </ol>
+        </nav>
 
-            <div class="card">
-                <div class="card-body about-section">
-                    <h2 class="mb-4">Về thông tin của Shop
-                    </h2>
-                    <p>
-                        LaptopShop-VH là đơn vị chuyên cung cấp laptop chất lượng cao, đa dạng từ phân khúc phổ
-                        thông đến cao cấp,
-                        đáp ứng nhu cầu học tập, làm việc và giải trí của mọi khách hàng.
-                    </p>
+        <div class="card">
+            <div class="card-body about-section">
+                <h2 class="mb-4">Về thông tin của Shop
+                </h2>
+                <p>
+                    LaptopShop-VH là đơn vị chuyên cung cấp laptop chất lượng cao, đa dạng từ phân khúc phổ
+                    thông đến cao cấp,
+                    đáp ứng nhu cầu học tập, làm việc và giải trí của mọi khách hàng.
+                </p>
 
-                    <h5 class="mt-4">Sứ mệnh của chúng tôi</h5>
-                    <p>Mang đến cho khách hàng những sản phẩm chính hãng, giá cả hợp lý, cùng dịch vụ hậu mãi tận tâm.
-                    </p>
+                <h5 class="mt-4">Sứ mệnh của chúng tôi</h5>
+                <p>Mang đến cho khách hàng những sản phẩm chính hãng, giá cả hợp lý, cùng dịch vụ hậu mãi tận tâm.
+                </p>
 
-                    <h5 class="mt-4">Tại sao chọn chúng tôi?</h5>
-                    <ul>
-                        <li>Sản phẩm laptop chính hãng, nguồn gốc rõ ràng.</li>
-                        <li>Chính sách bảo hành, đổi trả minh bạch và nhanh chóng.</li>
-                        <li>Đội ngũ kỹ thuật viên chuyên nghiệp, hỗ trợ nhiệt tình.</li>
-                        <li>Giá cả cạnh tranh, nhiều ưu đãi hấp dẫn.</li>
-                    </ul>
+                <h5 class="mt-4">Tại sao chọn chúng tôi?</h5>
+                <ul>
+                    <li>Sản phẩm laptop chính hãng, nguồn gốc rõ ràng.</li>
+                    <li>Chính sách bảo hành, đổi trả minh bạch và nhanh chóng.</li>
+                    <li>Đội ngũ kỹ thuật viên chuyên nghiệp, hỗ trợ nhiệt tình.</li>
+                    <li>Giá cả cạnh tranh, nhiều ưu đãi hấp dẫn.</li>
+                </ul>
 
-                    <h5 class="mt-4">Thông tin liên hệ</h5>
-                    <ul class="list-unstyled contact-info">
-                        <li><i class="fas fa-map-marker-alt"></i> 99 ABC, Thống Nhất, Gò Vấp, TP.HCM</li>
-                        <li><i class="fas fa-phone"></i> 0999 887 744</li>
-                        <li><i class="fas fa-envelope"></i> support@laptopshop.vn</li>
-                    </ul>
-                </div>
+                <h5 class="mt-4">Thông tin liên hệ</h5>
+                <ul class="list-unstyled contact-info">
+                    <li><i class="fas fa-map-marker-alt"></i> 99 ABC, Thống Nhất, Gò Vấp, TP.HCM</li>
+                    <li><i class="fas fa-phone"></i> 0999 887 744</li>
+                    <li><i class="fas fa-envelope"></i> support@laptopshop.vn</li>
+                </ul>
             </div>
         </div>
+    </div>
 
-        <%- include('../layout/footer'); -%>
+    <%- include('../layout/footer'); -%>
 
-            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top">
-                <i class="fa fa-arrow-up"></i>
-            </a>
+        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top">
+            <i class="fa fa-arrow-up"></i>
+        </a>
 
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="/client/js/main.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/client/js/main.js"></script>
 </body>
 
 </html>
