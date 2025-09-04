@@ -51,6 +51,19 @@
             transform: translateY(0);
         }
     }
+
+    #searchResults {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    #searchResults li {
+        cursor: pointer;
+    }
+
+    #searchResults li:hover {
+        background-color: #f0f0f0;
+    }
 </style>
 <div class="container-fluid shadow" style="margin-top: 10px">
     <div class="container topbar bg-primary d-none d-lg-block">
@@ -101,7 +114,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            Thông tin và chính sách
+                            Chính sách
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="policyDropdown">
                             <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
@@ -109,6 +122,19 @@
                             <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
                         </ul>
                     </li>
+
+                    <!-- Thanh tìm kiếm -->
+                    <div class="search-container" style="position: relative; width: 300px;">
+                        <form action="/products/search" method="get" class="d-flex">
+                            <input name="q" class="form-control" type="search" placeholder="Tìm sản phẩm..."
+                                autocomplete="off">
+                            <button class="btn btn-outline-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+
+
 
                 </div>
 
@@ -164,3 +190,6 @@
         </nav>
     </div>
 </div>
+<script>
+    
+</script>

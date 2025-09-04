@@ -58,6 +58,32 @@
         #desc-wrapper {
             transition: max-height 0.3s ease;
         }
+
+        .rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .rating label:hover,
+        .rating label:hover~label,
+        .rating input:checked~label {
+            color: #ffc107;
+        }
     </style>
 </head>
 
@@ -114,7 +140,30 @@
                 <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
                     <div class="navbar-nav mx-auto">
                         <a href="/" class="nav-item nav-link active">Trang chủ</a>
-                        <a href="/products" class="nav-item nav-link">Sản phẩm</a>
+                        <a href="/products" class="nav-item nav-link active">Sản phẩm</a>
+                        <a href="/about" class="nav-item nav-link">Giới thiệu</a>
+                        <a href="/contact" class="nav-item nav-link">Liên hệ</a>
+                        <a href="/terms" class="nav-item nav-link " hidden>Điều khoản</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Chính sách
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="policyDropdown">
+                                <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
+                                <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
+                                <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Thanh tìm kiếm -->
+                        <form class="d-flex ms-3" action="/products" method="get">
+                            <input class="form-control me-2" type="search" name="q" placeholder="Tìm sản phẩm..."
+                                aria-label="Search" required>
+                            <button class="btn btn-outline-primary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
                     </div>
 
                     <!-- Icon giỏ hàng & account nằm trong navbar-collapse -->
@@ -307,6 +356,61 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Form đánh giá sản phẩm -->
+                        <div class="col-lg-12 mt-4">
+                            <h4 class="mb-3">Đánh giá sản phẩm</h4>
+
+                            <!-- Hiển thị trung bình rating -->
+                            <div class="d-flex align-items-center mb-3">
+                                <% let avgRating=product.avg_rating || 0; %>
+                                    <% for (let i=1; i <=5; i++) { %>
+                                        <% if (i <=Math.round(avgRating)) { %>
+                                            <i class="fa fa-star text-warning"></i>
+                                            <% } else { %>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <% } %>
+                                                    <% } %>
+                                                        <span class="ms-2 small text-muted">(<%= product.review_count ||
+                                                                0 %> đánh giá)</span>
+                            </div>
+
+                            <!-- Form gửi đánh giá -->
+                            <form id="reviewForm" class="mb-4">
+                                <div class="mb-2">
+                                    <label class="form-label">Chọn số sao:</label><br>
+                                    <div class="rating">
+                                        <input type="radio" name="rating" value="5" id="star5">
+                                        <label for="star5"><i class="fa fa-star"></i></label>
+
+                                        <input type="radio" name="rating" value="4" id="star4">
+                                        <label for="star4"><i class="fa fa-star"></i></label>
+
+                                        <input type="radio" name="rating" value="3" id="star3">
+                                        <label for="star3"><i class="fa fa-star"></i></label>
+
+                                        <input type="radio" name="rating" value="2" id="star2">
+                                        <label for="star2"><i class="fa fa-star"></i></label>
+
+                                        <input type="radio" name="rating" value="1" id="star1">
+                                        <label for="star1"><i class="fa fa-star"></i></label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label">Bình luận:</label>
+                                    <textarea name="comment" class="form-control" rows="3" required></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-sm">Gửi đánh giá</button>
+                            </form>
+
+                            <!-- Khu vực hiển thị đánh giá -->
+                            <div id="reviewsContainer">
+                                <!-- Đánh giá sẽ được hiển thị ở đây bằng JavaScript -->
+                            </div>
+                        </div>
+
 
                     </div>
                 </div>
@@ -528,31 +632,73 @@
         });
 
         //Xem thêm
-        const desc = document.getElementById("description");
-        const toggleBtn = document.getElementById("toggleDesc");
-        let expanded = false;
+        // const desc = document.getElementById("description");
+        // const toggleBtn = document.getElementById("toggleDesc");
+        // let expanded = false;
 
-        toggleBtn.addEventListener("click", () => {
-            expanded = !expanded;
-            if (expanded) {
-                desc.style.maxHeight = "none"; // hiển thị full
-                toggleBtn.innerText = "Thu gọn";
-            } else {
-                desc.style.maxHeight = "150px"; // ẩn bớt
-                toggleBtn.innerText = "Xem thêm";
+
+
+        //
+
+
+        document.getElementById('reviewForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const rating = document.querySelector('input[name="rating"]:checked')?.value;
+            const comment = document.querySelector('textarea[name="comment"]').value;
+            const productId = <%= product.id %>; // EJS sẽ render số ID thật ở đây
+
+            if (!rating || !comment) {
+                alert('Vui lòng chọn số sao và nhập bình luận!');
+                return;
+            }
+
+            try {
+                const res = await fetch('http://localhost:3000/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product_id: productId, rating, comment })
+                });
+
+                if (res.ok) {
+                    document.getElementById('reviewForm').reset();
+                    loadReviews(); // gọi lại để hiển thị đánh giá mới
+                } else {
+                    alert('Gửi đánh giá thất bại!');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Lỗi kết nối tới server!');
             }
         });
+
+        async function loadReviews() {
+            const productId = <%= product.id %>; // EJS render ra số thật
+            try {
+                const res = await fetch(`http://localhost:3000/api/reviews/${productId}`);
+                const reviews = await res.json();
+
+                const container = document.getElementById('reviewsContainer');
+                container.innerHTML = reviews.map(r => `
+            <div class="border p-2 mb-2 rounded">
+                <div>${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+                <p>${r.comment}</p>
+                <small class="text-muted">${new Date(r.created_at).toLocaleString()}</small>
+            </div>
+        `).join('');
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<p class="text-danger">Không thể tải đánh giá.</p>';
+            }
+        }
+
+        // Gọi khi trang vừa load
+        loadReviews();
+
+
     </script>
     <script src="https://cdn.tiny.cloud/1/YOUR_API_KEY/tinymce/7/tinymce.min.js"></script>
-    <script>
-        tinymce.init({
-            selector: '#description',
-            plugins: 'lists link image code table',
-            toolbar: 'undo redo | bold italic underline | bullist numlist | link image | code',
-            menubar: false,
-            height: 400
-        });
-    </script>
+
 
 </body>
 

@@ -36,6 +36,7 @@ const webRoutes = (app: Express) => {
             callback(null, uniqueSuffix + "-" + file.originalname);
         }
     });
+    
     const upload = multer({ storage: storage });
     // GET profile page
     router.get("/profile", updateProfilePage);
