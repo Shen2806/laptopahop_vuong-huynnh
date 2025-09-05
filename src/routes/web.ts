@@ -8,6 +8,7 @@ import { getAboutUsPage, getContactPage, getLoginPage, getPrivacyPage, getReturn
 import passport from 'passport';
 import { isAdmin, isLogin } from 'src/middleware/auth';
 import multer from 'multer';
+import { prisma } from 'config/client';
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ const webRoutes = (app: Express) => {
             callback(null, uniqueSuffix + "-" + file.originalname);
         }
     });
-    
+
     const upload = multer({ storage: storage });
     // GET profile page
     router.get("/profile", updateProfilePage);
@@ -60,6 +61,9 @@ const webRoutes = (app: Express) => {
     router.get("/about", getAboutUsPage);
     // Hỗ trợ
     router.get("/support", getSupportPage);
+
+
+
 
     // Them san pham vao gio hang
     router.post("/add-product-to-cart/:id", postAddProductToCart)
