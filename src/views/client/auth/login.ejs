@@ -6,10 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login - LaptopShop</title>
 
+    <!-- Custom CSS -->
+    <link href="/admin/css/styles.css" rel="stylesheet" />
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Thêm vào <head> -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 
 
     <!-- Custom CSS -->
@@ -93,10 +98,10 @@
             margin-bottom: 20px;
         }
 
-        .login-right div h3 p{
+        .login-right div h3 p {
             margin-bottom: 20px;
             font-weight: 800;
-            
+
         }
 
         .btn-primary {
@@ -132,46 +137,56 @@
                 </div>
                 <ul>
                     <li><i class="fa-solid fa-gift text-primary"></i><span> Chiết khấu <b>5%</b> khi mua sản phẩm tại
-                        LaptopShop</span></li>
-                    <li><i class="fa-solid fa-truck-fast text-success"></i><span> Miễn phí giao hàng cho đơn hàng từ <b>300.000đ</b></span>
+                            LaptopShop</span></li>
+                    <li><i class="fa-solid fa-truck-fast text-success"></i><span> Miễn phí giao hàng cho đơn hàng từ
+                            <b>300.000đ</b></span>
                     </li>
-                    <li><i class="fa-solid fa-ticket text-danger"></i> <span>Tặng <b>voucher 500.000đ</b> cho khách hàng thành
-                        viên </span></li>
+                    <li><i class="fa-solid fa-ticket text-danger"></i> <span>Tặng <b>voucher 500.000đ</b> cho khách hàng
+                            thành
+                            viên </span></li>
                     <li><i class="fa-solid fa-graduation-cap text-warning"></i><span> Ưu đãi thêm <b>10%</b> cho
-                        S-Student/S-Teacher</span></li>
+                            S-Student/S-Teacher</span></li>
                 </ul>
 
                 <a href="/register" class="small text-primary">Xem chi tiết chính sách ưu đãi SMEMBER ></a>
             </div>
 
             <!-- Form đăng nhập bên phải -->
-            <div class="login-right">
+            <div class="login-right card-body">
                 <div style="">
                     <h3 style="color: red;">Đăng Nhập <p>SMEMBER</p>
                     </h3>
                 </div>
-                <form method="POST" action="/login">
-                    <div class="form-floating mb-3">
-                        <input name="username" class="form-control" id="inputEmail" type="email"
-                            placeholder="name@example.com" required />
-                        <label for="inputEmail">Email</label>
+
+                <% messages.forEach( function (error) { %>
+                    <div class="alert alert-danger mb-3">
+                        <%= error %>
                     </div>
-                    <div class="form-floating mb-3">
-                        <input name="password" class="form-control" id="inputPassword" type="password"
-                            placeholder="Password" required />
-                        <label for="inputPassword">Mật Khẩu</label>
-                    </div>
-                    <button class="btn btn-primary w-100 py-2">Đăng nhập</button>
-                </form>
-                <div class="text-center mt-3">
-                    <small>Bạn chưa có tài khoản? <a href="/register">Đăng ký</a></small>
-                </div>
+                    <% }) %>
+                        <form method="POST" action="/login">
+                            <div class="form-floating mb-3">
+                                <input name="username" class="form-control" id="inputEmail" type="email"
+                                    placeholder="name@example.com" required />
+                                <label for="inputEmail">Email</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input name="password" class="form-control" id="inputPassword" type="password"
+                                    placeholder="Password" required />
+                                <label for="inputPassword">Mật Khẩu</label>
+                            </div>
+                            <button class="btn btn-primary w-100 py-2">Đăng nhập</button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <small>Bạn chưa có tài khoản? <a href="/register">Đăng ký</a></small>
+                        </div>
             </div>
         </div>
     </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/admin/js/scripts.js"></script>
+
 </body>
 
 </html>
