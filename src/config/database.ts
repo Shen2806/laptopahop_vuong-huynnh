@@ -1,9 +1,6 @@
 // Get the client
 import mysql from 'mysql2/promise';
 
-
-
-
 const getConnection = async () => {
     // Create the connection to database
     const connection = await mysql.createConnection({
@@ -16,4 +13,6 @@ const getConnection = async () => {
     return connection;
 }
 
-export default getConnection;
+
+
+export default getConnection ;

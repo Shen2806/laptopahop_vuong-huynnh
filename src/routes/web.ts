@@ -37,6 +37,7 @@ const webRoutes = (app: Express) => {
             callback(null, uniqueSuffix + "-" + file.originalname);
         }
     });
+
     const upload = multer({ storage: storage });
     // GET profile page
     router.get("/profile", updateProfilePage);
@@ -61,19 +62,7 @@ const webRoutes = (app: Express) => {
     // Hỗ trợ
     router.get("/support", getSupportPage);
 
-    // Lấy tất cả notification chưa đọc
-    router.get("/api/notifications", isLogin, async (req: Request, res: Response) => {
-        try {
-            const notifications = await prisma.notification.findMany({
-                where: { userId: req.user.id, read: false },
-                orderBy: { createdAt: 'desc' }
-            });
-            res.json(notifications);
-        } catch (err) {
-            console.error(err);
-            res.status(500).json([]);
-        }
-    });
+
 
 
     // Them san pham vao gio hang

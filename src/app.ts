@@ -11,6 +11,7 @@ import { PrismaClient } from '@prisma/client';
 import apiRoutes from './routes/api';
 import cors from "cors"
 
+
 const app = express();
 
 
@@ -62,6 +63,7 @@ apiRoutes(app);
 // seeding data
 initDatabase()
 
+
 // handle 404 not found
 app.use((req, res) => {
     res.render("status/404.ejs");
@@ -69,3 +71,7 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`My app is running on port : ${PORT}`);
 });
+
+
+
+
