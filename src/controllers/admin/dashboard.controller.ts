@@ -86,10 +86,19 @@ const getAdminOrderDetailPage = async (req: Request, res: Response) => {
 const postConfirmOrder = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
-        await prisma.order.update({
+        const order = await prisma.order.update({
             where: { id: +id },
             data: { status: "COMPLETE" }
         });
+
+        // Tạo notification cho user
+        await prisma.notification.create({
+            data: {
+                userId: order.userId,
+                message: `Đơn hàng #${order.id} của bạn đã được xác nhận`
+            }
+        });
+
         return res.redirect("/admin/order");
     } catch (err) {
         console.error(err);
@@ -102,19 +111,29 @@ const postCancelOrderByAdmin = async (req: Request, res: Response) => {
     const { cancelReason } = req.body;
 
     try {
-        await prisma.order.update({
+        const order = await prisma.order.update({
             where: { id: +id },
             data: {
                 status: "CANCELED",
                 cancelReason
             }
         });
+
+        // Tạo notification cho user
+        await prisma.notification.create({
+            data: {
+                userId: order.userId,
+                message: `Đơn hàng #${order.id} của bạn đã bị hủy. Lý do: ${cancelReason}`
+            }
+        });
+
         return res.redirect("/admin/order/" + id);
     } catch (err) {
         console.error(err);
         return res.status(500).send("Lỗi hủy đơn");
     }
 };
+
 
 const postRestockProduct = async (req: Request, res: Response) => {
     const { productId, quantity } = req.body;

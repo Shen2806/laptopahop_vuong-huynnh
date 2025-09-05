@@ -8,6 +8,7 @@ import { getAboutUsPage, getContactPage, getLoginPage, getPrivacyPage, getReturn
 import passport from 'passport';
 import { isAdmin, isLogin } from 'src/middleware/auth';
 import multer from 'multer';
+import { prisma } from 'config/client';
 
 const router = express.Router();
 
@@ -59,6 +60,21 @@ const webRoutes = (app: Express) => {
     router.get("/about", getAboutUsPage);
     // Hỗ trợ
     router.get("/support", getSupportPage);
+
+    // Lấy tất cả notification chưa đọc
+    router.get("/api/notifications", isLogin, async (req: Request, res: Response) => {
+        try {
+            const notifications = await prisma.notification.findMany({
+                where: { userId: req.user.id, read: false },
+                orderBy: { createdAt: 'desc' }
+            });
+            res.json(notifications);
+        } catch (err) {
+            console.error(err);
+            res.status(500).json([]);
+        }
+    });
+
 
     // Them san pham vao gio hang
     router.post("/add-product-to-cart/:id", postAddProductToCart)
