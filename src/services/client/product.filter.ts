@@ -178,4 +178,4 @@ const getProductWithFilter = async (page: number,
 }
 
 
-export { userFilter, getMinPrice, getMaxPrice, getFactory, getManyFactory, getAboutPrice, getRangePrice, getSortIncProduct, getProductWithFilter }; 
+export { userFilter, getMinPrice, getMaxPrice, getFactory, getManyFactory, getAboutPrice, getRangePrice, getSortIncProduct, getProductWithFilter, getSortDescProduct }; 

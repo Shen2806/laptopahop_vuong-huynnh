@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>Tin tức & Blog - LaptopShop</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="blog, tin tức, laptop" name="keywords">
+    <meta content="Tin tức & Blog mới nhất từ LaptopShop" name="description">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="/client/css/style.css" rel="stylesheet">
+
+    <style>
+        .blog-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .blog-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+
+        .blog-content {
+            padding: 15px;
+        }
+
+        .blog-content h4 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .blog-content h4 a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .blog-content h4 a:hover {
+            color: #0d6efd;
+        }
+
+        .blog-meta {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .blog-meta i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+
+    <!-- Navbar -->
+    <%- include('../layout/header'); -%>
+        <!-- Blog List Start -->
+        <div class="container my-5">
+            <h1 class="text-center mb-4"><i class="fas fa-newspaper"></i> Tin tức & Blog</h1>
+            <div class="row g-4">
+                <% blogs.forEach(blog=> { %>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="blog-card">
+                            <% if (blog.thumbnail) { %>
+                                <img src="<%= blog.thumbnail %>" alt="<%= blog.title %>">
+                                <% } else { %>
+                                    <img src="/images/default-blog.jpg" alt="No image">
+                                    <% } %>
+                                        <div class="blog-content">
+                                            <h4>
+                                                <a href="/blogs/<%= blog.slug %>">
+                                                    <%= blog.title %>
+                                                </a>
+                                            </h4>
+                                            <p class="blog-meta">
+                                                <i class="fas fa-user"></i>
+                                                <%= blog.author %> &nbsp; | &nbsp;
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                    <%= blog.createdAt.toLocaleDateString() %>
+                                            </p>
+                                            <p>
+                                                <%= blog.content.substring(0, 100) %>...
+                                            </p>
+                                            <a href="/blogs/<%= blog.slug %>"
+                                                class="btn btn-outline-primary btn-sm rounded-pill">
+                                                Đọc tiếp <i class="fas fa-arrow-right ms-1"></i>
+                                            </a>
+                                        </div>
+                        </div>
+                    </div>
+                    <% }) %>
+            </div>
+        </div>
+        <!-- Blog List End -->
+
+        <!-- Footer -->
+        <%- include('../layout/footer'); -%>
+
+            <!-- Back to Top -->
+            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top">
+                <i class="fa fa-arrow-up"></i>
+            </a>
+
+            <!-- JavaScript Libraries -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/lib/easing/easing.min.js"></script>
+            <script src="/client/lib/waypoints/waypoints.min.js"></script>
+            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+
+            <!-- Template Javascript -->
+            <script src="/client/js/main.js"></script>
+</body>
+
+</html>

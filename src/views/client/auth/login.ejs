@@ -1,192 +1,133 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Login - LaptopShop</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        crossorigin="anonymous">
 
     <!-- Custom CSS -->
     <link href="/admin/css/styles.css" rel="stylesheet" />
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Thêm vào <head> -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
     <!-- Font Awesome -->
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 
-
-    <!-- Custom CSS -->
     <style>
         body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            background: url("/images/logo/login.png") no-repeat center center fixed;
-            background-size: cover;
-            /* tự động scale full màn hình */
-            background-attachment: fixed;
-            /* giữ cố định khi scroll */
-        }
-
-
-
-        .login-wrapper {
+            background: linear-gradient(135deg, #0d1b2a, #1b263b, #415a77);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .login-card {
-            width: 100%;
-            max-width: 950px;
-            border-radius: 16px;
+        .card {
+            border-radius: 1rem;
             overflow: hidden;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            background: #fff;
-            display: flex;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
         }
 
-        .login-left {
-            flex: 1;
-            background: #f8f9fa;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .login-left h3 {
-            font-size: 30px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .login-left ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .login-left ul li {
-            margin-bottom: 14px;
-            font-size: 15px;
-            display: flex;
-            align-items: center;
-        }
-
-        .login-left ul li i {
-            margin-right: 8px;
-            /* tạo khoảng cách giữa icon và chữ */
-            font-size: 18px;
-            /* icon nhìn cân hơn với chữ */
-            vertical-align: middle;
-            /* căn giữa icon với chữ */
-        }
-
-        .login-right {
-            flex: 1;
-            padding: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .login-right h3 {
+        .card-header {
+            background: #1b263b;
+            color: #fff;
             text-align: center;
-            margin-bottom: 20px;
+            padding: 1.5rem;
         }
 
-        .login-right div h3 p {
-            margin-bottom: 20px;
-            font-weight: 800;
+        .card-header h3 {
+            font-weight: 700;
+            margin: 0;
+        }
 
+        .form-control {
+            border-radius: 0.6rem;
+            padding-left: 2.5rem;
+        }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 0.9rem;
+            transform: translateY(-50%);
+            color: #6c757d;
         }
 
         .btn-primary {
-            background-color: #0066ff;
-            border: none;
+            background-color: #0d6efd;
+            border-radius: 0.6rem;
+            font-weight: 600;
+            transition: 0.3s;
         }
 
         .btn-primary:hover {
-            background-color: #0052cc;
+            background-color: #084298;
         }
 
-        .logo-row {
-            display: flex;
-            align-items: center;
-            gap: 78px;
-            /* khoảng cách giữa ảnh */
+        .card-footer {
+            background: #f8f9fa;
+        }
+
+        .tech-icon {
+            font-size: 3rem;
+            color: #0d6efd;
         }
     </style>
 </head>
 
 <body>
-    <div class="login-wrapper" style="margin-right: 20px; padding-bottom: 100px">;
-        <div class="login-card">
-            <!-- Khối bên trái -->
-            <div class="login-left">
-                <div class="logo-row mb-4">
-                    <img src="/images/logo/logosmall.png" alt="Logo nhỏ" style="height: 70px; width: 160px;">
-                    <img src="/images/logo/logo.png" alt="Logo lớn" style="height: 70px; width: 160px;">
-                </div>
-
-                <div style="margin-bottom: 10px;">
-                    <h4>Khách hàng thành viên <span class="text-primary" style="font-size: 30px;">SMEMBER </span></h4>
-                </div>
-                <ul>
-                    <li><i class="fa-solid fa-gift text-primary"></i><span> Chiết khấu <b>5%</b> khi mua sản phẩm tại
-                            LaptopShop</span></li>
-                    <li><i class="fa-solid fa-truck-fast text-success"></i><span> Miễn phí giao hàng cho đơn hàng từ
-                            <b>300.000đ</b></span>
-                    </li>
-                    <li><i class="fa-solid fa-ticket text-danger"></i> <span>Tặng <b>voucher 500.000đ</b> cho khách hàng
-                            thành
-                            viên </span></li>
-                    <li><i class="fa-solid fa-graduation-cap text-warning"></i><span> Ưu đãi thêm <b>10%</b> cho
-                            S-Student/S-Teacher</span></li>
-                </ul>
-
-                <a href="/register" class="small text-primary">Xem chi tiết chính sách ưu đãi SMEMBER ></a>
-            </div>
-
-            <!-- Form đăng nhập bên phải -->
-            <div class="login-right card-body">
-                <div style="">
-                    <h3 style="color: red;">Đăng Nhập <p>SMEMBER</p>
-                    </h3>
-                </div>
-
-                <% messages.forEach( function (error) { %>
-                    <div class="alert alert-danger mb-3">
-                        <%= error %>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card mt-5">
+                    <div class="card-header">
+                        <i class="fas fa-laptop-code tech-icon mb-2"></i>
+                        <h3 class="my-2">LaptopShop</h3>
+                        <p class="mb-0 small text-light">Đăng nhập để quản lý & mua sắm laptop</p>
                     </div>
-                    <% }) %>
-                        <form method="POST" action="/login">
-                            <div class="form-floating mb-3">
-                                <input name="username" class="form-control" id="inputEmail" type="email"
-                                    placeholder="name@example.com" required />
-                                <label for="inputEmail">Email</label>
+                    <div class="card-body p-4">
+                        <% messages.forEach(function (error) { %>
+                            <div class="alert alert-danger mb-3">
+                                <%= error %>
                             </div>
-                            <div class="form-floating mb-3">
-                                <input name="password" class="form-control" id="inputPassword" type="password"
-                                    placeholder="Password" required />
-                                <label for="inputPassword">Mật Khẩu</label>
-                            </div>
-                            <button class="btn btn-primary w-100 py-2">Đăng nhập</button>
-                        </form>
-                        <div class="text-center mt-3">
-                            <small>Bạn chưa có tài khoản? <a href="/register">Đăng ký</a></small>
-                        </div>
+                            <% }) %>
+
+                                <form method="POST" action="/login">
+                                    <div class="mb-3 position-relative">
+                                        <i class="fas fa-envelope input-icon"></i>
+                                        <input name="username" class="form-control" id="inputEmail" type="email"
+                                            placeholder="Email" />
+                                    </div>
+                                    <div class="mb-3 position-relative">
+                                        <i class="fas fa-lock input-icon"></i>
+                                        <input name="password" class="form-control" id="inputPassword" type="password"
+                                            placeholder="Mật khẩu" />
+                                    </div>
+                                    <button class="btn btn-primary w-100">Đăng nhập</button>
+                                </form>
+                    </div>
+                    <div class="card-footer text-center py-3">
+                        <div class="small">Bạn chưa có tài khoản? <a href="/register">Đăng ký ngay!</a></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
     <script src="/admin/js/scripts.js"></script>
-
 </body>
 
 </html>

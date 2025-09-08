@@ -9,7 +9,7 @@ import session from 'express-session';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
 import apiRoutes from './routes/api';
-import cors from "cors"
+import cors from "cors";
 
 
 const app = express();
@@ -17,7 +17,8 @@ const app = express();
 
 // config cors
 app.use(cors({
-    origin: ["http://localhost:5173"]
+    origin: "http://localhost:8080", // hoặc domain frontend
+    credentials: true
 }))
 // Set up EJS as the view engine
 app.set('view engine', 'ejs');
@@ -68,6 +69,7 @@ initDatabase()
 app.use((req, res) => {
     res.render("status/404.ejs");
 })
+
 app.listen(PORT, () => {
     console.log(`My app is running on port : ${PORT}`);
 });

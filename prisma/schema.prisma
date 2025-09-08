@@ -20,8 +20,6 @@ model Session {
   expiresAt DateTime
 }
 
-
-
 model User {
   id          Int     @id @default(autoincrement())
   username    String  @unique @db.VarChar(255)
@@ -37,6 +35,7 @@ model User {
   cart          Cart?
   orders        Order[]
   notifications Notification[]
+  Review        Review[]
 
   @@map("users")
 }
@@ -63,6 +62,7 @@ model Product {
   image        String?       @db.VarChar(255)
   CartDetails  CartDetail[]
   OrderDetails OrderDetail[]
+  Review       Review[]
 
   @@map("products")
 }
@@ -92,27 +92,6 @@ model CartDetail {
 
   @@map("cart_detail")
 }
-
-// model Order {
-//   id              Int    @id @default(autoincrement())
-//   totalPrice      Int
-//   receiverAddress String @db.VarChar(255)
-//   receiverName    String @db.VarChar(255)
-//   receiverPhone   String @db.VarChar(255)
-//   receiverNote    String @db.VarChar(255)
-//   status          String @default("PENDING") // PEDING, CANCELED, COMPLETE,
-
-//   paymentMethod String //COD, BANKING...
-//   paymentStatus String //PAYMENT_UNPAID, PAYMENT_SUCCED, PAYMENT_FAILED
-//   paymentRef    String?
-
-//   user   User @relation(fields: [userId], references: [id])
-//   userId Int
-
-//   orderDetails OrderDetail[]
-
-//   @@map("orders")
-// }
 
 model Order {
   id              Int    @id @default(autoincrement())
@@ -163,4 +142,32 @@ model Notification {
   createdAt DateTime @default(now())
 
   @@map("notifications")
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+
+  // Liên kết với Product & User
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Blog {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(255)
+  slug      String   @unique @db.VarChar(255)
+  content   String   @db.MediumText
+  thumbnail String?  @db.VarChar(255)
+  author    String?  @db.VarChar(100)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blogs")
 }

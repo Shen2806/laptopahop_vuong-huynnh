@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        <%= blog.title %> - LaptopShop VH
+    </title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries -->
+    <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom -->
+    <link href="/client/css/style.css" rel="stylesheet">
+
+    <style>
+        .blog-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .blog-thumbnail {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .blog-thumbnail img {
+            max-width: 100%;
+            max-height: 500px;
+            /* ảnh không quá cao */
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform .4s ease;
+        }
+
+        .blog-thumbnail img:hover {
+            transform: scale(1.03);
+        }
+
+
+        .blog-content {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        .blog-content img {
+            max-width: 100%;
+            /* Không vượt quá chiều rộng khung */
+            height: auto;
+            /* Giữ đúng tỉ lệ */
+            display: block;
+            /* Cho phép căn giữa */
+            margin: 20px auto;
+            /* Căn giữa + khoảng cách */
+            border-radius: 8px;
+            /* Bo góc nhẹ cho đẹp */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            /* Bóng nhẹ */
+        }
+
+
+        .blog-meta {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .blog-meta i {
+            margin-right: 5px;
+        }
+
+        .related-posts li {
+            margin-bottom: 10px;
+        }
+
+        .related-posts a {
+            color: #0d6efd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .related-posts a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Spinner -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+
+    <!-- Navbar -->
+    <%- include('../layout/header'); -%>
+
+        <!-- Blog Detail -->
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="blog-card">
+
+                        <!-- Title -->
+                        <h1 class="mb-3 text-center fw-bold">
+                            <%= blog.title %>
+                        </h1>
+
+                        <!-- Meta -->
+                        <p class="blog-meta text-center">
+                            <i class="fas fa-user"></i>
+                            <%= blog.author %> &nbsp; | &nbsp;
+                                <i class="fas fa-calendar-alt"></i>
+                                <%= blog.createdAt.toLocaleDateString() %>
+                        </p>
+
+                        <!-- Thumbnail -->
+                        <% if (blog.thumbnail) { %>
+                            <div class="blog-thumbnail mx-auto mb-4">
+                            </div>
+                            <% } %>
+
+                                <!-- Content -->
+                                <div class="blog-content">
+                                    <%- blog.content %>
+                                </div>
+
+                                <hr class="my-5">
+
+                                <!-- Related posts -->
+                                <h3 class="mt-5 mb-3 text-center">
+                                    <i class="fas fa-link me-2 text-primary"></i>Bài viết liên quan
+                                </h3>
+                                <ul class="related-posts list-unstyled text-center">
+                                    <% related.forEach(r=> { %>
+                                        <li class="mb-2">
+                                            <a href="/blogs/<%= r.slug %>">
+                                                <i class="fas fa-angle-right me-2"></i>
+                                                <%= r.title %>
+                                            </a>
+                                        </li>
+                                        <% }) %>
+                                </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <%- include('../layout/footer'); -%>
+
+            <!-- Back to Top -->
+            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top">
+                <i class="fa fa-arrow-up"></i>
+            </a>
+
+            <!-- JS -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/lib/easing/easing.min.js"></script>
+            <script src="/client/lib/waypoints/waypoints.min.js"></script>
+            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+            <script src="/client/js/main.js"></script>
+</body>
+
+</html>

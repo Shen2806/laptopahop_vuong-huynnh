@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="MinhVuong&QuocHuynh - Dự án laptopshop" />
+    <meta name="author" content="MinhVuong&QuocHuynh" />
+    <title>Edit Blog - LaptopShop</title>
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="sb-nav-fixed">
+    <%- include('../layout/header'); -%>
+
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+                            <h1 class="mt-4">Chỉnh sửa Blog</h1>
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/blog">Blogs</a></li>
+                                <li class="breadcrumb-item active">Chỉnh sửa Blog</li>
+                            </ol>
+
+                            <!-- Card form -->
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    <i class="fas fa-edit me-1"></i>
+                                    Cập nhật thông tin bài viết
+                                </div>
+                                <div class="card-body">
+                                    <form action="/admin/update-blog" method="POST" enctype="multipart/form-data">
+                                        <input type="hidden" name="id" value="<%= blog.id %>">
+
+                                        <div class="mb-3">
+                                            <label class="form-label"><i class="fas fa-heading me-1"></i> Tiêu
+                                                đề</label>
+                                            <input type="text" name="title" class="form-control"
+                                                value="<%= blog.title %>" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label"><i class="fas fa-user-edit me-1"></i> Tác
+                                                giả</label>
+                                            <input type="text" name="author" class="form-control"
+                                                value="<%= blog.author %>">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label"><i class="fas fa-image me-1"></i> Ảnh
+                                                thumbnail</label><br>
+                                            <% if (blog.thumbnail) { %>
+                                                <img src="<%= blog.thumbnail %>" width="150"
+                                                    class="mb-2 rounded shadow-sm border">
+                                                <br>
+                                                <% } %>
+                                                    <input type="file" name="thumbnail" class="form-control mt-2">
+                                                    <small class="text-muted">Nếu không chọn ảnh mới, ảnh cũ sẽ được giữ
+                                                        lại.</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label"><i class="fas fa-align-left me-1"></i> Nội
+                                                dung</label>
+                                            <textarea name="content" class="form-control"
+                                                rows="8"><%= blog.content %></textarea>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input type="checkbox" class="form-check-input" name="published"
+                                                value="true" <%=blog.published ? "checked" : "" %>>
+                                            <label class="form-check-label">Xuất bản</label>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between">
+                                            <a href="/admin/blog" class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left"></i> Quay lại
+                                            </a>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-save"></i> Cập nhật
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                    <%- include('../layout/footer'); -%>
+                </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="/admin/js/scripts.js"></script>
+</body>
+
+</html>

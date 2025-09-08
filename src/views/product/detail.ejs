@@ -59,29 +59,19 @@
             transition: max-height 0.3s ease;
         }
 
-        .rating {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: flex-end;
-        }
-
-        .rating input {
-            display: none;
-        }
-
-        .rating label {
+        /* css số sao đánh giá */
+        .rating .star {
             cursor: pointer;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+            margin-right: 5px;
         }
 
-        .rating label:hover,
-        .rating label:hover~label,
-        .rating input:checked~label {
+        /* Sao rỗng (far) mặc định màu xám */
+        .rating .star i.far {
+            color: #ccc;
+        }
+
+        /* Sao đầy (fas) màu vàng */
+        .rating .star i.fas {
             color: #ffc107;
         }
     </style>
@@ -239,8 +229,6 @@
     </div>
     <!-- Modal Search End -->
 
-
-
     <!-- Single Product Start -->
     <div class="container-fluid p-2">
         <div class="container py-2">
@@ -355,62 +343,20 @@
                                     </div>
                                 </div>
                             </div>
+
                         </div>
-
-                        <!-- Form đánh giá sản phẩm -->
-                        <div class="col-lg-12 mt-4">
-                            <h4 class="mb-3">Đánh giá sản phẩm</h4>
-
-                            <!-- Hiển thị trung bình rating -->
-                            <div class="d-flex align-items-center mb-3">
-                                <% let avgRating=product.avg_rating || 0; %>
-                                    <% for (let i=1; i <=5; i++) { %>
-                                        <% if (i <=Math.round(avgRating)) { %>
-                                            <i class="fa fa-star text-warning"></i>
-                                            <% } else { %>
-                                                <i class="fa fa-star text-secondary"></i>
-                                                <% } %>
-                                                    <% } %>
-                                                        <span class="ms-2 small text-muted">(<%= product.review_count ||
-                                                                0 %> đánh giá)</span>
-                            </div>
-
-                            <!-- Form gửi đánh giá -->
-                            <form id="reviewForm" class="mb-4">
-                                <div class="mb-2">
-                                    <label class="form-label">Chọn số sao:</label><br>
-                                    <div class="rating">
-                                        <input type="radio" name="rating" value="5" id="star5">
-                                        <label for="star5"><i class="fa fa-star"></i></label>
-
-                                        <input type="radio" name="rating" value="4" id="star4">
-                                        <label for="star4"><i class="fa fa-star"></i></label>
-
-                                        <input type="radio" name="rating" value="3" id="star3">
-                                        <label for="star3"><i class="fa fa-star"></i></label>
-
-                                        <input type="radio" name="rating" value="2" id="star2">
-                                        <label for="star2"><i class="fa fa-star"></i></label>
-
-                                        <input type="radio" name="rating" value="1" id="star1">
-                                        <label for="star1"><i class="fa fa-star"></i></label>
+                        <div class="mt-4">
+                            <% if (user) { %>
+                                <h5>Đánh giá của bạn</h5>
+                                <div id="user-review" class="border p-3 rounded bg-light">
+                                    <em>Đang tải đánh giá của bạn...</em>
+                                </div>
+                                <% } else { %>
+                                    <div class="alert alert-warning">
+                                        <a href="/login">Đăng nhập</a> để xem và viết đánh giá.
                                     </div>
-                                </div>
-
-                                <div class="mb-2">
-                                    <label class="form-label">Bình luận:</label>
-                                    <textarea name="comment" class="form-control" rows="3" required></textarea>
-                                </div>
-
-                                <button type="submit" class="btn btn-primary btn-sm">Gửi đánh giá</button>
-                            </form>
-
-                            <!-- Khu vực hiển thị đánh giá -->
-                            <div id="reviewsContainer">
-                                <!-- Đánh giá sẽ được hiển thị ở đây bằng JavaScript -->
-                            </div>
+                                    <% } %>
                         </div>
-
 
                     </div>
                 </div>
@@ -453,7 +399,8 @@
                                                 </ul>
                                             </li>
                                             <li>2. Tặng balo laptop cao cấp trị giá 500.000đ.</li>
-                                            <li>3. Tặng phiếu mua chuột hoặc bàn phím không dây trị giá 300.000đ.</li>
+                                            <li>3. Tặng phiếu mua chuột hoặc bàn phím không dây trị giá 300.000đ.
+                                            </li>
                                             <li>4. Tặng phiếu mua màn hình rời trị giá 300.000đ.</li>
                                             <li>5. Tặng phiếu mua tai nghe hoặc loa bluetooth trị giá 200.000đ.</li>
                                             <li>6. Tặng gói vệ sinh & bảo dưỡng laptop miễn phí 1 năm.</li>
@@ -472,8 +419,6 @@
         </div>
     </div>
     <!-- Single Product End -->
-
-
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
         <div class="container py-5">
@@ -499,22 +444,12 @@
                     <div class="d-flex flex-column text-start footer-item">
                         <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
                         <a class="btn-link" href="">Về chúng tôi</a>
-                        <!-- <a class="btn-link" href="">Contact Us</a>
-                    <a class="btn-link" href="">Privacy Policy</a>
-                    <a class="btn-link" href="">Terms & Condition</a>
-                    <a class="btn-link" href="">Return Policy</a>
-                    <a class="btn-link" href="">FAQs & Help</a> -->
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <div class="d-flex flex-column text-start footer-item">
                         <h4 class="text-light mb-3">Tài khoản</h4>
                         <a class="btn-link" href="">Tài khoản của tôi</a>
-                        <!-- <a class="btn-link" href="">Shop details</a>
-                    <a class="btn-link" href="">Shopping Cart</a>
-                    <a class="btn-link" href="">Wishlist</a>
-                    <a class="btn-link" href="">Order History</a>
-                    <a class="btn-link" href="">International Orders</a> -->
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -540,9 +475,6 @@
                         reserved.</span>
                 </div>
                 <div class="col-md-6 my-auto text-center text-md-end text-white">
-                    <!--/*** This template is free as long as you keep the below author’s credit link/attribution link/backlink. ***/-->
-                    <!--/*** If you'd like to use the template without the below author’s credit link/attribution link/backlink, ***/-->
-                    <!--/*** you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". ***/-->
                     Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a>
                     Distributed
                     By
@@ -575,6 +507,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
         integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- nút xem thêm -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const desc = document.getElementById("desc-wrapper");
@@ -620,84 +553,13 @@
         let timer = setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // khác
-        document.getElementById("cartForm").addEventListener("submit", function () {
-            let slotEl = document.getElementById("slots");
-            if (slotEl) {
-                let slots = parseInt(slotEl.textContent);
-                if (slots > 0) {
-                    slotEl.textContent = slots - 1; // Giảm 1 suất hiển thị
-                }
-            }
-        });
-
-        //Xem thêm
-        // const desc = document.getElementById("description");
-        // const toggleBtn = document.getElementById("toggleDesc");
-        // let expanded = false;
-
-
-
-        //
-
-
-        document.getElementById('reviewForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const rating = document.querySelector('input[name="rating"]:checked')?.value;
-            const comment = document.querySelector('textarea[name="comment"]').value;
-            const productId = <%= product.id %>; // EJS sẽ render số ID thật ở đây
-
-            if (!rating || !comment) {
-                alert('Vui lòng chọn số sao và nhập bình luận!');
-                return;
-            }
-
-            try {
-                const res = await fetch('http://localhost:3000/api/reviews', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ product_id: productId, rating, comment })
-                });
-
-                if (res.ok) {
-                    document.getElementById('reviewForm').reset();
-                    loadReviews(); // gọi lại để hiển thị đánh giá mới
-                } else {
-                    alert('Gửi đánh giá thất bại!');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Lỗi kết nối tới server!');
-            }
-        });
-
-        async function loadReviews() {
-            const productId = <%= product.id %>; // EJS render ra số thật
-            try {
-                const res = await fetch(`http://localhost:3000/api/reviews/${productId}`);
-                const reviews = await res.json();
-
-                const container = document.getElementById('reviewsContainer');
-                container.innerHTML = reviews.map(r => `
-            <div class="border p-2 mb-2 rounded">
-                <div>${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
-                <p>${r.comment}</p>
-                <small class="text-muted">${new Date(r.created_at).toLocaleString()}</small>
-            </div>
-        `).join('');
-            } catch (err) {
-                console.error(err);
-                container.innerHTML = '<p class="text-danger">Không thể tải đánh giá.</p>';
-            }
-        }
-
-        // Gọi khi trang vừa load
-        loadReviews();
-
 
     </script>
-    <script src="https://cdn.tiny.cloud/1/YOUR_API_KEY/tinymce/7/tinymce.min.js"></script>
+
+    <!-- đánh giá -->
+
+    <!-- Font Awesome (icon sao) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 
 </body>

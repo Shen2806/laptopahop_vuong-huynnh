@@ -9,6 +9,8 @@ import passport from 'passport';
 import { isAdmin, isLogin } from 'src/middleware/auth';
 import multer from 'multer';
 import { prisma } from 'config/client';
+import { getAdminBlogPage, getAdminCreateBlogPage, getAdminEditBlogPage, postAdminCreateBlog, postAdminUpdateBlog, postDeleteBlog } from 'controllers/admin/blog.controller';
+import { getBlogDetailPage, getBlogListPage } from 'controllers/client/blog.controller';
 
 const router = express.Router();
 
@@ -64,7 +66,6 @@ const webRoutes = (app: Express) => {
 
 
 
-
     // Them san pham vao gio hang
     router.post("/add-product-to-cart/:id", postAddProductToCart)
     // Xoa san pham tu gio hang
@@ -106,6 +107,18 @@ const webRoutes = (app: Express) => {
     router.post("/admin/delete-product/:id", postDeleteProduct);
     router.get("/admin/view-product/:id", getViewProduct);
     router.post("/admin/update-product", fileUploadMiddleware("image", "images/product"), postUpdateProduct);
+    // Blog routes - Admin
+    router.get("/admin/blog", getAdminBlogPage);
+    router.get("/admin/create-blog", getAdminCreateBlogPage);
+    router.post("/admin/create-blog", fileUploadMiddleware("thumbnail", "images/blog"), postAdminCreateBlog);
+    router.get("/admin/edit-blog/:id", getAdminEditBlogPage);
+    router.post("/admin/update-blog", fileUploadMiddleware("thumbnail", "images/blog"), postAdminUpdateBlog);
+    router.post("/admin/delete-blog/:id", postDeleteBlog);
+    // Blog routes - Client
+    // Client Blog
+    router.get("/blogs", getBlogListPage);
+    router.get("/blogs/:slug", getBlogDetailPage);
+
     router.get("/admin/order", getAdminOrderPage);
     router.get("/admin/order/:id", getAdminOrderDetailPage);
     // xác nhận trạng thái đơn hàng
