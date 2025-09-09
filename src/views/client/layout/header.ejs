@@ -84,6 +84,67 @@
         background: white;
         /* nền trắng để viền nổi bật hơn */
     }
+
+    /*css phần nav*/
+    /* Navbar container */
+    .navbar {
+        padding: 12px 20px;
+        border-bottom: 1px solid #eee;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Nav link */
+    .navbar-nav .nav-link {
+        font-weight: 500;
+        padding: 10px 15px;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: #4CAF50 !important;
+        /* xanh lá */
+    }
+
+    .navbar-nav .nav-link.active {
+        color: #4CAF50 !important;
+        font-weight: 600;
+    }
+
+    /* Gạch chân khi hover */
+    .navbar-nav .nav-link::after {
+        content: "";
+        display: block;
+        height: 2px;
+        width: 0;
+        background: #4CAF50;
+        transition: width 0.3s;
+        margin: auto;
+    }
+
+    .navbar-nav .nav-link:hover::after,
+    .navbar-nav .nav-link.active::after {
+        width: 60%;
+    }
+
+    /* Dropdown menu */
+    .dropdown-menu {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+    }
+
+    .dropdown-menu .dropdown-item {
+        border-radius: 6px;
+        padding: 10px 15px;
+        transition: all 0.2s ease;
+    }
+
+    .dropdown-menu .dropdown-item:hover {
+        background: #4CAF50;
+        color: #fff;
+    }
 </style>
 <div class="container-fluid shadow" style="margin-top: 10px">
     <!-- Topbar -->
@@ -173,6 +234,7 @@
                                 </li>
                                 <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
                                 <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
+                                <li><a class="dropdown-item" href="/order-user">Đơn hàng của tôi</a></li>
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
@@ -192,6 +254,4 @@
             </div>
         </nav>
     </div>
-</div>
-
 </div>

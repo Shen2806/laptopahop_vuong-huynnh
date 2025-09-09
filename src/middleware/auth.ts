@@ -24,5 +24,10 @@ const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     next();
 
 }
-
-export { isLogin, isAdmin };
+const ensureAuthenticated = (req: any, res: any, next: any) => {
+    if (req.isAuthenticated && req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/login");
+};
+export { isLogin, isAdmin, ensureAuthenticated };

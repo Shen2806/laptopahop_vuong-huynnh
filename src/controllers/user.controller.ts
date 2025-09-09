@@ -175,5 +175,23 @@ const postCancelOrderByUser = async (req: Request, res: Response) => {
     }
 };
 
+const getUserOrders = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user.id; // lấy từ passport
+        const orders = await prisma.order.findMany({
+            where: { userId },
+            include: {
+                orderDetails: {
+                    include: { product: true }, // cần có relation product trong OrderDetail
+                },
+            },
+            orderBy: { createdAt: "desc" },
+        });
 
-export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser };
+        res.render("client/order/orderuser.ejs", { user: req.user, orders });
+    } catch (err) {
+        console.error("❌ Lỗi lấy đơn hàng:", err);
+        res.status(500).send("Có lỗi xảy ra khi tải đơn hàng");
+    }
+};
+export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser, getUserOrders };

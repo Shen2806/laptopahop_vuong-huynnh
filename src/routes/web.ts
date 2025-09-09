@@ -1,12 +1,12 @@
 import express, { Express, Request, Response } from 'express';
-import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser } from 'controllers/user.controller';
+import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser, getUserOrders } from 'controllers/user.controller';
 import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage, postCancelOrderByAdmin, postConfirmOrder, postRestockProduct } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
 import { getCartPage, getCheckOutPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
 import { getAboutUsPage, getContactPage, getLoginPage, getPrivacyPage, getReturnPage, getSuccessRedirectPage, getSupportPage, getTermPage, getWarrantyPage, postLogout, postRegister } from 'controllers/client/auth.controller';
 import passport from 'passport';
-import { isAdmin, isLogin } from 'src/middleware/auth';
+import { ensureAuthenticated, isAdmin, isLogin } from 'src/middleware/auth';
 import multer from 'multer';
 import { prisma } from 'config/client';
 import { getAdminBlogPage, getAdminCreateBlogPage, getAdminEditBlogPage, postAdminCreateBlog, postAdminUpdateBlog, postDeleteBlog } from 'controllers/admin/blog.controller';
@@ -46,7 +46,8 @@ const webRoutes = (app: Express) => {
 
     // POST update profile
     router.post("/profile/update", upload.single("avatar"), handleUpdateProfile);
-
+    // GET /order-user
+    router.get("/order-user", ensureAuthenticated, getUserOrders);
     // Chính sách sử dụng
     router.get("/terms", getTermPage);
     // Chính sách bảo hành

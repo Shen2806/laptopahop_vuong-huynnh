@@ -127,6 +127,43 @@
             background: white;
             /* nền trắng để viền nổi bật hơn */
         }
+
+        .card.filter-card {
+            border: 1px solid #e0f2e9;
+            transition: all 0.3s ease;
+        }
+
+        .card.filter-card:hover {
+            border-color: #28a745;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+        }
+
+        .form-check-input:checked {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        #btnFilter {
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+            border: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        #btnFilter:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        #btnReset {
+            border: 1px solid #ccc;
+            transition: 0.3s;
+        }
+
+        #btnReset:hover {
+            border-color: #f44336;
+            color: #f44336;
+        }
     </style>
 
 </head>
@@ -285,122 +322,109 @@
                 <div class="row g-4 fruite">
                     <div class="col-12 col-md-4">
                         <div class="row g-4">
+
+                            <!-- Hãng sản xuất -->
                             <div class="col-12" id="factoryFilter">
-                                <div class="mb-2"><b>Hãng sản xuất</b></div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="factory-1" value="APPLE">
-                                    <label class="form-check-label" for="factory-1">Apple</label>
+                                <div class="card border-0 shadow-sm rounded-3">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3">Hãng sản xuất</h6>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <% ["Apple","Asus","Lenovo","Dell","LG","Acer"].forEach((brand, idx)=> { %>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox"
+                                                        id="factory-<%= idx %>" value="<%= brand.toUpperCase() %>">
+                                                    <label class="form-check-label" for="factory-<%= idx %>">
+                                                        <%= brand %>
+                                                    </label>
+                                                </div>
+                                                <% }) %>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="factory-2" value="ASUS">
-                                    <label class="form-check-label" for="factory-2">Asus</label>
-                                </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="factory-3" value="LENOVO">
-                                    <label class="form-check-label" for="factory-3">Lenovo</label>
-                                </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="factory-4" value="DELL">
-                                    <label class="form-check-label" for="factory-4">Dell</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="factory-5" value="LG">
-                                    <label class="form-check-label" for="factory-5">LG</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="factory-6" value="ACER">
-                                    <label class="form-check-label" for="factory-6">Acer</label>
-                                </div>
-
                             </div>
+
+                            <!-- Mục đích sử dụng -->
                             <div class="col-12" id="targetFilter">
-                                <div class="mb-2"><b>Mục đích sử dụng</b></div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="target-1" value="GAMING">
-                                    <label class="form-check-label" for="target-1">Gaming</label>
+                                <div class="card border-0 shadow-sm rounded-3">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3">Mục đích sử dụng</h6>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                    id="target-1" value="GAMING"><label class="form-check-label"
+                                                    for="target-1">Gaming</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                    id="target-2" value="SINHVIEN-VANPHONG"><label
+                                                    class="form-check-label" for="target-2">Sinh viên - Văn
+                                                    phòng</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                    id="target-3" value="THIET-KE-DO-HOA"><label
+                                                    class="form-check-label" for="target-3">Thiết kế đồ họa</label>
+                                            </div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                    id="target-4" value="MONG-NHE"><label class="form-check-label"
+                                                    for="target-4">Mỏng nhẹ</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                    id="target-5" value="DOANH-NHAN"><label class="form-check-label"
+                                                    for="target-5">Doanh nhân</label></div>
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="target-2"
-                                        value="SINHVIEN-VANPHONG">
-                                    <label class="form-check-label" for="target-2">Sinh viên - văn
-                                        phòng</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="target-3"
-                                        value="THIET-KE-DO-HOA">
-                                    <label class="form-check-label" for="target-3">Thiết kế đồ
-                                        họa</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="target-4" value="MONG-NHE">
-                                    <label class="form-check-label" for="target-4">Mỏng nhẹ</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="target-5" value="DOANH-NHAN">
-                                    <label class="form-check-label" for="target-5">Doanh nhân</label>
-                                </div>
-
-
                             </div>
 
+                            <!-- Mức giá -->
                             <div class="col-12" id="priceFilter">
-                                <div class="mb-2"><b>Mức giá</b></div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="price-2" value="duoi-10-trieu">
-                                    <label class="form-check-label" for="price-2">Dưới 10 triệu</label>
-                                </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="price-3" value="10-15-trieu">
-                                    <label class="form-check-label" for="price-3">Từ 10 - 15
-                                        triệu</label>
-                                </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="price-4" value="15-20-trieu">
-                                    <label class="form-check-label" for="price-4">Từ 15 - 20
-                                        triệu</label>
-                                </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" id="price-5" value="tren-20-trieu">
-                                    <label class="form-check-label" for="price-5">Trên 20 triệu</label>
+                                <div class="card border-0 shadow-sm rounded-3">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3">Mức giá</h6>
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                    id="price-1" value="duoi-10-trieu"><label class="form-check-label"
+                                                    for="price-1">Dưới 10 triệu</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                    id="price-2" value="10-15-trieu"><label class="form-check-label"
+                                                    for="price-2">10 - 15 triệu</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                    id="price-3" value="15-20-trieu"><label class="form-check-label"
+                                                    for="price-3">15 - 20 triệu</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox"
+                                                    id="price-4" value="tren-20-trieu"><label class="form-check-label"
+                                                    for="price-4">Trên 20 triệu</label></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-12">
-                                <div class="mb-2"><b>Sắp xếp</b></div>
 
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" id="sort-1" value="gia-tang-dan"
-                                        name="radio-sort">
-                                    <label class="form-check-label" for="sort-1">Giá tăng dần</label>
+                            <!-- Sắp xếp -->
+                            <div class="col-12" id="sortFilter">
+                                <div class="card border-0 shadow-sm rounded-3">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-3">Sắp xếp</h6>
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                    name="radio-sort" id="sort-1" value="gia-tang-dan"><label
+                                                    class="form-check-label" for="sort-1">Giá tăng dần</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                    name="radio-sort" id="sort-2" value="gia-giam-dan"><label
+                                                    class="form-check-label" for="sort-2">Giá giảm dần</label></div>
+                                            <div class="form-check"><input class="form-check-input" type="radio"
+                                                    name="radio-sort" id="sort-3" value="gia-khong-sap-xep"
+                                                    checked><label class="form-check-label" for="sort-3">Không sắp
+                                                    xếp</label></div>
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" id="sort-2" value="gia-giam-dan"
-                                        name="radio-sort">
-                                    <label class="form-check-label" for="sort-2">Giá giảm dần</label>
-                                </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" id="sort-3" value="gia-khong-sap-xep"
-                                        name="radio-sort" checked>
-                                    <label class="form-check-label" for="sort-3">Không sắp xếp</label>
-                                </div>
-
                             </div>
-                            <div class="col-12">
-                                <button id="btnFilter"
-                                    class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4">
-                                    Lọc Sản Phẩm
-                                </button>
+
+                            <!-- Nút filter -->
+                            <div class="col-12 d-flex gap-2">
+                                <button id="btnFilter" class="btn btn-success rounded-pill px-4 py-2 flex-fill">Lọc sản
+                                    phẩm</button>
+                                <button id="btnReset"
+                                    class="btn btn-outline-secondary rounded-pill px-4 py-2">Reset</button>
                             </div>
                         </div>
                     </div>
+
                     <div class="col-12 col-md-8 text-center">
                         <div class="row g-4">
                             <% products.forEach( function (product) { %>
