@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="utf-8" />
@@ -7,12 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="MinhVuong&QuocHuynh - Dự án laptopshop" />
     <meta name="author" content="MinhVuong&QuocHuynh" />
-    <title>Create Blog - LaptopShop</title>
+    <title>Thêm Blog - LaptopShop</title>
     <link href="/admin/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 
-<body class="sb-nav-fixed">
+<body class="sb-nav-fixed bg-light">
     <%- include('../layout/header'); -%>
 
         <div id="layoutSidenav">
@@ -20,18 +20,26 @@
                 <div id="layoutSidenav_content">
                     <main>
                         <div class="container-fluid px-4">
-                            <h1 class="mt-4">Thêm Blog</h1>
+
+                            <!-- Tiêu đề -->
+                            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                                <h1 class="h3 fw-bold text-primary"><i class="fas fa-plus"></i> Thêm Blog</h1>
+                                <a href="/admin/blog" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại Blogs
+                                </a>
+                            </div>
+
+                            <!-- Breadcrumb -->
                             <ol class="breadcrumb mb-4">
                                 <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/blog">Blogs</a></li>
                                 <li class="breadcrumb-item active">Thêm Blog</li>
                             </ol>
 
-                            <!-- Card form -->
-                            <div class="card shadow-sm mb-4">
-                                <div class="card-header">
-                                    <i class="fas fa-plus me-1"></i>
-                                    Thông tin bài viết
+                            <!-- Card Form -->
+                            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                                <div class="card-header bg-primary text-white fw-semibold">
+                                    <i class="fas fa-info-circle me-2"></i> Thông tin bài viết
                                 </div>
                                 <div class="card-body">
                                     <form action="/admin/create-blog" method="POST" enctype="multipart/form-data">
@@ -59,8 +67,8 @@
                                         <div class="mb-3">
                                             <label class="form-label"><i class="fas fa-align-left me-1"></i> Nội
                                                 dung</label>
-                                            <textarea name="content" class="form-control" rows="8"
-                                                placeholder="Nhập nội dung bài viết..." id="description"></textarea>
+                                            <textarea name="content" class="form-control" rows="8" id="description"
+                                                placeholder="Nhập nội dung bài viết..."></textarea>
                                         </div>
 
                                         <div class="form-check mb-3">
@@ -69,9 +77,9 @@
                                             <label class="form-check-label">Xuất bản ngay</label>
                                         </div>
 
-                                        <div class="d-flex justify-content-between">
+                                        <div class="d-flex justify-content-end gap-2">
                                             <a href="/admin/blog" class="btn btn-secondary">
-                                                <i class="fas fa-arrow-left"></i> Quay lại
+                                                <i class="fas fa-arrow-left"></i> Hủy
                                             </a>
                                             <button type="submit" class="btn btn-success">
                                                 <i class="fas fa-save"></i> Lưu bài viết
@@ -80,6 +88,7 @@
                                     </form>
                                 </div>
                             </div>
+
                         </div>
                     </main>
                     <%- include('../layout/footer'); -%>
@@ -93,12 +102,12 @@
             referrerpolicy="origin" crossorigin="anonymous"></script>
         <script>
             tinymce.init({
-                selector: '#description',   // textarea nào sẽ thành editor
+                selector: '#description',
                 plugins: 'lists link image table code',
                 toolbar: 'undo redo | bold italic underline | bullist numlist | link image | table | code',
-                menubar: false,             // ẩn menu bar trên cùng
-                height: 400,                // chỉnh chiều cao cho rộng rãi
-                branding: false,            // tắt logo TinyMCE
+                menubar: false,
+                height: 400,
+                branding: false,
                 content_style: "body { font-family: Arial, sans-serif; font-size:14px; }"
             });
         </script>

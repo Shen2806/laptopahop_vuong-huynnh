@@ -1,46 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="utf-8">
     <title>Chi tiết đơn hàng - LaptopShop</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <!-- Google Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <!-- Libraries & Custom CSS -->
-    <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
-    <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/client/css/style.css" rel="stylesheet">
-
-    <style>
-        .card-header {
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        .breadcrumb a {
-            text-decoration: none;
-        }
-
-        .badge {
-            font-size: 0.9rem;
-        }
-    </style>
+    <link href="/admin/css/styles.css" rel="stylesheet">
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 
+<<<<<<< HEAD
 <body>
     <!-- Navbar Start -->
     <div class="container-fluid shadow-sm bg-white fixed-top">
@@ -83,179 +53,154 @@
                                         </form>
                                     </li>
                                 </ul>
+=======
+<body class="sb-nav-fixed bg-light">
+    <%- include('../layout/header'); -%>
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+
+                            <!-- Tiêu đề -->
+                            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                                <h1 class="h3 fw-bold text-primary"><i class="fas fa-receipt"></i> Chi tiết đơn hàng
+                                </h1>
+                                <a href="/admin/order" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay
+                                    lại</a>
+>>>>>>> 68aa47a0bde606efc9723c910e286db432ddf0cc
                             </div>
-                            <% } else { %>
-                                <a href="/login" class="nav-item nav-link"><i class="fas fa-user fa-2x"></i></a>
-                                <% } %>
-                    </div>
-                </div>
-            </nav>
-        </div>
-    </div>
-    <!-- Navbar End -->
 
-    <div class="py-5"></div> <!-- margin top do navbar fixed -->
+                            <!-- Breadcrumb -->
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/order">Đơn hàng</a></li>
+                                <li class="breadcrumb-item active">Chi tiết</li>
+                            </ol>
 
-    <div class="container py-5">
+                            <div class="row g-4 mb-4">
+                                <!-- Thông tin đơn hàng -->
+                                <div class="col-md-6">
+                                    <div class="card shadow-sm">
+                                        <div class="card-header bg-primary text-white fw-semibold">Thông tin đơn hàng
+                                        </div>
+                                        <div class="card-body">
+                                            <p><strong>Mã đơn:</strong>
+                                                <%= order.id %>
+                                            </p>
+                                            <p><strong>Ngày đặt:</strong>
+                                                <%= formattedCreatedAtVN %>
+                                            </p>
+                                            <p><strong>Trạng thái:</strong>
+                                                <% if(order.status==='PENDING' ){ %>
+                                                    <span class="badge bg-warning text-dark">Chờ xử lý</span>
+                                                    <% } else if(order.status==='COMPLETE' ){ %>
+                                                        <span class="badge bg-success">Hoàn tất</span>
+                                                        <% } else if(order.status==='CANCELED' ){ %>
+                                                            <span class="badge bg-danger">Đã hủy</span>
+                                                            <% if(order.cancelReason){ %>
+                                                                <br><small class="text-muted">Lý do: <%=
+                                                                        order.cancelReason %></small>
+                                                                <% } %>
+                                                                    <% } %>
+                                            </p>
+                                            <p><strong>Phương thức thanh toán:</strong>
+                                                <%= order.paymentMethod %>
+                                            </p>
+                                            <p><strong>Trạng thái thanh toán:</strong>
+                                                <%= order.paymentStatus %>
+                                            </p>
+                                            <p><strong>Tổng tiền:</strong>
+                                                <%= new Intl.NumberFormat('vi-VN',{style:'currency',
+                                                    currency:'VND'}).format(order.totalPrice) %>
+                                            </p>
+                                            <p><strong>Ghi chú khách:</strong>
+                                                <%= order.receiverNote || "-" %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
 
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb bg-light p-2 rounded">
-                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="/admin/order">Đơn hàng</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Chi tiết</li>
-            </ol>
-        </nav>
-
-        <!-- Thông tin đơn hàng & người nhận -->
-        <div class="row g-4 mb-5">
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        Thông tin đơn hàng
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Mã đơn:</strong>
-                            <%= order.id %>
-                        </p>
-                        <p><strong>Ngày đặt:</strong>
-                            <%= formattedCreatedAtVN %>
-                        </p>
-                        <p>
-                            <strong>Trạng thái đơn:</strong>
-                            <% if(order.status==='PENDING' ){ %>
-                                <span class="badge bg-warning text-dark">Chờ xử lý</span>
-                                <% } else if(order.status==='COMPLETE' ){ %>
-                                    <span class="badge bg-success">Hoàn tất</span>
-                                    <% } else if(order.status==='CANCELED' ){ %>
-                                        <span class="badge bg-danger">Đã hủy</span>
-                                        <% if(order.cancelReason){ %>
-                                            <br><small class="text-muted">Lý do: <%= order.cancelReason %></small>
-                                            <% } %>
-                                                <% } %>
-                        </p>
-                        <p><strong>Phương thức thanh toán:</strong>
-                            <%= order.paymentMethod %>
-                        </p>
-                        <p><strong>Trạng thái thanh toán:</strong>
-                            <%= order.paymentStatus %>
-                        </p>
-                        <p><strong>Tổng tiền:</strong>
-                            <%= new Intl.NumberFormat('vi-VN',{ style:'currency',
-                                currency:'VND'}).format(order.totalPrice) %>
-                        </p>
-                        <p><strong>Ghi chú khách:</strong>
-                            <%= order.receiverNote || "-" %>
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        Thông tin người nhận
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Tên:</strong>
-                            <%= order.receiverName %>
-                        </p>
-                        <p><strong>SĐT:</strong>
-                            <%= order.receiverPhone %>
-                        </p>
-                        <p><strong>Địa chỉ:</strong>
-                            <%= order.receiverAddress %>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chi tiết sản phẩm -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">Chi tiết sản phẩm</div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Sản phẩm</th>
-                            <th>Tên</th>
-                            <th>Giá</th>
-                            <th>Số lượng</th>
-                            <th>Tổng tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% orderDetails.forEach(orderDetail=> { %>
-                            <tr>
-                                <td>
-                                    <img src="/images/product/<%= orderDetail.product.image %>"
-                                        class="img-fluid rounded" style="width:70px;height:70px;">
-                                </td>
-                                <td>
-                                    <a target="_blank" href="/product/<%= orderDetail.product.id %>">
-                                        <%= orderDetail.product.name %>
-                                    </a>
-                                </td>
-                                <td>
-                                    <%= new Intl.NumberFormat('vi-VN',{ style:'currency',
-                                        currency:'VND'}).format(orderDetail.price) %>
-                                </td>
-                                <td>
-                                    <%= orderDetail.quantity %>
-                                </td>
-                                <td>
-                                    <%= new Intl.NumberFormat('vi-VN',{ style:'currency',
-                                        currency:'VND'}).format(orderDetail.price * orderDetail.quantity) %>
-                                </td>
-                            </tr>
-                            <% }) %>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Hành động admin -->
-        <% if(order.status==='PENDING' ){ %>
-            <div class="mb-4">
-                <form action="/admin/order/<%= order.id %>/confirm" method="post" style="display:inline-block;">
-                    <button type="submit" class="btn btn-success me-2">Xác nhận đơn</button>
-                </form>
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                    Hủy đơn
-                </button>
-            </div>
-
-            <!-- Modal hủy đơn -->
-            <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form action="/admin/order/<%= order.id %>/cancel" method="post">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="cancelModalLabel">Hủy đơn hàng</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Đóng"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label for="cancelReason" class="form-label">Lý do hủy</label>
-                                    <textarea class="form-control" name="cancelReason" id="cancelReason" rows="3"
-                                        required></textarea>
+                                <!-- Thông tin người nhận -->
+                                <div class="col-md-6">
+                                    <div class="card shadow-sm">
+                                        <div class="card-header bg-primary text-white fw-semibold">Thông tin người nhận
+                                        </div>
+                                        <div class="card-body">
+                                            <p><strong>Tên:</strong>
+                                                <%= order.receiverName %>
+                                            </p>
+                                            <p><strong>SĐT:</strong>
+                                                <%= order.receiverPhone %>
+                                            </p>
+                                            <p><strong>Địa chỉ:</strong>
+                                                <%= order.receiverAddress %>
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+
+                            <!-- Chi tiết sản phẩm -->
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header bg-primary text-white fw-semibold">Chi tiết sản phẩm</div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Ảnh</th>
+                                                <th>Sản phẩm</th>
+                                                <th>Giá</th>
+                                                <th>Số lượng</th>
+                                                <th>Tổng tiền</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% orderDetails.forEach(orderDetail=> { %>
+                                                <tr>
+                                                    <td>
+                                                        <img src="/images/product/<%= orderDetail.product.image %>"
+                                                            class="img-fluid rounded" style="width:70px;height:70px;">
+                                                    </td>
+                                                    <td>
+                                                        <a target="_blank"
+                                                            href="/product/<%= orderDetail.product.id %>">
+                                                            <%= orderDetail.product.name %>
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <%= new Intl.NumberFormat('vi-VN',{style:'currency',
+                                                            currency:'VND'}).format(orderDetail.price) %>
+                                                    </td>
+                                                    <td>
+                                                        <%= orderDetail.quantity %>
+                                                    </td>
+                                                    <td>
+                                                        <%= new Intl.NumberFormat('vi-VN',{style:'currency',
+                                                            currency:'VND'}).format(orderDetail.price *
+                                                            orderDetail.quantity) %>
+                                                    </td>
+                                                </tr>
+                                                <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <% } %>
 
-                <a href="/admin/order" class="btn btn-secondary">Trở về</a>
-    </div>
+                            <!-- Hành động admin -->
+                            <% if(order.status==='PENDING' ){ %>
+                                <div class="mb-4 d-flex gap-2">
+                                    <form action="/admin/order/<%= order.id %>/confirm" method="post">
+                                        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Xác
+                                            nhận đơn</button>
+                                    </form>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                        data-bs-target="#cancelModal">
+                                        <i class="fas fa-times"></i> Hủy đơn
+                                    </button>
+                                </div>
 
+<<<<<<< HEAD
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
         <div class="container py-5">
@@ -281,23 +226,44 @@
                 </div>
             </div>
             <div class="text-center mt-4">&copy; 2025 LaptopShop. All Rights Reserved.</div>
+=======
+                                <!-- Modal hủy đơn -->
+                                <div class="modal fade" id="cancelModal" tabindex="-1"
+                                    aria-labelledby="cancelModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form action="/admin/order/<%= order.id %>/cancel" method="post">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="cancelModalLabel">Hủy đơn hàng</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Đóng"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label for="cancelReason" class="form-label">Lý do hủy</label>
+                                                        <textarea class="form-control" name="cancelReason"
+                                                            id="cancelReason" rows="3" required></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Đóng</button>
+                                                    <button type="submit" class="btn btn-danger">Xác nhận hủy</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% } %>
+
+                        </div>
+                    </main>
+                    <%- include('../layout/footer'); -%>
+                </div>
+>>>>>>> 68aa47a0bde606efc9723c910e286db432ddf0cc
         </div>
-    </div>
-    <!-- Footer End -->
 
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-            class="fa fa-arrow-up"></i></a>
-
-    <!-- JS Libraries -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="/client/js/bootstrap.bundle.min.js"></script>
-    <script src="/client/js/main.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
-
+        <script src="/admin/js/scripts.js"></script>
 </body>
 
 </html>
