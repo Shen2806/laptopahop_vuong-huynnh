@@ -7,7 +7,7 @@
         <%= typeof title !=='undefined' ? title : 'Liên hệ' %>
     </title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta name="description" content="Trang liên hệ của LaptopShop-VH">
+    <meta name="description" content="Trang liên hệ của LaptopShop">
 
     <!-- Fonts & Icons -->
     <link
@@ -84,6 +84,24 @@
                 transform: translateY(0);
             }
         }
+
+        /* Logo css */
+        .logo-circle {
+            margin-right: 10px;
+            height: 70px;
+            width: 70px;
+            /* nên để bằng nhau để bo tròn đẹp */
+            border-radius: 50%;
+            /* bo tròn */
+            object-fit: cover;
+            /* giữ hình không méo */
+            border: 3px solid #8BC34A;
+            /* viền xanh lá đồng bộ với web */
+            padding: 3px;
+            /* cách viền một chút nếu muốn */
+            background: white;
+            /* nền trắng để viền nổi bật hơn */
+        }
     </style>
 </head>
 
@@ -120,8 +138,11 @@
 
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                <div>
+                    <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle">
+                </div>
                 <a href="/" class="navbar-brand">
-                    <h1 class="text-primary display-6">LaptopShop-VH</h1>
+                    <h1 class="text-primary display-6">LaptopShop</h1>
                 </a>
                 <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarCollapse">
@@ -135,6 +156,7 @@
                         <a href="/about" class="nav-item nav-link">Giới thiệu</a>
                         <a href="/contact" class="nav-item nav-link active">Liên hệ</a>
                         <a href="/terms" class="nav-item nav-link " hidden>Điều khoản</a>
+                        <a href="/blogs" class="nav-item nav-link">Blog</a>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -146,15 +168,6 @@
                                 <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
                             </ul>
                         </li>
-
-                        <!-- Thanh tìm kiếm -->
-                        <form class="d-flex ms-3" action="/search" method="get">
-                            <input class="form-control me-2" type="search" name="q" placeholder="Tìm sản phẩm..."
-                                aria-label="Search" required>
-                            <button class="btn btn-outline-primary" type="submit">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </form>
                     </div>
 
                     <!-- Icon giỏ hàng & account nằm trong navbar-collapse -->
@@ -223,7 +236,7 @@
 
         <div class="card">
             <div class="card-body">
-                <h2 class="mb-4">Liên hệ LaptopShop-VH
+                <h2 class="mb-4">Liên hệ LaptopShop
                 </h2>
                 <p>Nếu bạn có bất kỳ câu hỏi, góp ý hoặc cần hỗ trợ, vui lòng liên hệ với chúng tôi theo thông tin
                     dưới đây hoặc gửi tin nhắn trực tiếp qua form.</p>

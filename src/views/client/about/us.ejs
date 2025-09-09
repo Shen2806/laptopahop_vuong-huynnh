@@ -7,7 +7,7 @@
         <%= typeof title !=='undefined' ? title : 'Giới thiệu' %>
     </title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta name="description" content="Giới thiệu về LaptopShop-VH">
+    <meta name="description" content="Giới thiệu về LaptopShop">
 
     <!-- Fonts & Icons -->
     <link
@@ -77,6 +77,24 @@
                 transform: translateY(0);
             }
         }
+
+        /* Logo css */
+        .logo-circle {
+            margin-right: 10px;
+            height: 70px;
+            width: 70px;
+            /* nên để bằng nhau để bo tròn đẹp */
+            border-radius: 50%;
+            /* bo tròn */
+            object-fit: cover;
+            /* giữ hình không méo */
+            border: 3px solid #8BC34A;
+            /* viền xanh lá đồng bộ với web */
+            padding: 3px;
+            /* cách viền một chút nếu muốn */
+            background: white;
+            /* nền trắng để viền nổi bật hơn */
+        }
     </style>
 </head>
 
@@ -113,8 +131,11 @@
 
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                <div>
+                    <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle">
+                </div>
                 <a href="/" class="navbar-brand">
-                    <h1 class="text-primary display-6">LaptopShop-VH</h1>
+                    <h1 class="text-primary display-6">LaptopShop</h1>
                 </a>
                 <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarCollapse">
@@ -128,6 +149,7 @@
                         <a href="/about" class="nav-item nav-link active">Giới thiệu</a>
                         <a href="/contact" class="nav-item nav-link">Liên hệ</a>
                         <a href="/terms" class="nav-item nav-link " hidden>Điều khoản</a>
+                        <a href="/blogs" class="nav-item nav-link">Blog</a>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -210,7 +232,7 @@
                 <h2 class="mb-4">Về thông tin của Shop
                 </h2>
                 <p>
-                    LaptopShop-VH là đơn vị chuyên cung cấp laptop chất lượng cao, đa dạng từ phân khúc phổ
+                    LaptopShop là đơn vị chuyên cung cấp laptop chất lượng cao, đa dạng từ phân khúc phổ
                     thông đến cao cấp,
                     đáp ứng nhu cầu học tập, làm việc và giải trí của mọi khách hàng.
                 </p>

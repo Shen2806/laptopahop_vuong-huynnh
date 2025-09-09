@@ -31,6 +31,100 @@
 
     <!-- Template Stylesheet -->
     <link href="/client/css/style.css" rel="stylesheet">
+    <style>
+        /* Hover effects */
+        .hover-shadow:hover {
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1) !important;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.02);
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Gradient button */
+        .btn-gradient {
+            background: linear-gradient(90deg, #28a745, #218838);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(90deg, #218838, #1e7e34);
+        }
+
+        /* Style dropdown menu */
+        .navbar .dropdown-menu {
+            border-radius: 8px;
+            /* bo góc */
+            padding: 8px 0;
+            /* khoảng cách bên trong */
+            border: none;
+            /* bỏ viền */
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            /* đổ bóng nhẹ */
+            min-width: 220px;
+            /* độ rộng tối thiểu */
+        }
+
+        /* Style item trong dropdown */
+        .navbar .dropdown-menu .dropdown-item {
+            padding: 10px 18px;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            border-radius: 6px;
+            /* bo góc item */
+        }
+
+        /* Hover item */
+        .navbar .dropdown-menu .dropdown-item:hover {
+            background-color: #8BC34A;
+            /* xanh lá nhạt */
+            color: #fff;
+            /* chữ trắng */
+        }
+
+        /* Dropdown mở khi hover */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+            animation: fadeIn 0.3s ease-in-out;
+            /* hiệu ứng mượt */
+        }
+
+        /* Hiệu ứng fade */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Logo css */
+        .logo-circle {
+            margin-right: 10px;
+            height: 70px;
+            width: 70px;
+            /* nên để bằng nhau để bo tròn đẹp */
+            border-radius: 50%;
+            /* bo tròn */
+            object-fit: cover;
+            /* giữ hình không méo */
+            border: 3px solid #8BC34A;
+            /* viền xanh lá đồng bộ với web */
+            padding: 3px;
+            /* cách viền một chút nếu muốn */
+            background: white;
+            /* nền trắng để viền nổi bật hơn */
+        }
+    </style>
 </head>
 
 <body>
@@ -74,8 +168,11 @@
 
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
+                <div>
+                    <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle">
+                </div>
                 <a href="/" class="navbar-brand">
-                    <h1 class="text-primary display-6">LaptopShop-VH</h1>
+                    <h1 class="text-primary display-6">LaptopShop</h1>
                 </a>
                 <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarCollapse">
@@ -86,204 +183,213 @@
                     <div class="navbar-nav mx-auto">
                         <a href="/" class="nav-item nav-link active">Trang chủ</a>
                         <a href="/products" class="nav-item nav-link">Sản phẩm</a>
+                        <a href="/about" class="nav-item nav-link">Giới thiệu</a>
+                        <a href="/contact" class="nav-item nav-link">Liên hệ</a>
+                        <a href="/terms" class="nav-item nav-link active" hidden>Điều khoản</a>
+                        <a href="/blogs" class="nav-item nav-link">Blog</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Thông tin và chính sách
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="policyDropdown">
+                                <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
+                                <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
+                                <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
+                            </ul>
+                        </li>
+                        <!-- Icon giỏ hàng & account nằm trong navbar-collapse -->
+                        <div class="d-flex ms-auto">
+                            <a href="/cart" class="position-relative me-4 my-auto">
+                                <i class="fa fa-shopping-bag fa-2x"></i>
+                                <span
+                                    class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
+                                    style="top: -5px; left: 15px; height: 20px; min-width: 20px;">
+                                    <%= user?.sumCart ?? 0%>
+                                </span>
+                            </a>
+                            <% if(user){ %>
+                                <div class="dropdown my-auto">
+                                    <a href="#" class="dropdown" role="button" id="dropdownMenuLink"
+                                        data-bs-toggle="dropdown" aria-expanded="false" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <i class="fas fa-user fa-2x"></i>
+                                    </a>
+
+                                    <ul class="dropdown-menu dropdown-menu-end p-4" aria-labelledby="dropdownMenuLink">
+                                        <li class="d-flex align-items-center flex-column" style="min-width: 300px;">
+                                            <img style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden;"
+                                                src="/images/<%= user.avatar %>" />
+                                            <div class="text-center my-3">
+                                                <%= user.fullName %>
+                                            </div>
+                                        </li>
+
+                                        <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
+
+                                        <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <form method="post" action="/logout">
+                                                <button class="dropdown-item">Đăng xuất</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <% }else { %>
+                                    <a href="/login" class="a-login">
+                                        <i class="fas fa-user fa-2x"></i>
+                                    </a>
+                                    <% } %>
+
+
+
+                        </div>
                     </div>
-
-                    <!-- Icon giỏ hàng & account nằm trong navbar-collapse -->
-                    <div class="d-flex ms-auto">
-                        <a href="/cart" class="position-relative me-4 my-auto">
-                            <i class="fa fa-shopping-bag fa-2x"></i>
-                            <span
-                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
-                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;">
-                                <%= user?.sumCart ?? 0%>
-                            </span>
-                        </a>
-                        <% if(user){ %>
-                            <div class="dropdown my-auto">
-                                <a href="#" class="dropdown" role="button" id="dropdownMenuLink"
-                                    data-bs-toggle="dropdown" aria-expanded="false" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <i class="fas fa-user fa-2x"></i>
-                                </a>
-
-                                <ul class="dropdown-menu dropdown-menu-end p-4" aria-labelledby="dropdownMenuLink">
-                                    <li class="d-flex align-items-center flex-column" style="min-width: 300px;">
-                                        <img style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden;"
-                                            src="/images/<%= user.avatar %>" />
-                                        <div class="text-center my-3">
-                                            <%= user.fullName %>
-                                        </div>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
-
-                                    <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form method="post" action="/logout">
-                                            <button class="dropdown-item">Đăng xuất</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                            <% }else { %>
-                                <a href="/login" class="a-login">
-                                    <i class="fas fa-user fa-2x"></i>
-                                </a>
-                                <% } %>
-
-
-
-                    </div>
-                </div>
             </nav>
         </div>
     </div>
     <!-- Navbar End -->
 
-    <!-- Cart Page Start -->
-    <div class="container-fluid py-3">
-        <div class="container py-3">
-            <div class="mb-3">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Thanh Toán Giỏ Hàng</li>
-                    </ol>
-                </nav>
-            </div>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Sản phẩm</th>
-                            <th scope="col">Tên</th>
-                            <th scope="col">Giá cả</th>
-                            <th scope="col">Số lượng</th>
-                            <th scope="col">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% cartDetails.forEach( function (cartDetail) { %>
-                            <tr>
-                                <th scope="row">
-                                    <div class="d-flex align-items-center">
-                                        <img src="/images/product/<%=cartDetail.product.image %>"
-                                            class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;"
-                                            alt="">
-                                    </div>
-                                </th>
-                                <td>
-                                    <p class="mb-0 mt-4">
-                                        <a target="_blank" href="/product/<%=cartDetail.product.id %>">
-                                            <%=cartDetail.product.name %>
+    <!-- Checkout Page Start -->
+    <div class="container-fluid py-5 bg-light">
+        <div class="container">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb bg-white px-4 py-2 rounded shadow-sm">
+                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="/cart" class="text-decoration-none">Chi tiết giỏ hàng</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Thanh toán</li>
+                </ol>
+            </nav>
+
+            <% if (user?.sumCart===0) { %>
+                <div class="alert alert-info text-center py-5 rounded">
+                    Chưa có sản phẩm trong giỏ hàng
+                </div>
+                <% } else { %>
+
+                    <!-- Cart Table -->
+                    <div class="mb-5">
+                        <% cartDetails.forEach(function(cartDetail) { %>
+                            <div
+                                class="d-flex align-items-center justify-content-between bg-white rounded shadow-sm mb-3 p-3 hover-shadow">
+
+                                <!-- Product Info -->
+                                <div class="d-flex align-items-center" style="flex: 2;">
+                                    <img src="/images/product/<%= cartDetail.product.image %>"
+                                        class="rounded me-3 shadow-sm"
+                                        style="width: 80px; height: 80px; object-fit: cover;" alt="">
+                                    <div>
+                                        <a href="/product/<%= cartDetail.product.id %>" target="_blank"
+                                            class="fw-bold text-dark text-decoration-none">
+                                            <%= cartDetail.product.name %>
                                         </a>
-                                    </p>
-                                </td>
-                                <td>
-                                    <p class="mb-0 mt-4">
+                                        <!-- Optional: Add SKU or short description -->
+                                        <div class="text-muted mt-1">SKU: <%= cartDetail.product.id %>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Price -->
+                                <div class="text-center" style="flex: 1;">
+                                    <span class="fw-bold text-primary">
                                         <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
                                             }).format(cartDetail.product.price) %>
-                                    </p>
-                                </td>
-                                <td>
-                                    <div class="input-group quantity mt-4" style="width: 100px;">
-                                        <input type="text" class="form-control form-control-sm text-center border-0"
-                                            value="<%=cartDetail.quantity %>" disabled />
-                                    </div>
-                                </td>
-                                <td>
-                                    <p class="mb-0 mt-4" data-cart-detail-id="<%=cartDetail.id %>">
-                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                            }).format(cartDetail.quantity * cartDetail.price) %>
-                                    </p>
-                                </td>
+                                    </span>
+                                </div>
 
-                            </tr>
+                                <!-- Quantity -->
+                                <div class="text-center" style="flex: 1;">
+                                    <input type="text" class="form-control form-control-sm text-center rounded-pill"
+                                        style="width: 60px;" value="<%= cartDetail.quantity %>" disabled>
+                                </div>
+
+                                <!-- Total -->
+                                <div class="text-center fw-bold text-success" style="flex: 1;">
+                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                        }).format(cartDetail.quantity * cartDetail.price) %>
+                                </div>
+
+                            </div>
                             <% }) %>
-                                <%if (user?.sumCart===0) { %>
-                                    <tr>
-                                        <td colspan="6"> Chưa có sản phẩm trong giỏ hàng</td>
-                                    </tr>
-                                    <% } %>
-                    </tbody>
-                </table>
-            </div>
-
-            <%if (user?.sumCart> 0) { %>
-                <form action="/place-order" method="post">
-                    <input value="<%=totalPrice%>" name="totalPrice" style="display: none;" />
-                    <div class="mt-5 row g-4 justify-content-start">
-                        <div class="col-12 col-md-6">
-                            <div class="p-4 ">
-                                <h5>Thông Tin Người Nhận</h5>
-                                <div class="row">
-                                    <div class="col-12 form-group mb-3">
-                                        <label>Tên người nhận</label>
-                                        <input class="form-control" name="receiverName" required />
-                                    </div>
-                                    <div class="col-12 form-group mb-3">
-                                        <label>Địa chỉ người nhận</label>
-                                        <input class="form-control" name="receiverAddress" required />
-                                    </div>
-                                    <div class="col-12 form-group mb-3">
-                                        <label>Số điện thoại</label>
-                                        <input class="form-control" name="receiverPhone" required />
-                                    </div>
-                                    <div class="col-12 form-group mb-3">
-                                        <label>Ghi chú khi giao hàng</label>
-                                        <textarea class="form-control" name="receiverNote" type="text"
-                                            required></textarea>
-                                    </div>
-                                    <div class="mt-4">
-                                        <i class="fas fa-arrow-left"></i>
-                                        <a href="/cart">Quay lại giỏ hàng</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="bg-light rounded">
-                                <div class="p-4">
-                                    <h1 class="display-6 mb-4">Thông Tin <span class="fw-normal">Thanh
-                                            Toán</span>
-                                    </h1>
-
-                                    <div class="d-flex justify-content-between">
-                                        <h5 class="mb-0 me-4">Phí vận chuyển</h5>
-                                        <div class="">
-                                            <p class="mb-0">0 đ</p>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3 d-flex justify-content-between">
-                                        <h5 class="mb-0 me-4">Hình thức</h5>
-                                        <div class="">
-                                            <p class="mb-0">Thanh toán khi nhận hàng (COD)</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
-                                    <h5 class="mb-0 ps-4 me-4">Tổng số tiền</h5>
-                                    <p class="mb-0 pe-4" data-cart-total-price="<%= totalPrice %>">
-                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                            }).format(totalPrice) %>
-                                    </p>
-                                </div>
-
-                                <button
-                                    class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4">
-                                    Xác nhận thanh toán
-                                </button>
-
-                            </div>
-                        </div>
                     </div>
-                </form>
-                <% } %>
+
+
+                    <!-- Checkout Form -->
+                    <form action="/place-order" method="post">
+                        <input type="hidden" name="totalPrice" value="<%= totalPrice %>">
+
+                        <div class="row g-4">
+                            <!-- Receiver Info -->
+                            <div class="col-12 col-lg-6">
+                                <div class="bg-white rounded shadow-sm p-4 border border-light h-100">
+                                    <h5 class="mb-4 fw-bold text-uppercase border-bottom pb-2"><i class="fa fa-user"></i> Thông Tin Người Nhận</h5>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Tên người nhận</label>
+                                        <input class="form-control rounded-pill" name="receiverName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Địa chỉ người nhận</label>
+                                        <input class="form-control rounded-pill" name="receiverAddress" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Số điện thoại</label>
+                                        <input class="form-control rounded-pill" name="receiverPhone" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">Ghi chú khi giao hàng</label>
+                                        <textarea class="form-control rounded" name="receiverNote"></textarea>
+                                    </div>
+
+                                    <a href="/cart"
+                                        class="d-inline-flex align-items-center text-decoration-none text-primary fw-semibold mt-3">
+                                        <i class="fas fa-arrow-left me-2"></i>Quay lại giỏ hàng
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Payment Info -->
+                            <div class="col-12 col-lg-6">
+                                <div class="bg-white rounded shadow-sm p-4 border border-light h-100">
+                                    <h5 class="mb-4 fw-bold text-uppercase border-bottom pb-2"><i class="fa fa-credit-card me-2 text-info"></i>Thông Tin Thanh Toán</h5>
+
+                                    <div class="d-flex justify-content-between mb-2 fw-semibold text-muted">
+                                        <span>Phí vận chuyển</span>
+                                        <span class="text-success fw-bold">0 đ</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-4 fw-semibold text-muted">
+                                        <span>Hình thức</span>
+                                        <span>Thanh toán khi nhận hàng (COD)</span>
+                                    </div>
+
+                                    <div
+                                        class="border-top border-bottom py-3 mb-4 d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Tổng số tiền</h5>
+                                        <h5 class="mb-0 text-danger fw-bold" data-cart-total-price="<%= totalPrice %>">
+                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                }).format(totalPrice) %>
+                                        </h5>
+                                    </div>
+
+                                    <button class="btn w-100 py-3 fw-bold rounded-pill btn-gradient hover-scale">
+                                        Xác nhận thanh toán
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <% } %>
         </div>
     </div>
+    <!-- Checkout Page End -->
+
+
     <!-- Cart Page End -->
 
     <!-- Footer Start -->
@@ -293,7 +399,7 @@
                 <div class="row g-4">
                     <div class="col-lg-3">
                         <a href="#">
-                            <h1 class="text-primary mb-0">LaptopShop-VH</h1>
+                            <h1 class="text-primary mb-0">LaptopShop</h1>
                         </a>
                     </div>
 

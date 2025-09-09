@@ -31,6 +31,47 @@
 
     <!-- Template Stylesheet -->
     <link href="/client/css/style.css" rel="stylesheet">
+    <style>
+        /* Fade-in alert */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Icon nhấp nháy nhẹ */
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .animated-icon {
+            animation: bounce 1s infinite;
+        }
+
+        /* Gradient nền nhẹ cho alert */
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        }
+    </style>
+
 </head>
 
 <body>
@@ -76,7 +117,7 @@
         <div class="container px-0">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
                 <a href="/" class="navbar-brand">
-                    <h1 class="text-primary display-6">LaptopShop-VH</h1>
+                    <h1 class="text-primary display-6">LaptopShop</h1>
                 </a>
                 <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarCollapse">
@@ -90,6 +131,7 @@
                         <a href="/about" class="nav-item nav-link">Giới thiệu</a>
                         <a href="/contact" class="nav-item nav-link">Liên hệ</a>
                         <a href="/terms" class="nav-item nav-link active" hidden>Điều khoản</a>
+                        <a href="/blogs" class="nav-item nav-link">Blog</a>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
@@ -158,17 +200,36 @@
     </div>
     <!-- Navbar End -->
 
-    <div class="container " style="margin-top: 70px;">
+    <!-- body starts -->
+
+
+    <div class="container" style="margin-top: 50px;">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-white px-4 py-2 rounded shadow-sm">
+                <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="/cart" class="text-decoration-none">Chi tiết giỏ hàng</a></li>
+                <li class="breadcrumb-item" aria-current="page">Thanh toán</li>
+                <li class="breadcrumb-item active" aria-current="page">Hoàn tất thanh toán</li>
+            </ol>
+        </nav>
         <div class="row">
-            <div class="col-12 ">
-                <div class="alert alert-success" role="alert">
-                    Cảm ơn bạn đã mua hàng, đơn hàng đã được xác nhận thành công !
+            <div class="col-12">
+                <div class="alert alert-success shadow-lg rounded-3 p-4 d-flex align-items-center fade-in" role="alert">
+                    <i class="fa fa-check-circle fa-3x me-3 text-success animated-icon"></i>
+                    <div>
+                        <h5 class="fw-bold">Đặt hàng thành công!</h5>
+                        <span>Đơn hàng của bạn đang chờ được xác nhận. Chúng tôi sẽ liên hệ với bạn sớm để xác nhận
+                            thông tin giao hàng.</span>
+                        <p>Quay về trang chủ trong <span id="countdown">3</span> giây...</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- body End -->
+
     <!-- Feature -->
-    <div class="container-fluid featurs">
+    <!-- <div class="container-fluid featurs">
         <div class="container ">
             <div class="row g-4">
                 <div class="col-md-6 col-lg-3">
@@ -217,7 +278,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
         <div class="container py-5">
@@ -225,7 +286,7 @@
                 <div class="row g-4">
                     <div class="col-lg-3">
                         <a href="#">
-                            <h1 class="text-primary mb-0">LaptopShop-VH</h1>
+                            <h1 class="text-primary mb-0">LaptopShop</h1>
                         </a>
                     </div>
 
@@ -312,6 +373,21 @@
 
     <!-- Template Javascript -->
     <script src="/client/js/main.js"></script>
+    <script>
+        // Countdown 3 → 2 → 1
+        let seconds = 3;
+        const countdown = document.getElementById('countdown');
+
+        const interval = setInterval(() => {
+            seconds--;
+            if (seconds > 0) {
+                countdown.textContent = seconds;
+            } else {
+                clearInterval(interval);
+                window.location.href = '/'; // chuyển về trang chủ
+            }
+        }, 1000);
+    </script>
 </body>
 
 </html>

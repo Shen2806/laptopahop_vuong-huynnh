@@ -1,3 +1,90 @@
+<!-- Libraries Stylesheet -->
+<link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+<link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+<!-- Customized Bootstrap Stylesheet -->
+<link href="/client/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Template Stylesheet -->
+<link href="/client/css/style.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css"
+    integrity="sha512-wJgJNTBBkLit7ymC6vvzM1EcSWeM9mmOu+1USHaRBbHkm6W9EgM0HY27+UtUaprntaYQJF75rc8gjxllKs5OIQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+    /*menu*/
+    /* Style dropdown menu */
+    .navbar .dropdown-menu {
+        border-radius: 8px;
+        /* bo góc */
+        padding: 8px 0;
+        /* khoảng cách bên trong */
+        border: none;
+        /* bỏ viền */
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        /* đổ bóng nhẹ */
+        min-width: 220px;
+        /* độ rộng tối thiểu */
+    }
+
+    /* Style item trong dropdown */
+    .navbar .dropdown-menu .dropdown-item {
+        padding: 10px 18px;
+        color: #333;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+        border-radius: 6px;
+        /* bo góc item */
+    }
+
+    /* Hover item */
+    .navbar .dropdown-menu .dropdown-item:hover {
+        background-color: #8BC34A;
+        /* xanh lá nhạt */
+        color: #fff;
+        /* chữ trắng */
+    }
+
+    /* Dropdown mở khi hover */
+    .nav-item.dropdown:hover .dropdown-menu {
+        display: block;
+        margin-top: 0;
+        animation: fadeIn 0.3s ease-in-out;
+        /* hiệu ứng mượt */
+    }
+
+    /* Hiệu ứng fade */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Logo css */
+    .logo-circle {
+        margin-right: 10px;
+        height: 70px;
+        width: 70px;
+        /* nên để bằng nhau để bo tròn đẹp */
+        border-radius: 50%;
+        /* bo tròn */
+        object-fit: cover;
+        /* giữ hình không méo */
+        border: 3px solid #8BC34A;
+        /* viền xanh lá đồng bộ với web */
+        padding: 3px;
+        /* cách viền một chút nếu muốn */
+        background: white;
+        /* nền trắng để viền nổi bật hơn */
+    }
+</style>
 <div class="container-fluid shadow" style="margin-top: 10px">
     <!-- Topbar -->
     <div class="container topbar bg-primary d-none d-lg-block">
@@ -25,86 +112,86 @@
         </div>
     </div>
 
+    <!-- Navbar -->
+    <div class="container px-0">
+        <nav class="navbar navbar-light bg-white navbar-expand-xl">
+            <div>
+                <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle">
+            </div>
+            <a href="/" class="navbar-brand">
+                <h1 class="text-primary display-6">LaptopShop</h1>
+            </a>
+            <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarCollapse">
+                <span class="fa fa-bars text-primary"></span>
+            </button>
 
-    <div class="container-fluid shadow" style="margin-top: 10px">
-        <!-- Navbar -->
-        <div class="container px-0">
-            <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                <a href="/" class="navbar-brand">
-                    <h1 class="text-primary display-6">LaptopShop-VH</h1>
-                </a>
-                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarCollapse">
-                    <span class="fa fa-bars text-primary"></span>
-                </button>
-
-                <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
-                    <div class="navbar-nav mx-auto">
-                        <a href="/" class="nav-item nav-link active">Trang chủ</a>
-                        <a href="/products" class="nav-item nav-link">Sản phẩm</a>
-                        <a href="/about" class="nav-item nav-link">Giới thiệu</a>
-                        <a href="/contact" class="nav-item nav-link">Liên hệ</a>
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Thông tin và chính sách
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="policyDropdown">
-                                <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
-                                <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
-                                <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item"><a class="nav-link" href="/blogs">Blog</a></li>
-                    </div>
-
-                    <div class="d-flex ms-auto align-items-center">
-                        <!-- Giỏ hàng -->
-                        <a href="/cart" class="position-relative me-3">
-                            <i class="fa fa-shopping-bag fa-2x"></i>
-                            <span
-                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
-                                id="sumCart" style="top: -5px; left: 15px; height: 20px; min-width: 20px;">
-                                <%= user?.sumCart ?? 0 %>
-                            </span>
+            <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                <div class="navbar-nav mx-auto">
+                    <a href="/" class="nav-item nav-link active">Trang chủ</a>
+                    <a href="/products" class="nav-item nav-link">Sản phẩm</a>
+                    <a href="/about" class="nav-item nav-link">Giới thiệu</a>
+                    <a href="/contact" class="nav-item nav-link">Liên hệ</a>
+                    <a href="/blogs" class="nav-item nav-link">Blog</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Thông tin và chính sách
                         </a>
-                        <!-- User -->
-                        <% if(user){ %>
-                            <div class="dropdown my-auto">
-                                <a href="#" class="dropdown" role="button" id="dropdownMenuLink"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-user fa-2x"></i>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end p-4" aria-labelledby="dropdownMenuLink">
-                                    <li class="d-flex align-items-center flex-column" style="min-width: 300px;">
-                                        <img style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden;"
-                                            src="/images/<%= user.avatar %>" />
-                                        <div class="text-center my-3">
-                                            <%= user.fullName %>
-                                        </div>
-                                    </li>
-                                    <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
-                                    <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form method="post" action="/logout">
-                                            <button class="dropdown-item">Đăng xuất</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                            <% } else { %>
-                                <a href="/login" class="a-login">
-                                    <i class="fas fa-user fa-2x"></i>
-                                </a>
-                                <% } %>
-                    </div>
+                        <ul class="dropdown-menu" aria-labelledby="policyDropdown">
+                            <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
+                            <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
+                            <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
+                        </ul>
+                    </li>
                 </div>
-            </nav>
-        </div>
+
+                <div class="d-flex ms-auto align-items-center">
+                    <!-- Giỏ hàng -->
+                    <a href="/cart" class="position-relative me-3">
+                        <i class="fa fa-shopping-bag fa-2x"></i>
+                        <span
+                            class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
+                            id="sumCart" style="top: -5px; left: 15px; height: 20px; min-width: 20px;">
+                            <%= user?.sumCart ?? 0 %>
+                        </span>
+                    </a>
+                    <!-- User -->
+                    <% if(user){ %>
+                        <div class="dropdown my-auto">
+                            <a href="#" class="dropdown" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                <i class="fas fa-user fa-2x"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end p-4" aria-labelledby="dropdownMenuLink">
+                                <li class="d-flex align-items-center flex-column" style="min-width: 300px;">
+                                    <img style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden;"
+                                        src="/images/<%= user.avatar %>" />
+                                    <div class="text-center my-3">
+                                        <%= user.fullName %>
+                                    </div>
+                                </li>
+                                <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
+                                <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <form method="post" action="/logout">
+                                        <button class="dropdown-item ">Đăng xuất</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                        <% } else { %>
+                            <a href="/login" class="a-login">
+                                <i class="fas fa-user fa-2x"></i>
+                            </a>
+                            <% } %>
+                </div>
+            </div>
+        </nav>
     </div>
+</div>
 
 </div>
