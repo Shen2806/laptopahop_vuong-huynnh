@@ -7,114 +7,126 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="MinhVuong&QuocHuynh - Dự án laptopshop" />
     <meta name="author" content="MinhVuong&QuocHuynh" />
-    <title>Manager Users - LaptopShop</title>
+    <title>Quản lý người dùng - LaptopShop</title>
     <link href="/admin/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 
-<body class="sb-nav-fixed">
+<body class="sb-nav-fixed bg-light">
     <%- include('../layout/header'); -%>
         <div id="layoutSidenav">
             <%- include('../layout/sidenav'); -%>
                 <div id="layoutSidenav_content">
                     <main>
                         <div class="container-fluid px-4">
-                            <h1 class="mt-4">Manage Users</h1>
+                            <!-- Tiêu đề -->
+                            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                                <h1 class="h3 fw-bold text-primary"><i class="fa-solid fa-users"></i> Quản lý người dùng
+                                </h1>
+                                <a href="/admin/create-user" class="btn btn-success shadow-sm">
+                                    <i class="fa-solid fa-user-plus me-1"></i> Thêm người người
+                                </a>
+                            </div>
+
+                            <!-- Breadcrumb -->
                             <ol class="breadcrumb mb-4">
                                 <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
                                 <li class="breadcrumb-item active">Users</li>
                             </ol>
-                            <div>
-                                <div
-                                    style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
-                                    <h4>
-                                        Table Users
-                                    </h4>
-                                    <div>
-                                        <a href="/admin/create-user" class='btn btn-warning'>Create a new user</a>
-                                    </div>
+
+                            <!-- Bảng Users -->
+                            <div class="card shadow-sm border-0 rounded-3">
+                                <div class="card-header bg-primary text-white fw-semibold">
+                                    <i class="fa-solid fa-table me-2"></i> Danh sách Người dùng
                                 </div>
-                                <hr />
-                                <table class="table table-hover table-bordered">
-                                    <thead>
-                                        <th>Id</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Address</th>
-                                        <th>Action</th>
-                                    </thead>
-                                    <tbody>
-                                        <% users.forEach( function (user) { %>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>STT</th>
+                                                    <th>Tên</th>
+                                                    <th>Email</th>
+                                                    <th>Địa chỉ</th>
+                                                    <th class="text-center">Hành động</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% users.forEach(function (user) { %>
+                                                    <tr>
+                                                        <td><span class="badge bg-secondary">
+                                                                <%= user.id %>
+                                                            </span></td>
+                                                        <td>
+                                                            <%= user.fullName %>
+                                                        </td>
+                                                        <td>
+                                                            <%= user.username %>
+                                                        </td>
+                                                        <td>
+                                                            <%= user.address %>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-center gap-2">
+                                                                <form action="/admin/view-user/<%= user.id %>"
+                                                                    method="get">
+                                                                    <button type="submit"
+                                                                        class="btn btn-sm btn-info text-white">
+                                                                        <i class="fa-solid fa-eye"></i> Xem
+                                                                    </button>
+                                                                </form>
+                                                                <form action="/admin/delete-user/<%= user.id %>"
+                                                                    method="post"
+                                                                    onsubmit="return confirm('Bạn có chắc muốn xóa user này không?')">
+                                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                                        <i class="fa-solid fa-trash"></i> Xóa
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <% }) %>
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                                            <tr>
-                                                <td>
-                                                    <%= user.id %>
-                                                </td>
-                                                <td>
-                                                    <%= user.fullName %>
-                                                </td>
-                                                <td>
-                                                    <%= user.username %>
-                                                </td>
-                                                <td>
-                                                    <%= user.address %>
-                                                </td>
-
-                                                <td>
-                                                    <div style="display: flex; gap: 10px;">
-                                                        <form action="/admin/view-user/<%= user.id %>" method="get">
-                                                            <button type="submit" class="btn btn-warning">View </button>
-                                                        </form>
-                                                        <form action="/admin/delete-user/<%= user.id %>" method="post">
-                                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                                        </form>
-                                                    </div>
-
-                                                </td>
-                                            </tr>
-                                            <% }) %>
-
-                                    </tbody>
-
-                                </table>
-                                <nav aria-label="Page navigation example">
-                                    <ul class="pagination justify-content-center">
-                                        <li class="page-item">
-                                            <a class="<%= page === 1 ? 'disabled page-link' : 'page-link' %>"
-                                                href="/admin/user?page=<%= page - 1 %>" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                        <% for(var i=1; i<=totalPages; i++) {%>
-                                            <li class="page-item"><a
-                                                    class="<%= page === i ? 'active page-link' : 'page-link' %>"
-                                                    href="/admin/user?page=<%= i %>">
-                                                    <%= i %>
+                                    <!-- Pagination -->
+                                    <nav aria-label="User pagination">
+                                        <ul class="pagination justify-content-center mt-3">
+                                            <li class="page-item">
+                                                <a class="<%= page === 1 ? 'disabled page-link' : 'page-link' %>"
+                                                    href="/admin/user?page=<%= page - 1 %>" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
                                                 </a>
                                             </li>
-                                            <% } %>
-
-
+                                            <% for(var i=1; i<=totalPages; i++) { %>
                                                 <li class="page-item">
-                                                    <a class="<%= page === totalPages ? 'disabled page-link' : 'page-link' %>"
-                                                        href="/admin/user?page=<%= page + 1 %>" aria-label="Next">
-                                                        <span aria-hidden="true">&raquo;</span>
+                                                    <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
+                                                        href="/admin/user?page=<%= i %>">
+                                                        <%= i %>
                                                     </a>
                                                 </li>
-                                    </ul>
-                                </nav>
+                                                <% } %>
+                                                    <li class="page-item">
+                                                        <a class="<%= page === totalPages ? 'disabled page-link' : 'page-link' %>"
+                                                            href="/admin/user?page=<%= page + 1 %>" aria-label="Next">
+                                                            <span aria-hidden="true">&raquo;</span>
+                                                        </a>
+                                                    </li>
+                                        </ul>
+                                    </nav>
+                                </div>
                             </div>
                         </div>
-
                     </main>
                     <%- include('../layout/footer'); -%>
                 </div>
         </div>
+
+        <!-- Bootstrap -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
             crossorigin="anonymous"></script>
         <script src="/admin/js/scripts.js"></script>
-
-
 </body>
 
 </html>
