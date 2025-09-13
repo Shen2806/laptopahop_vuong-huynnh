@@ -10,6 +10,7 @@ import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
 import apiRoutes from './routes/api';
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 
 const app = express();
@@ -63,6 +64,8 @@ webRoutes(app);
 apiRoutes(app);
 // seeding data
 initDatabase()
+
+app.use(cookieParser());
 
 
 // handle 404 not found

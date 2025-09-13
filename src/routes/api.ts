@@ -8,6 +8,7 @@ import {
     postAddProductToCartAPI,
     updateUserByIdAPI
 } from 'controllers/client/api.controller';
+import { postLogin, refreshToken } from 'controllers/client/auth.controller';
 
 import express, { Express } from 'express';
 import { checkValidJWT } from 'src/middleware/jwt.middleware';
@@ -18,6 +19,8 @@ const apiRoutes = (app: Express) => {
     // ------------------ Public routes ------------------
     router.post("/add-product-to-cart", postAddProductToCartAPI);
     router.post("/login", loginAPI);
+    router.post("/login", postLogin);
+    router.post("/refresh", refreshToken);
 
 
 
@@ -32,7 +35,7 @@ const apiRoutes = (app: Express) => {
     router.get("/account", checkValidJWT, fetchAccountAPI);
 
     // ------------------ Mount router ------------------
-    app.use("/api", checkValidJWT, router);
+    app.use("/api", router);
 };
 
 export default apiRoutes;

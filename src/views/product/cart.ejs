@@ -355,8 +355,24 @@
                                                 <%= cartDetail.product.name%>
                                             </a>
                                             <span class=" fw-bold" style="color: #8BC34A;">
-                                                <%= new Intl.NumberFormat('vi-VN',{style:"currency",currency:"VND"})
-                                                    .format(cartDetail.product.price)%>
+
+                                                <% if (cartDetail.product.discount> 0) { %>
+                                                    <p class="mb-1 text-decoration-line-through text-muted small">
+                                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                            currency: 'VND' }).format(cartDetail.product.price) %>
+                                                    </p>
+                                                    <p class="fw-bold text-danger fs-5 mb-3">
+                                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                            currency: 'VND' }) .format(cartDetail.product.price * (100 -
+                                                            cartDetail.product.discount) / 100) %>
+                                                    </p>
+                                                    <% } else { %>
+                                                        <p class="text-dark fs-5 fw-bold mb-3">
+                                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                                currency: 'VND' }).format(cartDetail.product.price) %>
+                                                        </p>
+                                                        <% } %>
+
                                             </span>
                                         </div>
 
@@ -369,10 +385,11 @@
                                             </button>
                                             <input type="text"
                                                 class="form-control text-center border-0 fw-semibold cart-qty mx-1"
-                                                style="width:50px; " value="<%=cartDetail.quantity %>"
-                                                data-cart-detail-id="<%=cartDetail.id %>"
-                                                data-cart-detail-price="<%=cartDetail.price %>"
-                                                data-cart-detail-index="<%= index %>">
+                                                style="width:50px;" value="<%=cartDetail.quantity %>"
+                                                data-cart-detail-id="<%=cartDetail.id %>" data-cart-detail-price="<%= cartDetail.product.discount > 0 
+        ? Math.round(cartDetail.product.price * (100 - cartDetail.product.discount) / 100) 
+        : cartDetail.product.price %>" data-cart-detail-index="<%= index %>">
+
                                             <button type="button"
                                                 class="btn btn-outline-succes btn-sm rounded-circle btn-plus"
                                                 data-index="<%= index %>">
@@ -383,8 +400,22 @@
                                         <!-- Thành tiền -->
                                         <div class="text-danger fw-bold text-end cart-item-total"
                                             data-cart-detail-id="<%= cartDetail.id %>">
-                                            <%= new Intl.NumberFormat('vi-VN',{style:"currency",currency:"VND"})
-                                                .format(cartDetail.quantity * cartDetail.price)%>
+                                            <% if (cartDetail.product.discount> 0) { %>
+                                                <p class="mb-1 text-decoration-line-through text-muted small">
+                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                        currency: 'VND' }).format(cartDetail.product.price) %>
+                                                </p>
+                                                <p class="fw-bold text-danger fs-5 mb-3">
+                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                        currency: 'VND' }) .format(cartDetail.product.price * (100 -
+                                                        cartDetail.product.discount) / 100) %>
+                                                </p>
+                                                <% } else { %>
+                                                    <p class="text-dark fs-5 fw-bold mb-3">
+                                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                            currency: 'VND' }).format(cartDetail.product.price) %>
+                                                    </p>
+                                                    <% } %>
                                         </div>
 
                                         <!-- Xóa -->

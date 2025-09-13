@@ -10,50 +10,6 @@
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 
-<<<<<<< HEAD
-<body>
-    <!-- Navbar Start -->
-    <div class="container-fluid shadow-sm bg-white fixed-top">
-        <div class="container px-0">
-            <nav class="navbar navbar-light navbar-expand-xl">
-                <a href="/" class="navbar-brand">
-                    <h1 class="text-primary display-6">LaptopShop</h1>
-                </a>
-                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarCollapse">
-                    <span class="fa fa-bars text-primary"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <div class="navbar-nav mx-auto">
-                        <a href="/" class="nav-item nav-link">Trang chủ</a>
-                        <a href="/products" class="nav-item nav-link">Sản phẩm</a>
-                    </div>
-                    <div class="d-flex">
-                        <% if(user){ %>
-                            <div class="dropdown">
-                                <a href="#" class="dropdown" id="userDropdown" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user fa-2x"></i>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="userDropdown">
-                                    <li class="d-flex flex-column align-items-center">
-                                        <img src="/images/<%= user.avatar %>" class="rounded-circle mb-2"
-                                            style="width:100px;height:100px;">
-                                        <strong>
-                                            <%= user.fullName %>
-                                        </strong>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
-                                    <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
-                                    <li>
-                                        <form method="post" action="/logout">
-                                            <button class="dropdown-item">Đăng xuất</button>
-                                        </form>
-                                    </li>
-                                </ul>
-=======
 <body class="sb-nav-fixed bg-light">
     <%- include('../layout/header'); -%>
         <div id="layoutSidenav">
@@ -68,7 +24,6 @@
                                 </h1>
                                 <a href="/admin/order" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay
                                     lại</a>
->>>>>>> 68aa47a0bde606efc9723c910e286db432ddf0cc
                             </div>
 
                             <!-- Breadcrumb -->
@@ -168,18 +123,25 @@
                                                             <%= orderDetail.product.name %>
                                                         </a>
                                                     </td>
-                                                    <td>
-                                                        <%= new Intl.NumberFormat('vi-VN',{style:'currency',
-                                                            currency:'VND'}).format(orderDetail.price) %>
-                                                    </td>
-                                                    <td>
-                                                        <%= orderDetail.quantity %>
-                                                    </td>
-                                                    <td>
-                                                        <%= new Intl.NumberFormat('vi-VN',{style:'currency',
-                                                            currency:'VND'}).format(orderDetail.price *
-                                                            orderDetail.quantity) %>
-                                                    </td>
+                                                    <% const discountPrice=orderDetail.product.discount> 0
+                                                        ? Math.round(orderDetail.product.price * (100 -
+                                                        orderDetail.product.discount) / 100)
+                                                        : orderDetail.product.price;
+                                                        %>
+
+                                                        <td>
+                                                            <%= new Intl.NumberFormat('vi-VN',{style:'currency',
+                                                                currency:'VND'}) .format(discountPrice) %>
+                                                        </td>
+                                                        <td>
+                                                            <%= orderDetail.quantity %>
+                                                        </td>
+                                                        <td>
+                                                            <%= new Intl.NumberFormat('vi-VN',{style:'currency',
+                                                                currency:'VND'}) .format(discountPrice *
+                                                                orderDetail.quantity) %>
+                                                        </td>
+
                                                 </tr>
                                                 <% }) %>
                                         </tbody>
@@ -200,33 +162,6 @@
                                     </button>
                                 </div>
 
-<<<<<<< HEAD
-    <!-- Footer Start -->
-    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-        <div class="container py-5">
-            <div class="row g-4">
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-3">LaptopShop</h4>
-                    <p>Chất lượng là ưu tiên hàng đầu.</p>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-3">Thông tin</h4>
-                    <a href="#" class="text-decoration-none text-white d-block">Về chúng tôi</a>
-                    <a href="#" class="text-decoration-none text-white d-block">Liên hệ</a>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-3">Tài khoản</h4>
-                    <a href="/profile" class="text-decoration-none text-white d-block">Thông tin cá nhân</a>
-                    <a href="/order-history" class="text-decoration-none text-white d-block">Lịch sử mua hàng</a>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-3">Liên hệ</h4>
-                    <p>Email: support@laptopshop.com</p>
-                    <p>Hotline: 1900 1234</p>
-                </div>
-            </div>
-            <div class="text-center mt-4">&copy; 2025 LaptopShop. All Rights Reserved.</div>
-=======
                                 <!-- Modal hủy đơn -->
                                 <div class="modal fade" id="cancelModal" tabindex="-1"
                                     aria-labelledby="cancelModalLabel" aria-hidden="true">
@@ -260,8 +195,9 @@
                     </main>
                     <%- include('../layout/footer'); -%>
                 </div>
->>>>>>> 68aa47a0bde606efc9723c910e286db432ddf0cc
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
 
         <script src="/admin/js/scripts.js"></script>
 </body>

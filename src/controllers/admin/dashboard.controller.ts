@@ -41,7 +41,6 @@ const getAdminProductPage = async (req: Request, res: Response) => {
     });
 }
 
-
 const getAdminOrderPage = async (req: Request, res: Response) => {
     const { page } = req.query;
 
@@ -134,7 +133,6 @@ const postCancelOrderByAdmin = async (req: Request, res: Response) => {
     }
 };
 
-
 const postRestockProduct = async (req: Request, res: Response) => {
     const { productId, quantity } = req.body;
     const qty = parseInt(quantity, 10);
@@ -152,4 +150,56 @@ const postRestockProduct = async (req: Request, res: Response) => {
 
     res.redirect("/admin"); // quay lại dashboard sau khi nhập thêm
 };
-export { getDashboardPage, getAdminUserPage, getAdminProductPage, getAdminOrderPage, getAdminOrderDetailPage, postConfirmOrder, postRestockProduct, postCancelOrderByAdmin };
+
+// Trang quản lý khuyến mãi
+// Trang khuyến mãi
+const getPromoPage = async (req: Request, res: Response) => {
+    const promoProducts = await prisma.product.findMany({
+        where: { discount: { gt: 0 } },
+        select: { id: true, name: true, price: true, discount: true, image: true }
+    });
+
+    const allProducts = await prisma.product.findMany({
+        select: { id: true, name: true }
+    });
+
+    res.render("admin/promotion/promo", { promoProducts, allProducts });
+};
+
+// Thêm khuyến mãi
+const postAddPromo = async (req: Request, res: Response) => {
+    const { productId, discount } = req.body;
+
+    await prisma.product.update({
+        where: { id: Number(productId) },
+        data: { discount: Number(discount) }
+    });
+
+    res.redirect("/admin/promo");
+};
+
+// Sửa khuyến mãi
+const postUpdatePromo = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { discount } = req.body;
+
+    await prisma.product.update({
+        where: { id: Number(id) },
+        data: { discount: Number(discount) }
+    });
+
+    res.redirect("/admin/promo");
+};
+
+// Xóa khuyến mãi (đặt discount = 0)
+const postDeletePromo = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    await prisma.product.update({
+        where: { id: Number(id) },
+        data: { discount: 0 }
+    });
+
+    res.redirect("/admin/promo");
+};
+export { getDashboardPage, getAdminUserPage, getAdminProductPage, getAdminOrderPage, getAdminOrderDetailPage, postConfirmOrder, postRestockProduct, postCancelOrderByAdmin, getPromoPage, postAddPromo, postUpdatePromo, postDeletePromo };

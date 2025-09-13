@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser, getUserOrders } from 'controllers/user.controller';
-import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage, postCancelOrderByAdmin, postConfirmOrder, postRestockProduct } from 'controllers/admin/dashboard.controller';
+import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage, getPromoPage, postAddPromo, postCancelOrderByAdmin, postConfirmOrder, postDeletePromo, postRestockProduct, postUpdatePromo } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
 import { getCartPage, getCheckOutPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
@@ -115,6 +115,12 @@ const webRoutes = (app: Express) => {
     router.get("/admin/edit-blog/:id", getAdminEditBlogPage);
     router.post("/admin/update-blog", fileUploadMiddleware("thumbnail", "images/blog"), postAdminUpdateBlog);
     router.post("/admin/delete-blog/:id", postDeleteBlog);
+    // Promo routes - Admin
+    router.get("/admin/promo", getPromoPage);
+    router.post("/admin/promo/add", postAddPromo);
+    router.post("/admin/promo/update/:id", postUpdatePromo);
+    router.post("/admin/promo/delete/:id", postDeletePromo);
+
     // Blog routes - Client
     // Client Blog
     router.get("/blogs", getBlogListPage);

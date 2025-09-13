@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { registerNewUser } from "services/client/auth.service";
 import { RegisterSchema, TRegisterSchema } from "src/validation/register.shema";
+import jwt from "jsonwebtoken";
+import passport from "passport";
+import { prisma } from "config/client";
+import bcrypt from "bcrypt";
+import { generateAccessToken, generateRefreshToken } from "services/client/token.service";
 
 const getLoginPage = async (req: Request, res: Response) => {
     const { session } = req as any;
@@ -10,6 +15,75 @@ const getLoginPage = async (req: Request, res: Response) => {
     });
 }
 
+// LOGIN
+const postLogin = async (req: Request, res: Response) => {
+    const { username, password } = req.body;
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { username },
+            include: { role: true },
+        });
+        if (!user) return res.status(401).json({ message: "Username không tồn tại" });
+
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) return res.status(401).json({ message: "Sai mật khẩu" });
+
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+
+        // Set cookies
+        res.cookie("access_token", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 15 * 60 * 1000, // 15 phút
+        });
+
+        res.cookie("refresh_token", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+        });
+
+        return res.json({
+            message: "Đăng nhập thành công",
+            user: {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+            },
+            accessToken,
+            refreshToken,
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Lỗi server" });
+    }
+};
+
+// REFRESH TOKEN
+const refreshToken = (req: Request, res: Response) => {
+    const token = req.cookies.refresh_token;
+    if (!token) return res.status(401).json({ message: "Không có refresh token" });
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET as string) as any;
+        const newAccessToken = generateAccessToken(decoded);
+
+        res.cookie("access_token", newAccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 15 * 60 * 1000,
+        });
+
+        return res.json({ message: "Access token mới đã được cấp", accessToken: newAccessToken });
+    } catch (err) {
+        return res.status(403).json({ message: "Refresh token không hợp lệ" });
+    }
+};
 const getTermPage = async (req: Request, res: Response) => {
     const { session } = req as any;
     const messages = session?.messages ?? [];
@@ -96,4 +170,4 @@ const postLogout = async (req: Request, res: Response, next: NextFunction) => {
 
 
 
-export { getLoginPage, postRegister, getSuccessRedirectPage, postLogout, getTermPage, getWarrantyPage, getReturnPage, getPrivacyPage, getContactPage, getAboutUsPage, getSupportPage };
+export { getLoginPage, postRegister, getSuccessRedirectPage, postLogout, getTermPage, getWarrantyPage, getReturnPage, getPrivacyPage, getContactPage, getAboutUsPage, getSupportPage, postLogin, refreshToken };

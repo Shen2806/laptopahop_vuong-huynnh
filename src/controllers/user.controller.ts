@@ -4,19 +4,45 @@ import { countTotalProductClientPages, getProducts } from 'services/client/item.
 import { getProductWithFilter, getSortIncProduct, userFilter } from 'services/client/product.filter';
 import { getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById } from 'services/user.service';
 
+// const getHomePage = async (req: Request, res: Response) => {
+//     const { page } = req.query;
+
+//     let currentPage = page ? +page : 1;
+//     if (currentPage <= 0) currentPage = 1;
+//     const totalPages = await countTotalProductClientPages(8);
+//     const products = await getProducts(currentPage, 8);
+//     return res.render("client/home/show.ejs", {
+//         products,
+//         totalPages: +totalPages,
+//         page: +currentPage
+//     });
+// }
+
 const getHomePage = async (req: Request, res: Response) => {
     const { page } = req.query;
 
     let currentPage = page ? +page : 1;
     if (currentPage <= 0) currentPage = 1;
+
+    // Lấy phân trang sản phẩm thường
     const totalPages = await countTotalProductClientPages(8);
     const products = await getProducts(currentPage, 8);
+
+    // Lấy sản phẩm khuyến mãi
+    const promoProducts = await prisma.product.findMany({
+        where: { discount: { gt: 0 } },
+        take: 6, // ví dụ: chỉ lấy 6 sp nổi bật
+        select: { id: true, name: true, price: true, discount: true, image: true }
+    });
+
     return res.render("client/home/show.ejs", {
         products,
         totalPages: +totalPages,
-        page: +currentPage
+        page: +currentPage,
+        promoProducts // 👈 truyền thêm
     });
-}
+};
+
 const getCreateUserPage = async (req: Request, res: Response) => {
     const roles = await getAllRoles();
     return res.render("admin/user/create.ejs", {
@@ -194,4 +220,5 @@ const getUserOrders = async (req: Request, res: Response) => {
         res.status(500).send("Có lỗi xảy ra khi tải đơn hàng");
     }
 };
+
 export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser, getUserOrders };

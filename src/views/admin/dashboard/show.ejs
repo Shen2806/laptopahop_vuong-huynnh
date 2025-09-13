@@ -103,60 +103,86 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Top sản phẩm bán chạy -->
-                            <div class="card mb-4" style="max-width: 1100px; margin: auto;">
-                                <div class="card-header">
-                                    <i class="fas fa-chart-line me-1"></i>
-                                    Biểu đồ Top sản phẩm bán chạy
-                                </div>
-                                <div class="card-body">
-                                    <div style="height: 550px;">
-                                        <canvas id="topProductsChart"
-                                            data-labels='<%- JSON.stringify(info?.topProducts?.map(p => p.name) || []) %>'
-                                            data-values='<%- JSON.stringify(info?.topProducts?.map(p => p.quantitySold) || []) %>'>
-                                        </canvas>
+                                <!-- Sản phẩm khuyến mãi -->
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card bg-info text-dark mb-4">
+                                        <div class="card-body d-flex flex-column">
+                                            <span class="fw-bold">Sản phẩm khuyến mãi</span>
+                                            <% if(info?.promoProducts?.length> 0) { %>
+                                                <ul class="mt-2 mb-0">
+                                                    <% info.promoProducts.forEach(p=> { %>
+                                                        <li>
+                                                            <%= p.name %>
+                                                                - <span class="text-success fw-bold">
+                                                                    <%= p.discount %>% OFF
+                                                                </span>
+                                                        </li>
+                                                        <% }) %>
+                                                </ul>
+                                                <% } else { %>
+                                                    <span class="mt-2">Hiện chưa có sản phẩm khuyến mãi</span>
+                                                    <% } %>
+                                        </div>
+                                        <div class="card-footer d-flex align-items-center justify-content-between">
+                                            <a class="small text-dark stretched-link" href="/admin/product/promo">Quản
+                                                lý khuyến mãi</a>
+                                            <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-
-
-                            <!-- Modal nhập thêm hàng -->
-                            <div class="modal fade" id="restockModal" tabindex="-1" aria-labelledby="restockModalLabel"
-                                aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <form id="restockForm" method="post" action="/admin/product/restock">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="restockModalLabel">Nhập thêm hàng</h5>
-                                                <button type="button" class="btn-close"
-                                                    data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <input type="hidden" name="productId" id="restockProductId">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Sản phẩm</label>
-                                                    <input type="text" class="form-control" id="restockProductName"
-                                                        disabled>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Số lượng thêm</label>
-                                                    <input type="number" name="quantity" class="form-control" min="1"
-                                                        required>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary"
-                                                    data-bs-dismiss="modal">Hủy</button>
-                                                <button type="submit" class="btn btn-primary">Xác nhận</button>
-                                            </div>
+                                <!-- Top sản phẩm bán chạy -->
+                                <div class="card mb-4" style="max-width: 1100px; margin: auto;">
+                                    <div class="card-header">
+                                        <i class="fas fa-chart-line me-1"></i>
+                                        Biểu đồ Top sản phẩm bán chạy
+                                    </div>
+                                    <div class="card-body">
+                                        <div style="height: 550px;">
+                                            <canvas id="topProductsChart"
+                                                data-labels='<%- JSON.stringify(info?.topProducts?.map(p => p.name) || []) %>'
+                                                data-values='<%- JSON.stringify(info?.topProducts?.map(p => p.quantitySold) || []) %>'>
+                                            </canvas>
                                         </div>
-                                    </form>
+                                    </div>
                                 </div>
-                            </div>
 
-                        </div>
+
+
+                                <!-- Modal nhập thêm hàng -->
+                                <div class="modal fade" id="restockModal" tabindex="-1"
+                                    aria-labelledby="restockModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <form id="restockForm" method="post" action="/admin/product/restock">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="restockModalLabel">Nhập thêm hàng</h5>
+                                                    <button type="button" class="btn-close"
+                                                        data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <input type="hidden" name="productId" id="restockProductId">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Sản phẩm</label>
+                                                        <input type="text" class="form-control" id="restockProductName"
+                                                            disabled>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Số lượng thêm</label>
+                                                        <input type="number" name="quantity" class="form-control"
+                                                            min="1" required>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Hủy</button>
+                                                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
                     </main>
                     <%- include('../layout/footer'); -%>
 
