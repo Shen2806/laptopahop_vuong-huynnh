@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="MinhVuong&QuocHuynh - Dự án LaptopShop" />
+    <meta name="author" content="MinhVuong&QuocHuynh" />
+    <title>Chi tiết sản phẩm - LaptopShop</title>
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(() => {
+            $("#avatarFile").change(function (e) {
+                const imgURL = URL.createObjectURL(e.target.files[0]);
+                $("#avatarPreview").attr("src", imgURL).css("display", "block");
+            });
+        });
+    </script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            /* giống code 2: bg-light */
+        }
+
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-success {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .btn-success:hover {
+            background-color: #0b5ed7;
+            border-color: #0b5ed7;
+        }
+    </style>
+</head>
+
+<body class="sb-nav-fixed">
+    <%- include('../layout/header'); -%>
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+                            <h1 class="mt-4 text-primary"><i class="fas fa-box me-1"></i> Chi tiết sản phẩm</h1>
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/product">Sản phẩm</a></li>
+                                <li class="breadcrumb-item active">Chi tiết</li>
+                            </ol>
+
+                            <div class="card shadow-sm mb-4">
+                                <div class="card-header">
+                                    Thông tin sản phẩm
+                                </div>
+                                <div class="card-body">
+                                    <form action="/admin/update-product" method="POST" enctype="multipart/form-data">
+                                        <input type="hidden" name="id" value="<%= product.id %>">
+
+                                        <!-- Ảnh sản phẩm lên trên -->
+                                        <div class="mb-3 text-center">
+                                            <input type="file" name="image" class="form-control mb-2" id="avatarFile"
+                                                accept=".jpg,.png,.jpeg">
+                                            <% if (product.image) { %>
+                                                <img id="avatarPreview" src="/images/product/<%= product.image %>"
+                                                    class="rounded shadow-sm border"
+                                                    style="max-height:250px; display:block;">
+                                                <% } else { %>
+                                                    <img id="avatarPreview" class="rounded shadow-sm border"
+                                                        style="max-height:250px; display:none;">
+                                                    <% } %>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Tên sản phẩm</label>
+                                                <input type="text" name="name" class="form-control"
+                                                    value="<%= product.name %>" placeholder="Tên sản phẩm" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Giá (VND)</label>
+                                                <input type="number" name="price" class="form-control"
+                                                    value="<%= product.price %>" placeholder="Giá sản phẩm" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Mô tả chi tiết</label>
+                                            <textarea name="detailDesc" id="description" class="form-control"
+                                                rows="5"><%= product.detailDesc %></textarea>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Mô tả ngắn</label>
+                                                <input type="text" name="shortDesc" class="form-control"
+                                                    value="<%= product.shortDesc %>">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Số lượng</label>
+                                                <input type="number" name="quantity" class="form-control"
+                                                    value="<%= product.quantity %>">
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Hãng sản xuất</label>
+                                                <select name="factory" class="form-select">
+                                                    <% factoryOptions.forEach(factory=> { %>
+                                                        <option value="<%= factory.value %>"
+                                                            <%=factory.value===product.factory ? 'selected' : '' %>>
+                                                            <%= factory.name %>
+                                                        </option>
+                                                        <% }) %>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Mục đích</label>
+                                                <select name="target" class="form-select">
+                                                    <% targetOptions.forEach(target=> { %>
+                                                        <option value="<%= target.value %>"
+                                                            <%=target.value===product.target ? 'selected' : '' %>>
+                                                            <%= target.name %>
+                                                        </option>
+                                                        <% }) %>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between mt-4">
+                                            <a href="/admin/product" class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left"></i> Quay lại
+                                            </a>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-save"></i> Cập nhật sản phẩm
+                                            </button>
+                                        </div>
+
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </main>
+                    <%- include('../layout/footer'); -%>
+                </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="/admin/js/scripts.js"></script>
+        <script src="https://cdn.tiny.cloud/1/1dtzi1n2b488rghqj103opvbjkkyk3kvz7mmh0fm99xh95hq/tinymce/8/tinymce.min.js"
+            referrerpolicy="origin" crossorigin="anonymous"></script>
+        <script>
+            tinymce.init({
+                selector: '#description',
+                plugins: 'lists link image table code',
+                toolbar: 'undo redo | bold italic underline | bullist numlist | link image | table | code',
+                menubar: false,
+                height: 400,
+                branding: false,
+                content_style: "body { font-family: Arial, sans-serif; font-size:14px; }"
+            });
+        </script>
+</body>
+
+</html>

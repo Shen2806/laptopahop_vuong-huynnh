@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        <%= typeof title !=='undefined' ? title : 'Chính sách bảo hành' %>
+    </title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="description" content="Chính sách bảo hành & đổi trả cho khách hàng của Laptop-Shop">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries -->
+    <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Bootstrap & Template -->
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/client/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="/client/css/policies/warranty.css">
+
+
+</head>
+
+<body>
+    <!-- HEADER (nếu bạn đang dùng layout chung, có thể bỏ toàn bộ block header/topbar dưới đây) -->
+    <%- include('../layout/header'); -%>
+        <!-- /HEADER -->
+
+
+        <div class="py-1"></div>
+
+        <!-- CONTENT -->
+        <div class="container my-4">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Chính sách bảo hành</li>
+                </ol>
+            </nav>
+
+            <div class="row g-4">
+                <div class="col-12 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="mb-3">Mục lục</h5>
+                            <ul class="list-unstyled toc">
+                                <li><a href="#general">1. Chính sách chung</a></li>
+                                <li><a href="#warranty">2. Bảo hành sản phẩm</a></li>
+                                <li><a href="#return">3. Chính sách đổi trả</a></li>
+                                <li><a href="#exceptions">4. Trường hợp từ chối bảo hành</a></li>
+                                <li><a href="#process">5. Quy trình bảo hành</a></li>
+                                <li><a href="#contact">6. Liên hệ hỗ trợ</a></li>
+                            </ul>
+                            <div class="terms-updated mt-3">
+                                Cập nhật lần cuối:
+                                <%= typeof lastUpdated !=='undefined' ? lastUpdated : (new
+                                    Date()).toLocaleDateString('vi-VN') %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-9 terms-section">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="mb-3">Chính sách bảo hành & đổi trả</h2>
+                            <p>
+                                Cảm ơn bạn đã tin tưởng lựa chọn
+                                <strong>
+                                    <%= typeof companyName !=='undefined' ? companyName : 'Laptop-Shop' %>
+                                </strong>.
+                                Chúng tôi cam kết cung cấp sản phẩm chất lượng cao cùng chính sách bảo hành, đổi trả
+                                minh bạch nhằm bảo vệ quyền lợi khách hàng.
+                            </p>
+
+                            <hr class="my-4">
+
+                            <h3 id="general" class="mt-4">1. Chính sách chung</h3>
+                            <ul>
+                                <li>Tất cả sản phẩm laptop và phụ kiện đều được áp dụng bảo hành chính hãng hoặc của
+                                    Laptop-Shop.</li>
+                                <li>Khách hàng cần giữ lại hóa đơn mua hàng hoặc phiếu bảo hành để được hỗ trợ.</li>
+                            </ul>
+
+                            <h3 id="warranty" class="mt-4">2. Bảo hành sản phẩm</h3>
+                            <ul>
+                                <li>Thời gian bảo hành: từ 12 đến 24 tháng tùy sản phẩm.</li>
+                                <li>Bảo hành bao gồm: lỗi kỹ thuật từ nhà sản xuất, lỗi linh kiện phần cứng.</li>
+                                <li>Thời gian xử lý bảo hành: 7 – 15 ngày làm việc (tùy tình trạng sản phẩm).</li>
+                            </ul>
+
+                            <h3 id="return" class="mt-4">3. Chính sách đổi trả</h3>
+                            <ul>
+                                <li>Đổi trả miễn phí trong 7 ngày nếu sản phẩm lỗi do nhà sản xuất.</li>
+                                <li>Sản phẩm phải còn nguyên tem, phiếu bảo hành, phụ kiện kèm theo và không có dấu hiệu
+                                    đã qua sửa chữa.</li>
+                                <li>Không áp dụng đổi trả với các trường hợp hao mòn tự nhiên, hỏng hóc do sử dụng sai
+                                    cách.</li>
+                            </ul>
+
+                            <h3 id="exceptions" class="mt-4">4. Trường hợp từ chối bảo hành</h3>
+                            <ul>
+                                <li>Sản phẩm bị hư hỏng do va đập, rơi vỡ, nước vào, cháy nổ.</li>
+                                <li>Sản phẩm bị sửa chữa bởi đơn vị không thuộc hệ thống bảo hành ủy quyền.</li>
+                                <li>Hỏng hóc do lỗi người dùng (cài đặt sai phần mềm, virus, sử dụng sai nguồn điện…).
+                                </li>
+                            </ul>
+
+                            <h3 id="process" class="mt-4">5. Quy trình bảo hành</h3>
+                            <ol>
+                                <li>Khách hàng mang sản phẩm đến cửa hàng hoặc gửi về trung tâm bảo hành.</li>
+                                <li>Nhân viên kiểm tra và lập biên bản tiếp nhận.</li>
+                                <li>Sản phẩm được chuyển đến hãng hoặc trung tâm bảo hành Laptop-Shop.</li>
+                                <li>Khách hàng nhận lại sản phẩm sau khi xử lý xong.</li>
+                            </ol>
+
+                            <h3 id="contact" class="mt-4">6. Liên hệ hỗ trợ</h3>
+                            <p>Nếu cần hỗ trợ thêm, vui lòng liên hệ:</p>
+                            <ul>
+                                <li>Địa chỉ: 99 ABC, Thống Nhất, Gò Vấp, TP.HCM</li>
+                                <li>Email: support@laptop-shop.vn</li>
+                                <li>Điện thoại: 0999 887 744</li>
+                            </ul>
+
+                            <div class="callout mt-4">
+                                <small>
+                                    Laptop-Shop cam kết luôn đồng hành cùng khách hàng trong suốt quá trình sử dụng sản
+                                    phẩm.
+                                    Mọi thắc mắc sẽ được giải đáp tận tình để mang lại trải nghiệm mua sắm tốt nhất.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- row -->
+        </div><!-- /container -->
+
+    <!-- FOOTER START -->
+    <%- include('../layout/footer'); -%>
+    <!-- FOOTER END -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+            class="fa fa-arrow-up"></i></a>
+
+
+
+            <!-- JS -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/lib/easing/easing.min.js"></script>
+            <script src="/client/lib/waypoints/waypoints.min.js"></script>
+            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+            <script src="/client/js/main.js"></script>
+</body>
+
+</html>

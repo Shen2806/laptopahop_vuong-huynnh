@@ -1,0 +1,527 @@
+/* Pagination của promo-swiper */
+.promo-swiper {
+  padding-bottom: 50px;
+  /* chừa khoảng trống ở dưới */
+}
+
+.promo-swiper .swiper-pagination {
+  bottom: 10px !important;
+  /* đẩy xuống thêm */
+}
+
+.promo-swiper .swiper-pagination-bullet {
+  background: #dc3545;
+  /* màu đỏ Bootstrap Danger */
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.promo-swiper .swiper-pagination-bullet-active {
+  opacity: 1;
+  transform: scale(1.2);
+  /* chấm active to hơn */
+}
+
+/* Ảnh sản phẩm */
+.fruite-img,
+.promo-img-wrapper {
+  width: 100%;
+  height: 220px;
+  /* cố định chiều cao */
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px 8px 0 0;
+  position: relative;
+}
+
+/* Ảnh bên trong */
+.fruite-img img,
+.promo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+
+}
+
+/* Hover effect cho ảnh */
+.fruite-item:hover .fruite-img img,
+.promo-card:hover .promo-img {
+  transform: scale(1.1);
+
+}
+
+/* Card sản phẩm chung */
+.fruite-item,
+.promo-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.fruite-item:hover {
+  transform: scale(1.03);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+.promo-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0px 12px 25px rgba(0, 0, 0, 0.15);
+
+}
+
+/* Nội dung trong card */
+.fruite-item .p-4 {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* đẩy nút xuống cuối */
+  flex-grow: 1;
+}
+
+/* Tên sản phẩm */
+.fruite-item h4 {
+  font-size: 18px;
+  font-weight: 600;
+  min-height: 46px;
+  /* giữ 2 dòng đều nhau */
+  line-height: 1.3;
+  overflow: hidden;
+}
+
+/* Mô tả ngắn */
+.fruite-item p {
+  font-size: 14px;
+  color: #555;
+  min-height: 38px;
+  overflow: hidden;
+}
+
+/* Giá */
+.fruite-item .fs-5 {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+  min-height: 28px;
+  margin-bottom: 8px;
+}
+
+/*Đớm lửa*/
+.fire-title-wrapper {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+}
+
+.fire-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  position: relative;
+  z-index: 2;
+  color: red;
+}
+
+.fire-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 180%;
+  height: 200%;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+  /* hoà vào chữ */
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.fire-gif {
+  width: 80px;
+  height: 80px;
+  vertical-align: middle;
+  margin-bottom: 20px;
+}
+
+.news-card {
+  background: #fff;
+  border: 1px solid #eee;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.news-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.news-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 6px 6px 0 0;
+}
+
+.news-summary {
+  font-size: 14px;
+  line-height: 1.5;
+  max-height: 60px;
+  /* 3 dòng */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.promo-swiper .swiper-button-next,
+.promo-swiper .swiper-button-prev,
+.news-swiper .swiper-button-next,
+.news-swiper .swiper-button-prev {
+  color: #6c757d;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.promo-swiper .swiper-button-next:hover,
+.promo-swiper .swiper-button-prev:hover,
+.news-swiper .swiper-button-next:hover,
+.news-swiper .swiper-button-prev:hover {
+  color: #343a40;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.promo-swiper .swiper-button-next::after,
+.promo-swiper .swiper-button-prev::after,
+.news-swiper .swiper-button-next::after,
+.news-swiper .swiper-button-prev::after {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/*ảnh*/
+.news-img {
+  width: 100%;
+  height: 160px;
+  /* hoặc 180px nếu muốn cao hơn */
+  object-fit: cover;
+  /* cắt ảnh cho vừa khung */
+  border-radius: 6px 6px 0 0;
+  /* bo góc trên giống card */
+  display: block;
+}
+
+/*-----sản phẩm khuyến mãi*/
+/* ===== PATCH: làm nhẹ mọi đổ bóng trong khu SẢN PHẨM KHUYẾN MÃI ===== */
+.promo-zone {
+  /* token bóng nhẹ */
+  --ring: 1px solid #e9eef5;
+  --shadow-1: 0 1px 2px rgba(16, 24, 40, .06);
+  --shadow-2: 0 2px 8px rgba(16, 24, 40, .08), 0 8px 20px rgba(16, 24, 40, .06);
+}
+
+/* Tiêu đề: pill sáng, bóng rất nhẹ */
+.promo-zone .fire-title-wrapper {}
+
+/* Card: viền mảnh + bóng nhẹ; hover nhích 2px thôi */
+.promo-zone .promo-card {
+  border-radius: 14px;
+  background: #fff;
+  border: var(--ring);
+  box-shadow: var(--shadow-1);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+
+.promo-zone .promo-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+
+/* Ngăn card có cảm giác “nặng đáy” */
+.promo-zone .promo-img-wrapper {
+  border-bottom: 1px solid #f1f4f8;
+}
+
+.promo-zone .promo-card:hover .promo-img {
+  transform: scale(1.03);
+}
+
+/* giảm từ 1.05 */
+
+/* Nút điều hướng: thu nhỏ + bóng nhẹ */
+.promo-zone .swiper-button-prev,
+.promo-zone .swiper-button-next {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  border: var(--ring);
+  box-shadow: var(--shadow-1);
+}
+
+.promo-zone .swiper-button-prev:hover,
+.promo-zone .swiper-button-next:hover {
+  box-shadow: var(--shadow-2);
+}
+
+/* Chấm trang gọn hơn, không bóng */
+.promo-zone .swiper-pagination-bullet {
+  width: 7px;
+  height: 7px;
+  background: #cfd8e3;
+  opacity: 1;
+}
+
+.promo-zone .swiper-pagination-bullet-active {
+  background: #69C24F;
+}
+
+/* Nếu bạn có video nền cho section, giảm “độ đậm” để bóng nhìn càng nhẹ */
+.promo-zone .promo-bg {
+  filter: saturate(1) contrast(.95) brightness(.92);
+}
+
+.promo-zone .promo-overlay {
+  background: linear-gradient(180deg, rgba(0, 0, 0, .18), rgba(0, 0, 0, .22));
+}
+
+/* ======================
+   BRAND & BUTTON SYSTEM
+   ====================== */
+:root {
+  /* Xanh thương hiệu – đổi nếu bạn có mã chuẩn */
+  --brand: #63C047;
+  --brand-600: #43a72f;
+  /* hover */
+  --brand-700: #2f8e22;
+  /* active */
+  --brand-soft: rgba(99, 192, 71, .12);
+  --brand-border: rgba(99, 192, 71, .28);
+
+  --gray-800: #1f2937;
+  --ring: 0 0 0 .25rem rgba(99, 192, 71, .25);
+  --radius-pill: 999px;
+}
+
+/* Kích thước & trọng số chung cho nút */
+.btn {
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  transition: all .18s ease;
+  box-shadow: none !important;
+}
+
+/* ===== 1) Primary brand (dùng cho CTA chính: Mua ngay, Thêm giỏ hàng…) ===== */
+.btn-primary,
+.btn-success {
+  /* override Bootstrap-success sang màu brand */
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+
+.btn-primary:hover,
+.btn-success:hover {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(99, 192, 71, .25);
+}
+
+.btn-primary:active,
+.btn-primary:focus,
+.btn-success:active,
+.btn-success:focus {
+  background: var(--brand-700);
+  border-color: var(--brand-700);
+  box-shadow: var(--ring);
+}
+
+.btn-primary.disabled,
+.btn-primary:disabled,
+.btn-success.disabled,
+.btn-success:disabled {
+  background: #cfe9d2;
+  border-color: #cfe9d2;
+  color: #4c6b50;
+}
+
+/* ===== 2) Outline brand (nhẹ nhàng, nền trắng) ===== */
+.btn-outline-success,
+.btn-outline-primary {
+  border-color: var(--brand);
+  color: var(--brand-700);
+  background: #fff;
+}
+
+.btn-outline-success:hover,
+.btn-outline-primary:hover {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(99, 192, 71, .22);
+}
+
+/* ===== 3) Ghost (nút phụ như “Xem khuyến mãi”) ===== */
+.btn-ghost {
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-border);
+  color: var(--brand-700);
+}
+
+.btn-ghost:hover {
+  background: rgba(99, 192, 71, .18);
+  border-color: var(--brand);
+}
+
+/* ===== Icon trong nút ===== */
+.btn i {
+  margin-right: .45rem;
+  transform: translateY(1px);
+  transition: transform .18s ease;
+}
+
+.btn:hover i {
+  transform: translateY(-1px);
+}
+
+/* ===== Nút “Thêm vào giỏ hàng” đang dùng class riêng ===== */
+.btnAddToCartHomePage {
+  @apply btn;
+  /* nếu không dùng Tailwind thì bỏ dòng này */
+  background: #fff;
+  border: 2px solid var(--brand-border) !important;
+  color: var(--brand-700) !important;
+}
+
+.btnAddToCartHomePage:hover {
+  background: var(--brand) !important;
+  color: #fff !important;
+  border-color: var(--brand) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(99, 192, 71, .28);
+}
+
+/* ===== Badge “Còn hàng” theo brand nhẹ ===== */
+.badge.bg-primary {
+  background: var(--brand-soft) !important;
+  color: var(--brand-700) !important;
+  border: 1px solid var(--brand-border);
+  font-weight: 700;
+  border-radius: 10px;
+}
+
+/* ===== Badge % khuyến mãi – gọn, hiện đại ===== */
+.badge.bg-danger {
+  background: linear-gradient(180deg, #ff5a5f 0%, #e60023 100%) !important;
+  color: #fff;
+  border: 1px solid rgba(230, 0, 35, .35);
+  border-radius: var(--radius-pill);
+  padding: .28rem .55rem;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(230, 0, 35, .28), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+
+/* ===== Pagination theo brand ===== */
+.pagination .page-link {
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--brand-border);
+  color: var(--gray-800);
+  font-weight: 700;
+  padding: .5rem .9rem;
+  transition: all .18s ease;
+}
+
+.pagination .page-link:hover {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand-700);
+}
+
+.pagination .page-link.active,
+.pagination .page-item.active .page-link {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+
+/* ===== Swiper nav & bullets dưới slider khuyến mãi ===== */
+.promo-swiper {
+  padding-bottom: 48px;
+}
+
+.promo-swiper .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background: var(--brand-soft);
+  border: 1px solid var(--brand-border);
+  opacity: 1;
+  transition: all .18s ease;
+}
+
+.promo-swiper .swiper-pagination-bullet-active {
+  background: var(--brand);
+  border-color: var(--brand);
+  transform: scale(1.2);
+  box-shadow: 0 6px 16px rgba(99, 192, 71, .35);
+}
+
+.promo-swiper .swiper-button-next,
+.promo-swiper .swiper-button-prev {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  border: 1px solid var(--brand-border);
+  color: var(--brand-700);
+  box-shadow: 0 8px 18px rgba(18, 38, 63, .08);
+  transition: all .18s ease;
+}
+
+.promo-swiper .swiper-button-next:hover,
+.promo-swiper .swiper-button-prev:hover {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(99, 192, 71, .28);
+}
+
+.promo-swiper .swiper-button-next:after,
+.promo-swiper .swiper-button-prev:after {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* ===== Nav pill “Tất cả sản phẩm” ===== */
+.nav-pills .btn.rounded-pill.active {
+  background: var(--brand) !important;
+  border-color: var(--brand) !important;
+  box-shadow: 0 10px 22px rgba(99, 192, 71, .22);
+  transform: translateY(-1px);
+}
+
+.btnAddToCartHomePage:hover {
+  background-color: #afbbb2;
+  /* Màu nền khi hover */
+  color: #fff !important;
+  /* Màu chữ khi hover */
+  border-color: #a5a9a6 !important;
+  /* Viền */
+}
+
+.btnAddToCartHomePage:hover i {
+  color: #fff !important;
+  /* Màu icon khi hover */
+}

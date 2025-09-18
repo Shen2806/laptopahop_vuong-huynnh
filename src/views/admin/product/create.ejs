@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="MinhVuong&QuocHuynh - Dự án laptopshop" />
+    <meta name="author" content="MinhVuong&QuocHuynh" />
+    <title>Tạo mới sản phẩm - LaptopShop</title>
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(() => {
+            const avatarFile = $("#avatarFile");
+            avatarFile.change(function (e) {
+                const imgURL = URL.createObjectURL(e.target.files[0]);
+                $("#avatarPreview").attr("src", imgURL);
+                $("#avatarPreview").css({ "display": "block" });
+            });
+        });
+    </script>
+
+</head>
+
+<body class="sb-nav-fixed">
+    <%- include('../layout/header'); -%>
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+                            <h1 class="mt-4">Quản lý sản phẩm</h1>
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                <li class="breadcrumb-item active"><a href="/admin/product">Sản phẩm</a></li>
+                            </ol>
+                            <div class="row">
+                                <div class="col-6 mx-auto">
+                                    <div style="width: 600px ; margin: 0 auto">
+                                        <% errors.forEach( function (error) { %>
+                                            <div class="alert alert-danger mb-3">
+                                                <%= error %>
+                                            </div>
+                                            <% }) %>
+                                                <h3 style="padding: 10px 0"> Tạo mới sản phẩm</h3>
+                                                <form action="/admin/create-product" enctype="multipart/form-data"
+                                                    method="post">
+
+                                                    <div class="row">
+                                                        <div class="mb-3  col-6">
+                                                            <label class="form-label">Tên:</label>
+                                                            <input value="<%= oldData.name %>" name="name" type="text"
+                                                                class="form-control" placeholder="Tên sản phẩm">
+                                                        </div>
+                                                        <div class="mb-3  col-6">
+                                                            <label class="form-label">Giá:</label>
+                                                            <input value="<%= oldData.price %>" name="price"
+                                                                type="number" class="form-control" placeholder="VND">
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Mô tả chi tiết </label>
+                                                        <textarea name="detailDesc" class="form-control"
+                                                            rows="2"><%= oldData.detailDesc %></textarea>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="mb-3 col-6">
+                                                            <label class="form-label">Mô tả ngắn</label>
+                                                            <input value="<%= oldData.shortDesc %>" type="text"
+                                                                class="form-control" name="shortDesc">
+                                                        </div>
+                                                        <div class="mb-3 col-6">
+                                                            <label class="form-label">Số lượng</label>
+                                                            <input value="<%= oldData.quantity %>" type="text"
+                                                                class="form-control" name="quantity">
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="mb-3 col-6">
+                                                            <label class="form-label">Hãng sản xuất</label>
+                                                            <select name="factory" class="form-select">
+                                                                <option value="APPLE">Apple (MacBook)</option>
+                                                                <option value="ASUS">Asus</option>
+                                                                <option value="LENOVO">Lenovo</option>
+                                                                <option value="DELL">Dell</option>
+                                                                <option value="LG">LG</option>
+                                                                <option value="ACER">Acer</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3 col-6">
+                                                            <label class="form-label">Mục đích</label>
+                                                            <select name="target" class="form-select">
+                                                                <option value="GAMING">Gaming</option>
+                                                                <option value="SINHVIEN-VANPHONG">Sinh viên - Văn phòng
+                                                                </option>
+                                                                <option value="THIET-KE-DO-HOA">Thiết kế đồ họa</option>
+                                                                <option value="MONG-NHE">Mỏng nhẹ</option>
+                                                                <option value="DOANH-NHAN">Doanh nhân</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="formFile" class="form-label">Image</label>
+                                                        <input name="image" class="form-control" type="file"
+                                                            id="avatarFile" accept=".png, .jpg, .jpeg">
+                                                    </div>
+                                                    <img style="max-height: 250px; display: none;" alt="avatar preview"
+                                                        id="avatarPreview" />
+                                                    <div class="mb-3">
+                                                        <button class="btn btn-warning  mt-2" type="submit">Gửi</button>
+                                                    </div>
+                                                </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </main>
+                    <%- include('../layout/footer'); -%>
+                </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="/admin/js/scripts.js"></script>
+
+
+</body>
+
+</html>

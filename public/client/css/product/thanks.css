@@ -1,0 +1,65 @@
+
+        /* Fade-in alert */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Icon nhấp nháy nhẹ */
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .animated-icon {
+            animation: bounce 1s infinite;
+        }
+
+        /* Gradient nền nhẹ cho alert */
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        }
+
+        /*footer*/
+        .footer .btn-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer .btn-link:hover {
+            color: #4CAF50;
+            padding-left: 5px;
+        }
+
+        .btn-social {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .btn-social:hover {
+            background: #4CAF50;
+            color: #000;
+        }

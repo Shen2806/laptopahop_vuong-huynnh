@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="MinhVuong&QuocHuynh - Dự án laptopshop" />
+    <meta name="author" content="MinhVuong&QuocHuynh" />
+    <title>Quản lý người dùng - LaptopShop</title>
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="sb-nav-fixed bg-light">
+    <%- include('../layout/header'); -%>
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+                            <!-- Tiêu đề -->
+                            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                                <h1 class="h3 fw-bold text-primary"><i class="fa-solid fa-users"></i> Quản lý người dùng
+                                </h1>
+                                <a href="/admin/create-user" class="btn btn-success shadow-sm">
+                                    <i class="fa-solid fa-user-plus me-1"></i> Thêm người người
+                                </a>
+                            </div>
+
+                            <!-- Breadcrumb -->
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Users</li>
+                            </ol>
+
+                            <!-- Bảng Users -->
+                            <div class="card shadow-sm border-0 rounded-3">
+                                <div class="card-header bg-primary text-white fw-semibold">
+                                    <i class="fa-solid fa-table me-2"></i> Danh sách Người dùng
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>STT</th>
+                                                    <th>Tên</th>
+                                                    <th>Email</th>
+                                                    <th>Địa chỉ</th>
+                                                    <th class="text-center">Hành động</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% users.forEach(function (user) { %>
+                                                    <tr>
+                                                        <td><span class="badge bg-secondary">
+                                                                <%= user.id %>
+                                                            </span></td>
+                                                        <td>
+                                                            <%= user.fullName %>
+                                                        </td>
+                                                        <td>
+                                                            <%= user.username %>
+                                                        </td>
+                                                        <td>
+                                                            <%= user.address %>
+                                                        </td>
+                                                        <td>
+                                                            <div class="d-flex justify-content-center gap-2">
+                                                                <form action="/admin/view-user/<%= user.id %>"
+                                                                    method="get">
+                                                                    <button type="submit"
+                                                                        class="btn btn-sm btn-info text-white">
+                                                                        <i class="fa-solid fa-eye"></i> Xem
+                                                                    </button>
+                                                                </form>
+                                                                <form action="/admin/delete-user/<%= user.id %>"
+                                                                    method="post"
+                                                                    onsubmit="return confirm('Bạn có chắc muốn xóa user này không?')">
+                                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                                        <i class="fa-solid fa-trash"></i> Xóa
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <% }) %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Pagination -->
+                                    <nav aria-label="User pagination">
+                                        <ul class="pagination justify-content-center mt-3">
+                                            <li class="page-item">
+                                                <a class="<%= page === 1 ? 'disabled page-link' : 'page-link' %>"
+                                                    href="/admin/user?page=<%= page - 1 %>" aria-label="Previous">
+                                                    <span aria-hidden="true">&laquo;</span>
+                                                </a>
+                                            </li>
+                                            <% for(var i=1; i<=totalPages; i++) { %>
+                                                <li class="page-item">
+                                                    <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
+                                                        href="/admin/user?page=<%= i %>">
+                                                        <%= i %>
+                                                    </a>
+                                                </li>
+                                                <% } %>
+                                                    <li class="page-item">
+                                                        <a class="<%= page === totalPages ? 'disabled page-link' : 'page-link' %>"
+                                                            href="/admin/user?page=<%= page + 1 %>" aria-label="Next">
+                                                            <span aria-hidden="true">&raquo;</span>
+                                                        </a>
+                                                    </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                    <%- include('../layout/footer'); -%>
+                </div>
+        </div>
+
+        <!-- Bootstrap -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="/admin/js/scripts.js"></script>
+</body>
+
+</html>

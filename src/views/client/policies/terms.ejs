@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        <%= typeof title !=='undefined' ? title : 'Điều khoản sử dụng ' %>
+    </title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="description" content="Điều khoản sử dụng cho trang web mua sắm LaptopShop">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries -->
+    <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Bootstrap & Template -->
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/client/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="/client/css/policies/terms.css">
+
+
+</head>
+
+<body>
+
+    <!-- HEADER (nếu bạn đang dùng layout chung, có thể bỏ toàn bộ block header/topbar dưới đây) -->
+
+    <%- include('../layout/header'); -%>
+
+        <!-- /HEADER -->
+
+        <div class="py-1"></div>
+
+        <!-- CONTENT -->
+        <div class="container my-4">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Điều khoản sử dụng</li>
+                </ol>
+            </nav>
+
+            <div class="row g-4">
+                <div class="col-12 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="mb-3">Mục lục</h5>
+                            <ul class="list-unstyled toc">
+                                <li><a href="#intro">1. Giới thiệu</a></li>
+                                <li><a href="#defs">2. Định nghĩa</a></li>
+                                <li><a href="#account">3. Tài khoản & bảo mật</a></li>
+                                <li><a href="#order">4. Đặt hàng & xác nhận</a></li>
+                                <li><a href="#price">5. Giá & thanh toán</a></li>
+                                <li><a href="#ship">6. Giao hàng</a></li>
+                                <li><a href="#return">7. Bảo hành & đổi trả</a></li>
+                                <li><a href="#ip">8. Quyền sở hữu trí tuệ</a></li>
+                                <li><a href="#prohibited">9. Hành vi bị cấm</a></li>
+                                <li><a href="#liability">10. Trách nhiệm & miễn trừ</a></li>
+                                <li><a href="#privacy">11. Quyền riêng tư</a></li>
+                                <li><a href="#law">12. Luật áp dụng & tranh chấp</a></li>
+                                <li><a href="#changes">13. Sửa đổi điều khoản</a></li>
+                                <li><a href="#contact">14. Liên hệ</a></li>
+                            </ul>
+                            <div class="terms-updated mt-3">
+                                Cập nhật lần cuối:
+                                <%= typeof lastUpdated !=='undefined' ? lastUpdated : (new
+                                    Date()).toLocaleDateString('vi-VN') %>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-12 col-lg-9 terms-section">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="mb-3">Điều khoản sử dụng</h2>
+                            <p>
+                                Chào mừng bạn đến với
+                                <strong>
+                                    <%= typeof companyName !=='undefined' ? companyName : 'LaptopShop' %>
+                                </strong>.
+                                Khi truy cập và mua sắm tại website này, bạn đồng ý tuân thủ các Điều khoản sử dụng dưới
+                                đây.
+                                Vui lòng đọc kỹ trước khi sử dụng dịch vụ.
+                            </p>
+
+                            <hr class="my-4">
+
+                            <h3 id="intro" class="mt-4">1. Giới thiệu</h3>
+                            <p>
+                                Website do
+                                <strong>
+                                    <%= typeof companyName !=='undefined' ? companyName : 'LaptopShop' %>
+                                </strong>
+                                vận hành nhằm cung cấp sản phẩm máy tính xách tay và phụ kiện chính hãng
+                                cho khách hàng tại Việt Nam.
+                            </p>
+
+                            <h3 id="defs" class="mt-4">2. Định nghĩa</h3>
+                            <ul>
+                                <li><strong>“Website”</strong>: trang thương mại điện tử tại địa chỉ do
+                                    <%= typeof companyName !=='undefined' ? companyName : 'LaptopShop' %> quản lý.
+                                </li>
+                                <li><strong>“Khách hàng/Người dùng”</strong>: bất kỳ cá nhân/tổ chức truy cập hoặc mua
+                                    hàng.
+                                </li>
+                                <li><strong>“Tài khoản”</strong>: thông tin đăng nhập do người dùng tạo để sử dụng dịch
+                                    vụ.
+                                </li>
+                            </ul>
+
+                            <h3 id="account" class="mt-4">3. Tài khoản & bảo mật</h3>
+                            <ul>
+                                <li>Thông tin đăng ký phải chính xác, đầy đủ và được cập nhật khi thay đổi.</li>
+                                <li>Bạn chịu trách nhiệm bảo mật thông tin đăng nhập và mọi hoạt động phát sinh từ tài
+                                    khoản
+                                    của mình.</li>
+                                <li>Chúng tôi có thể tạm khóa hoặc chấm dứt tài khoản nếu phát hiện vi phạm điều khoản
+                                    hoặc
+                                    có dấu hiệu gian lận.</li>
+                            </ul>
+
+                            <h3 id="order" class="mt-4">4. Đặt hàng & xác nhận</h3>
+                            <ul>
+                                <li>Đơn hàng chỉ được coi là <strong>xác nhận</strong> khi bạn nhận được thông báo xác
+                                    nhận
+                                    từ hệ thống
+                                    hoặc từ bộ phận chăm sóc khách hàng.</li>
+                                <li>Trong một số trường hợp (thiếu hàng, lỗi giá hiển thị, rủi ro giao dịch…), chúng tôi
+                                    có
+                                    quyền từ chối
+                                    hoặc hủy đơn; mọi khoản thanh toán (nếu có) sẽ được hoàn lại theo chính sách hiện
+                                    hành.
+                                </li>
+                            </ul>
+
+                            <h3 id="price" class="mt-4">5. Giá & thanh toán</h3>
+                            <ul>
+                                <li>Giá hiển thị đã bao gồm/không bao gồm thuế, phí vận chuyển (sẽ thể hiện ở bước thanh
+                                    toán).</li>
+                                <li>Chấp nhận các phương thức: tiền mặt khi nhận hàng (COD), chuyển khoản, cổng thanh
+                                    toán
+                                    điện tử…</li>
+                                <li>Giá có thể thay đổi tùy thời điểm; giá tại thời điểm xác nhận đơn hàng là giá áp
+                                    dụng
+                                    cho đơn đó.</li>
+                            </ul>
+
+                            <h3 id="ship" class="mt-4">6. Giao hàng</h3>
+                            <ul>
+                                <li>Thời gian giao hàng dự kiến được thông báo khi đặt hàng; có thể thay đổi do điều
+                                    kiện
+                                    khách quan.</li>
+                                <li>Bạn cần cung cấp địa chỉ, số điện thoại chính xác để việc giao hàng diễn ra thuận
+                                    lợi.
+                                </li>
+                                <li>Kiểm tra tình trạng niêm phong, ngoại quan trước khi ký nhận; phản hồi ngay nếu có
+                                    vấn
+                                    đề.</li>
+                            </ul>
+
+                            <h3 id="return" class="mt-4">7. Bảo hành & đổi trả</h3>
+                            <ul>
+                                <li>Sản phẩm được áp dụng chính sách bảo hành của hãng hoặc của
+                                    <%= typeof companyName !=='undefined' ? companyName : 'LaptopShop' %> (nếu có công
+                                        bố
+                                        riêng).
+                                </li>
+                                <li>Điều kiện đổi trả: còn nguyên tem/mác, phụ kiện đi kèm, đầy đủ hóa đơn; không thuộc
+                                    nhóm
+                                    bị từ chối theo quy định.</li>
+                                <li>Thời hạn và quy trình cụ thể xem tại trang “Chính sách bảo hành & đổi trả”.</li>
+                            </ul>
+
+                            <h3 id="ip" class="mt-4">8. Quyền sở hữu trí tuệ</h3>
+                            <p>
+                                Toàn bộ nội dung, hình ảnh, nhãn hiệu, mã nguồn, bố cục trên website thuộc quyền sở hữu
+                                của
+                                <%= typeof companyName !=='undefined' ? companyName : 'LaptopShop' %> hoặc đối tác và
+                                    được
+                                    bảo hộ bởi pháp luật.
+                                    Nghiêm cấm sao chép, sử dụng trái phép dưới mọi hình thức nếu không có sự đồng ý
+                                    bằng
+                                    văn bản.
+                            </p>
+
+                            <h3 id="prohibited" class="mt-4">9. Hành vi bị cấm</h3>
+                            <ul>
+                                <li>Sử dụng website cho mục đích gian lận, phát tán mã độc, tấn công hệ thống, thu thập
+                                    dữ
+                                    liệu trái phép.</li>
+                                <li>Giả mạo danh tính, lợi dụng lỗ hổng giá/khuyến mãi để trục lợi.</li>
+                                <li>Đăng tải nội dung vi phạm pháp luật, thuần phong mỹ tục.</li>
+                            </ul>
+
+                            <h3 id="liability" class="mt-4">10. Trách nhiệm & miễn trừ</h3>
+                            <ul>
+                                <li>Chúng tôi nỗ lực đảm bảo thông tin chính xác, nhưng không đảm bảo tuyệt đối không có
+                                    sai
+                                    sót ngoài ý muốn.</li>
+                                <li>Không chịu trách nhiệm cho thiệt hại gián tiếp, lợi nhuận bị mất do việc sử dụng
+                                    hoặc
+                                    không thể sử dụng website.</li>
+                                <li>Trong mọi trường hợp, trách nhiệm tối đa của chúng tôi (nếu có) không vượt quá giá
+                                    trị
+                                    đơn hàng liên quan.</li>
+                            </ul>
+
+                            <h3 id="privacy" class="mt-4">11. Quyền riêng tư</h3>
+                            <p>
+                                Việc thu thập và xử lý dữ liệu cá nhân được thực hiện theo “Chính sách quyền riêng tư”.
+                                Khi sử dụng website, bạn đồng ý với các nội dung nêu trong chính sách này.
+                            </p>
+
+                            <h3 id="law" class="mt-4">12. Luật áp dụng & giải quyết tranh chấp</h3>
+                            <p>
+                                Điều khoản này được điều chỉnh bởi pháp luật Việt Nam. Bất kỳ tranh chấp nào phát sinh
+                                sẽ
+                                ưu tiên giải quyết bằng thương lượng. Nếu không đạt được thỏa thuận, tranh chấp sẽ được
+                                đưa
+                                ra
+                                cơ quan có thẩm quyền tại Việt Nam để giải quyết.
+                            </p>
+
+                            <h3 id="changes" class="mt-4">13. Sửa đổi điều khoản</h3>
+                            <p>
+                                <%= typeof companyName !=='undefined' ? companyName : 'LaptopShop' %> có quyền cập nhật,
+                                    sửa
+                                    đổi Điều khoản
+                                    bất kỳ lúc nào. Phiên bản cập nhật sẽ có hiệu lực kể từ ngày đăng tải hoặc ngày ghi
+                                    rõ
+                                    trong thông báo.
+                            </p>
+
+                            <h3 id="contact" class="mt-4">14. Liên hệ</h3>
+                            <p>Nếu có câu hỏi về Điều khoản, vui lòng liên hệ:</p>
+                            <ul>
+                                <li>Địa chỉ:
+                                    99 ABC, Thống Nhất, Gò Vấp, TP.HCM
+                                </li>
+                                <li>Email:
+                                    support@laptopshop.vn
+                                    </a>
+                                </li>
+                                <li>Điện thoại:
+                                    0999 887 744
+                                    </a>
+                                </li>
+                            </ul>
+
+                            <div class="callout mt-4">
+                                <small>
+                                    Bằng việc tiếp tục sử dụng website, bạn xác nhận đã đọc, hiểu và đồng ý với toàn bộ
+                                    Điều
+                                    khoản sử dụng.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- row -->
+        </div><!-- /container -->
+
+        <!-- FOOTER START -->
+        <%- include('../layout/footer'); -%>
+            <!-- FOOTER END -->
+
+
+            <!-- Back to Top -->
+            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                    class="fa fa-arrow-up"></i></a>
+
+            <!-- JS -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/lib/easing/easing.min.js"></script>
+            <script src="/client/lib/waypoints/waypoints.min.js"></script>
+            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+            <script src="/client/js/main.js"></script>
+</body>
+
+</html>

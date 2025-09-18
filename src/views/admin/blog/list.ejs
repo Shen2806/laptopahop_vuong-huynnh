@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="MinhVuong&QuocHuynh - Dự án laptopshop" />
+    <meta name="author" content="MinhVuong&QuocHuynh" />
+    <title>Manage Blogs - LaptopShop</title>
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="sb-nav-fixed bg-light">
+    <%- include('../layout/header'); -%>
+
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+                            <!-- Tiêu đề -->
+                            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                                <h1 class="h3 fw-bold text-primary"><i class="fa-solid fa-blog"></i> Quản lý Blogs</h1>
+                                <a href="/admin/create-blog" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Thêm Blog
+                                </a>
+                            </div>
+
+                            <!-- Breadcrumb -->
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Blogs</li>
+                            </ol>
+
+                            <!-- Bảng Blogs -->
+                            <div class="card shadow-sm border-0 rounded-3">
+                                <div class="card-header bg-primary text-white fw-semibold">
+                                    <i class="fa-solid fa-table me-2"></i> Danh sách Blog
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Tiêu đề</th>
+                                                    <th>Tác giả</th>
+                                                    <th>Thời gian</th>
+                                                    <th class="text-center">Hành động</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (blogs.length> 0) { %>
+                                                    <% blogs.forEach(blog=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= blog.title %>
+                                                            </td>
+                                                            <td>
+                                                                <%= blog.author %>
+                                                            </td>
+                                                            <td>
+                                                                <%= blog.createdAt.toLocaleDateString() %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="d-flex justify-content-center gap-2">
+                                                                    <a href="/admin/edit-blog/<%= blog.id %>"
+                                                                        class="btn btn-sm btn-warning">
+                                                                        <i class="fas fa-edit"></i> Sửa
+                                                                    </a>
+                                                                    <form action="/admin/delete-blog/<%= blog.id %>"
+                                                                        method="POST" style="display:inline;">
+                                                                        <button type="submit"
+                                                                            class="btn btn-sm btn-danger"
+                                                                            onclick="return confirm('Are you sure to delete?')">
+                                                                            <i class="fas fa-trash"></i> Xóa
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="4" class="text-center text-muted">
+                                                                        No blogs available
+                                                                    </td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </main>
+                    <%- include('../layout/footer'); -%>
+                </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="/admin/js/scripts.js"></script>
+</body>
+
+</html>

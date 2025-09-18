@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="MinhVuong&QuocHuynh - Dự án laptopshop" />
+    <meta name="author" content="MinhVuong&QuocHuynh" />
+    <title>Chỉnh sửa Blog - LaptopShop</title>
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="sb-nav-fixed bg-light">
+    <%- include('../layout/header'); -%>
+
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+
+                            <!-- Tiêu đề -->
+                            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                                <h1 class="h3 fw-bold text-primary"><i class="fas fa-edit"></i> Chỉnh sửa Blog</h1>
+                                <a href="/admin/blog" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Quay lại Blogs
+                                </a>
+                            </div>
+
+                            <!-- Breadcrumb -->
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="/admin/blog">Blogs</a></li>
+                                <li class="breadcrumb-item active">Chỉnh sửa Blog</li>
+                            </ol>
+
+                            <!-- Card Form -->
+                            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                                <div class="card-header bg-primary text-white fw-semibold">
+                                    <i class="fas fa-info-circle me-2"></i> Cập nhật thông tin bài viết
+                                </div>
+                                <div class="card-body">
+                                    <form action="/admin/update-blog" method="POST" enctype="multipart/form-data">
+                                        <input type="hidden" name="id" value="<%= blog.id %>">
+
+                                        <div class="mb-3">
+                                            <label class="form-label"><i class="fas fa-heading me-1"></i> Tiêu
+                                                đề</label>
+                                            <input type="text" name="title" class="form-control"
+                                                value="<%= blog.title %>" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label"><i class="fas fa-user-edit me-1"></i> Tác
+                                                giả</label>
+                                            <input type="text" name="author" class="form-control"
+                                                value="<%= blog.author %>">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label"><i class="fas fa-image me-1"></i> Ảnh
+                                                thumbnail</label><br>
+                                            <% if (blog.thumbnail) { %>
+                                                <img src="<%= blog.thumbnail %>" width="150"
+                                                    class="mb-2 rounded shadow-sm border">
+                                                <br>
+                                                <% } %>
+                                                    <input type="file" name="thumbnail" class="form-control mt-2">
+                                                    <small class="text-muted">Nếu không chọn ảnh mới, ảnh cũ sẽ được giữ
+                                                        lại.</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label"><i class="fas fa-align-left me-1"></i> Nội
+                                                dung</label>
+                                            <textarea name="content" class="form-control" rows="8"
+                                                id="description"><%= blog.content %></textarea>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input type="checkbox" class="form-check-input" name="published"
+                                                value="true" <%=blog.published ? "checked" : "" %>>
+                                            <label class="form-check-label">Xuất bản</label>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a href="/admin/blog" class="btn btn-secondary">
+                                                <i class="fas fa-arrow-left"></i> Hủy
+                                            </a>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-save"></i> Cập nhật
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </main>
+                    <%- include('../layout/footer'); -%>
+                </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="/admin/js/scripts.js"></script>
+        <script src="https://cdn.tiny.cloud/1/1dtzi1n2b488rghqj103opvbjkkyk3kvz7mmh0fm99xh95hq/tinymce/8/tinymce.min.js"
+            referrerpolicy="origin" crossorigin="anonymous"></script>
+        <script>
+            tinymce.init({
+                selector: '#description',
+                plugins: 'lists link image table code',
+                toolbar: 'undo redo | bold italic underline | bullist numlist | link image | table | code',
+                menubar: false,
+                height: 400,
+                branding: false,
+                content_style: "body { font-family: Arial, sans-serif; font-size:14px; }"
+            });
+        </script>
+
+</body>
+
+</html>

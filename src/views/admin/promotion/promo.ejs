@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Quản lý khuyến mãi - LaptopShop</title>
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="sb-nav-fixed bg-light">
+    <%- include('../layout/header'); -%>
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); -%>
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+
+                            <!-- Tiêu đề -->
+                            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                                <h1 class="h3 fw-bold text-primary">
+                                    <i class="fa-solid fa-tags"></i> Quản lý khuyến mãi
+                                </h1>
+                            </div>
+
+                            <!-- Breadcrumb -->
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Khuyến mãi</li>
+                            </ol>
+
+                            <!-- Form thêm khuyến mãi -->
+                            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                                <div class="card-header bg-success text-white fw-semibold">
+                                    <i class="fa-solid fa-plus"></i> Thêm khuyến mãi mới
+                                </div>
+                                <div class="card-body">
+                                    <form action="/admin/promo/add" method="post" class="row g-3 align-items-end">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Chọn sản phẩm</label>
+                                            <select name="productId" class="form-select" required>
+                                                <% allProducts.forEach(p=> { %>
+                                                    <option value="<%= p.id %>">
+                                                        <%= p.name %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">% Giảm giá</label>
+                                            <input type="number" class="form-control" name="discount" min="1" max="90"
+                                                required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="submit" class="btn btn-success w-100">
+                                                <i class="fa-solid fa-plus-circle"></i> Thêm
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Danh sách sản phẩm đang khuyến mãi -->
+                            <div class="card shadow-sm border-0 rounded-3">
+                                <div class="card-header bg-primary text-white fw-semibold">
+                                    <i class="fa-solid fa-list"></i> Danh sách sản phẩm khuyến mãi
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Tên sản phẩm</th>
+                                                    <th>Giá gốc</th>
+                                                    <th>% Giảm</th>
+                                                    <th>Giá sau KM</th>
+                                                    <th class="text-center">Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (promoProducts.length> 0) { %>
+                                                    <% promoProducts.forEach(p=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= p.name %>
+                                                            </td>
+                                                            <td>
+                                                                <%= p.price.toLocaleString('vi-VN') %> ₫
+                                                            </td>
+                                                            <td><span class="badge bg-info text-dark">
+                                                                    <%= p.discount %>%
+                                                                </span></td>
+                                                            <td class="fw-bold text-danger">
+                                                                <%= (p.price * (100 - p.discount) /
+                                                                    100).toLocaleString('vi-VN') %> ₫
+                                                            </td>
+                                                            <td class="text-center">
+
+                                                                <!-- Form sửa -->
+                                                                <form action="/admin/promo/update/<%= p.id %>"
+                                                                    method="post"
+                                                                    class="d-inline-flex align-items-center">
+                                                                    <input type="number" name="discount" min="1"
+                                                                        max="90" value="<%= p.discount %>"
+                                                                        class="form-control form-control-sm me-2"
+                                                                        style="width: 80px;">
+                                                                    <button type="submit"
+                                                                        class="btn btn-warning btn-sm text-white">
+                                                                        <i class="fa-solid fa-pen-to-square"></i> Cập
+                                                                        nhật
+                                                                    </button>
+                                                                </form>
+
+                                                                <!-- Form xóa -->
+                                                                <form action="/admin/promo/delete/<%= p.id %>"
+                                                                    method="post" class="d-inline">
+                                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                                        <i class="fa-solid fa-trash"></i> Xóa
+                                                                    </button>
+                                                                </form>
+
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="5" class="text-center text-muted">
+                                                                        <i class="fa-solid fa-circle-info"></i> Chưa có
+                                                                        sản phẩm khuyến mãi
+                                                                    </td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </main>
+                    <%- include('../layout/footer'); -%>
+                </div>
+        </div>
+</body>
+
+</html>

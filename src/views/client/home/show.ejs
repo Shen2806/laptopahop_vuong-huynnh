@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>LaptopShop- VH </title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="/client/css/style.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css"
+        integrity="sha512-wJgJNTBBkLit7ymC6vvzM1EcSWeM9mmOu+1USHaRBbHkm6W9EgM0HY27+UtUaprntaYQJF75rc8gjxllKs5OIQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <link href="/client/css/home/show.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+
+
+    <!-- Navbar start -->
+    <%- include('../layout/header'); -%>
+        <!-- Navbar End -->
+
+        <!-- Hero Start -->
+        <%- include('../layout/banner'); -%>
+            <!-- Hero End -->
+
+
+            <!-- Sản phẩm khuyến mãi -->
+            <div class="container-fluid">
+                <div class="container ">
+                    <div class="tab-class text-center">
+                        <div class="row g-4">
+                            <section class="promo-zone mt-5">
+                                <h2 class="fire-title-wrapper ">
+                                    <span class="fire-title ">
+                                        <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmJqeW0xZ2Nsc3o5Z245amhwdXozY3NlbGQyanFycXd3OG1ycG9ybSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KPVJXH61g2jHkdqZES/giphy.gif"
+                                            alt="fire" class="fire-gif"> <span>Sản phẩm khuyến
+                                            mãi</span> </span>
+                                    <video autoplay loop muted playsinline class="fire-bg">
+                                        <source src="https://i.imgur.com/J6J4pP6.mp4" type="video/mp4">
+                                    </video>
+                                </h2>
+
+<<<<<<< HEAD
+                <div class="container-fluid">
+                    <div class="container ">
+                        <div class="tab-class text-center">
+                            <div class="row g-4">
+                                <section class="mt-5">
+                                    <h2 class="fire-title-wrapper ">
+                                        <span class="fire-title ">
+                                            <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmJqeW0xZ2Nsc3o5Z245amhwdXozY3NlbGQyanFycXd3OG1ycG9ybSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KPVJXH61g2jHkdqZES/giphy.gif"
+                                                alt="fire" class="fire-gif"> <span>Sản phẩm khuyến
+                                                mãi</span> </span>
+                                        <video autoplay loop muted playsinline class="fire-bg">
+                                            <source src="https://i.imgur.com/J6J4pP6.mp4" type="video/mp4">
+                                        </video>
+                                    </h2>
+=======
+                                <!-- Swiper container -->
+                                <div class="swiper promo-swiper">
+                                    <div class="swiper-wrapper">
+                                        <% promoProducts.forEach(p=> { %>
+                                            <div class="swiper-slide">
+                                                <div
+                                                    class="card h-100 shadow-lg border-0 promo-card position-relative overflow-hidden">
+>>>>>>> a019dde9fc011572475043ca4d7d5019101de745
+
+                                                    <!-- Hình ảnh -->
+                                                    <div class="promo-img-wrapper">
+                                                        <img src="/images/product/<%= p.image %>"
+                                                            class="card-img-top promo-img" alt="<%= p.name %>">
+                                                    </div>
+
+                                                    <div class="card-body d-flex flex-column">
+                                                        <h5 class="card-title text-truncate fw-bold">
+                                                            <%= p.name %>
+                                                        </h5>
+                                                        <p class="mb-1 text-decoration-line-through text-muted small">
+                                                            <%= p.price.toLocaleString('vi-VN') %> ₫
+                                                                <!-- Badge giảm giá -->
+                                                                <span
+                                                                    class="badge bg-danger position-absolute promo-badge"
+                                                                    style="margin-left: 10px; margin-top: 2px;">
+                                                                    -<%= p.discount %>%
+                                                                </span>
+                                                        </p>
+                                                        <p class="fw-bold text-danger fs-5 mb-3">
+                                                            <%= (p.price * (100 - p.discount) /
+                                                                100).toLocaleString('vi-VN') %> ₫
+                                                        </p>
+
+                                                        <div class="mt-auto text-center">
+                                                            <a href="/product/<%= p.id %>"
+                                                                class="btn btn-success rounded-pill px-4">
+                                                                <i class="fa fa-eye me-2"></i> Xem chi tiết
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                    </div>
+
+                                    <!-- Nút điều hướng -->
+                                    <div class="swiper-button-next"></div>
+                                    <div class="swiper-button-prev"></div>
+
+                                    <!-- Thanh pagination -->
+                                    <div class="swiper-pagination"></div>
+                                </div>
+                            </section>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- Sản phẩm khuyến mãi -->
+
+
+            <!-- Fruits Shop Start-->
+            <div class="container-fluid ">
+                <div class="container ">
+                    <div class="tab-class text-center">
+                        <div class="row g-4">
+                            <div class="col-lg-4 text-start">
+                                <h1>Sản phẩm nổi bật</h1>
+                            </div>
+                            <div class="col-lg-8 text-end">
+                                <ul class="nav nav-pills d-inline-flex text-center mb-5">
+                                    <li class="nav-item">
+                                        <a class="d-flex m-2 py-2 btn btn-success rounded-pill active" href="/products">
+                                            <span class="text-light" style="width: 130px;">Tất cả sản phẩm</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="tab-content">
+                            <div id="tab-1" class="tab-pane fade show p-0 active">
+                                <div class="row g-4">
+                                    <div class="col-lg-12">
+                                        <div class="row g-4">
+                                            <% products.forEach( function (product) { %>
+                                                <div class="col-md-6 col-lg-4 col-xl-3">
+                                                    <div class="rounded position-relative fruite-item">
+                                                        <div class="fruite-img">
+                                                            <img src="/images/product/<%= product.image %>"
+                                                                class="img-fluid w-100 rounded-top" alt="">
+                                                        </div>
+                                                        <div class="text-white bg-secondary px-3 py-1 rounded position-absolute"
+                                                            style="top: 10px; left: 10px;">Laptop</div>
+                                                        <div class="p-4 border  border-top-0 rounded-bottom">
+                                                            <h4 style="font-size: 18px;">
+                                                                <a href="/product/<%= product.id %>">
+                                                                    <%= product.name %>
+                                                                </a>
+
+                                                            </h4>
+                                                            <p style="font-size: 15px;">
+                                                                <%= product.shortDesc %>
+                                                            </p>
+                                                            <div class="d-flex justify-content-center flex-lg-wrap row">
+                                                                <% if (product.discount> 0) { %>
+                                                                    <!-- Giá gốc -->
+                                                                    <div
+                                                                        class="d-flex align-items-center justify-content-center">
+                                                                        <p class="mb-1 text-decoration-line-through text-muted small me-2"
+                                                                            style="font-size: 12px;">
+                                                                            <%= new Intl.NumberFormat('vi-VN', {
+                                                                                style: 'currency' , currency: 'VND'
+                                                                                }).format(product.price) %>
+                                                                        </p>
+
+                                                                        <span class="badge bg-danger"
+                                                                            style="margin-bottom: 20px;">
+                                                                            -<%= product.discount %>%
+                                                                        </span>
+                                                                    </div>
+
+
+
+                                                                    <!-- Giá sau giảm + % giảm -->
+                                                                    <div class="d-flex align-items-center justify-content-center"
+                                                                        style="margin-bottom: 30px;">
+                                                                        <p class="fw-bold text-danger fs-5 mb-0 me-2">
+                                                                            <%= new Intl.NumberFormat('vi-VN', {
+                                                                                style: 'currency' , currency: 'VND'
+                                                                                }).format(product.price * (100 -
+                                                                                product.discount) / 100) %>
+                                                                        </p>
+
+                                                                    </div>
+
+                                                                    <% } else { %>
+                                                                        <!-- Giá thường -->
+                                                                        <div class="text-dark fs-5 fw-bold mb-3 text-center w-100 "
+                                                                            style="padding-bottom: 15px;">
+                                                                            <%= new Intl.NumberFormat('vi-VN', {
+                                                                                style: 'currency' , currency: 'VND'
+                                                                                }).format(product.price) %>
+                                                                        </div>
+                                                                        <% } %>
+
+                                                                            <!-- Nút thêm vào giỏ + tồn kho -->
+                                                                            <div
+                                                                                class="d-flex justify-content-between align-items-center mt-1 w-100">
+                                                                                <form method="post"
+                                                                                    action="/add-product-to-cart/<%= product.id %>">
+                                                                                    <button
+                                                                                        data-product-id="<%=product.id%>"
+                                                                                        class="btnAddToCartHomePage mx-auto btn border rounded-pill px-3 text-primary">
+                                                                                        <i
+                                                                                            class="fa fa-shopping-bag me-2 text-primary"></i>
+                                                                                        Thêm vào giỏ hàng
+                                                                                    </button>
+                                                                                </form>
+                                                                                <span class="badge bg-primary ms-3">
+                                                                                    Còn: <%= product.quantity %>
+                                                                                </span>
+                                                                            </div>
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }) %>
+                                                    <div class="pagination d-flex justify-content-center mt-5">
+                                                        <li
+                                                            class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
+                                                            <a class="page-link" href="/?page=<%= page - 1  %>"
+                                                                aria-label="Previous">
+                                                                <span aria-hidden="true">&laquo;</span>
+                                                            </a>
+                                                        </li>
+                                                        <% for(var i=1; i <=totalPages; i++) {%>
+                                                            <li class="page-item">
+                                                                <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
+                                                                    href="/?page=<%= i  %>">
+                                                                    <%= i %>
+                                                                </a>
+                                                            </li>
+                                                            <% } %>
+                                                                <li
+                                                                    class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
+                                                                    <a class="page-link" href="/?page=<%= page + 1  %>"
+                                                                        aria-label="Next">
+                                                                        <span aria-hidden="true">&raquo;</span>
+                                                                    </a>
+                                                                </li>
+                                                    </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Fruits Shop End-->
+
+            <!-- Features Section Start -->
+            <%- include('../layout/feature'); -%>
+                <!-- Features Section End -->
+
+                <!-- Blogs Start-->
+                <div class="container-fluid">
+                    <div class="container ">
+                        <div class="tab-class text-center">
+                            <div class="row g-4">
+                                <section class="mt-5">
+                                    <h2 class="mb-4 text-primary">Tin công nghệ Laptop</h2>
+                                    <div class="swiper news-swiper">
+                                        <div class="swiper-wrapper">
+
+                                            <!-- Tin 1 -->
+                                            <div class="swiper-slide">
+                                                <div class="news-card shadow-sm rounded">
+                                                    <img src="https://maytinhcdc.vn/media/news/1213_dell_xps_14_2024_co_gi_khac_biet_voi_dell_xps_15_2023_08.jpg"
+                                                        class="news-img" alt="Dell XPS 2025">
+                                                    <div class="p-3">
+                                                        <h5 class="fw-bold mb-2">Dell ra mắt XPS 2025</h5>
+                                                        <p class="news-summary text-muted">
+                                                            Dell giới thiệu dòng XPS 2025 với viền siêu mỏng, chip Intel
+                                                            Gen 15 và
+                                                            pin
+                                                            bền bỉ hơn.
+                                                        </p>
+                                                        <a href="https://tinhte.vn/thread/ces2025-dell-loai-bo-xps-doi-cach-dat-ten-san-pham-thanh-dell-dell-pro-va-dell-pro-max.3935893/"
+                                                            class="btn btn-sm btn-primary mt-2">Đọc tiếp</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tin 2 -->
+                                            <div class="swiper-slide">
+                                                <div class="news-card shadow-sm rounded">
+                                                    <img src="https://iphone-mania.jp/uploads/2024/06/19/M4-MacBook-Pro_1200.jpg"
+                                                        class="news-img" alt="MacBook Pro M4">
+                                                    <div class="p-3">
+                                                        <h5 class="fw-bold mb-2">MacBook Pro M4</h5>
+                                                        <p class="news-summary text-muted">
+                                                            Apple nâng cấp MacBook Pro với chip M4 cực mạnh, tối ưu AI
+                                                            và tiết kiệm
+                                                            điện
+                                                            năng.
+                                                        </p>
+                                                        <a href="https://www.apple.com/newsroom/2024/10/new-macbook-pro-features-m4-family-of-chips-and-apple-intelligence/"
+                                                            class="btn btn-sm btn-primary mt-2">Đọc tiếp</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tin 3 -->
+                                            <div class="swiper-slide">
+                                                <div class="news-card shadow-sm rounded">
+                                                    <img src="https://photo2.tinhte.vn/data/attachment-files/2023/04/6404516_Cover_ASUS_ROG_Maxed_Out_Seminar_1.jpg"
+                                                        class="news-img" alt="Asus ROG">
+                                                    <div class="p-3">
+                                                        <h5 class="fw-bold mb-2">Asus ROG mới</h5>
+                                                        <p class="news-summary text-muted">
+                                                            Asus ROG trình làng laptop gaming với màn hình Mini LED
+                                                            240Hz và GPU RTX
+                                                            5090.
+                                                        </p>
+                                                        <a href="https://memoryzone.com.vn/ces-2025-asus-pha-dao-thi-truong-voi-loat-laptop-gaming#:~:text=Las%20Vegas%2C%20M%E1%BB%B9%2C%20ng%C3%A0y%206%20th%C3%A1ng%201%20n%C4%83m,gaming%20s%E1%BB%91%201%20th%E1%BA%BF%20gi%E1%BB%9Bi%20v%C3%A0%20Vi%E1%BB%87t%20Nam."
+                                                            class="btn btn-sm btn-primary mt-2">Đọc tiếp</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tin 4 -->
+                                            <div class="swiper-slide">
+                                                <div class="news-card shadow-sm rounded">
+                                                    <img src="https://i5.walmartimages.com/seo/Thunderobot-ZERO-Gaming-Laptop-16-QHD-240Hz-Intel-Core-i9-13900HX-NVIDIA-GeForce-4080-32GB-DDR5-RAM-1TB-SSD-Wi-Fi-6-Windows-11-Home_2731c321-995d-4184-a175-5b405f8a9bd9.f16f3d75edba6e5d0474d19cbd64a833.png"
+                                                        class="news-img" alt="HP Spectre">
+                                                    <div class="p-3">
+                                                        <h5 class="fw-bold mb-2">HP Spectre 2025</h5>
+                                                        <p class="news-summary text-muted">
+                                                            HP tung ra Spectre mới với màn OLED 4K cảm ứng, hỗ trợ xoay
+                                                            gập 360 độ
+                                                            tiện
+                                                            lợi.
+                                                        </p>
+                                                        <a href="https://www.hp.com/us-en/newsroom/press-releases/2025/future-of-work.html?msockid=0eebc1372060604911fdd4dc2161611b"
+                                                            class="btn btn-sm btn-primary mt-2">Đọc tiếp</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tin 5 -->
+                                            <div class="swiper-slide">
+                                                <div class="news-card shadow-sm rounded">
+                                                    <img src="https://sm.pcmag.com/t/pcmag_au/review/l/lenovo-thi/lenovo-thinkpad-x1-carbon-gen-12_g1tq.1920.jpg"
+                                                        class="news-img" alt="Lenovo ThinkPad">
+                                                    <div class="p-3">
+                                                        <h5 class="fw-bold mb-2">Lenovo ThinkPad Gen 12</h5>
+                                                        <p class="news-summary text-muted">
+                                                            Lenovo nâng cấp ThinkPad với bàn phím mới, hiệu suất ổn định
+                                                            và bảo mật
+                                                            tăng
+                                                            cường.
+                                                        </p>
+                                                        <a href="https://www.notebookcheck.net/Lenovo-releases-full-version-of-X1-Carbon-G12-ThinkPad-X1-2-in-1.813296.0.html#:~:text=The%20nearing%20release%20means%20Lenovo%20has%20finally%20released,ThinkPad%20X1%20series%20is%20Lenovo%27s%20premier%20ThinkPad%20lineup."
+                                                            class="btn btn-sm btn-primary mt-2">Đọc tiếp</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tin 6 -->
+                                            <div class="swiper-slide">
+                                                <div class="news-card shadow-sm rounded">
+                                                    <img src="https://photo2.tinhte.vn/data/attachment-files/2023/08/7233750_tinhte-MSI-1.jpg"
+                                                        class="news-img" alt="MSI Stealth">
+                                                    <div class="p-3">
+                                                        <h5 class="fw-bold mb-2">MSI Stealth 2025</h5>
+                                                        <p class="news-summary text-muted">
+                                                            MSI Stealth mới ra mắt với thiết kế mỏng nhẹ, GPU RTX 5080
+                                                            và hệ thống
+                                                            tản
+                                                            nhiệt kép.
+                                                        </p>
+                                                        <a href="https://www.notebookcheck.net/MSI-Stealth-A16-AI-launches-with-Ryzen-AI-9-HX-processor-and-GeForce-RTX-50-series-GPU.942418.0.html#:~:text=MSI%20has%20unveiled%20its%20latest%20gaming%20laptop%2C%20the,which%20are%20designed%20for%20content%20creators%20and%20gamers."
+                                                            class="btn btn-sm btn-primary mt-2">Đọc tiếp</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Nút điều hướng -->
+                                        <div class="swiper-button-next"></div>
+                                        <div class="swiper-button-prev"></div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blogs End-->
+
+                <!-- Footer Start -->
+                <%- include('../layout/footer'); -%>
+                    <!-- Footer End -->
+
+                    <!-- Back to Top -->
+                    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                            class="fa fa-arrow-up"></i></a>
+
+                    <!-- JavaScript Libraries -->
+                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+                    <script src="/client/lib/easing/easing.min.js"></script>
+                    <script src="/client/lib/waypoints/waypoints.min.js"></script>
+                    <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+                    <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+
+                    <!-- Template Javascript -->
+                    <script src="/client/js/main.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
+                        integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
+                        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <script>
+                        var swiper = new Swiper('.promo-swiper', {
+                            loop: true,  // Bật vòng lặp vô hạn
+                            slidesPerView: 3,  // Hiển thị 3 sản phẩm mỗi lần
+                            spaceBetween: 30,  // Khoảng cách giữa các sản phẩm
+                            autoplay: {
+                                delay: 2000,  // Thời gian chuyển slide (2.5 giây)
+                            },
+                            navigation: {
+                                nextEl: '.swiper-button-next',
+                                prevEl: '.swiper-button-prev',
+                            },
+                            pagination: {
+                                el: '.swiper-pagination',
+                                clickable: true,
+                            },
+                        });
+
+                        /*tin tức công nghệ*/
+                        var newsSwiper = new Swiper(".news-swiper", {
+                            slidesPerView: 3,
+                            spaceBetween: 20,
+                            loop: true,
+                            autoplay: {
+                                delay: 2000,
+                                disableOnInteraction: false,
+                            },
+                            pagination: {
+                                el: ".news-swiper .swiper-pagination",
+                                clickable: true,
+                            },
+                            navigation: {
+                                nextEl: ".news-swiper .swiper-button-next",
+                                prevEl: ".news-swiper .swiper-button-prev",
+                            },
+                        });
+
+                    </script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+{
+  "name": "minhvuong-nodepro",
+  "version": "1.0.0",
+  "description": "nodepro-minhvuong",
+  "main": "dist/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon",
+    "dev": "nodemon",
+    "start:debug": "nodemon --inspect=9229 -e ts,tsx --exec node -r ts-node/register -r tsconfig-paths/register ./src/app.ts"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src"
+    ],
+    "ext": "ts",
+    "ignore": [
+      "node_modules"
+    ],
+    "exec": "ts-node -r tsconfig-paths/register ./src/app.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shen2806/laptopahop_vuong-huynnh.git"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "minhvuong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shen2806/laptopahop_vuong-huynnh/issues"
+  },
+  "homepage": "https://github.com/Shen2806/laptopahop_vuong-huynnh#readme",
+  "dependencies": {
+    "@nestjs/jwt": "10.0.3",
+    "@nestjs/passport": "9.0.3",
+    "@prisma/client": "6.3.0",
+    "@quixo3/prisma-session-store": "3.1.13",
+    "bcrypt": "5.1.1",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "2.8.5",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
+    "dotenv": "16.4.7",
+    "ejs": "3.1.10",
+    "express": "^5.0.1",
+    "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "1.4.5-lts.1",
+    "mysql2": "^3.14.4",
+    "passport": "0.6.0",
+    "passport-jwt": "4.0.1",
+    "passport-local": "1.0.0",
+    "react-toastify": "^11.0.5",
+    "sequelize": "^6.37.7",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
+    "uuid": "11.0.5",
+    "zod": "3.24.2"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "5.0.2",
+    "@types/connect-flash": "^0.0.40",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "2.8.17",
+    "@types/ejs": "3.1.5",
+    "@types/express": "5.0.0",
+    "@types/express-session": "^1.18.1",
+    "@types/jquery": "^3.5.33",
+    "@types/jsonwebtoken": "9.0.9",
+    "@types/multer": "1.4.12",
+    "@types/node": "22.10.7",
+    "@types/passport": "1.0.17",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-local": "^1.0.38",
+    "@types/sequelize": "^6.12.0",
+    "@types/socket.io": "^3.0.2",
+    "i": "0.3.7",
+    "nodemon": "3.1.9",
+    "prisma": "6.3.0",
+    "ts-node": "10.9.2",
+    "tsconfig-paths": "4.2.0",
+    "typescript": "5.7.3"
+  }
+}

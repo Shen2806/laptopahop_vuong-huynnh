@@ -1,0 +1,145 @@
+<!-- Libraries Stylesheet -->
+<link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+<link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+<!-- Customized Bootstrap Stylesheet -->
+<link href="/client/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Template Stylesheet -->
+<link href="/client/css/style.css" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css"
+    integrity="sha512-wJgJNTBBkLit7ymC6vvzM1EcSWeM9mmOu+1USHaRBbHkm6W9EgM0HY27+UtUaprntaYQJF75rc8gjxllKs5OIQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="/client/css/layout/header.css">
+
+
+
+<div class="container-fluid shadow" style="margin-top: 10px">
+    <!-- Topbar -->
+    <div class="container topbar bg-primary d-none d-lg-block">
+        <div class="d-flex justify-content-between">
+            <div class="top-info ps-2">
+                <% if(user){ %>
+                    <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i>
+                        <a href="#" class="text-white">
+                            <%= user?.address || "" %>
+                        </a>
+                    </small>
+                    <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i>
+                        <a href="#" class="text-white">
+                            <%= user?.username || "" %>
+                        </a>
+                    </small>
+                    <% } else { %>
+                        <small class="me-3"><i class="fas fa-voicemail me-2 text-secondary"></i></small>
+                        <% } %>
+            </div>
+            <div class="top-link pe-2">
+                <a href="/terms" class="text-white"><small class="text-white mx-2">Điều khoản sử dụng</small>/</a>
+                <a href="/support" class="text-white"><small class="text-white mx-2">Hỗ trợ</small></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <div class="container px-0">
+        <nav class="navbar navbar-light bg-white navbar-expand-xl">
+            <div>
+                <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle">
+            </div>
+            <a href="/" class="navbar-brand">
+                <h1 class="text-primary display-6">LaptopShop</h1>
+            </a>
+            <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarCollapse">
+                <span class="fa fa-bars text-primary"></span>
+            </button>
+
+            <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                <div class="navbar-nav mx-auto">
+                    <a href="/" class="nav-item nav-link active">Trang chủ</a>
+                    <a href="/products" class="nav-item nav-link">Sản phẩm</a>
+                    <a href="/about" class="nav-item nav-link">Giới thiệu</a>
+                    <a href="/contact" class="nav-item nav-link">Liên hệ</a>
+                    <a href="/blogs" class="nav-item nav-link">Blog</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">Thông tin và chính sách</a>
+                        <ul class="dropdown-menu" aria-labelledby="policyDropdown">
+                            <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
+                            <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
+                            <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
+                        </ul>
+                    </li>
+                </div>
+
+                <div class="d-flex ms-auto align-items-center">
+                    <% if(user){ %>
+                        <!-- Chuông thông báo -->
+                        <div class="notification-icon position-relative me-3" id="notificationDropdown"
+                            style="cursor: pointer;">
+                            <i class="fas fa-bell fa-2x"></i>
+                            <span id="notificationBadge"
+                                class="position-absolute bg-danger text-white rounded-circle d-flex align-items-center justify-content-center"
+                                style="top:-5px; right:-5px; width:20px; height:20px; font-size:12px; display:none;">
+                                0
+                            </span>
+                        </div>
+                        <!-- Âm thanh -->
+                        <audio id="notificationSound" src="/sounds/ring.wav" preload="auto"></audio>
+                        <% } %>
+
+                            <!-- Giỏ hàng -->
+                            <a href="/cart" class="position-relative me-3">
+                                <i class="fa fa-shopping-bag fa-2x"></i>
+                                <span
+                                    class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
+                                    id="sumCart" style="top:-5px; left: 15px; height: 20px; min-width: 20px;">
+                                    <%= user?.sumCart ?? 0 %>
+                                </span>
+                            </a>
+
+                            <!-- User -->
+                            <% if(user){ %>
+                                <div class="dropdown my-auto">
+                                    <a href="#" class="dropdown" role="button" id="dropdownMenuLink"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-user fa-2x"></i>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end p-4" aria-labelledby="dropdownMenuLink">
+                                        <li class="d-flex align-items-center flex-column" style="min-width: 300px;">
+                                            <img style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden;"
+                                                src="/images/<%= user.avatar %>" />
+                                            <div class="text-center my-3">
+                                                <%= user.fullName %>
+                                            </div>
+                                        </li>
+                                        <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
+                                        <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
+                                        <li><a class="dropdown-item" href="/order-user">Đơn hàng của tôi</a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <form method="post" action="/logout">
+                                                <button class="dropdown-item">Đăng xuất</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <% } else { %>
+                                    <a href="/login" class="a-login"><i class="fas fa-user fa-2x"></i></a>
+                                    <% } %>
+                </div>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<% if(user){ %>
+    <script>
+        // inject an toàn (id luôn là chuỗi)
+        window.userId = "<%= user.id %>";
+    </script>
+    <% } %>

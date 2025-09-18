@@ -1,0 +1,57 @@
+<link rel="stylesheet" href="/client/css/layout/banner.css">
+<!-- ========== HERO MINIMAL GREEN (scoped, static) ========== -->
+<div class="container-fluid hero-min">
+  <div class="container py-5">
+    <div class="row g-5 align-items-center">
+      <!-- LEFT -->
+      <div class="col-lg-6">
+        <p class="hm-kicker mb-2">
+          <i class="bi bi-patch-check-fill me-2"></i>100% sản phẩm chính hãng
+        </p>
+        <h1 class="hm-title mb-3">
+          Laptop cao cấp, <span class="hm-hl">giá vô địch</span>
+        </h1>
+        <p class="hm-sub mb-4">Giao nhanh toàn quốc, đổi trả linh hoạt, bảo hành tận tâm.</p>
+
+        <div class="d-flex flex-wrap gap-3 mb-4">
+          <a href="/products" class="hm-btn hm-btn-primary">Mua ngay</a>
+          <a href="/promotions" class="hm-btn hm-btn-ghost">Xem khuyến mãi</a>
+        </div>
+
+        <form action="/search" method="GET" role="search" class="hm-search d-flex align-items-stretch">
+          <input name="q" type="search" class="form-control"
+                 placeholder="Tìm: “RTX 4060”, “MacBook”, “bàn phím cơ”…" aria-label="Tìm kiếm">
+          <button class="hm-btn-search" type="submit" aria-label="Tìm kiếm"><i class="bi bi-search"></i></button>
+        </form>
+
+        <ul class="hm-usps list-unstyled d-flex flex-wrap gap-4 mt-4">
+          <li><i class="bi bi-truck me-2"></i>Free ship 0đ</li>
+          <li><i class="bi bi-arrow-repeat me-2"></i>Đổi trả 7–30 ngày</li>
+          <li><i class="bi bi-headset me-2"></i>Hỗ trợ 24/7</li>
+          <li><i class="bi bi-shield-check me-2"></i>Bảo hành chính hãng</li>
+        </ul>
+      </div>
+
+      <!-- RIGHT: 3 tiles -->
+      <div class="col-lg-6">
+        <div class="hm-grid">
+          <a class="hm-tile" href="/products?category=gaming" aria-label="Gaming"
+             style="--img:url('/images/banner/hero-img-1.png')">
+            <span class="hm-chip"><i class="bi bi-controller me-1"></i>Gaming</span>
+          </a>
+
+          <a class="hm-tile" href="/products?category=laptop" aria-label="Laptop"
+             style="--img:url('/images/banner/hero-img-2.png')">
+            <span class="hm-chip"><i class="bi bi-laptop me-1"></i>Laptop</span>
+          </a>
+
+          <a class="hm-tile span-2" href="/products?category=accessory" aria-label="Phụ kiện"
+             style="--img:url('/images/banner/hero-img-3.png')">
+            <span class="hm-chip"><i class="bi bi-plug me-1"></i>Phụ kiện</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ========== /HERO MINIMAL GREEN ========== -->

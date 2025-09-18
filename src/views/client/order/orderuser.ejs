@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>Đơn hàng của tôi</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries -->
+    <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Bootstrap & Template -->
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/client/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="/client/css/order/orderuser.css">
+
+
+
+</head>
+
+<body>
+    <%- include('../layout/header'); -%>
+
+        <div class="container my-5">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Đơn hàng của tôi</li>
+                </ol>
+            </nav>
+
+            <h2 class="mb-4"><i class="fas fa-shopping-bag me-2" style="color: #8BC34A;"></i>Đơn hàng của tôi</h2>
+
+            <% if (orders.length===0) { %>
+                <div class="alert alert-info">
+                    Bạn chưa có đơn hàng nào. <a href="/products" class="alert-link">Mua ngay</a> để trải nghiệm!
+                </div>
+                <% } else { %>
+                    <div class="row g-4">
+                        <% orders.forEach(order=> { %>
+                            <div class="col-12">
+                                <div class="card order-card mb-4">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="order-header mb-0">Đơn hàng #<%= order.id %>
+                                            </h5>
+                                            <span class="badge
+  <% if(order.status==='PENDING'){ %> bg-warning text-dark
+  <% } else if(order.status==='CONFIRMED'){ %> bg-info text-dark
+  <% } else if(order.status==='SHIPPING'){ %> bg-primary
+  <% } else if(order.status==='OUT_FOR_DELIVERY'){ %> bg-secondary
+  <% } else if(order.status==='DELIVERED'){ %> bg-success
+  <% } else if(order.status==='CANCELED'){ %> bg-danger
+  <% } else { %> bg-light text-dark <% } %>">
+                                                <% const viLabel={ PENDING: 'Chờ xử lý' , CONFIRMED: 'Đã xác nhận đơn' ,
+                                                    SHIPPING: 'Đang vận chuyển' , OUT_FOR_DELIVERY: 'Đang giao hàng' ,
+                                                    DELIVERED: 'Đã giao hàng' , CANCELED: 'Đã hủy' }[order.status] ||
+                                                    order.status; %>
+                                                    <%= viLabel %>
+                                            </span>
+
+                                        </div>
+                                        <p><b>Ngày đặt:</b>
+                                            <%= order.createdAt.toLocaleDateString('vi-VN') %>
+                                        </p>
+                                        <p><b>Thanh toán:</b>
+                                            <%= order.paymentMethod %> - <%= order.paymentStatus %>
+                                        </p>
+                                        <p><b>Tổng tiền:</b> <span class="order-total">
+                                                <%= order.totalPrice.toLocaleString() %>₫
+                                            </span></p>
+
+                                        <hr>
+                                        <h6><i class="fas fa-box-open me-2"></i>Sản phẩm</h6>
+                                        <div class="order-products table-responsive">
+                                            <table class="table align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Hình ảnh</th>
+                                                        <th>Tên sản phẩm</th>
+                                                        <th class="text-center">Số lượng</th>
+                                                        <th class="text-end">Giá</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% order.orderDetails.forEach(item=> { %>
+                                                        <tr>
+                                                            <td style="width: 80px;">
+                                                                <img src="/images/product/<%=item.product.image %>"
+                                                                    alt=" <%=item.product.name %>"
+                                                                    class="img-fluid rounded" style="max-width: 60px; max-height: 60px; object-fit:
+                                                                cover;">
+                                                            </td>
+                                                            <td>
+                                                                <%= item.product.name %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <%= item.quantity %>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <%= item.price.toLocaleString() %>₫
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <% }) %>
+                    </div>
+                    <% } %>
+        </div>
+
+        <%- include('../layout/footer'); -%>
+
+            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top">
+                <i class="fa fa-arrow-up"></i>
+            </a>
+
+            <!-- Scripts -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/lib/easing/easing.min.js"></script>
+            <script src="/client/lib/waypoints/waypoints.min.js"></script>
+            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+            <script src="/client/js/main.js"></script>
+</body>
+
+</html>

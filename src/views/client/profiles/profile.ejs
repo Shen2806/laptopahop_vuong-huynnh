@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Thông tin cá nhân</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Google Fonts & Bootstrap  -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/client/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+
+    <!-- Navbar -->
+    <%- include('../layout/header'); -%>
+
+        <!-- Banner -->
+
+        <div class="container my-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="card shadow p-4">
+                        <h2 class="mb-4 text-center text-success">Cập nhật thông tin</h2>
+
+                        <!-- Toast container -->
+                        <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+                            <div id="notifyToast" class="toast align-items-center text-white bg-success border-0"
+                                role="alert" aria-live="assertive" aria-atomic="true">
+                                <div class="d-flex">
+                                    <div class="toast-body" id="notifyToastBody">Thông báo</div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                        data-bs-dismiss="toast"></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form action="/profile/update" method="POST" enctype="multipart/form-data">
+                            <div class="mb-3 text-center">
+                                <img id="avatarPreview"
+                                    src="<%= user.avatar ? '/images/' + user.avatar : 'https://via.placeholder.com/120x120?text=Avatar' %>"
+                                    class="rounded-circle border border-3 border-success shadow" width="120"
+                                    height="120">
+                                <input type="file" id="avatar" name="avatar" class="form-control mt-3">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Họ và tên</label>
+                                <input type="text" name="fullName" class="form-control" value="<%= user.fullName %>"
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="text" name="phone" class="form-control" value="<%= user.phone %>" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Địa chỉ</label>
+                                <textarea name="address" class="form-control" rows="3"
+                                    required><%= user.address %></textarea>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success btn-lg">Cập nhật</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <!-- Footer -->
+        <%- include('../layout/footer'); -%>
+
+
+
+            <!-- JS -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/js/main.js"></script>
+
+            <script>
+                // Xem trước avatar mới chọn
+                document.getElementById("avatar").addEventListener("change", function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const preview = document.getElementById("avatarPreview");
+                        preview.src = URL.createObjectURL(file);
+                    }
+                });
+            </script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/js/main.js"></script>
+
+            <script>
+                // Xem trước avatar
+                document.getElementById("avatar").addEventListener("change", function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const preview = document.getElementById("avatarPreview");
+                        preview.src = URL.createObjectURL(file);
+                    }
+                });
+
+                // Hàm toast đếm ngược
+                function showToastCountdown(message, seconds = 3) {
+                    const toastEl = document.getElementById('notifyToast');
+                    const toastBody = document.getElementById('notifyToastBody');
+
+                    if (!toastEl || !toastBody) return;
+
+                    let remaining = seconds;
+                    toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
+
+                    let toast = bootstrap.Toast.getInstance(toastEl);
+                    if (!toast) {
+                        toast = new bootstrap.Toast(toastEl, { autohide: false });
+                    }
+
+                    toast.show();
+
+                    const interval = setInterval(() => {
+                        remaining--;
+                        if (remaining > 0) {
+                            toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
+                        } else {
+                            clearInterval(interval);
+                            toast.hide();
+                        }
+                    }, 1000);
+                }
+
+                document.addEventListener("DOMContentLoaded", function () {
+                    var successMessage = "<%= successMessage ? successMessage : '' %>";
+                    if (successMessage) {
+                        showToastCountdown(successMessage, 3);
+                    }
+                });
+            </script>
+
+
+
+
+</body>
+
+</html>

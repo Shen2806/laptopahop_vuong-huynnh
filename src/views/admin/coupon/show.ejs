@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý mã giảm giá</title>
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+
+
+
+</head>
+
+<body class="sb-nav-fixed bg-light">
+    <!-- Header -->
+    <%- include('../layout/header'); -%>
+
+        <div id="layoutSidenav">
+            <!-- Sidebar -->
+            <%- include('../layout/sidenav'); -%>
+
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+                            <!-- Tiêu đề + nút thêm -->
+                            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                                <h1 class="h3 fw-bold text-primary">
+                                    <i class="fa-solid fa-ticket"></i> Quản lý mã giảm giá
+                                </h1>
+                                <a href="/admin/coupon/create" class="btn btn-success">
+                                    <i class="fas fa-plus"></i> Thêm mã
+                                </a>
+                            </div>
+
+                            <!-- Breadcrumb -->
+                            <ol class="breadcrumb mb-4">
+                                <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+                                <li class="breadcrumb-item active">Mã giảm giá</li>
+                            </ol>
+
+                            <!-- Bảng danh sách -->
+                            <div class="card shadow-sm border-0 rounded-3">
+                                <div class="card-header bg-primary text-white fw-semibold">
+                                    <i class="fa-solid fa-table me-2"></i> Danh sách mã giảm giá
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table align-middle table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Mã</th>
+                                                    <th>Giảm (%)</th>
+                                                    <th>Ngày hết hạn</th>
+                                                    <th class="text-center">Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (coupons.length> 0) { %>
+                                                    <% coupons.forEach(coupon=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= coupon.id %>
+                                                            </td>
+                                                            <td>
+                                                                <%= coupon.code %>
+                                                            </td>
+                                                            <td>
+                                                                <%= coupon.discount %> %
+                                                            </td>
+                                                            <td>
+                                                                <%= coupon.expiryDate.toLocaleDateString("vi-VN") %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="d-flex justify-content-center gap-2">
+                                                                    <a href="/admin/coupon/edit/<%= coupon.id %>"
+                                                                        class="btn btn-sm btn-warning">
+                                                                        <i class="fas fa-edit"></i> Sửa
+                                                                    </a>
+
+                                                                    <a href="#" class="btn btn-sm btn-danger"
+                                                                        data-id="<%= coupon.id %>"
+                                                                        data-bs-toggle="popover" data-bs-html="true"
+                                                                        data-bs-placement="right" data-bs-content="
+     <div class='text-center'>
+       <p class='mb-2'>Bạn có chắc muốn xóa?</p>
+       <a href='/admin/coupon/delete/<%= coupon.id %>' class='btn btn-danger btn-sm'>Xóa</a>
+       <button type='button' class='btn btn-secondary btn-sm' onclick='hidePopover(this)'>Hủy</button>
+     </div>
+   ">
+                                                                        <i class="fas fa-trash"></i> Xóa
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="5" class="text-center text-muted">
+                                                                        Chưa có mã giảm giá nào
+                                                                    </td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                            <!-- Modal Xác nhận xóa -->
+                                            <div class="modal fade" id="deleteModal" tabindex="-1"
+                                                aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header bg-danger text-white">
+                                                            <h5 class="modal-title" id="deleteModalLabel"><i
+                                                                    class="fas fa-exclamation-triangle"></i> Xác nhận
+                                                                xóa</h5>
+                                                            <button type="button" class="btn-close btn-close-white"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Bạn có chắc chắn muốn xóa mã giảm giá này không?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <form id="deleteForm" method="GET">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">Hủy</button>
+                                                                <button type="submit"
+                                                                    class="btn btn-danger">Xóa</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </main>
+
+                    <!-- Footer -->
+                    <%- include('../layout/footer'); -%>
+                </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="/admin/js/scripts.js"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+                popoverTriggerList.forEach(function (el) {
+                    new bootstrap.Popover(el, {
+                        trigger: 'focus', // popover biến mất khi click ra ngoài
+                    })
+                })
+            });
+
+            function hidePopover(button) {
+                const popover = bootstrap.Popover.getInstance(button.closest('.popover').previousElementSibling);
+                popover.hide();
+            }
+        </script>
+
+
+</body>
+
+</html>

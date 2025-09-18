@@ -1,0 +1,151 @@
+
+        /* menu
+        /* Style dropdown menu */
+        .navbar .dropdown-menu {
+            border-radius: 8px;
+            /* bo góc */
+            padding: 8px 0;
+            /* khoảng cách bên trong */
+            border: none;
+            /* bỏ viền */
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            /* đổ bóng nhẹ */
+            min-width: 220px;
+            /* độ rộng tối thiểu */
+        }
+
+        /* Style item trong dropdown */
+        .navbar .dropdown-menu .dropdown-item {
+            padding: 10px 18px;
+            color: #333;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            border-radius: 6px;
+            /* bo góc item */
+        }
+
+        /* Hover item */
+        .navbar .dropdown-menu .dropdown-item:hover {
+            background-color: #8BC34A;
+            /* xanh lá nhạt */
+            color: #fff;
+            /* chữ trắng */
+        }
+
+        /* Dropdown mở khi hover */
+        .nav-item.dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+            animation: fadeIn 0.3s ease-in-out;
+            /* hiệu ứng mượt */
+        }
+
+        /* Hiệu ứng fade */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Trạng thái thu gọn */
+        #desc-wrapper.desc-collapsed {
+            max-height: 150px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Hiệu ứng mờ dưới */
+        #desc-wrapper.desc-collapsed::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(to top, #fff, transparent);
+        }
+
+        /* Trạng thái mở rộng */
+        #desc-wrapper {
+            transition: max-height 0.3s ease;
+        }
+
+        /* css số sao đánh giá */
+        .rating .star {
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        /* Sao rỗng (far) mặc định màu xám */
+        .rating .star i.far {
+            color: #ccc;
+        }
+
+        /* Sao đầy (fas) màu vàng */
+        .rating .star i.fas {
+            color: #ffc107;
+        }
+
+        /* Logo css */
+        .logo-circle {
+            margin-right: 10px;
+            height: 70px;
+            width: 70px;
+            /* nên để bằng nhau để bo tròn đẹp */
+            border-radius: 50%;
+            /* bo tròn */
+            object-fit: cover;
+            /* giữ hình không méo */
+            border: 3px solid #8BC34A;
+            /* viền xanh lá đồng bộ với web */
+            padding: 3px;
+            /* cách viền một chút nếu muốn */
+            background: white;
+            /* nền trắng để viền nổi bật hơn */
+        }
+
+        .policy-card {
+            border-radius: 12px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .policy-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .policy-card ul li {
+            line-height: 1.5;
+            color: #555;
+        }
+
+    .footer .btn-link {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .footer .btn-link:hover {
+        color: #8BC34A;
+        padding-left: 5px;
+    }
+
+    .btn-social {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+    }
+
+    .btn-social:hover {
+        background: #8BC34A;
+        color: #000;
+    }

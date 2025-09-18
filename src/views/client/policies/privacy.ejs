@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <title>
+        <%= typeof title !=='undefined' ? title : 'Chính sách bảo mật' %>
+    </title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="description" content="Chính sách bảo mật thông tin khách hàng của LaptopShop">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries -->
+    <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Bootstrap & Template -->
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/client/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="/client/css/policies/privacy.css">
+
+
+</head>
+
+<body>
+    <%- include('../layout/header'); -%>
+
+        <div class="py-1"></div>
+
+        <div class="container my-4">
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Chính sách bảo mật</li>
+                </ol>
+            </nav>
+
+            <div class="row g-4">
+                <!-- Sidebar mục lục -->
+                <div class="col-12 col-lg-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="mb-3">Mục lục</h5>
+                            <ul class="list-unstyled toc">
+                                <li><a href="#intro">1. Giới thiệu</a></li>
+                                <li><a href="#collect">2. Thông tin thu thập</a></li>
+                                <li><a href="#use">3. Mục đích sử dụng</a></li>
+                                <li><a href="#protect">4. Bảo mật thông tin</a></li>
+                                <li><a href="#rights">5. Quyền của khách hàng</a></li>
+                                <li><a href="#share">6. Chia sẻ thông tin</a></li>
+                                <li><a href="#changes">7. Thay đổi chính sách</a></li>
+                                <li><a href="#contact">8. Liên hệ</a></li>
+                            </ul>
+                            <div class="terms-updated mt-3">
+                                Cập nhật lần cuối: <%= typeof lastUpdated !=='undefined' ? lastUpdated : (new
+                                    Date()).toLocaleDateString('vi-VN') %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nội dung -->
+                <div class="col-12 col-lg-9 terms-section">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="mb-3">Chính sách bảo mật</h2>
+                            <p>
+                                <strong>
+                                    <%= typeof companyName !=='undefined' ? companyName : 'LaptopShop' %>
+                                </strong>
+                                cam kết bảo vệ tuyệt đối thông tin cá nhân và quyền riêng tư của khách hàng khi truy cập
+                                website và mua sắm tại cửa hàng.
+                            </p>
+                            <hr class="my-4">
+
+                            <h3 id="intro" class="mt-4">1. Giới thiệu</h3>
+                            <p>
+                                Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu cá nhân của
+                                khách hàng. Khi sử dụng website, bạn đồng ý với các điều khoản trong chính sách này.
+                            </p>
+
+                            <h3 id="collect" class="mt-4">2. Thông tin thu thập</h3>
+                            <ul>
+                                <li>Thông tin cá nhân: họ tên, số điện thoại, email, địa chỉ giao hàng.</li>
+                                <li>Thông tin giao dịch: sản phẩm đã mua, phương thức thanh toán.</li>
+                                <li>Dữ liệu kỹ thuật: cookies, địa chỉ IP, lịch sử truy cập website.</li>
+                            </ul>
+
+                            <h3 id="use" class="mt-4">3. Mục đích sử dụng</h3>
+                            <ul>
+                                <li>Xử lý đơn hàng, giao hàng và hỗ trợ khách hàng.</li>
+                                <li>Thông báo chương trình khuyến mãi, ưu đãi.</li>
+                                <li>Nâng cao chất lượng sản phẩm, dịch vụ.</li>
+                            </ul>
+
+                            <h3 id="protect" class="mt-4">4. Bảo mật thông tin</h3>
+                            <p>
+                                Chúng tôi áp dụng biện pháp bảo mật kỹ thuật và tổ chức nhằm ngăn chặn truy cập trái
+                                phép, mất mát hoặc lạm dụng thông tin.
+                                LaptopShop không chia sẻ thông tin khách hàng cho bên thứ ba trừ khi được sự đồng ý hoặc
+                                theo yêu cầu pháp luật.
+                            </p>
+
+                            <h3 id="rights" class="mt-4">5. Quyền của khách hàng</h3>
+                            <ul>
+                                <li>Yêu cầu truy cập, chỉnh sửa hoặc xóa dữ liệu cá nhân.</li>
+                                <li>Yêu cầu ngừng nhận thông tin quảng cáo, khuyến mãi.</li>
+                            </ul>
+
+                            <h3 id="share" class="mt-4">6. Chia sẻ thông tin</h3>
+                            <p>
+                                Thông tin khách hàng chỉ được chia sẻ với đối tác vận chuyển, thanh toán trong phạm vi
+                                cần thiết để hoàn tất đơn hàng.
+                            </p>
+
+                            <h3 id="changes" class="mt-4">7. Thay đổi chính sách</h3>
+                            <p>
+                                Chính sách bảo mật có thể được điều chỉnh để phù hợp với quy định pháp luật hoặc nhu cầu
+                                hoạt động. Mọi thay đổi sẽ được công bố trên website.
+                            </p>
+
+                            <h3 id="contact" class="mt-4">8. Liên hệ</h3>
+                            <p>Nếu có thắc mắc về chính sách bảo mật, vui lòng liên hệ:</p>
+                            <ul>
+                                <li>Địa chỉ: 99 ABC, Thống Nhất, Gò Vấp, TP.HCM</li>
+                                <li>Email: support@laptopshop.vn</li>
+                                <li>Hotline: 0999 887 744</li>
+                            </ul>
+
+                            <div class="callout mt-4">
+                                <small>
+                                    Khi tiếp tục sử dụng website, bạn xác nhận đã đọc, hiểu và đồng ý với Chính sách bảo
+                                    mật này.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- row -->
+        </div><!-- /container -->
+
+        <%- include('../layout/footer'); -%>
+
+            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top">
+                <i class="fa fa-arrow-up"></i>
+            </a>
+
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/lib/easing/easing.min.js"></script>
+            <script src="/client/lib/waypoints/waypoints.min.js"></script>
+            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+            <script src="/client/js/main.js"></script>
+</body>
+
+</html>
