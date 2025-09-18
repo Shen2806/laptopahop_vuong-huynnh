@@ -212,18 +212,8 @@ import { getOrderAdmin, getOrderDetailAdmin } from 'services/admin/order.service
 import { getProductList } from 'services/admin/product.service';
 import { countTotalOrderPages, countTotalProductPages, countTotalUserPages, getAllUsers } from 'services/user.service';
 import { format, toZonedTime } from 'date-fns-tz';
+import { getIO } from 'src/socket';
 
-/** ====== TRẠNG THÁI ĐƠN HÀNG ====== */
-// export const ORDER_STATUS = {
-//     PENDING: 'PENDING',
-//     CONFIRMED: 'CONFIRMED',
-//     SHIPPING: 'SHIPPING',
-//     OUT_FOR_DELIVERY: 'OUT_FOR_DELIVERY',
-//     DELIVERED: 'DELIVERED',
-//     CANCELED: 'CANCELED',
-// } as const;
-
-// trước đây: Record<string, string> / Record<string, string[]>
 export const STATUS_LABEL_VI: Record<$Enums.OrderStatus, string> = {
     PENDING: "Chờ xử lý",
     CONFIRMED: "Đã xác nhận đơn",
@@ -315,21 +305,130 @@ const getAdminOrderDetailPage = async (req: Request, res: Response) => {
     });
 };
 
-/** XÁC NHẬN ĐƠN (giữ route cũ nhưng đổi sang CONFIRMED) */
+// /** XÁC NHẬN ĐƠN (giữ route cũ nhưng đổi sang CONFIRMED) */
+// const postConfirmOrder = async (req: Request, res: Response) => {
+//     const { id } = req.params;
+//     try {
+//         const order = await prisma.order.update({
+//             where: { id: +id },
+//             data: { status: OrderStatus.CONFIRMED }
+//         });
+
+//         await prisma.notification.create({
+//             data: {
+//                 userId: order.userId,
+//                 message: `Đơn hàng #${order.id} đã được xác nhận`
+//             }
+//         });
+
+//         return res.redirect("/admin/order");
+//     } catch (err) {
+//         console.error(err);
+//         return res.status(500).send("Lỗi xác nhận đơn");
+//     }
+// };
+
+// const postCancelOrderByAdmin = async (req: Request, res: Response) => {
+//     const { id } = req.params;
+//     const { cancelReason } = req.body;
+
+//     try {
+//         const order = await prisma.order.update({
+//             where: { id: +id },
+//             data: {
+//                 status: OrderStatus.CANCELED,
+//                 cancelReason
+//             }
+//         });
+
+//         await prisma.notification.create({
+//             data: {
+//                 userId: order.userId,
+//                 message: `Đơn hàng #${order.id} đã bị hủy. Lý do: ${cancelReason}`
+//             }
+//         });
+
+//         return res.redirect("/admin/order/" + id);
+//     } catch (err) {
+//         console.error(err);
+//         return res.status(500).send("Lỗi hủy đơn");
+//     }
+// };
+
+// /** ===== Route chung: cập nhật sang trạng thái tiếp theo ===== */
+// const postUpdateOrderStatus = async (req: Request, res: Response) => {
+//     const { id } = req.params;
+
+//     // ép và validate theo enum
+//     const nextRaw = String(req.body.status || "");
+//     const isValid = Object.values(OrderStatus).includes(nextRaw as OrderStatus);
+//     if (!isValid) {
+//         return res.status(400).send("Trạng thái không hợp lệ");
+//     }
+
+//     const next = nextRaw as $Enums.OrderStatus;
+
+//     const order = await prisma.order.findUnique({ where: { id: +id } });
+//     if (!order) return res.status(404).send("Order not found");
+
+//     const allow = ALLOWED_NEXT[order.status] || []; // order.status đã là $Enums.OrderStatus
+//     if (!allow.includes(next)) {
+//         return res
+//             .status(400)
+//             .send(`Không thể chuyển từ ${STATUS_LABEL_VI[order.status]} → ${STATUS_LABEL_VI[next]}`);
+//     }
+
+//     const updated = await prisma.order.update({
+//         where: { id: +id },
+//         data: { status: next },                 // <-- enum type, hết lỗi TS2322
+//     });
+
+//     // // (tuỳ) tạo notification ngắn gọn
+//     // try {
+//     //     await prisma.notification.create({
+//     //         data: {
+//     //             userId: updated.userId,
+//     //             message: `Đơn #${updated.id} cập nhật: ${STATUS_LABEL_VI[nextStatus] || nextStatus}`
+//     //         }
+//     //     });
+//     // } catch (e) { }
+
+//     // Trả về cho form thường:
+//     return res.redirect(`/admin/order/${id}`);
+// };
+/** =========================================================== */
+
+/** XÁC NHẬN ĐƠN */
 const postConfirmOrder = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
         const order = await prisma.order.update({
             where: { id: +id },
-            data: { status: OrderStatus.CONFIRMED }
+            data: { status: OrderStatus.CONFIRMED },
         });
 
         await prisma.notification.create({
             data: {
                 userId: order.userId,
-                message: `Đơn hàng #${order.id} đã được xác nhận`
-            }
+                message: `Đơn hàng #${order.id} đã được xác nhận`,
+            },
         });
+
+        // ✅ Emit cho user
+        try {
+            const io = getIO();
+            console.log("[SOCKET] confirming order -> emit to user room:", `user-${order.userId}`);
+            io.to(`user-${order.userId}`).emit("order-confirmed", {
+                orderId: order.id,
+                status: OrderStatus.CONFIRMED,
+                message: `Đơn hàng #${order.id} đã được xác nhận`,
+            });
+
+            // (tuỳ) Cũng có thể báo lại cho admins để cập nhật list
+            io.to("admins").emit("order-updated", { orderId: order.id, status: OrderStatus.CONFIRMED });
+        } catch (e) {
+            console.error("emit order-confirmed error:", e);
+        }
 
         return res.redirect("/admin/order");
     } catch (err) {
@@ -347,16 +446,29 @@ const postCancelOrderByAdmin = async (req: Request, res: Response) => {
             where: { id: +id },
             data: {
                 status: OrderStatus.CANCELED,
-                cancelReason
-            }
+                cancelReason,
+            },
         });
 
         await prisma.notification.create({
             data: {
                 userId: order.userId,
-                message: `Đơn hàng #${order.id} đã bị hủy. Lý do: ${cancelReason}`
-            }
+                message: `Đơn hàng #${order.id} đã bị hủy. Lý do: ${cancelReason}`,
+            },
         });
+
+        // ✅ Emit cho user
+        try {
+            const io = getIO();
+            io.to(`user-${order.userId}`).emit("order-canceled", {
+                orderId: order.id,
+                status: OrderStatus.CANCELED,
+                message: `Đơn hàng #${order.id} đã bị hủy. Lý do: ${cancelReason}`,
+            });
+            io.to("admins").emit("order-updated", { orderId: order.id, status: OrderStatus.CANCELED });
+        } catch (e) {
+            console.error("emit order-canceled error:", e);
+        }
 
         return res.redirect("/admin/order/" + id);
     } catch (err) {
@@ -365,23 +477,19 @@ const postCancelOrderByAdmin = async (req: Request, res: Response) => {
     }
 };
 
-/** ===== Route chung: cập nhật sang trạng thái tiếp theo ===== */
+/** Cập nhật sang trạng thái tiếp theo (giữ logic kiểm tra hợp lệ) */
 const postUpdateOrderStatus = async (req: Request, res: Response) => {
     const { id } = req.params;
-
-    // ép và validate theo enum
     const nextRaw = String(req.body.status || "");
     const isValid = Object.values(OrderStatus).includes(nextRaw as OrderStatus);
-    if (!isValid) {
-        return res.status(400).send("Trạng thái không hợp lệ");
-    }
+    if (!isValid) return res.status(400).send("Trạng thái không hợp lệ");
 
     const next = nextRaw as $Enums.OrderStatus;
 
     const order = await prisma.order.findUnique({ where: { id: +id } });
     if (!order) return res.status(404).send("Order not found");
 
-    const allow = ALLOWED_NEXT[order.status] || []; // order.status đã là $Enums.OrderStatus
+    const allow = ALLOWED_NEXT[order.status] || [];
     if (!allow.includes(next)) {
         return res
             .status(400)
@@ -390,23 +498,34 @@ const postUpdateOrderStatus = async (req: Request, res: Response) => {
 
     const updated = await prisma.order.update({
         where: { id: +id },
-        data: { status: next },                 // <-- enum type, hết lỗi TS2322
+        data: { status: next },
     });
 
-    // // (tuỳ) tạo notification ngắn gọn
-    // try {
-    //     await prisma.notification.create({
-    //         data: {
-    //             userId: updated.userId,
-    //             message: `Đơn #${updated.id} cập nhật: ${STATUS_LABEL_VI[nextStatus] || nextStatus}`
-    //         }
-    //     });
-    // } catch (e) { }
+    // (tuỳ) Lưu notification cho user:
+    try {
+        await prisma.notification.create({
+            data: {
+                userId: updated.userId,
+                message: `Đơn #${updated.id} cập nhật: ${STATUS_LABEL_VI[next] || next}`,
+            },
+        });
+    } catch { }
 
-    // Trả về cho form thường:
+    // ✅ Emit cho user & admins
+    try {
+        const io = getIO();
+        io.to(`user-${updated.userId}`).emit("order-updated", {
+            orderId: updated.id,
+            status: next,
+            message: `Đơn #${updated.id} cập nhật: ${STATUS_LABEL_VI[next] || next}`,
+        });
+        io.to("admins").emit("order-updated", { orderId: updated.id, status: next });
+    } catch (e) {
+        console.error("emit order-updated error:", e);
+    }
+
     return res.redirect(`/admin/order/${id}`);
 };
-/** =========================================================== */
 
 const postRestockProduct = async (req: Request, res: Response) => {
     const { productId, quantity } = req.body;

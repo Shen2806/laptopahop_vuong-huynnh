@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser, getUserOrders } from 'controllers/user.controller';
 import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage, getPromoPage, postAddPromo, postCancelOrderByAdmin, postConfirmOrder, postDeletePromo, postRestockProduct, postUpdateOrderStatus, postUpdatePromo } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
-import { getCartPage, getCheckOutPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
+import { getCartPage, getCheckOutPage, getOrderDetailPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
 import { getAboutUsPage, getContactPage, getLoginPage, getPrivacyPage, getReturnPage, getSuccessRedirectPage, getSupportPage, getTermPage, getWarrantyPage, postLogin, postLogout, postRegister, refreshToken } from 'controllers/client/auth.controller';
 import passport from 'passport';
@@ -126,7 +126,8 @@ const webRoutes = (app: Express) => {
     router.get("/thanks", getThanksPage)
     // lịch sử mua hàng
     router.get("/order-history", getOrderHistoryPage)
-    // hủy đơn hàng của khách hàng
+    // chi tiết đơn hàng của user
+    router.get("/order/:id", ensureAuthenticated, getOrderDetailPage);
 
 
     // Xử lý hủy đơn với lý do

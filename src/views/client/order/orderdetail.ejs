@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Chi tiết đơn #<%= order.id %> - LaptopShop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries -->
+    <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+    <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Bootstrap & Template -->
+    <link href="/client/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/client/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="/client/css/order/orderuser.css">
+
+    <style>
+        body {
+            background: #f7f9fc;
+        }
+
+        .page-title {
+            font-weight: 700;
+            letter-spacing: .2px;
+        }
+
+        .card {
+            border: 0;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .06);
+        }
+
+        .card-header {
+            background: linear-gradient(180deg, #ffffff, #fafbff);
+            border-bottom: 1px solid #eef1f6;
+            border-top-left-radius: 14px !important;
+            border-top-right-radius: 14px !important;
+            font-weight: 600;
+        }
+
+        .badge-status {
+            font-size: .9rem;
+        }
+
+        /* ===== Stepper ===== */
+        .tracker {
+            padding: 20px 16px 10px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .steps::before {
+            content: "";
+            position: absolute;
+            left: 6%;
+            right: 6%;
+            top: 24px;
+            height: 4px;
+            background: #e9edf3;
+            border-radius: 999px;
+        }
+
+        .steps .progress-line {
+            position: absolute;
+            left: 6%;
+            top: 24px;
+            height: 4px;
+            background: linear-gradient(90deg, #0d6efd, #5aa1ff);
+            border-radius: 999px;
+            width: 0%;
+            transition: width .4s ease;
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .step .icon-wrap {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #e9edf3;
+            color: #6c757d;
+            margin-bottom: 8px;
+            font-size: 18px;
+            transition: all .25s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .05) inset;
+        }
+
+        .step.done .icon-wrap,
+        .step.active .icon-wrap {
+            background: #0d6efd;
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(13, 110, 253, .35);
+        }
+
+        .step .label {
+            font-size: .88rem;
+            line-height: 1.2;
+            color: #6c7a91;
+            min-height: 32px;
+        }
+
+        .step.done .label,
+        .step.active .label {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+
+        /* Table */
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
+
+        .price {
+            white-space: nowrap;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .steps {
+                grid-template-columns: repeat(3, 1fr);
+                row-gap: 16px;
+            }
+
+            .steps::before,
+            .steps .progress-line {
+                left: 4%;
+                right: 4%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../layout/header', { user: user }); -%>
+
+        <div class="container my-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <h3 class="page-title mb-0">Đơn hàng #<%= order.id %>
+                </h3>
+                <div>
+                    <% if (canceled) { %>
+                        <span class="badge bg-danger badge-status"><i class="bi bi-x-circle me-1"></i>
+                            <%= STATUS_LABEL_VI[order.status] %>
+                        </span>
+                        <% } else { %>
+                            <span class="badge bg-primary badge-status"><i class="bi bi-info-circle me-1"></i>
+                                <%= STATUS_LABEL_VI[order.status] %>
+                            </span>
+                            <% } %>
+                </div>
+            </div>
+            <p class="text-muted mb-1">Tạo lúc: <%= new Date(order.createdAt).toLocaleString('vi-VN') %>
+            </p>
+            <p class="text-muted">Cập nhật: <%= new Date(order.updatedAt).toLocaleString('vi-VN') %>
+            </p>
+
+            <!-- ===== Stepper ===== -->
+            <div class="card mb-4">
+                <div class="card-body tracker">
+                    <% if (!canceled) { %>
+                        <% function iconFor(st) { if (st==='PENDING' ) return 'bi-hourglass-split' ; if
+                            (st==='CONFIRMED' ) return 'bi-check2-circle' ; if(st==='PROCESSING' ) return 'bi-box-seam'
+                            ; if (st==='SHIPPING' ) return 'bi-truck' ; if(st==='COMPLETED' ) return 'bi-emoji-smile' ;
+                            return 'bi-circle' ; } var progressPct=Math.max( 0, Math.min(100, Math.round(((currentStep +
+                            1) / ORDER_STEPS.length) * 100)) ); %>
+
+
+                            <div class="steps">
+                                <div class="progress-line" data-progress="<%= progressPct %>" style="width:0%;"></div>
+
+                                <% ORDER_STEPS.forEach(function (st, idx) { %>
+                                    <div
+                                        class="step <%= (idx < currentStep) ? 'done' : (idx === currentStep ? 'active' : '') %>">
+                                        <div class="icon-wrap"><i class="bi <%= iconFor(st) %>"></i></div>
+                                        <div class="label">
+                                            <%= STATUS_LABEL_VI[st] %>
+                                        </div>
+                                    </div>
+                                    <% }); %>
+                            </div>
+                            <% } else { %>
+                                <div class="alert alert-danger mb-0">
+                                    <strong><i class="bi bi-x-octagon me-1"></i> Đơn hàng đã bị hủy.</strong>
+                                    <% if (order.cancelReason) { %> — Lý do: <em>
+                                            <%= order.cancelReason %>
+                                        </em>
+                                        <% } %>
+                                </div>
+                                <% } %>
+                </div>
+            </div>
+
+            <!-- ===== 3 cột thông tin ===== -->
+            <div class="row g-4 order-meta">
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header"><i class="bi bi-person-badge me-2"></i>Thông tin người nhận</div>
+                        <div class="card-body">
+                            <div class="mb-2"><strong>Họ tên:</strong>
+                                <%= order.receiverName %>
+                            </div>
+                            <div class="mb-2"><strong>SĐT:</strong>
+                                <%= order.receiverPhone %>
+                            </div>
+                            <div class="mb-2"><strong>Địa chỉ:</strong>
+                                <%= order.receiverAddress %>
+                            </div>
+                            <% if (order.receiverNote) { %>
+                                <div class="mb-2"><strong>Ghi chú:</strong>
+                                    <%= order.receiverNote %>
+                                </div>
+                                <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header"><i class="bi bi-wallet2 me-2"></i>Thanh toán</div>
+                        <div class="card-body">
+                            <div class="mb-2"><strong>Phương thức:</strong>
+                                <%= order.paymentMethod %>
+                            </div>
+                            <div class="mb-2"><strong>Trạng thái:</strong>
+                                <%= order.paymentStatus %>
+                            </div>
+                            <% if (order.paymentRef) { %>
+                                <div class="mb-2"><strong>Mã giao dịch:</strong>
+                                    <%= order.paymentRef %>
+                                </div>
+                                <% } %>
+                                    <% if (order.couponCode) { %>
+                                        <div class="mb-2"><strong>Mã giảm giá:</strong> <span class="badge bg-success">
+                                                <%= order.couponCode %>
+                                            </span></div>
+                                        <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-header"><i class="bi bi-receipt me-2"></i>Tổng tiền</div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tạm tính</span>
+                                <span class="price">
+                                    <%= subTotal.toLocaleString('vi-VN') %> ₫
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Giảm giá</span>
+                                <span class="price text-danger">-<%= discountAmount.toLocaleString('vi-VN') %> ₫</span>
+                            </div>
+                            <hr />
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold">Tổng cộng</span>
+                                <span class="price fs-5 text-primary fw-bold">
+                                    <%= Math.max(0, total).toLocaleString('vi-VN') %> ₫
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Sản phẩm ===== -->
+            <div class="card mt-4">
+                <div class="card-header"><i class="bi bi-bag-check me-2"></i>Sản phẩm</div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width:80px;">Ảnh</th>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-end">Giá</th>
+                                    <th class="text-center">SL</th>
+                                    <th class="text-end">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% items.forEach(function (it) { var p=it.product || {}; var line=Number(it.price) *
+                                    Number(it.quantity); %>
+                                    <tr>
+                                        <td>
+                                            <% if (p.image) { %>
+                                                <img src="/images/product/<%= p.image %>" alt="<%= p.name || '' %>"
+                                                    style="width:60px; height:60px; object-fit:cover; border-radius: 8px;" />
+                                                <% } %>
+                                        </td>
+                                        <td>
+                                            <a href="/product/<%= p.id %>" class="text-decoration-none fw-semibold">
+                                                <%= p.name || ('Sản phẩm #' + p.id) %>
+                                            </a>
+                                            <% if (p.shortDesc) { %>
+                                                <div class="text-muted small mt-1">
+                                                    <%= p.shortDesc %>
+                                                </div>
+                                                <% } %>
+                                        </td>
+                                        <td class="text-end">
+                                            <%= Number(it.price).toLocaleString('vi-VN') %> ₫
+                                        </td>
+                                        <td class="text-center">
+                                            <%= it.quantity %>
+                                        </td>
+                                        <td class="text-end fw-semibold">
+                                            <%= line.toLocaleString('vi-VN') %> ₫
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Footer actions ===== -->
+            <div class="mt-4 d-flex justify-content-between align-items-center">
+                <a href="/order-user" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left-short me-1"></i> Đơn hàng của tôi
+                </a>
+                <% if (!canceled && order.status !=='COMPLETED' ) { %>
+                    <span class="text-muted">Trạng thái hiện tại: <strong>
+                            <%= STATUS_LABEL_VI[order.status] %>
+                        </strong></span>
+                    <% } %>
+            </div>
+        </div>
+
+        <%- include('../layout/footer'); -%>
+
+            <!-- Scripts -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/lib/easing/easing.min.js"></script>
+            <script src="/client/lib/waypoints/waypoints.min.js"></script>
+            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+            <script src="/client/js/main.js"></script>
+
+            <!-- Set width cho progress-line (tránh EJS trong style) -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var line = document.querySelector('.steps .progress-line');
+                    if (line && line.dataset.progress) {
+                        var pct = Number(line.dataset.progress) || 0;
+                        line.style.width = pct + '%';
+                    }
+                });
+            </script>
+</body>
+
+</html>

@@ -84,9 +84,6 @@
                 </div>
             </li>
 
-
-
-
             <!-- User Dropdown -->
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown"
@@ -104,7 +101,102 @@
                 </ul>
             </li>
         </ul>
+        <!-- Panel dropdown notification cho Admin -->
+        <div id="aNotificationPanel" class="dropdown-menu show"
+            style="display:none; position:absolute; right:70px; top:55px; width:360px; max-height:420px; overflow:auto;">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <strong>Thông báo</strong>
+                <button id="aMarkAllRead" class="btn btn-sm btn-link">Đánh dấu đã đọc</button>
+            </div>
+            <ul id="aNotificationList" class="list-group list-group-flush"></ul>
+        </div>
+
+        <!-- Âm thanh -->
+        <audio id="aNotificationSound" src="/ring.wav" preload="auto"></audio>
     </nav>
+    <!-- Socket.IO client -->
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        const aBadge = document.getElementById('notificationBadge');
+        const aIcon = document.getElementById('notificationDropdown');
+        const aPanel = document.getElementById('aNotificationPanel');
+        const aList = document.getElementById('aNotificationList');
+        const aSound = document.getElementById('aNotificationSound');
+
+        // Toggle panel
+        aIcon.addEventListener('click', () => {
+            aPanel.style.display = (aPanel.style.display === 'none' || aPanel.style.display === '') ? 'block' : 'none';
+            aIcon.classList.remove('ring');
+        });
+
+        function aUpdateBadge(delta = 1) {
+            let cur = parseInt(aBadge.textContent || "0", 10);
+            cur = isNaN(cur) ? 0 : cur;
+            cur += delta;
+            if (cur <= 0) {
+                aBadge.style.display = "none";
+                aBadge.textContent = "0";
+            } else {
+                aBadge.style.display = "flex";
+                aBadge.textContent = cur > 9 ? "9+" : String(cur);
+            }
+        }
+
+        function aPrepend(itemHtml) {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.innerHTML = itemHtml;
+            aList.prepend(li);
+        }
+
+        function aRing() {
+            aIcon.classList.add('ring');
+            try { aSound.currentTime = 0; aSound.play(); } catch { }
+        }
+
+        document.getElementById('aMarkAllRead').addEventListener('click', () => {
+            aBadge.style.display = 'none'; aBadge.textContent = '0';
+        });
+
+        // Socket
+        const aSocket = io(); // same origin
+        aSocket.on('connect', () => {
+            aSocket.emit('join-admin-room');
+        });
+
+        // User đặt hàng -> admin nhận
+        aSocket.on('new-order', (data) => {
+            aRing();
+            aUpdateBadge(1);
+            const url = `/admin/order/${data.orderId}`;
+            aPrepend(`
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="fw-semibold">Đơn #${data.orderId} từ ${data.customerName || 'khách hàng'}</div>
+          <small class="text-muted">${new Date(data.createdAt || Date.now()).toLocaleString('vi-VN')}</small>
+        </div>
+        <a href="${url}" class="btn btn-sm btn-primary ms-2">Xem</a>
+      </div>
+    `);
+        });
+
+        // Mọi cập nhật đơn (xác nhận/hủy/đổi trạng thái)
+        aSocket.on('order-updated', (data) => {
+            aRing();
+            aUpdateBadge(1);
+            const url = `/admin/order/${data.orderId}`;
+            aPrepend(`
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="fw-semibold">Đơn #${data.orderId} cập nhật: ${data.status}</div>
+          <small class="text-muted">${new Date().toLocaleString('vi-VN')}</small>
+        </div>
+        <a href="${url}" class="btn btn-sm btn-primary ms-2">Xem</a>
+      </div>
+    `);
+        });
+    </script>
 </body>
 
 </html>
