@@ -32,7 +32,7 @@
     <!-- Template Stylesheet -->
     <link href="/client/css/style.css" rel="stylesheet">
 
-        <link rel="stylesheet" href="/client/css/product/cart.css">
+    <link rel="stylesheet" href="/client/css/product/cart.css">
 
 </head>
 
@@ -389,10 +389,10 @@
     </div>
 
     <!-- Copyright -->
-    <<<<<<< HEAD <div class="container-fluid copyright bg-black py-3">
+    <div class="container-fluid copyright bg-black py-3">
         =======
         <div class="container-fluid bg-dark copyright bg-black py-3">
-            >>>>>>> 0540a6cb7dca18bae7b510775ef710332a66da0e
+
             <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
                 <span class="text-light mb-2 mb-md-0">
                     <i class="fas fa-copyright me-2"></i>2025
@@ -405,83 +405,81 @@
             </div>
         </div>
         <!-- Footer End -->
-        <<<<<<< HEAD=======>>>>>>> 0540a6cb7dca18bae7b510775ef710332a66da0e
 
-            <!-- Back to Top -->
-            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-                    class="fa fa-arrow-up"></i></a>
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                class="fa fa-arrow-up"></i></a>
 
 
-            <!-- JavaScript Libraries -->
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="/client/lib/easing/easing.min.js"></script>
-            <script src="/client/lib/waypoints/waypoints.min.js"></script>
-            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+        <!-- JavaScript Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/client/lib/easing/easing.min.js"></script>
+        <script src="/client/lib/waypoints/waypoints.min.js"></script>
+        <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+        <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
-            <!-- Template Javascript -->
-            <script src="/client/js/main.js"></script>
-            <script>
-                // Thay đoạn JS cập nhật số lượng bằng phiên bản sync với #checkout-form
-                document.addEventListener("DOMContentLoaded", () => {
-                    const formatVND = (n) => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n);
+        <!-- Template Javascript -->
+        <script src="/client/js/main.js"></script>
+        <script>
+            // Thay đoạn JS cập nhật số lượng bằng phiên bản sync với #checkout-form
+            document.addEventListener("DOMContentLoaded", () => {
+                const formatVND = (n) => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n);
 
-                    const updateTotals = () => {
-                        let subtotal = 0;
+                const updateTotals = () => {
+                    let subtotal = 0;
 
-                        document.querySelectorAll(".cart-item").forEach((item) => {
-                            const qtyInput = item.querySelector(".cart-qty");
-                            const price = parseInt(qtyInput.dataset.cartDetailPrice) || 0;
-                            const index = qtyInput.dataset.cartDetailIndex;
-                            const quantity = Math.max(1, parseInt(qtyInput.value) || 1);
+                    document.querySelectorAll(".cart-item").forEach((item) => {
+                        const qtyInput = item.querySelector(".cart-qty");
+                        const price = parseInt(qtyInput.dataset.cartDetailPrice) || 0;
+                        const index = qtyInput.dataset.cartDetailIndex;
+                        const quantity = Math.max(1, parseInt(qtyInput.value) || 1);
 
-                            // Cập nhật hidden input TRONG #checkout-form theo index
-                            const hiddenInForm = document.querySelector(
-                                `#checkout-form input[name="cartDetails[${index}][quantity]"]`
-                            );
-                            if (hiddenInForm) hiddenInForm.value = quantity;
+                        // Cập nhật hidden input TRONG #checkout-form theo index
+                        const hiddenInForm = document.querySelector(
+                            `#checkout-form input[name="cartDetails[${index}][quantity]"]`
+                        );
+                        if (hiddenInForm) hiddenInForm.value = quantity;
 
-                            // Tính & hiển thị thành tiền từng sản phẩm
-                            const itemTotal = price * quantity;
-                            subtotal += itemTotal;
-                            const itemTotalEl = item.querySelector(".cart-item-total p");
-                            if (itemTotalEl) itemTotalEl.textContent = formatVND(itemTotal);
-                        });
-
-                        // Tổng cộng
-                        const subEl = document.getElementById("cart-subtotal");
-                        const totEl = document.getElementById("cart-total");
-                        if (subEl) subEl.textContent = formatVND(subtotal);
-                        if (totEl) totEl.textContent = formatVND(subtotal);
-                    };
-
-                    // Sự kiện +/- (giữ nguyên code gốc, chỉ gọi updateTotals sau khi đổi value)
-                    document.querySelectorAll(".btn-plus, .btn-minus").forEach((btn) => {
-                        btn.addEventListener("click", () => {
-                            const index = btn.dataset.index;
-                            const qtyInput = document.querySelector(`.cart-qty[data-cart-detail-index="${index}"]`);
-                            let value = Math.max(1, parseInt(qtyInput.value) || 1);
-                            value += btn.classList.contains("btn-plus") ? 1 : value > 1 ? -1 : 0;
-                            qtyInput.value = value;
-                            updateTotals();
-                        });
+                        // Tính & hiển thị thành tiền từng sản phẩm
+                        const itemTotal = price * quantity;
+                        subtotal += itemTotal;
+                        const itemTotalEl = item.querySelector(".cart-item-total p");
+                        if (itemTotalEl) itemTotalEl.textContent = formatVND(itemTotal);
                     });
 
-                    // Sửa trực tiếp bằng bàn phím
-                    document.querySelectorAll(".cart-qty").forEach((input) => {
-                        input.addEventListener("input", () => {
-                            input.value = Math.max(1, parseInt(input.value) || 1);
-                            updateTotals();
-                        });
-                    });
+                    // Tổng cộng
+                    const subEl = document.getElementById("cart-subtotal");
+                    const totEl = document.getElementById("cart-total");
+                    if (subEl) subEl.textContent = formatVND(subtotal);
+                    if (totEl) totEl.textContent = formatVND(subtotal);
+                };
 
-                    updateTotals();
+                // Sự kiện +/- (giữ nguyên code gốc, chỉ gọi updateTotals sau khi đổi value)
+                document.querySelectorAll(".btn-plus, .btn-minus").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        const index = btn.dataset.index;
+                        const qtyInput = document.querySelector(`.cart-qty[data-cart-detail-index="${index}"]`);
+                        let value = Math.max(1, parseInt(qtyInput.value) || 1);
+                        value += btn.classList.contains("btn-plus") ? 1 : value > 1 ? -1 : 0;
+                        qtyInput.value = value;
+                        updateTotals();
+                    });
                 });
 
+                // Sửa trực tiếp bằng bàn phím
+                document.querySelectorAll(".cart-qty").forEach((input) => {
+                    input.addEventListener("input", () => {
+                        input.value = Math.max(1, parseInt(input.value) || 1);
+                        updateTotals();
+                    });
+                });
 
-            </script>
+                updateTotals();
+            });
 
+
+        </script>
 
 
 

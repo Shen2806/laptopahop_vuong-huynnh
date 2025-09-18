@@ -50,428 +50,593 @@
 
 
     <!-- Navbar start -->
-    <div class="container-fluid shadow" style="margin-top: 10px">
+    <header class="container-fluid shadow" style="margin-top:10px;">
+        <!-- Topbar -->
         <div class="container topbar bg-primary d-none d-lg-block">
             <div class="d-flex justify-content-between">
                 <div class="top-info ps-2">
-                    <% if(user){ %>
-                        <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i>
+                    <% if (user) { %>
+                        <small class="me-3">
+                            <i class="fas fa-map-marker-alt me-2 text-secondary"></i>
                             <a href="#" class="text-white">
-                                <!-- <%= user?.address ?? "" %> -->
                                 <%= user?.address || "" %>
                             </a>
                         </small>
-                        <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i>
+                        <small class="me-3">
+                            <i class="fas fa-envelope me-2 text-secondary"></i>
                             <a href="#" class="text-white">
                                 <%= user?.username || "" %>
                             </a>
                         </small>
                         <% } else { %>
-                            <small class="me-3"><i class="fas fa-voicemail me-2 text-secondary"></i>
-                            </small>
+                            <small class="me-3"><i class="fas fa-voicemail me-2 text-secondary"></i></small>
                             <% } %>
-
                 </div>
                 <div class="top-link pe-2">
-                    <a href="/terms" class="text-white"><small class="text-white mx-2">Điều khoản sử dụng</small>/</a>
+                    <a href="/terms" class="text-white">
+                        <small class="text-white mx-2">Điều khoản sử dụng</small>/
+                    </a>
                     <a href="/support" class="text-white"><small class="text-white mx-2">Hỗ trợ</small></a>
                 </div>
             </div>
         </div>
 
-        <div class="container px-0">
+        <!-- Navbar -->
+        <div class="container px-0 position-relative">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                <div>
-                    <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle">
+                <div class="d-flex align-items-center">
+                    <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle" />
+                    <a href="/" class="navbar-brand ms-2">
+                        <h1 class="text-primary display-6 m-0">LaptopShop</h1>
+                    </a>
                 </div>
-                <a href="/" class="navbar-brand">
-                    <h1 class="text-primary display-6">LaptopShop</h1>
-                </a>
+
                 <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarCollapse">
+                    data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
+                    aria-label="Toggle navigation">
                     <span class="fa fa-bars text-primary"></span>
                 </button>
 
                 <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
-                    <div class="navbar-nav mx-auto">
-                        <a href="/" class="nav-item nav-link active">Trang chủ</a>
-                        <a href="/products" class="nav-item nav-link active">Sản phẩm</a>
-                        <a href="/about" class="nav-item nav-link">Giới thiệu</a>
-                        <a href="/contact" class="nav-item nav-link">Liên hệ</a>
-                        <a href="/terms" class="nav-item nav-link " hidden>Điều khoản</a>
-                        <a href="/blogs" class="nav-item nav-link">Blog</a>
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item"><a href="/" class="nav-link active">Trang chủ</a></li>
+                        <li class="nav-item"><a href="/products" class="nav-link">Sản phẩm</a></li>
+                        <li class="nav-item"><a href="/about" class="nav-link">Giới thiệu</a></li>
+                        <li class="nav-item"><a href="/contact" class="nav-link">Liên hệ</a></li>
+                        <li class="nav-item"><a href="/blogs" class="nav-link">Blog</a></li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Thông tin và chính sách
-                            </a>
+                                data-bs-toggle="dropdown" aria-expanded="false">Thông tin và chính sách</a>
                             <ul class="dropdown-menu" aria-labelledby="policyDropdown">
                                 <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
                                 <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
                                 <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
                             </ul>
                         </li>
-                    </div>
+                    </ul>
 
+                    <div class="d-flex ms-auto align-items-center position-relative">
+                        <% if (user) { %>
+                            <!-- Chuông thông báo -->
+                            <button class="notification-icon position-relative me-3 btn btn-link p-0 border-0"
+                                id="notificationDropdown" type="button" aria-label="Thông báo">
+                                <i class="fas fa-bell fa-2x"></i>
+                                <span id="notificationBadge"
+                                    class="position-absolute bg-danger text-white rounded-circle d-flex align-items-center justify-content-center"
+                                    style="top:-5px; right:-5px; width:20px; height:20px; font-size:12px; display:none;">0</span>
+                            </button>
 
-                    <!-- Icon giỏ hàng & account nằm trong navbar-collapse -->
-                    <div class="d-flex ms-auto">
-                        <a href="/cart" class="position-relative me-4 my-auto">
-                            <i class="fa fa-shopping-bag fa-2x"></i>
-                            <span
-                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
-                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="sumCart">
-                                <%= user?.sumCart ?? 0%>
-                            </span>
-                        </a>
-                        <% if(user){ %>
-                            <div class="dropdown my-auto">
-                                <a href="#" class="dropdown" role="button" id="dropdownMenuLink"
-                                    data-bs-toggle="dropdown" aria-expanded="false" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <i class="fas fa-user fa-2x"></i>
+                            <!-- Âm thanh -->
+                            <audio id="notificationSound" src="/ring.wav" preload="auto"></audio>
+                            <% } %>
+
+                                <!-- Giỏ hàng -->
+                                <a href="/cart" class="position-relative me-3" aria-label="Giỏ hàng">
+                                    <i class="fa fa-shopping-bag fa-2x"></i>
+                                    <span
+                                        class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
+                                        id="sumCart" style="top:-5px; left:15px; height:20px; min-width:20px;">
+                                        <%= user?.sumCart ?? 0 %>
+                                    </span>
                                 </a>
 
-                                <ul class="dropdown-menu dropdown-menu-end p-4" aria-labelledby="dropdownMenuLink">
-                                    <li class="d-flex align-items-center flex-column" style="min-width: 300px;">
-                                        <img style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden;"
-                                            src="/images/<%= user.avatar %>" />
-                                        <div class="text-center my-3">
-                                            <%= user.fullName %>
-                                        </div>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="#">Quản lý tài khoản</a></li>
-                                    <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
-                                    <li><a class="dropdown-item" href="/order-user">Đơn hàng của tôi</a></li>
-
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form method="post" action="/logout">
-                                            <button class="dropdown-item">Đăng xuất</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                            <% }else { %>
-                                <a href="/login" class="a-login">
-                                    <i class="fas fa-user fa-2x"></i>
-                                </a>
-                                <% } %>
+                                <!-- User -->
+                                <% if (user) { %>
+                                    <div class="dropdown my-auto">
+                                        <a href="#" class="dropdown-toggle" role="button" id="dropdownMenuLink"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-user fa-2x"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-end p-4"
+                                            aria-labelledby="dropdownMenuLink">
+                                            <li class="d-flex align-items-center flex-column" style="min-width:300px;">
+                                                <img style="width:150px; height:150px; border-radius:50%; overflow:hidden;"
+                                                    src="/images/<%= user.avatar %>" alt="Avatar người dùng" />
+                                                <div class="text-center my-3">
+                                                    <%= user.fullName %>
+                                                </div>
+                                            </li>
+                                            <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
+                                            <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
+                                            <li><a class="dropdown-item" href="/order-user">Đơn hàng của tôi</a></li>
+                                            <li>
+                                                <hr class="dropdown-divider" />
+                                            </li>
+                                            <li>
+                                                <form method="post" action="/logout">
+                                                    <button class="dropdown-item" type="submit">Đăng xuất</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <% } else { %>
+                                        <a href="/login" class="a-login" aria-label="Đăng nhập"><i
+                                                class="fas fa-user fa-2x"></i></a>
+                                        <% } %>
                     </div>
+                </div>
             </nav>
+
+            <% if (user) { %>
+                <!-- Panel dropdown notification cho User -->
+                <div id="uNotificationPanel" class="dropdown-menu show"
+                    style="display:none; position:absolute; right:10px; top:72px; width:360px; max-height:420px; overflow:auto; z-index:1050;">
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                        <strong>Thông báo</strong>
+                        <button id="uMarkAllRead" class="btn btn-sm btn-link">Đánh dấu đã đọc</button>
+                    </div>
+                    <ul id="uNotificationList" class="list-group list-group-flush"></ul>
+                </div>
+                <% } %>
         </div>
-    </div>
-    <!-- Navbar End -->
+
+    </header>
+
+    <% if (user) { %>
+        <script>
+            window.USER_ID = "<%= String(user.id) %>";
+        </script>
+        <% } %>
+
+            <!-- Socket.IO client -->
+            <script src="/socket.io/socket.io.js"></script>
+            <script>
+                (function () {
+                    if (!window.USER_ID) return; // chưa login thì thôi
+
+                    const uBadge = document.getElementById('notificationBadge');
+                    const uIcon = document.getElementById('notificationDropdown');
+                    const uPanel = document.getElementById('uNotificationPanel');
+                    const uList = document.getElementById('uNotificationList');
+                    const uSound = document.getElementById('notificationSound');
+                    const USER_ID = window.USER_ID;
+
+                    // Toggle panel
+                    if (uIcon && uPanel) {
+                        uIcon.addEventListener('click', () => {
+                            const shown = uPanel.style.display === 'block';
+                            uPanel.style.display = shown ? 'none' : 'block';
+                        });
+                    }
+
+                    // Unlock audio lần click đầu vào chuông
+                    let audioUnlocked = false;
+                    if (uIcon && uSound) {
+                        uIcon.addEventListener('click', () => {
+                            if (!audioUnlocked) {
+                                uSound.volume = 0.0;
+                                uSound.play().catch(() => { });
+                                setTimeout(() => {
+                                    try { uSound.pause(); uSound.currentTime = 0; } catch { }
+                                    uSound.volume = 1.0;
+                                    audioUnlocked = true;
+                                }, 50);
+                            }
+                        });
+                    }
+
+                    function uUpdateBadge(delta = 1) {
+                        if (!uBadge) return;
+                        let cur = parseInt(uBadge.textContent || "0", 10);
+                        cur = isNaN(cur) ? 0 : cur;
+                        cur += delta;
+                        if (cur <= 0) {
+                            uBadge.style.display = "none";
+                            uBadge.textContent = "0";
+                        } else {
+                            uBadge.style.display = "flex";
+                            uBadge.textContent = cur > 9 ? "9+" : String(cur);
+                        }
+                    }
+
+                    function uPrepend(itemHtml) {
+                        if (!uList) return;
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item';
+                        li.innerHTML = itemHtml;
+                        uList.prepend(li);
+                    }
+
+                    const markBtn = document.getElementById('uMarkAllRead');
+                    if (markBtn && uBadge) {
+                        markBtn.addEventListener('click', () => {
+                            uBadge.style.display = 'none';
+                            uBadge.textContent = '0';
+                        });
+                    }
+
+                    // Socket
+                    const uSocket = io(); // same-origin
+                    uSocket.on('connect', () => {
+                        console.log('[SOCKET] user connected, USER_ID=', USER_ID);
+                        uSocket.emit('join-user-room', USER_ID);
+                    });
+
+                    // Admin xác nhận
+                    uSocket.on('order-confirmed', (data) => {
+                        console.log('[SOCKET] order-confirmed:', data);
+                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                        uUpdateBadge(1);
+                        const url = `/order/${data.orderId}`;
+                        const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
+                        uPrepend(
+                            '<div class="d-flex justify-content-between align-items-start">' +
+                            '<div>' +
+                            '<div class="fw-semibold">' + msg + '</div>' +
+                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                            '</div>' +
+                            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                            '</div>'
+                        );
+                    });
+
+                    uSocket.on('order-canceled', (data) => {
+                        console.log('[SOCKET] order-canceled:', data);
+                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                        uUpdateBadge(1);
+                        const url = `/order/${data.orderId}`;
+                        const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
+                        uPrepend(
+                            '<div class="d-flex justify-content-between align-items-start">' +
+                            '<div>' +
+                            '<div class="fw-semibold">' + msg + '</div>' +
+                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                            '</div>' +
+                            '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
+                            '</div>'
+                        );
+                    });
+
+                    uSocket.on('order-updated', (data) => {
+                        console.log('[SOCKET] order-updated:', data);
+                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                        uUpdateBadge(1);
+                        const url = `/order/${data.orderId}`;
+                        const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
+                        uPrepend(
+                            '<div class="d-flex justify-content-between align-items-start">' +
+                            '<div>' +
+                            '<div class="fw-semibold">' + msg + '</div>' +
+                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                            '</div>' +
+                            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                            '</div>'
+                        );
+                    });
+                })();
+            </script>
+            <!-- Navbar End -->
 
 
-    <!-- Single Product Start -->
-    <div class="container-fluid p-2">
-        <div class="container py-2">
-            <div class="mb-3">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                        <li class="breadcrumb-item active" aria-current="page"><span href="/">Chi tiết sản phẩm</span>
-                        </li>
-                    </ol>
-                </nav>
+            <!-- Single Product Start -->
+            <div class="container-fluid p-2">
+                <div class="container py-2">
+                    <div class="mb-3">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><span href="/">Chi tiết sản
+                                        phẩm</span>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="row g-4 mb-5">
+                        <div class="col-lg-12 col-xl-12">
+                            <div class="row g-4">
+
+                                <div class="col-lg-5">
+                                    <div class="rounded">
+                                        <a href="#">
+                                            <img src="/images/product/<%= product.image%>" class="img-fluid rounded"
+                                                alt="Image">
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-5">
+                                    <!-- Tên sản phẩm -->
+                                    <h3 class="fw-bold mb-2">
+                                        <%= product.name %>
+                                    </h3>
+                                    <p class="text-muted mb-3">
+                                        <%= product.shortDesc %>
+                                    </p>
+
+
+
+                                    <h2 class="text-danger fw-bold">
+                                        <% if (product.discount> 0) { %>
+                                            <p class="mb-1 text-decoration-line-through text-muted small">
+                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                    }).format(product.price) %>
+                                            </p>
+                                            <p class="fw-bold text-danger fs-5 mb-3">
+                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                    }) .format(product.price * (100 - product.discount) / 100) %>
+                                            </p>
+                                            <% } else { %>
+                                                <p class="text-dark fs-5 fw-bold mb-3">
+                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                        currency: 'VND' }).format(product.price) %>
+                                                </p>
+                                                <% } %>
+
+                                    </h2>
+
+                                    <!-- Rating -->
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-warning"></i>
+                                        <i class="fa fa-star text-secondary"></i>
+                                        <span class="ms-2 small text-muted">(128 đánh giá)</span>
+                                    </div>
+
+                                    <!-- Số lượng -->
+                                    <div class="d-flex align-items-center mb-4">
+                                        <span class="me-3 fw-bold">Số lượng:</span>
+                                        <div class="input-group quantity" style="width: 120px;">
+                                            <button class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                            <input type="text" class="form-control form-control-sm text-center border-0"
+                                                value="1">
+                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Nút thêm giỏ -->
+                                    <form method="post" action="/add-to-cart-from-detail-page/<%= product.id %>">
+                                        <input value="1" type="hidden" id="quantityDetail" name="quantity" />
+                                        <button type="submit" data-product-id="<%= product.id %>"
+                                            class="btnAddToCartDetail btn btn-primary rounded-pill px-4 py-2 mb-4">
+                                            <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ hàng
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <div class="col-lg-2">
+                                    <!-- Cột 3: Chính sách & Dịch vụ -->
+                                    <div class="">
+                                        <div class="card shadow-sm border-0 policy-card flex-fill">
+                                            <div class="card-body">
+                                                <!-- Thông tin công ty -->
+                                                <div class="mb-3">
+                                                    <h5 class="fw-bold mb-1">LaptopShop VH</h5>
+                                                    <span class="badge bg-success">Đã xác minh</span>
+                                                </div>
+
+                                                <!-- Chính sách bán hàng -->
+                                                <h6 class="fw-bold mb-2">Chính sách bán hàng</h6>
+                                                <ul class="list-unstyled small mb-3">
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-shipping-fast text-primary me-2"></i>
+                                                        Miễn phí giao hàng cho đơn hàng từ 5 triệu
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-shield-alt text-primary me-2"></i>
+                                                        Cam kết hàng chính hãng 100%
+                                                    </li>
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-undo text-primary me-2"></i>
+                                                        Đổi trả trong vòng 10 ngày
+                                                    </li>
+                                                </ul>
+
+                                                <!-- Dịch vụ khác -->
+                                                <h6 class="fw-bold mb-2">Dịch vụ khác</h6>
+                                                <ul class="list-unstyled small">
+                                                    <li class="mb-2">
+                                                        <i class="fas fa-tools text-primary me-2"></i>
+                                                        Gói dịch vụ bảo hành / sửa chữa tận nơi
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-10">
+                                    <nav>
+                                        <div class="nav nav-tabs mb-3">
+                                            <button class="nav-link active border-white border-bottom-0" type="button"
+                                                role="tab" id="nav-about-tab" data-bs-toggle="tab"
+                                                data-bs-target="#nav-about" aria-controls="nav-about"
+                                                aria-selected="true">
+                                                Mô tả chi tiết
+                                            </button>
+                                        </div>
+                                    </nav>
+
+                                    <div class="tab-content mb-5">
+                                        <div class="tab-pane active" id="nav-about" role="tabpanel"
+                                            aria-labelledby="nav-about-tab">
+
+                                            <!-- Hiển thị mô tả chi tiết dưới dạng HTML -->
+                                            <div id="desc-wrapper" class="desc-collapsed">
+                                                <%- product.detailDesc %>
+                                            </div>
+
+
+
+                                            <!-- Nút xem thêm -->
+                                            <div class="text-center mt-2">
+                                                <button type="button" id="toggle-desc"
+                                                    class="btn btn-outline-primary btn-sm">
+                                                    Xem thêm
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-lg-10">
+                                    <% if (user) { %>
+                                        <h5>Đánh giá của bạn</h5>
+                                        <div id="user-review" class="border p-3 rounded bg-light">
+                                            <em>Đang tải đánh giá của bạn...</em>
+                                        </div>
+                                        <% } else { %>
+                                            <div class="alert alert-warning">
+                                                <a href="/login">Đăng nhập</a> để xem và viết đánh giá.
+                                            </div>
+                                            <% } %>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <div class="row g-4 mb-5">
-                <div class="col-lg-12 col-xl-12">
-                    <div class="row g-4">
-
-                        <div class="col-lg-5">
-                            <div class="rounded">
-                                <a href="#">
-                                    <img src="/images/product/<%= product.image%>" class="img-fluid rounded"
-                                        alt="Image">
-                                </a>
+            <!-- Single Product End -->
+            <!-- Footer Start -->
+            <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+                <div class="container py-5">
+                    <div class="row g-5">
+                        <!-- Logo & Giới thiệu -->
+                        <div class="col-lg-3 col-md-6">
+                            <a href="/" class="d-inline-block mb-3">
+                                <h2 class="text-primary fw-bold">LaptopShop</h2>
+                            </a>
+                            <p class="small">
+                                Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
+                                dịch vụ tận tâm và giá cả cạnh tranh nhất.
+                            </p>
+                            <!-- Icon mạng xã hội -->
+                            <div class="d-flex pt-2">
+                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                        class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                        class="fab fa-instagram"></i></a>
+                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                        class="fab fa-youtube"></i></a>
+                                <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
+                                        class="fab fa-tiktok"></i></a>
                             </div>
                         </div>
 
-                        <div class="col-lg-5">
-                            <!-- Tên sản phẩm -->
-                            <h3 class="fw-bold mb-2">
-                                <%= product.name %>
-                            </h3>
-                            <p class="text-muted mb-3">
-                                <%= product.shortDesc %>
-                            </p>
+                        <!-- Thông tin cửa hàng -->
+                        <div class="col-lg-3 col-md-6">
+                            <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
+                            <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
+                            <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
+                            <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
+                            <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
+                        </div>
 
+                        <!-- Tài khoản -->
+                        <div class="col-lg-3 col-md-6">
+                            <h4 class="text-light mb-3">Tài khoản</h4>
+                            <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
+                            <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
+                            <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
+                            <a class="btn-link d-block" href="/blogs">Blogs</a>
+                        </div>
 
-
-                            <h2 class="text-danger fw-bold">
-                                <% if (product.discount> 0) { %>
-                                    <p class="mb-1 text-decoration-line-through text-muted small">
-                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                            }).format(product.price) %>
-                                    </p>
-                                    <p class="fw-bold text-danger fs-5 mb-3">
-                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND' })
-                                            .format(product.price * (100 - product.discount) / 100) %>
-                                    </p>
-                                    <% } else { %>
-                                        <p class="text-dark fs-5 fw-bold mb-3">
-                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                                }).format(product.price) %>
-                                        </p>
-                                        <% } %>
-
-                            </h2>
-
-                            <!-- Rating -->
-                            <div class="d-flex align-items-center mb-3">
-                                <i class="fa fa-star text-warning"></i>
-                                <i class="fa fa-star text-warning"></i>
-                                <i class="fa fa-star text-warning"></i>
-                                <i class="fa fa-star text-warning"></i>
-                                <i class="fa fa-star text-secondary"></i>
-                                <span class="ms-2 small text-muted">(128 đánh giá)</span>
-                            </div>
-
-                            <!-- Số lượng -->
-                            <div class="d-flex align-items-center mb-4">
-                                <span class="me-3 fw-bold">Số lượng:</span>
-                                <div class="input-group quantity" style="width: 120px;">
-                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                        <i class="fa fa-minus"></i>
-                                    </button>
-                                    <input type="text" class="form-control form-control-sm text-center border-0"
-                                        value="1">
-                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                        <i class="fa fa-plus"></i>
-                                    </button>
+                        <!-- Liên hệ -->
+                        <div class="col-lg-3 col-md-6">
+                            <h4 class="text-light mb-3">Liên hệ</h4>
+                            <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
+                            <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
+                            <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
+                            <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
+                            <!-- Form đăng ký nhận tin -->
+                            <form class="mt-3">
+                                <div class="input-group">
+                                    <input type="email" class="form-control border-0" placeholder="Nhập email của bạn">
+                                    <button class="btn btn-primary">Đăng ký</button>
                                 </div>
-                            </div>
-
-                            <!-- Nút thêm giỏ -->
-                            <form method="post" action="/add-to-cart-from-detail-page/<%= product.id %>">
-                                <input value="1" type="hidden" id="quantityDetail" name="quantity" />
-                                <button type="submit" data-product-id="<%= product.id %>"
-                                    class="btnAddToCartDetail btn btn-primary rounded-pill px-4 py-2 mb-4">
-                                    <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ hàng
-                                </button>
                             </form>
                         </div>
-
-                        <div class="col-lg-2">
-                            <!-- Cột 3: Chính sách & Dịch vụ -->
-                            <div class="">
-                                <div class="card shadow-sm border-0 policy-card flex-fill">
-                                    <div class="card-body">
-                                        <!-- Thông tin công ty -->
-                                        <div class="mb-3">
-                                            <h5 class="fw-bold mb-1">LaptopShop VH</h5>
-                                            <span class="badge bg-success">Đã xác minh</span>
-                                        </div>
-
-                                        <!-- Chính sách bán hàng -->
-                                        <h6 class="fw-bold mb-2">Chính sách bán hàng</h6>
-                                        <ul class="list-unstyled small mb-3">
-                                            <li class="mb-2">
-                                                <i class="fas fa-shipping-fast text-primary me-2"></i>
-                                                Miễn phí giao hàng cho đơn hàng từ 5 triệu
-                                            </li>
-                                            <li class="mb-2">
-                                                <i class="fas fa-shield-alt text-primary me-2"></i>
-                                                Cam kết hàng chính hãng 100%
-                                            </li>
-                                            <li class="mb-2">
-                                                <i class="fas fa-undo text-primary me-2"></i>
-                                                Đổi trả trong vòng 10 ngày
-                                            </li>
-                                        </ul>
-
-                                        <!-- Dịch vụ khác -->
-                                        <h6 class="fw-bold mb-2">Dịch vụ khác</h6>
-                                        <ul class="list-unstyled small">
-                                            <li class="mb-2">
-                                                <i class="fas fa-tools text-primary me-2"></i>
-                                                Gói dịch vụ bảo hành / sửa chữa tận nơi
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-10">
-                            <nav>
-                                <div class="nav nav-tabs mb-3">
-                                    <button class="nav-link active border-white border-bottom-0" type="button"
-                                        role="tab" id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about"
-                                        aria-controls="nav-about" aria-selected="true">
-                                        Mô tả chi tiết
-                                    </button>
-                                </div>
-                            </nav>
-
-                            <div class="tab-content mb-5">
-                                <div class="tab-pane active" id="nav-about" role="tabpanel"
-                                    aria-labelledby="nav-about-tab">
-
-                                    <!-- Hiển thị mô tả chi tiết dưới dạng HTML -->
-                                    <div id="desc-wrapper" class="desc-collapsed">
-                                        <%- product.detailDesc %>
-                                    </div>
-
-
-
-                                    <!-- Nút xem thêm -->
-                                    <div class="text-center mt-2">
-                                        <button type="button" id="toggle-desc" class="btn btn-outline-primary btn-sm">
-                                            Xem thêm
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <div class="col-lg-10">
-                            <% if (user) { %>
-                                <h5>Đánh giá của bạn</h5>
-                                <div id="user-review" class="border p-3 rounded bg-light">
-                                    <em>Đang tải đánh giá của bạn...</em>
-                                </div>
-                                <% } else { %>
-                                    <div class="alert alert-warning">
-                                        <a href="/login">Đăng nhập</a> để xem và viết đánh giá.
-                                    </div>
-                                    <% } %>
-                        </div>
-
                     </div>
                 </div>
             </div>
 
-        </div>
-    </div>
-    <!-- Single Product End -->
-        <!-- Footer Start -->
-    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-        <div class="container py-5">
-            <div class="row g-5">
-                <!-- Logo & Giới thiệu -->
-                <div class="col-lg-3 col-md-6">
-                    <a href="/" class="d-inline-block mb-3">
-                        <h2 class="text-primary fw-bold">LaptopShop</h2>
-                    </a>
-                    <p class="small">
-                        Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
-                        dịch vụ tận tâm và giá cả cạnh tranh nhất.
-                    </p>
-                    <!-- Icon mạng xã hội -->
-                    <div class="d-flex pt-2">
-                        <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                class="fab fa-instagram"></i></a>
-                        <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                class="fab fa-youtube"></i></a>
-                        <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
-                                class="fab fa-tiktok"></i></a>
-                    </div>
-                </div>
-
-                <!-- Thông tin cửa hàng -->
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
-                    <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
-                    <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
-                    <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
-                    <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
-                </div>
-
-                <!-- Tài khoản -->
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-3">Tài khoản</h4>
-                    <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
-                    <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
-                    <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
-                    <a class="btn-link d-block" href="/blogs">Blogs</a>
-                </div>
-
-                <!-- Liên hệ -->
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-3">Liên hệ</h4>
-                    <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
-                    <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
-                    <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
-                    <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
-                    <!-- Form đăng ký nhận tin -->
-                    <form class="mt-3">
-                        <div class="input-group">
-                            <input type="email" class="form-control border-0" placeholder="Nhập email của bạn">
-                            <button class="btn btn-primary">Đăng ký</button>
-                        </div>
-                    </form>
+            <!-- Copyright -->
+            <div class="container-fluid bg-dark copyright bg-black py-3">
+                <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
+                    <span class="text-light mb-2 mb-md-0">
+                        <i class="fas fa-copyright me-2"></i>2025
+                        <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
+                    </span>
+                    <span class="text-white">
+                        Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML Codex</a> |
+                        Distributed by <a class="text-primary border-bottom"
+                            href="https://themewagon.com">ThemeWagon</a>
+                    </span>
                 </div>
             </div>
-        </div>
-    </div>
+            <!-- Footer End -->
 
-    <!-- Copyright -->
-    <div class="container-fluid bg-dark copyright bg-black py-3">
-        <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
-            <span class="text-light mb-2 mb-md-0">
-                <i class="fas fa-copyright me-2"></i>2025
-                <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
-            </span>
-            <span class="text-white">
-                Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML Codex</a> |
-                Distributed by <a class="text-primary border-bottom" href="https://themewagon.com">ThemeWagon</a>
-            </span>
-        </div>
-    </div>
-    <!-- Footer End -->
-
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-            class="fa fa-arrow-up"></i></a>
+            <!-- Back to Top -->
+            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                    class="fa fa-arrow-up"></i></a>
 
 
-    <!-- JavaScript Libraries -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/client/lib/easing/easing.min.js"></script>
-    <script src="/client/lib/waypoints/waypoints.min.js"></script>
-    <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-    <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+            <!-- JavaScript Libraries -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/lib/easing/easing.min.js"></script>
+            <script src="/client/lib/waypoints/waypoints.min.js"></script>
+            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
-    <!-- Template Javascript -->
-    <script src="/client/js/main.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
-        integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- nút xem thêm -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const desc = document.getElementById("desc-wrapper");
-            const btn = document.getElementById("toggle-desc");
+            <!-- Template Javascript -->
+            <script src="/client/js/main.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
+                integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
+                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            <!-- nút xem thêm -->
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const desc = document.getElementById("desc-wrapper");
+                    const btn = document.getElementById("toggle-desc");
 
-            btn.addEventListener("click", function () {
-                desc.classList.toggle("desc-collapsed");
+                    btn.addEventListener("click", function () {
+                        desc.classList.toggle("desc-collapsed");
 
-                if (desc.classList.contains("desc-collapsed")) {
-                    btn.innerText = "Xem thêm";
-                } else {
-                    btn.innerText = "Thu gọn";
-                }
-            });
-        });
+                        if (desc.classList.contains("desc-collapsed")) {
+                            btn.innerText = "Xem thêm";
+                        } else {
+                            btn.innerText = "Thu gọn";
+                        }
+                    });
+                });
 
 
 
-    </script>
+            </script>
 
-    <!-- đánh giá -->
+            <!-- đánh giá -->
 
-    <!-- Font Awesome (icon sao) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+            <!-- Font Awesome (icon sao) -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 
 </body>

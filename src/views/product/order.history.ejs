@@ -45,169 +45,334 @@
     <!-- Spinner End -->
 
     <!-- Navbar start -->
-    <div class="container-fluid shadow ">
+    <header class="container-fluid shadow" style="margin-top:10px;">
+        <!-- Topbar -->
         <div class="container topbar bg-primary d-none d-lg-block">
             <div class="d-flex justify-content-between">
                 <div class="top-info ps-2">
-                    <% if(user){ %>
-                        <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i>
+                    <% if (user) { %>
+                        <small class="me-3">
+                            <i class="fas fa-map-marker-alt me-2 text-secondary"></i>
                             <a href="#" class="text-white">
-                                <!-- <%= user?.address ?? "" %> -->
                                 <%= user?.address || "" %>
                             </a>
                         </small>
-                        <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i>
+                        <small class="me-3">
+                            <i class="fas fa-envelope me-2 text-secondary"></i>
                             <a href="#" class="text-white">
                                 <%= user?.username || "" %>
                             </a>
                         </small>
                         <% } else { %>
-                            <small class="me-3"><i class="fas fa-voicemail me-2 text-secondary"></i>
-                            </small>
+                            <small class="me-3"><i class="fas fa-voicemail me-2 text-secondary"></i></small>
                             <% } %>
                 </div>
                 <div class="top-link pe-2">
-                    <a href="/terms" class="text-white"><small class="text-white mx-2">Điều khoản sử dụng</small>/</a>
+                    <a href="/terms" class="text-white">
+                        <small class="text-white mx-2">Điều khoản sử dụng</small>/
+                    </a>
                     <a href="/support" class="text-white"><small class="text-white mx-2">Hỗ trợ</small></a>
                 </div>
             </div>
         </div>
-        <div class="container px-0">
+
+        <!-- Navbar -->
+        <div class="container px-0 position-relative">
             <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                <div>
-                    <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle">
+                <div class="d-flex align-items-center">
+                    <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle" />
+                    <a href="/" class="navbar-brand ms-2">
+                        <h1 class="text-primary display-6 m-0">LaptopShop</h1>
+                    </a>
                 </div>
-                <a href="/" class="navbar-brand">
-                    <h1 class="text-primary display-6">LaptopShop</h1>
-                </a>
+
                 <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarCollapse">
+                    data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
+                    aria-label="Toggle navigation">
                     <span class="fa fa-bars text-primary"></span>
                 </button>
+
                 <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
-                    <div class="navbar-nav mx-auto">
-                        <a href="/" class="nav-item nav-link active">Trang chủ</a>
-                        <a href="/products" class="nav-item nav-link">Sản phẩm</a>
-                        <a href="/about" class="nav-item nav-link">Giới thiệu</a>
-                        <a href="/contact" class="nav-item nav-link">Liên hệ</a>
-                        <a href="/terms" class="nav-item nav-link active" hidden>Điều khoản</a>
-                        <a href="/blogs" class="nav-item nav-link">Blog</a>
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item"><a href="/" class="nav-link active">Trang chủ</a></li>
+                        <li class="nav-item"><a href="/products" class="nav-link">Sản phẩm</a></li>
+                        <li class="nav-item"><a href="/about" class="nav-link">Giới thiệu</a></li>
+                        <li class="nav-item"><a href="/contact" class="nav-link">Liên hệ</a></li>
+                        <li class="nav-item"><a href="/blogs" class="nav-link">Blog</a></li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Thông tin và chính sách
-                            </a>
+                                data-bs-toggle="dropdown" aria-expanded="false">Thông tin và chính sách</a>
                             <ul class="dropdown-menu" aria-labelledby="policyDropdown">
                                 <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
                                 <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
                                 <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
                             </ul>
                         </li>
+                    </ul>
 
+                    <div class="d-flex ms-auto align-items-center position-relative">
+                        <% if (user) { %>
+                            <!-- Chuông thông báo -->
+                            <button class="notification-icon position-relative me-3 btn btn-link p-0 border-0"
+                                id="notificationDropdown" type="button" aria-label="Thông báo">
+                                <i class="fas fa-bell fa-2x"></i>
+                                <span id="notificationBadge"
+                                    class="position-absolute bg-danger text-white rounded-circle d-flex align-items-center justify-content-center"
+                                    style="top:-5px; right:-5px; width:20px; height:20px; font-size:12px; display:none;">0</span>
+                            </button>
 
-                    </div>
-                    <div class="d-flex m-3 me-0">
-                        <a href="#" class="position-relative me-4 my-auto">
-                            <i class="fa fa-shopping-bag fa-2x"></i>
-                            <span
-                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
-                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;">
-                                <%= user?.sumCart ?? 0%>
-                            </span>
-                        </a>
-                        <% if(user){ %>
-                            <div class="dropdown my-auto">
-                                <a href="#" class="dropdown" role="button" id="dropdownMenuLink"
-                                    data-bs-toggle="dropdown" aria-expanded="false" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <i class="fas fa-user fa-2x"></i>
+                            <!-- Âm thanh -->
+                            <audio id="notificationSound" src="/ring.wav" preload="auto"></audio>
+                            <% } %>
+
+                                <!-- Giỏ hàng -->
+                                <a href="/cart" class="position-relative me-3" aria-label="Giỏ hàng">
+                                    <i class="fa fa-shopping-bag fa-2x"></i>
+                                    <span
+                                        class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
+                                        id="sumCart" style="top:-5px; left:15px; height:20px; min-width:20px;">
+                                        <%= user?.sumCart ?? 0 %>
+                                    </span>
                                 </a>
 
-                                <ul class="dropdown-menu dropdown-menu-end p-4" aria-labelledby="dropdownMenuLink">
-                                    <li class="d-flex align-items-center flex-column" style="min-width: 300px;">
-                                        <img style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden;"
-                                            src="/images/<%= user.avatar %>" />
-                                        <div class="text-center my-3">
-                                            <%= user.fullName %>
-                                        </div>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
-                                    <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
-                                    <li><a class="dropdown-item" href="/order-user">Đơn hàng của tôi</a></li>
-
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form method="post" action="/logout">
-                                            <button class="dropdown-item">Đăng xuất</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                            <% }else { %>
-                                <a href="/login" class="a-login">
-                                    <i class="fas fa-user fa-2x"></i>
-                                </a>
-                                <% } %>
+                                <!-- User -->
+                                <% if (user) { %>
+                                    <div class="dropdown my-auto">
+                                        <a href="#" class="dropdown-toggle" role="button" id="dropdownMenuLink"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-user fa-2x"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-end p-4"
+                                            aria-labelledby="dropdownMenuLink">
+                                            <li class="d-flex align-items-center flex-column" style="min-width:300px;">
+                                                <img style="width:150px; height:150px; border-radius:50%; overflow:hidden;"
+                                                    src="/images/<%= user.avatar %>" alt="Avatar người dùng" />
+                                                <div class="text-center my-3">
+                                                    <%= user.fullName %>
+                                                </div>
+                                            </li>
+                                            <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
+                                            <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
+                                            <li><a class="dropdown-item" href="/order-user">Đơn hàng của tôi</a></li>
+                                            <li>
+                                                <hr class="dropdown-divider" />
+                                            </li>
+                                            <li>
+                                                <form method="post" action="/logout">
+                                                    <button class="dropdown-item" type="submit">Đăng xuất</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <% } else { %>
+                                        <a href="/login" class="a-login" aria-label="Đăng nhập"><i
+                                                class="fas fa-user fa-2x"></i></a>
+                                        <% } %>
                     </div>
                 </div>
             </nav>
-        </div>
-    </div>
-    <!-- Navbar End -->
 
-    <!-- Cart Page Start -->
-    <!-- Cart Page Start -->
-    <div class="container-fluid py-5 bg-light">
-        <div class="container py-4">
-
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb bg-white shadow-sm rounded-3 p-2">
-                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Chi Tiết Giỏ Hàng</li>
-                </ol>
-            </nav>
-
-            <div class="accordion" id="ordersAccordion">
-
-                <% if (!orders || orders.length===0) { %>
-                    <div class="text-center py-5 fw-bold text-muted">
-                        Không có đơn hàng nào được tạo!
+            <% if (user) { %>
+                <!-- Panel dropdown notification cho User -->
+                <div id="uNotificationPanel" class="dropdown-menu show"
+                    style="display:none; position:absolute; right:10px; top:72px; width:360px; max-height:420px; overflow:auto; z-index:1050;">
+                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                        <strong>Thông báo</strong>
+                        <button id="uMarkAllRead" class="btn btn-sm btn-link">Đánh dấu đã đọc</button>
                     </div>
-                    <% } else { %>
-                        <% orders.forEach(function(order, index) { %>
-                            <div class="accordion-item mb-3 shadow-sm rounded-3">
-                                <h2 class="accordion-header" id="heading<%= order.id %>">
-                                    <button class="accordion-button collapsed row" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#collapse<%= order.id %>"
-                                        aria-expanded="false" aria-controls="collapse<%= order.id %>">
+                    <ul id="uNotificationList" class="list-group list-group-flush"></ul>
+                </div>
+                <% } %>
+        </div>
 
-                                        <span class="fw-bold me-3 col-2">Order ID: <%= order.id %></span>
+    </header>
 
-                                        <!-- Ảnh sản phẩm đầu tiên -->
-                                        <div class="col-4 d-flex align-items-center">
-                                            <% order.orderDetails.forEach(function(detail) { %>
-                                                <img src="/images/product/<%= detail.product.image %>"
-                                                    alt="Ảnh sản phẩm" class="rounded-circle shadow-sm border me-1"
-                                                    style="width:35px; height:35px; object-fit:cover;">
-                                                <% }) %>
-                                        </div>
+    <% if (user) { %>
+        <script>
+            window.USER_ID = "<%= String(user.id) %>";
+        </script>
+        <% } %>
+
+            <!-- Socket.IO client -->
+            <script src="/socket.io/socket.io.js"></script>
+            <script>
+                (function () {
+                    if (!window.USER_ID) return; // chưa login thì thôi
+
+                    const uBadge = document.getElementById('notificationBadge');
+                    const uIcon = document.getElementById('notificationDropdown');
+                    const uPanel = document.getElementById('uNotificationPanel');
+                    const uList = document.getElementById('uNotificationList');
+                    const uSound = document.getElementById('notificationSound');
+                    const USER_ID = window.USER_ID;
+
+                    // Toggle panel
+                    if (uIcon && uPanel) {
+                        uIcon.addEventListener('click', () => {
+                            const shown = uPanel.style.display === 'block';
+                            uPanel.style.display = shown ? 'none' : 'block';
+                        });
+                    }
+
+                    // Unlock audio lần click đầu vào chuông
+                    let audioUnlocked = false;
+                    if (uIcon && uSound) {
+                        uIcon.addEventListener('click', () => {
+                            if (!audioUnlocked) {
+                                uSound.volume = 0.0;
+                                uSound.play().catch(() => { });
+                                setTimeout(() => {
+                                    try { uSound.pause(); uSound.currentTime = 0; } catch { }
+                                    uSound.volume = 1.0;
+                                    audioUnlocked = true;
+                                }, 50);
+                            }
+                        });
+                    }
+
+                    function uUpdateBadge(delta = 1) {
+                        if (!uBadge) return;
+                        let cur = parseInt(uBadge.textContent || "0", 10);
+                        cur = isNaN(cur) ? 0 : cur;
+                        cur += delta;
+                        if (cur <= 0) {
+                            uBadge.style.display = "none";
+                            uBadge.textContent = "0";
+                        } else {
+                            uBadge.style.display = "flex";
+                            uBadge.textContent = cur > 9 ? "9+" : String(cur);
+                        }
+                    }
+
+                    function uPrepend(itemHtml) {
+                        if (!uList) return;
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item';
+                        li.innerHTML = itemHtml;
+                        uList.prepend(li);
+                    }
+
+                    const markBtn = document.getElementById('uMarkAllRead');
+                    if (markBtn && uBadge) {
+                        markBtn.addEventListener('click', () => {
+                            uBadge.style.display = 'none';
+                            uBadge.textContent = '0';
+                        });
+                    }
+
+                    // Socket
+                    const uSocket = io(); // same-origin
+                    uSocket.on('connect', () => {
+                        console.log('[SOCKET] user connected, USER_ID=', USER_ID);
+                        uSocket.emit('join-user-room', USER_ID);
+                    });
+
+                    // Admin xác nhận
+                    uSocket.on('order-confirmed', (data) => {
+                        console.log('[SOCKET] order-confirmed:', data);
+                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                        uUpdateBadge(1);
+                        const url = `/order/${data.orderId}`;
+                        const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
+                        uPrepend(
+                            '<div class="d-flex justify-content-between align-items-start">' +
+                            '<div>' +
+                            '<div class="fw-semibold">' + msg + '</div>' +
+                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                            '</div>' +
+                            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                            '</div>'
+                        );
+                    });
+
+                    uSocket.on('order-canceled', (data) => {
+                        console.log('[SOCKET] order-canceled:', data);
+                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                        uUpdateBadge(1);
+                        const url = `/order/${data.orderId}`;
+                        const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
+                        uPrepend(
+                            '<div class="d-flex justify-content-between align-items-start">' +
+                            '<div>' +
+                            '<div class="fw-semibold">' + msg + '</div>' +
+                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                            '</div>' +
+                            '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
+                            '</div>'
+                        );
+                    });
+
+                    uSocket.on('order-updated', (data) => {
+                        console.log('[SOCKET] order-updated:', data);
+                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                        uUpdateBadge(1);
+                        const url = `/order/${data.orderId}`;
+                        const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
+                        uPrepend(
+                            '<div class="d-flex justify-content-between align-items-start">' +
+                            '<div>' +
+                            '<div class="fw-semibold">' + msg + '</div>' +
+                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                            '</div>' +
+                            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                            '</div>'
+                        );
+                    });
+                })();
+            </script>
+            <!-- Navbar End -->
+
+            <!-- Cart Page Start -->
+            <!-- Cart Page Start -->
+            <div class="container-fluid py-5 bg-light">
+                <div class="container py-4">
+
+                    <!-- Breadcrumb -->
+                    <nav aria-label="breadcrumb" class="mb-4">
+                        <ol class="breadcrumb bg-white shadow-sm rounded-3 p-2">
+                            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Chi Tiết Giỏ Hàng</li>
+                        </ol>
+                    </nav>
+
+                    <div class="accordion" id="ordersAccordion">
+
+                        <% if (!orders || orders.length===0) { %>
+                            <div class="text-center py-5 fw-bold text-muted">
+                                Không có đơn hàng nào được tạo!
+                            </div>
+                            <% } else { %>
+                                <% orders.forEach(function(order, index) { %>
+                                    <div class="accordion-item mb-3 shadow-sm rounded-3">
+                                        <h2 class="accordion-header" id="heading<%= order.id %>">
+                                            <button class="accordion-button collapsed row" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#collapse<%= order.id %>"
+                                                aria-expanded="false" aria-controls="collapse<%= order.id %>">
+
+                                                <span class="fw-bold me-3 col-2">Order ID: <%= order.id %></span>
+
+                                                <!-- Ảnh sản phẩm đầu tiên -->
+                                                <div class="col-4 d-flex align-items-center">
+                                                    <% order.orderDetails.forEach(function(detail) { %>
+                                                        <img src="/images/product/<%= detail.product.image %>"
+                                                            alt="Ảnh sản phẩm"
+                                                            class="rounded-circle shadow-sm border me-1"
+                                                            style="width:35px; height:35px; object-fit:cover;">
+                                                        <% }) %>
+                                                </div>
 
 
-                                        <!-- Tên sản phẩm đầu tiên -->
-                                        <span class="fw-semibold me-3 col-3">
-                                            <%= order.orderDetails[0]?.product?.name %>
-                                        </span>
+                                                <!-- Tên sản phẩm đầu tiên -->
+                                                <span class="fw-semibold me-3 col-3">
+                                                    <%= order.orderDetails[0]?.product?.name %>
+                                                </span>
 
-                                        <span class="text-muted me-3 col-1">
-                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                                }).format(order.totalPrice) %>
-                                        </span>
+                                                <span class="text-muted me-3 col-1">
+                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                        currency: 'VND' }).format(order.totalPrice) %>
+                                                </span>
 
-                                        <span class="badge col-1
+                                                <span class="badge col-1
   <% if(order.status==='PENDING'){ %> bg-warning text-dark
   <% } else if(order.status==='CONFIRMED'){ %> bg-info text-dark
   <% } else if(order.status==='SHIPPING'){ %> bg-primary
@@ -215,384 +380,391 @@
   <% } else if(order.status==='DELIVERED'){ %> bg-success
   <% } else if(order.status==='CANCELED'){ %> bg-danger
   <% } else { %> bg-light text-dark <% } %>">
-                                            <% const viLabel={ PENDING: 'Chờ xử lý' , CONFIRMED: 'Đã xác nhận đơn' ,
-                                                SHIPPING: 'Đang vận chuyển' , OUT_FOR_DELIVERY: 'Đang giao hàng' ,
-                                                DELIVERED: 'Đã giao hàng' , CANCELED: 'Đã hủy' }[order.status] ||
-                                                order.status; %>
-                                                <%= viLabel %>
-                                        </span>
+                                                    <% const viLabel={ PENDING: 'Chờ xử lý' ,
+                                                        CONFIRMED: 'Đã xác nhận đơn' , SHIPPING: 'Đang vận chuyển' ,
+                                                        OUT_FOR_DELIVERY: 'Đang giao hàng' , DELIVERED: 'Đã giao hàng' ,
+                                                        CANCELED: 'Đã hủy' }[order.status] || order.status; %>
+                                                        <%= viLabel %>
+                                                </span>
 
-                                    </button>
-                                </h2>
-                                <div id="collapse<%= order.id %>" class="accordion-collapse collapse"
-                                    aria-labelledby="heading<%= order.id %>" data-bs-parent="#ordersAccordion">
-                                    <div class="accordion-body p-0">
-                                        <div class="table-responsive">
-                                            <table class="table mb-0">
-                                                <thead class="table-light text-center">
-                                                    <tr>
-                                                        <th>Sản phẩm</th>
-                                                        <th>Tên</th>
-                                                        <th>Giá</th>
-                                                        <th>Số lượng</th>
-                                                        <th>Tổng tiền</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <% order.orderDetails.forEach(function(detail) { const
-                                                        discountedPrice=detail.product.discount> 0
-                                                        ? Math.round(detail.product.price * (100 -
-                                                        detail.product.discount) / 100)
-                                                        : detail.product.price;
-                                                        %>
-                                                        <tr class="align-middle">
-                                                            <td class="text-center">
-                                                                <img src="/images/product/<%= detail.product.image %>"
-                                                                    class="rounded-circle shadow-sm border"
-                                                                    style="width:50px; height:50px; object-fit:cover;">
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <a href="/product/<%= detail.product.id %>"
-                                                                    target="_blank"
-                                                                    class="text-decoration-none fw-semibold text-dark hover-primary">
-                                                                    <%= detail.product.name %>
-                                                                </a>
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <% if(detail.product.discount> 0) { %>
-                                                                    <!-- Giá gốc gạch ngang -->
-                                                                    <div
-                                                                        class="text-muted text-decoration-line-through small">
+                                            </button>
+                                        </h2>
+                                        <div id="collapse<%= order.id %>" class="accordion-collapse collapse"
+                                            aria-labelledby="heading<%= order.id %>" data-bs-parent="#ordersAccordion">
+                                            <div class="accordion-body p-0">
+                                                <div class="table-responsive">
+                                                    <table class="table mb-0">
+                                                        <thead class="table-light text-center">
+                                                            <tr>
+                                                                <th>Sản phẩm</th>
+                                                                <th>Tên</th>
+                                                                <th>Giá</th>
+                                                                <th>Số lượng</th>
+                                                                <th>Tổng tiền</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% order.orderDetails.forEach(function(detail) { const
+                                                                discountedPrice=detail.product.discount> 0
+                                                                ? Math.round(detail.product.price * (100 -
+                                                                detail.product.discount) / 100)
+                                                                : detail.product.price;
+                                                                %>
+                                                                <tr class="align-middle">
+                                                                    <td class="text-center">
+                                                                        <img src="/images/product/<%= detail.product.image %>"
+                                                                            class="rounded-circle shadow-sm border"
+                                                                            style="width:50px; height:50px; object-fit:cover;">
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <a href="/product/<%= detail.product.id %>"
+                                                                            target="_blank"
+                                                                            class="text-decoration-none fw-semibold text-dark hover-primary">
+                                                                            <%= detail.product.name %>
+                                                                        </a>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <% if(detail.product.discount> 0) { %>
+                                                                            <!-- Giá gốc gạch ngang -->
+                                                                            <div
+                                                                                class="text-muted text-decoration-line-through small">
+                                                                                <%= new Intl.NumberFormat('vi-VN', {
+                                                                                    style: 'currency' , currency: 'VND'
+                                                                                    }).format(detail.product.price) %>
+                                                                            </div>
+                                                                            <!-- Giá sau giảm -->
+                                                                            <span class="fw-bold text-danger">
+                                                                                <%= new Intl.NumberFormat('vi-VN', {
+                                                                                    style: 'currency' , currency: 'VND'
+                                                                                    }).format(discountedPrice) %>
+                                                                            </span>
+                                                                            <% } else { %>
+                                                                                <!-- Không có giảm giá -->
+                                                                                <span class="fw-bold text-dark">
+                                                                                    <%= new Intl.NumberFormat('vi-VN', {
+                                                                                        style: 'currency' ,
+                                                                                        currency: 'VND'
+                                                                                        }).format(detail.product.price)
+                                                                                        %>
+                                                                                </span>
+                                                                                <% } %>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <%= detail.quantity %>
+                                                                    </td>
+                                                                    <td class="text-center fw-bold text-success">
                                                                         <%= new Intl.NumberFormat('vi-VN', {
                                                                             style: 'currency' , currency: 'VND'
-                                                                            }).format(detail.product.price) %>
-                                                                    </div>
-                                                                    <!-- Giá sau giảm -->
-                                                                    <span class="fw-bold text-danger">
-                                                                        <%= new Intl.NumberFormat('vi-VN', {
-                                                                            style: 'currency' , currency: 'VND'
-                                                                            }).format(discountedPrice) %>
-                                                                    </span>
-                                                                    <% } else { %>
-                                                                        <!-- Không có giảm giá -->
-                                                                        <span class="fw-bold text-dark">
-                                                                            <%= new Intl.NumberFormat('vi-VN', {
-                                                                                style: 'currency' , currency: 'VND'
-                                                                                }).format(detail.product.price) %>
-                                                                        </span>
-                                                                        <% } %>
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <%= detail.quantity %>
-                                                            </td>
-                                                            <td class="text-center fw-bold text-success">
-                                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                                    currency: 'VND' }).format(discountedPrice *
-                                                                    detail.quantity) %>
-                                                            </td>
-                                                        </tr>
-                                                        <% }) %>
-                                                </tbody>
-                                            </table>
+                                                                            }).format(discountedPrice * detail.quantity)
+                                                                            %>
+                                                                    </td>
+                                                                </tr>
+                                                                <% }) %>
+                                                        </tbody>
+                                                    </table>
 
-                                        </div>
+                                                </div>
 
-                                        <!-- Thông tin thêm -->
-                                        <div class="p-3 border-top d-flex justify-content-between align-items-center">
-                                            <div>Ngày đặt: <strong>
-                                                    <%= new Date(order.createdAt).toLocaleDateString('vi-VN') %>
-                                                </strong></div>
-                                            <% if(order.status==='PENDING' || order.status==='CONFIRMED' ){ %>
-                                                <button type="button" class="btn btn-danger btn-sm btn-cancel"
-                                                    data-order-id="<%= order.id %>" data-bs-toggle="modal"
-                                                    data-bs-target="#cancelOrderModal">
-                                                    Hủy đơn
-                                                </button>
-                                                <% } %>
+                                                <!-- Thông tin thêm -->
+                                                <div
+                                                    class="p-3 border-top d-flex justify-content-between align-items-center">
+                                                    <div>Ngày đặt: <strong>
+                                                            <%= new Date(order.createdAt).toLocaleDateString('vi-VN') %>
+                                                        </strong></div>
+                                                    <% if(order.status==='PENDING' || order.status==='CONFIRMED' ){ %>
+                                                        <button type="button" class="btn btn-danger btn-sm btn-cancel"
+                                                            data-order-id="<%= order.id %>" data-bs-toggle="modal"
+                                                            data-bs-target="#cancelOrderModal">
+                                                            Hủy đơn
+                                                        </button>
+                                                        <% } %>
 
-                                        </div>
-                                        <% if(order.status==='CANCELED' ){ %>
-                                            <div class="p-3 bg-light border-top text-danger fw-semibold">
-                                                Lý do hủy: <%= order.cancelReason || 'Không có lý do' %>
+                                                </div>
+                                                <% if(order.status==='CANCELED' ){ %>
+                                                    <div class="p-3 bg-light border-top text-danger fw-semibold">
+                                                        Lý do hủy: <%= order.cancelReason || 'Không có lý do' %>
+                                                    </div>
+                                                    <% } %>
                                             </div>
-                                            <% } %>
+                                        </div>
+
                                     </div>
-                                </div>
+                                    <% }) %>
+                                        <% } %>
 
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <a href="/" class="btn btn-success btn-lg shadow-sm">
+                            <i class="fa fa-arrow-left me-2"></i> Trở về
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Modal Hủy đơn hàng -->
+            <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form id="cancelOrderForm">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="cancelOrderLabel">Hủy đơn hàng</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
-                            <% }) %>
-                                <% } %>
-
-            </div>
-
-            <div class="mt-4 text-end">
-                <a href="/" class="btn btn-success btn-lg shadow-sm">
-                    <i class="fa fa-arrow-left me-2"></i> Trở về
-                </a>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Modal Hủy đơn hàng -->
-    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="cancelOrderForm">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="cancelOrderLabel">Hủy đơn hàng</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div class="modal-body">
+                                <input type="hidden" id="cancelOrderId">
+                                <div class="mb-3">
+                                    <label for="cancelReason" class="form-label">Chọn lý do hủy:</label>
+                                    <select class="form-select" id="cancelReason" required>
+                                        <option value="">-- Chọn lý do --</option>
+                                        <option value="Đổi ý - không mua nữa">Đối ý - không mua nữa</option>
+                                        <option value="Đặt nhầm">Đặt nhầm</option>
+                                        <option value="Giao hàng lâu">Giao hàng lâu</option>
+                                        <option value="Khác">Khác</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                <button type="submit" class="btn btn-danger">Hủy đơn</button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="cancelOrderId">
-                        <div class="mb-3">
-                            <label for="cancelReason" class="form-label">Chọn lý do hủy:</label>
-                            <select class="form-select" id="cancelReason" required>
-                                <option value="">-- Chọn lý do --</option>
-                                <option value="Đổi ý - không mua nữa">Đối ý - không mua nữa</option>
-                                <option value="Đặt nhầm">Đặt nhầm</option>
-                                <option value="Giao hàng lâu">Giao hàng lâu</option>
-                                <option value="Khác">Khác</option>
-                            </select>
+                </div>
+            </div>
+
+            <!-- Toast Container -->
+            <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+                <div id="notifyToast" class="toast align-items-center text-white bg-success border-0" role="alert"
+                    aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body" id="notifyToastBody">
+                            Thông báo ở đây
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                            aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Start -->
+            <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+                <div class="container py-5">
+                    <div class="row g-5">
+                        <!-- Logo & Giới thiệu -->
+                        <div class="col-lg-3 col-md-6">
+                            <a href="/" class="d-inline-block mb-3">
+                                <h2 class="text-primary fw-bold">LaptopShop</h2>
+                            </a>
+                            <p class="small">
+                                Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
+                                dịch vụ tận tâm và giá cả cạnh tranh nhất.
+                            </p>
+                            <!-- Icon mạng xã hội -->
+                            <div class="d-flex pt-2">
+                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                        class="fab fa-facebook-f"></i></a>
+                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                        class="fab fa-instagram"></i></a>
+                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                        class="fab fa-youtube"></i></a>
+                                <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
+                                        class="fab fa-tiktok"></i></a>
+                            </div>
+                        </div>
+
+                        <!-- Thông tin cửa hàng -->
+                        <div class="col-lg-3 col-md-6">
+                            <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
+                            <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
+                            <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
+                            <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
+                            <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
+                        </div>
+
+                        <!-- Tài khoản -->
+                        <div class="col-lg-3 col-md-6">
+                            <h4 class="text-light mb-3">Tài khoản</h4>
+                            <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
+                            <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
+                            <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
+                            <a class="btn-link d-block" href="/blogs">Blogs</a>
+                        </div>
+
+                        <!-- Liên hệ -->
+                        <div class="col-lg-3 col-md-6">
+                            <h4 class="text-light mb-3">Liên hệ</h4>
+                            <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
+                            <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
+                            <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
+                            <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
+                            <!-- Form đăng ký nhận tin -->
+                            <form class="mt-3">
+                                <div class="input-group">
+                                    <input type="email" class="form-control border-0" placeholder="Nhập email của bạn">
+                                    <button class="btn btn-primary">Đăng ký</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        <button type="submit" class="btn btn-danger">Hủy đơn</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
-        <div id="notifyToast" class="toast align-items-center text-white bg-success border-0" role="alert"
-            aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body" id="notifyToastBody">
-                    Thông báo ở đây
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer Start -->
-    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-        <div class="container py-5">
-            <div class="row g-5">
-                <!-- Logo & Giới thiệu -->
-                <div class="col-lg-3 col-md-6">
-                    <a href="/" class="d-inline-block mb-3">
-                        <h2 class="text-primary fw-bold">LaptopShop</h2>
-                    </a>
-                    <p class="small">
-                        Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
-                        dịch vụ tận tâm và giá cả cạnh tranh nhất.
-                    </p>
-                    <!-- Icon mạng xã hội -->
-                    <div class="d-flex pt-2">
-                        <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                class="fab fa-instagram"></i></a>
-                        <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                class="fab fa-youtube"></i></a>
-                        <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
-                                class="fab fa-tiktok"></i></a>
-                    </div>
-                </div>
-
-                <!-- Thông tin cửa hàng -->
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
-                    <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
-                    <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
-                    <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
-                    <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
-                </div>
-
-                <!-- Tài khoản -->
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-3">Tài khoản</h4>
-                    <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
-                    <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
-                    <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
-                    <a class="btn-link d-block" href="/blogs">Blogs</a>
-                </div>
-
-                <!-- Liên hệ -->
-                <div class="col-lg-3 col-md-6">
-                    <h4 class="text-light mb-3">Liên hệ</h4>
-                    <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
-                    <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
-                    <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
-                    <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
-                    <!-- Form đăng ký nhận tin -->
-                    <form class="mt-3">
-                        <div class="input-group">
-                            <input type="email" class="form-control border-0" placeholder="Nhập email của bạn">
-                            <button class="btn btn-primary">Đăng ký</button>
-                        </div>
-                    </form>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Copyright -->
-    <div class="container-fluid bg-dark copyright bg-black py-3">
-        <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
-            <span class="text-light mb-2 mb-md-0">
-                <i class="fas fa-copyright me-2"></i>2025
-                <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
-            </span>
-            <span class="text-white">
-                Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML Codex</a> |
-                Distributed by <a class="text-primary border-bottom" href="https://themewagon.com">ThemeWagon</a>
-            </span>
-        </div>
-    </div>
-    <!-- Footer End -->
-
+            <!-- Copyright -->
+            <div class="container-fluid bg-dark copyright bg-black py-3">
+                <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
+                    <span class="text-light mb-2 mb-md-0">
+                        <i class="fas fa-copyright me-2"></i>2025
+                        <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
+                    </span>
+                    <span class="text-white">
+                        Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML Codex</a> |
+                        Distributed by <a class="text-primary border-bottom"
+                            href="https://themewagon.com">ThemeWagon</a>
+                    </span>
+                </div>
+            </div>
+            <!-- Footer End -->
 
 
 
-    <!-- Back to Top -->
-    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-            class="fa fa-arrow-up"></i></a>
+
+            <!-- Back to Top -->
+            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                    class="fa fa-arrow-up"></i></a>
 
 
-    <!-- JavaScript Libraries -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/client/lib/easing/easing.min.js"></script>
-    <script src="/client/lib/waypoints/waypoints.min.js"></script>
-    <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-    <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+            <!-- JavaScript Libraries -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/lib/easing/easing.min.js"></script>
+            <script src="/client/lib/waypoints/waypoints.min.js"></script>
+            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
-    <!-- Template Javascript -->
-    <script src="/client/js/main.js"></script>
-    <!-- AJAX HỦY ĐƠN HÀNG -->
-    <script>
-        // Hàm toast đếm ngược
-        function showToastCountdown(message, isSuccess = true, seconds = 3) {
-            const toastEl = document.getElementById('notifyToast');
-            const toastBody = document.getElementById('notifyToastBody');
+            <!-- Template Javascript -->
+            <script src="/client/js/main.js"></script>
+            <!-- AJAX HỦY ĐƠN HÀNG -->
+            <script>
+                // Hàm toast đếm ngược
+                function showToastCountdown(message, isSuccess = true, seconds = 3) {
+                    const toastEl = document.getElementById('notifyToast');
+                    const toastBody = document.getElementById('notifyToastBody');
 
-            if (!toastEl || !toastBody) return;
+                    if (!toastEl || !toastBody) return;
 
-            toastEl.classList.remove('bg-success', 'bg-danger');
-            toastEl.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
+                    toastEl.classList.remove('bg-success', 'bg-danger');
+                    toastEl.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
 
-            let remaining = seconds;
-            toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
-
-            let toast = bootstrap.Toast.getInstance(toastEl);
-            if (!toast) {
-                toast = new bootstrap.Toast(toastEl, { autohide: false });
-            }
-
-            toast.show();
-
-            const interval = setInterval(() => {
-                remaining--;
-                if (remaining > 0) {
+                    let remaining = seconds;
                     toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
-                } else {
-                    clearInterval(interval);
-                    toast.hide();
-                }
-            }, 1000);
-        }
 
-        (function () {
-            const modalEl = document.getElementById('cancelOrderModal');
-            const cancelForm = document.getElementById('cancelOrderForm');
-            const cancelIdInput = document.getElementById('cancelOrderId');
-            const cancelReason = document.getElementById('cancelReason');
+                    let toast = bootstrap.Toast.getInstance(toastEl);
+                    if (!toast) {
+                        toast = new bootstrap.Toast(toastEl, { autohide: false });
+                    }
 
-            const escapeHtml = (str = '') => String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+                    toast.show();
 
-            // Gán orderId vào hidden input khi bấm nút hủy
-            document.addEventListener('click', (e) => {
-                const btn = e.target.closest('.btn-cancel');
-                if (!btn) return;
-                const orderId = btn.dataset.orderId || btn.getAttribute('data-order-id');
-                if (!orderId) return;
-                if (cancelIdInput) cancelIdInput.value = orderId;
-                if (cancelReason) cancelReason.selectedIndex = 0;
-            });
-
-            if (!cancelForm) return;
-
-            cancelForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const orderId = (cancelIdInput && cancelIdInput.value) ? cancelIdInput.value.trim() : '';
-                const reason = (cancelReason && cancelReason.value) ? cancelReason.value.trim() : '';
-
-                if (!orderId) {
-                    showToastCountdown('Không xác định được mã đơn hàng. Vui lòng thử lại.', false, 3);
-                    return;
-                }
-                if (!reason) {
-                    showToastCountdown('Vui lòng chọn lý do hủy!', false, 3);
-                    return;
+                    const interval = setInterval(() => {
+                        remaining--;
+                        if (remaining > 0) {
+                            toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
+                        } else {
+                            clearInterval(interval);
+                            toast.hide();
+                        }
+                    }, 1000);
                 }
 
-                const submitBtn = cancelForm.querySelector('button[type="submit"]');
-                if (submitBtn) submitBtn.disabled = true;
+                (function () {
+                    const modalEl = document.getElementById('cancelOrderModal');
+                    const cancelForm = document.getElementById('cancelOrderForm');
+                    const cancelIdInput = document.getElementById('cancelOrderId');
+                    const cancelReason = document.getElementById('cancelReason');
 
-                try {
-                    const res = await fetch(`/order-history/${encodeURIComponent(orderId)}/cancel`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ reason })
+                    const escapeHtml = (str = '') => String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+
+                    // Gán orderId vào hidden input khi bấm nút hủy
+                    document.addEventListener('click', (e) => {
+                        const btn = e.target.closest('.btn-cancel');
+                        if (!btn) return;
+                        const orderId = btn.dataset.orderId || btn.getAttribute('data-order-id');
+                        if (!orderId) return;
+                        if (cancelIdInput) cancelIdInput.value = orderId;
+                        if (cancelReason) cancelReason.selectedIndex = 0;
                     });
 
-                    let data = {};
-                    try { data = await res.json(); } catch (err) { }
+                    if (!cancelForm) return;
 
-                    if (res.ok) {
-                        // Update UI
-                        const btn = document.querySelector(`button.btn-cancel[data-order-id="${orderId}"]`);
-                        if (btn) {
-                            const cell = btn.closest('td') || btn.parentElement;
-                            if (cell) {
-                                const title = escapeHtml(reason);
-                                cell.innerHTML = `<span class="badge bg-danger fs-6 px-3 py-2" title="${title}">Đã hủy</span>`;
+                    cancelForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+
+                        const orderId = (cancelIdInput && cancelIdInput.value) ? cancelIdInput.value.trim() : '';
+                        const reason = (cancelReason && cancelReason.value) ? cancelReason.value.trim() : '';
+
+                        if (!orderId) {
+                            showToastCountdown('Không xác định được mã đơn hàng. Vui lòng thử lại.', false, 3);
+                            return;
+                        }
+                        if (!reason) {
+                            showToastCountdown('Vui lòng chọn lý do hủy!', false, 3);
+                            return;
+                        }
+
+                        const submitBtn = cancelForm.querySelector('button[type="submit"]');
+                        if (submitBtn) submitBtn.disabled = true;
+
+                        try {
+                            const res = await fetch(`/order-history/${encodeURIComponent(orderId)}/cancel`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ reason })
+                            });
+
+                            let data = {};
+                            try { data = await res.json(); } catch (err) { }
+
+                            if (res.ok) {
+                                // Update UI
+                                const btn = document.querySelector(`button.btn-cancel[data-order-id="${orderId}"]`);
+                                if (btn) {
+                                    const cell = btn.closest('td') || btn.parentElement;
+                                    if (cell) {
+                                        const title = escapeHtml(reason);
+                                        cell.innerHTML = `<span class="badge bg-danger fs-6 px-3 py-2" title="${title}">Đã hủy</span>`;
+                                    }
+                                }
+
+                                // Đóng modal (Bootstrap 5.0)
+                                if (modalEl && typeof bootstrap !== 'undefined') {
+                                    let modal = bootstrap.Modal.getInstance(modalEl);
+                                    if (!modal) modal = new bootstrap.Modal(modalEl);
+                                    modal.hide();
+                                }
+
+                                showToastCountdown(data.message || 'Hủy đơn hàng thành công!', true, 4);
+                            } else {
+                                const msg = (data && data.message) ? data.message : 'Có lỗi xảy ra!';
+                                showToastCountdown(msg, false, 3);
                             }
+                        } catch (err) {
+                            console.error('Cancel order error:', err);
+                            showToastCountdown('Có lỗi xảy ra. Vui lòng kiểm tra console server.', false, 4);
+                        } finally {
+                            if (submitBtn) submitBtn.disabled = false;
                         }
-
-                        // Đóng modal (Bootstrap 5.0)
-                        if (modalEl && typeof bootstrap !== 'undefined') {
-                            let modal = bootstrap.Modal.getInstance(modalEl);
-                            if (!modal) modal = new bootstrap.Modal(modalEl);
-                            modal.hide();
-                        }
-
-                        showToastCountdown(data.message || 'Hủy đơn hàng thành công!', true, 4);
-                    } else {
-                        const msg = (data && data.message) ? data.message : 'Có lỗi xảy ra!';
-                        showToastCountdown(msg, false, 3);
-                    }
-                } catch (err) {
-                    console.error('Cancel order error:', err);
-                    showToastCountdown('Có lỗi xảy ra. Vui lòng kiểm tra console server.', false, 4);
-                } finally {
-                    if (submitBtn) submitBtn.disabled = false;
-                }
-            });
-        })();
-    </script>
+                    });
+                })();
+            </script>
 </body>
 
 </html>

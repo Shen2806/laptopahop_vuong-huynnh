@@ -26,219 +26,105 @@
 
 <body>
     <!-- HEADER START -->
-    <div class="container-fluid shadow" style="margin-top: 10px">
-        <div class="container topbar bg-primary d-none d-lg-block">
-            <div class="d-flex justify-content-between">
-                <div class="top-info ps-2">
-                    <% if(user){ %>
-                        <small class="me-3"><i class="fas fa-map-marker-alt me-2 text-secondary"></i>
-                            <a href="#" class="text-white">
-                                <!-- <%= user?.address ?? "" %> -->
-                                <%= user?.address || "" %>
-                            </a>
-                        </small>
-                        <small class="me-3"><i class="fas fa-envelope me-2 text-secondary"></i>
-                            <a href="#" class="text-white">
-                                <%= user?.username || "" %>
-                            </a>
-                        </small>
-                        <% } else { %>
-                            <small class="me-3"><i class="fas fa-voicemail me-2 text-secondary"></i>
-                            </small>
-                            <% } %>
+    <%- include('../layout/header') -%>
 
-                </div>
-                <div class="top-link pe-2">
-                    <a href="/terms" class="text-white"><small class="text-white mx-2">Điều khoản sử dụng</small>/</a>
-                    <a href="/support" class="text-white"><small class="text-white mx-2">Hỗ trợ</small></a>
-                </div>
-            </div>
-        </div>
+        <!-- HEADER END -->
 
-        <div class="container px-0">
-            <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                <div>
-                    <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle">
-                </div>
-                <a href="/" class="navbar-brand">
-                    <h1 class="text-primary display-6">LaptopShop</h1>
-                </a>
-                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarCollapse">
-                    <span class="fa fa-bars text-primary"></span>
-                </button>
-
-                <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
-                    <div class="navbar-nav mx-auto">
-                        <a href="/" class="nav-item nav-link ">Trang chủ</a>
-                        <a href="/products" class="nav-item nav-link">Sản phẩm</a>
-                        <a href="/about" class="nav-item nav-link">Giới thiệu</a>
-                        <a href="/contact" class="nav-item nav-link active">Liên hệ</a>
-                        <a href="/terms" class="nav-item nav-link " hidden>Điều khoản</a>
-                        <a href="/blogs" class="nav-item nav-link">Blog</a>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Thông tin và chính sách
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="policyDropdown">
-                                <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
-                                <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
-                                <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
-                            </ul>
-                        </li>
-                    </div>
-
-                    <!-- Icon giỏ hàng & account nằm trong navbar-collapse -->
-                    <div class="d-flex ms-auto">
-                        <a href="/cart" class="position-relative me-4 my-auto">
-                            <i class="fa fa-shopping-bag fa-2x"></i>
-                            <span
-                                class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
-                                style="top: -5px; left: 15px; height: 20px; min-width: 20px;" id="sumCart">
-                                <%= user?.sumCart ?? 0%>
-                            </span>
-                        </a>
-                        <% if(user){ %>
-                            <div class="dropdown my-auto">
-                                <a href="#" class="dropdown" role="button" id="dropdownMenuLink"
-                                    data-bs-toggle="dropdown" aria-expanded="false" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <i class="fas fa-user fa-2x"></i>
-                                </a>
-
-                                <ul class="dropdown-menu dropdown-menu-end p-4" aria-labelledby="dropdownMenuLink">
-                                    <li class="d-flex align-items-center flex-column" style="min-width: 300px;">
-                                        <img style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden;"
-                                            src="/images/<%= user.avatar %>" />
-                                        <div class="text-center my-3">
-                                            <%= user.fullName %>
-                                        </div>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
-                                    <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
-                                    <li><a class="dropdown-item" href="/order-user">Đơn hàng của tôi</a></li>
-                                    
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form method="post" action="/logout">
-                                            <button class="dropdown-item">Đăng xuất</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </div>
-                            <% }else { %>
-                                <a href="/login" class="a-login">
-                                    <i class="fas fa-user fa-2x"></i>
-                                </a>
-                                <% } %>
-
-
-
-                    </div>
-                </div>
+        <div class="container my-4">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Liên hệ</li>
+                </ol>
             </nav>
-        </div>
-    </div>
-    <!-- HEADER END -->
 
-    <div class="container my-4">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-3">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Liên hệ</li>
-            </ol>
-        </nav>
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="mb-4">Liên hệ LaptopShop
+                    </h2>
+                    <p>Nếu bạn có bất kỳ câu hỏi, góp ý hoặc cần hỗ trợ, vui lòng liên hệ với chúng tôi theo thông tin
+                        dưới đây hoặc gửi tin nhắn trực tiếp qua form.</p>
 
-        <div class="card">
-            <div class="card-body">
-                <h2 class="mb-4">Liên hệ LaptopShop
-                </h2>
-                <p>Nếu bạn có bất kỳ câu hỏi, góp ý hoặc cần hỗ trợ, vui lòng liên hệ với chúng tôi theo thông tin
-                    dưới đây hoặc gửi tin nhắn trực tiếp qua form.</p>
+                    <div class="row g-4 mt-2">
+                        <!-- Thông tin liên hệ -->
+                        <div class="col-lg-5">
+                            <h5 class="mb-3">Thông tin liên hệ</h5>
+                            <ul class="list-unstyled contact-info">
+                                <li class="mb-2"><i class="fas fa-map-marker-alt"></i> 99 ABC, Thống Nhất, Gò Vấp,
+                                    TP.HCM</li>
+                                <li class="mb-2"><i class="fas fa-phone"></i> 0999 887 744</li>
+                                <li class="mb-2"><i class="fas fa-envelope"></i> support@laptopshop.vn</li>
+                                <li class="mb-2"><i class="fas fa-clock"></i> Thứ 2 - Chủ nhật: 8:00 - 21:00</li>
+                            </ul>
+                        </div>
 
-                <div class="row g-4 mt-2">
-                    <!-- Thông tin liên hệ -->
-                    <div class="col-lg-5">
-                        <h5 class="mb-3">Thông tin liên hệ</h5>
-                        <ul class="list-unstyled contact-info">
-                            <li class="mb-2"><i class="fas fa-map-marker-alt"></i> 99 ABC, Thống Nhất, Gò Vấp,
-                                TP.HCM</li>
-                            <li class="mb-2"><i class="fas fa-phone"></i> 0999 887 744</li>
-                            <li class="mb-2"><i class="fas fa-envelope"></i> support@laptopshop.vn</li>
-                            <li class="mb-2"><i class="fas fa-clock"></i> Thứ 2 - Chủ nhật: 8:00 - 21:00</li>
-                        </ul>
-                    </div>
+                        <!-- Form liên hệ -->
+                        <div class="col-lg-7">
+                            <h5 class="mb-3">Gửi tin nhắn cho chúng tôi</h5>
+                            <form id="contactForm" action="#" method="post">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Họ tên</label>
+                                    <input type="text" class="form-control" id="name" placeholder="Nhập họ tên của bạn"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" placeholder="Nhập email"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="message" class="form-label">Nội dung</label>
+                                    <textarea class="form-control" id="message" rows="4"
+                                        placeholder="Nhập nội dung liên hệ" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Gửi liên hệ</button>
+                            </form>
 
-                    <!-- Form liên hệ -->
-                    <div class="col-lg-7">
-                        <h5 class="mb-3">Gửi tin nhắn cho chúng tôi</h5>
-                        <form id="contactForm" action="#" method="post">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Họ tên</label>
-                                <input type="text" class="form-control" id="name" placeholder="Nhập họ tên của bạn"
-                                    required>
+                            <!-- Modal thông báo -->
+                            <div id="successMsg" class="alert alert-success mt-3 d-none">
+                                ✅ Phản hồi đã được gửi! Quay lại trang chủ sau <span id="countdown">3</span> giây...
                             </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" placeholder="Nhập email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="message" class="form-label">Nội dung</label>
-                                <textarea class="form-control" id="message" rows="4" placeholder="Nhập nội dung liên hệ"
-                                    required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Gửi liên hệ</button>
-                        </form>
-
-                        <!-- Modal thông báo -->
-                        <div id="successMsg" class="alert alert-success mt-3 d-none">
-                            ✅ Phản hồi đã được gửi! Quay lại trang chủ sau <span id="countdown">3</span> giây...
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <%- include('../layout/footer'); -%>
+        <%- include('../layout/footer'); -%>
 
-        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top">
-            <i class="fa fa-arrow-up"></i>
-        </a>
+            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top">
+                <i class="fa fa-arrow-up"></i>
+            </a>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="/client/js/main.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="/client/js/main.js"></script>
 
-        <script>
-            const form = document.getElementById("contactForm");
-            const msg = document.getElementById("successMsg");
-            const countdownEl = document.getElementById("countdown");
+            <script>
+                const form = document.getElementById("contactForm");
+                const msg = document.getElementById("successMsg");
+                const countdownEl = document.getElementById("countdown");
 
-            form.addEventListener("submit", function (e) {
-                e.preventDefault(); // chặn reload
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault(); // chặn reload
 
-                // Ẩn form, hiện thông báo
-                form.classList.add("d-none");
-                msg.classList.remove("d-none");
+                    // Ẩn form, hiện thông báo
+                    form.classList.add("d-none");
+                    msg.classList.remove("d-none");
 
-                let timeLeft = 3;
-                countdownEl.textContent = timeLeft;
-
-                const timer = setInterval(() => {
-                    timeLeft--;
+                    let timeLeft = 3;
                     countdownEl.textContent = timeLeft;
-                    if (timeLeft <= 0) {
-                        clearInterval(timer);
-                        window.location.href = "/"; // tự động quay về trang chủ
-                    }
-                }, 1000);
-            });
-        </script>
+
+                    const timer = setInterval(() => {
+                        timeLeft--;
+                        countdownEl.textContent = timeLeft;
+                        if (timeLeft <= 0) {
+                            clearInterval(timer);
+                            window.location.href = "/"; // tự động quay về trang chủ
+                        }
+                    }, 1000);
+                });
+            </script>
 </body>
 
 </html>
