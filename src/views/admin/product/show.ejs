@@ -10,33 +10,139 @@
     <title>Quản lý sản phẩm - LaptopShop</title>
     <link href="/admin/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --brand: #4f8cff;
+            --glass: rgba(255, 255, 255, .06);
+            --glass-bd: rgba(255, 255, 255, .10);
+            --muted: #aeb6c8;
+        }
+
+        body.sb-nav-fixed {
+            background: radial-gradient(1200px 800px at 10% 10%, #10172a 0%, #0a0f1f 45%, #080c18 100%) fixed;
+        }
+
+        .page-title {
+            color: #eef2ff;
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .btn-brand {
+            background: linear-gradient(135deg, rgba(79, 140, 255, .8), rgba(139, 92, 246, .7));
+            border: 1px solid rgba(255, 255, 255, .15);
+            color: #fff;
+            border-radius: 12px;
+        }
+
+        .btn-brand:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+        .card.glass {
+            border: 1px solid var(--glass-bd);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+            color: #e8ecff;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, .25);
+        }
+
+        .card.glass .card-header {
+            background: transparent;
+            color: #cbd5ff;
+            font-weight: 700;
+            border-bottom: 1px solid var(--glass-bd);
+        }
+
+        .table thead.table-light {
+            background: rgba(255, 255, 255, .06);
+            color: #e8ecff;
+        }
+
+        .table {
+            color: #e8ecff;
+        }
+
+        .table thead.table-light {
+            background: rgba(255, 255, 255, .06);
+            color: #161d41;
+        }
+
+
+
+        .table-hover tbody tr:hover {
+            background: rgba(255, 255, 255, .05);
+        }
+
+        .badge.bg-secondary {
+            background: rgba(255, 255, 255, .15) !important;
+        }
+
+        .btn-soft {
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid var(--glass-bd);
+            color: #e7ecff;
+            border-radius: 10px;
+        }
+
+        .btn-soft:hover {
+            background: rgba(255, 255, 255, .12);
+            color: #fff;
+        }
+
+        .pagination .page-link {
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--glass-bd);
+            color: #e5e7eb;
+        }
+
+        .pagination .page-item.active .page-link,
+        .pagination .page-link.active {
+            background: rgba(79, 140, 255, .22);
+            border-color: rgba(79, 140, 255, .35);
+            color: #fff;
+        }
+
+        .breadcrumb {
+            background: transparent;
+        }
+
+        .breadcrumb a {
+            color: #cbd5ff;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 
-<body class="sb-nav-fixed bg-light">
+<body class="sb-nav-fixed">
     <%- include('../layout/header'); -%>
         <div id="layoutSidenav">
             <%- include('../layout/sidenav'); -%>
                 <div id="layoutSidenav_content">
                     <main>
                         <div class="container-fluid px-4">
-                            <!-- Tiêu đề và nút tạo mới -->
                             <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-                                <h1 class="h3 fw-bold text-primary"><i class="fa-solid fa-boxes-stacked"></i> Quản lý
-                                    sản phẩm</h1>
-                                <a href="/admin/create-product" class="btn btn-success shadow-sm">
+                                <h1 class="page-title h3"><i class="fa-solid fa-boxes-stacked me-2"></i> Quản lý sản
+                                    phẩm</h1>
+                                <a href="/admin/create-product" class="btn btn-brand shadow-sm">
                                     <i class="fa-solid fa-plus me-1"></i> Thêm sản phẩm
                                 </a>
                             </div>
 
-                            <!-- Breadcrumb -->
                             <ol class="breadcrumb mb-4">
                                 <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
-                                <li class="breadcrumb-item active">Sản phẩm</li>
+                                <li class="breadcrumb-item active text-light">Sản phẩm</li>
                             </ol>
 
-                            <!-- Bảng Products -->
-                            <div class="card shadow-sm border-0 rounded-3">
-                                <div class="card-header bg-primary text-white fw-semibold">
+                            <div class="card glass border-0 rounded-3">
+                                <div class="card-header">
                                     <i class="fa-solid fa-table me-2"></i> Danh sách sản phẩm
                                 </div>
                                 <div class="card-body">
@@ -61,8 +167,8 @@
                                                             <%= product.name %>
                                                         </td>
                                                         <td>
-                                                            <%= product.price.toLocaleString('vi-VN', {style: 'currency'
-                                                                , currency: 'VND' }) %>
+                                                            <%= product.price.toLocaleString('vi-VN', {style:'currency',
+                                                                currency:'VND'}) %>
                                                         </td>
                                                         <td>
                                                             <%= product.factory %>
@@ -71,8 +177,7 @@
                                                             <div class="d-flex justify-content-center gap-2">
                                                                 <form action="/admin/view-product/<%= product.id %>"
                                                                     method="get">
-                                                                    <button type="submit"
-                                                                        class="btn btn-sm btn-info text-white">
+                                                                    <button type="submit" class="btn btn-soft btn-sm">
                                                                         <i class="fa-solid fa-eye"></i> Xem chi tiết
                                                                     </button>
                                                                 </form>
@@ -91,7 +196,6 @@
                                         </table>
                                     </div>
 
-                                    <!-- Pagination -->
                                     <nav aria-label="Product pagination">
                                         <ul class="pagination justify-content-center mt-3">
                                             <li class="page-item">
@@ -101,8 +205,8 @@
                                                 </a>
                                             </li>
                                             <% for(var i=1; i<=totalPages; i++) { %>
-                                                <li class="page-item">
-                                                    <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
+                                                <li class="page-item <%= page === i ? 'active' : '' %>">
+                                                    <a class="page-link <%= page === i ? 'active' : '' %>"
                                                         href="/admin/product?page=<%= i %>">
                                                         <%= i %>
                                                     </a>
@@ -124,8 +228,6 @@
                     <%- include('../layout/footer'); -%>
                 </div>
         </div>
-
-        <!-- Bootstrap -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
             crossorigin="anonymous"></script>
         <script src="/admin/js/scripts.js"></script>

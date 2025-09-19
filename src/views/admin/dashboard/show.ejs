@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="utf-8" />
@@ -8,260 +8,465 @@
     <meta name="description" content="MinhVuong&QuocHuynh - Dự án laptopshop" />
     <meta name="author" content="MinhVuong&QuocHuynh" />
     <title>Dashboard - LaptopShop</title>
-    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+
+    <!-- Base styles (keep your originals) -->
     <link href="/admin/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+
+    <!-- Single Chart.js (v4) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+
+    <!-- Fancy Datatables (optional, keep if you use tables on this page) -->
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
+        crossorigin="anonymous"></script>
+
+    <!-- Polished overrides -->
+    <style>
+        :root {
+            --brand: #4f8cff;
+            --brand-2: #8b5cf6;
+            --ink: #0b1020;
+            --glass: rgba(255, 255, 255, .06);
+            --glass-border: rgba(255, 255, 255, .10);
+            --muted: #aeb6c8;
+        }
+
+        body.sb-nav-fixed {
+            background: radial-gradient(1200px 800px at 10% 10%, #10172a 0%, #0a0f1f 45%, #080c18 100%) fixed;
+        }
+
+        /* Breadcrumb + title */
+        .page-title {
+            color: #eef2ff;
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .breadcrumb {
+            background: transparent;
+        }
+
+        /* Revenue banner */
+        .revenue-banner {
+            background: linear-gradient(135deg, rgba(79, 140, 255, .18), rgba(139, 92, 246, .18));
+            color: #e7ecff;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(255, 255, 255, .04);
+        }
+
+        .revenue-banner small {
+            color: var(--muted);
+        }
+
+        /* Cards */
+        .dash-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            color: #e8ecff;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, .28);
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+
+        .dash-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, .34);
+        }
+
+        .dash-card .card-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dash-card .stat {
+            font-size: .95rem;
+            opacity: .85;
+        }
+
+        .dash-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 1.2rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+        }
+
+        .dash-link {
+            color: #e7ecff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .dash-link:hover {
+            color: #fff;
+        }
+
+        /* Thematic accents */
+        .accent-primary {
+            background: linear-gradient(135deg, rgba(79, 140, 255, .24), rgba(56, 189, 248, .12));
+        }
+
+        .accent-danger {
+            background: linear-gradient(135deg, rgba(244, 63, 94, .22), rgba(251, 146, 60, .12));
+        }
+
+        .accent-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, .22), rgba(34, 197, 94, .12));
+        }
+
+        /* Info blocks */
+        .glass-card {
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+            color: #e8ecff;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, .25);
+        }
+
+        .glass-card .card-header {
+            background: transparent;
+            color: #cbd5ff;
+            font-weight: 700;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .glass-card .list-group-item {
+            background: transparent;
+            color: #e8ecff;
+            border-color: var(--glass-border);
+        }
+
+        /* Chart container */
+        .chart-wrap {
+            height: 440px;
+            padding: 12px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+        }
+
+        /* Buttons soft */
+        .btn-soft {
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--glass-border);
+            color: #e7ecff;
+            border-radius: 12px;
+        }
+
+        .btn-soft:hover {
+            background: rgba(255, 255, 255, .10);
+            color: #fff;
+        }
+    </style>
 </head>
 
 <body class="sb-nav-fixed">
     <%- include('../layout/header'); -%>
-
 
         <div id="layoutSidenav">
             <%- include('../layout/sidenav'); -%>
                 <div id="layoutSidenav_content">
                     <main>
                         <div class="container-fluid px-4">
-                            <h1 class="mt-4">Dashboard</h1>
-                            <ol class="breadcrumb mb-4">
-                                <li class="breadcrumb-item active">Dashboard</li>
-                            </ol>
-                            <!-- Doanh thu tổng -->
+                            <div class="d-flex align-items-center justify-content-between mt-4 mb-2">
+                                <h1 class="page-title">Dashboard</h1>
+                                <ol class="breadcrumb mb-0">
+                                    <li class="breadcrumb-item active">Dashboard</li>
+                                </ol>
+                            </div>
+
+                            <!-- Revenue -->
                             <div
-                                class="alert alert-warning d-flex justify-content-between align-items-center fs-5 fw-bold">
+                                class="revenue-banner alert d-flex justify-content-between align-items-center fs-5 fw-bold">
                                 <span>
                                     💰 Tổng doanh thu:
-                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND' })
-                                        .format(info?.totalRevenue ?? 0) %>
+                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                        }).format(info?.totalRevenue ?? 0) %>
                                 </span>
-                                <small class="text-muted">* Chỉ tính đơn đã thanh toán</small>
-                            </div>
-                            <!-- Hàng 1: Các card thống kê -->
-                            <div class="row">
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="card bg-primary text-white mb-4">
-                                        <div class="card-body">Người dùng (<%= info?.countUser ?? 0 %>)</div>
-                                        <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="small text-white stretched-link" href="/admin/user">Xem người
-                                                dùng</a>
-                                            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="card bg-danger text-white mb-4">
-                                        <div class="card-body">Sản phẩm (<%= info?.countProduct ?? 0 %>)</div>
-                                        <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="small text-white stretched-link" href="/admin/product">Xem sản
-                                                phẩm</a>
-                                            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="card bg-success text-white mb-4">
-                                        <div class="card-body">Đơn hàng (<%= info?.countOrder ?? 0 %>)</div>
-                                        <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="small text-white stretched-link" href="/admin/order">Xem đơn
-                                                hàng</a>
-                                            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
+                                <small>* Chỉ tính đơn đã thanh toán</small>
                             </div>
 
-                            <!-- Hàng 2: Báo cáo và cảnh báo -->
-                            <div class="row">
-                                <!-- Sản phẩm sắp hết hàng -->
+                            <!-- Row stats -->
+                            <div class="row g-4">
                                 <div class="col-xl-4 col-md-6">
-                                    <div class="card bg-warning text-dark mb-4">
-                                        <div class="card-body d-flex flex-column">
-                                            <span class="fw-bold">Sản phẩm sắp hết hàng (dưới 10 sp)</span>
-                                            <% if(info?.lowStockProducts?.length> 0) { %>
-                                                <ul class="mt-2 mb-0">
-                                                    <% info.lowStockProducts.forEach(p=> { %>
-                                                        <li>
-                                                            <%= p.name %>
-                                                                (<span class="fw-bold text-danger">
+                                    <div class="card dash-card accent-primary mb-0">
+                                        <div class="card-body">
+                                            <div>
+                                                <div class="h5 fw-bold mb-1">Người dùng</div>
+                                                <div class="stat">Tổng: <span class="fw-bold">
+                                                        <%= info?.countUser ?? 0 %>
+                                                    </span></div>
+                                            </div>
+                                            <div class="dash-icon"><i class="fa-solid fa-users"></i></div>
+                                        </div>
+                                        <div class="card-footer d-flex align-items-center justify-content-between">
+                                            <a class="dash-link stretched-link" href="/admin/user">Xem người dùng</a>
+                                            <div class="text-white-50"><i class="fas fa-angle-right"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card dash-card accent-danger mb-0">
+                                        <div class="card-body">
+                                            <div>
+                                                <div class="h5 fw-bold mb-1">Sản phẩm</div>
+                                                <div class="stat">Tổng: <span class="fw-bold">
+                                                        <%= info?.countProduct ?? 0 %>
+                                                    </span></div>
+                                            </div>
+                                            <div class="dash-icon"><i class="fa-solid fa-box-open"></i></div>
+                                        </div>
+                                        <div class="card-footer d-flex align-items-center justify-content-between">
+                                            <a class="dash-link stretched-link" href="/admin/product">Xem sản phẩm</a>
+                                            <div class="text-white-50"><i class="fas fa-angle-right"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card dash-card accent-success mb-0">
+                                        <div class="card-body">
+                                            <div>
+                                                <div class="h5 fw-bold mb-1">Đơn hàng</div>
+                                                <div class="stat">Tổng: <span class="fw-bold">
+                                                        <%= info?.countOrder ?? 0 %>
+                                                    </span></div>
+                                            </div>
+                                            <div class="dash-icon"><i class="fa-solid fa-receipt"></i></div>
+                                        </div>
+                                        <div class="card-footer d-flex align-items-center justify-content-between">
+                                            <a class="dash-link stretched-link" href="/admin/order">Xem đơn hàng</a>
+                                            <div class="text-white-50"><i class="fas fa-angle-right"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Info row -->
+                            <div class="row mt-4 g-4">
+                                <!-- Low stock -->
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card glass-card h-100">
+                                        <div class="card-header d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                                            Sản phẩm sắp hết hàng (dưới 10 sp)
+                                        </div>
+                                        <div class="card-body">
+                                            <% if(info?.lowStockProducts?.length>0){ %>
+                                                <ul class="list-group list-group-flush">
+                                                    <% info.lowStockProducts.forEach(p=>{ %>
+                                                        <li
+                                                            class="list-group-item d-flex justify-content-between align-items-center">
+                                                            <span>
+                                                                <%= p.name %>
+                                                            </span>
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span class="badge bg-danger rounded-pill">
                                                                     <%= p.quantity %>
-                                                                </span> còn lại)
-                                                        </li>
-                                                        <% }) %>
-                                                </ul>
-                                                <% } else { %>
-                                                    <span class="mt-2">Không có sản phẩm nào sắp hết hàng</span>
-                                                    <% } %>
-                                        </div>
-                                        <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="small text-dark stretched-link" href="/admin/product">Quản lý
-                                                kho</a>
-                                            <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Sản phẩm khuyến mãi -->
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="card bg-info text-dark mb-4">
-                                        <div class="card-body d-flex flex-column">
-                                            <span class="fw-bold">Sản phẩm khuyến mãi</span>
-                                            <% if(info?.promoProducts?.length> 0) { %>
-                                                <ul class="mt-2 mb-0">
-                                                    <% info.promoProducts.forEach(p=> { %>
-                                                        <li>
-                                                            <%= p.name %>
-                                                                - <span class="text-success fw-bold">
-                                                                    <%= p.discount %>% OFF
                                                                 </span>
+                                                                <button class="btn btn-sm btn-soft"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#restockModal"
+                                                                    data-product-id="<%= p.id %>"
+                                                                    data-product-name="<%= p.name %>">
+                                                                    Nhập thêm
+                                                                </button>
+                                                            </div>
                                                         </li>
                                                         <% }) %>
                                                 </ul>
                                                 <% } else { %>
-                                                    <span class="mt-2">Hiện chưa có sản phẩm khuyến mãi</span>
+                                                    <span class="text-muted">Không có sản phẩm nào sắp hết hàng</span>
                                                     <% } %>
                                         </div>
                                         <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="small text-dark stretched-link" href="/admin/promo">Quản
-                                                lý khuyến mãi</a>
-                                            <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Top sản phẩm bán chạy -->
-                                <div class="card mb-4" style="max-width: 1100px; margin: auto;">
-                                    <div class="card-header">
-                                        <i class="fas fa-chart-line me-1"></i>
-                                        Biểu đồ Top sản phẩm bán chạy
-                                    </div>
-                                    <div class="card-body">
-                                        <div style="height: 550px;">
-                                            <canvas id="topProductsChart"
-                                                data-labels='<%- JSON.stringify(info?.topProducts?.map(p => p.name) || []) %>'
-                                                data-values='<%- JSON.stringify(info?.topProducts?.map(p => p.quantitySold) || []) %>'>
-                                            </canvas>
+                                            <a class="dash-link" href="/admin/product">Quản lý kho</a>
+                                            <div class="text-white-50"><i class="fas fa-angle-right"></i></div>
                                         </div>
                                     </div>
                                 </div>
 
+                                <!-- Promo products -->
+                                <div class="col-xl-4 col-md-6">
+                                    <div class="card glass-card h-100">
+                                        <div class="card-header d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-tags me-1"></i>
+                                            Sản phẩm khuyến mãi
+                                        </div>
+                                        <div class="card-body">
+                                            <% if(info?.promoProducts?.length>0){ %>
+                                                <ul class="list-group list-group-flush">
+                                                    <% info.promoProducts.forEach(p=>{ %>
+                                                        <li
+                                                            class="list-group-item d-flex justify-content-between align-items-center">
+                                                            <span>
+                                                                <%= p.name %>
+                                                            </span>
+                                                            <span class="badge bg-success-subtle text-success fw-bold"
+                                                                style="background:rgba(34,197,94,.15); border:1px solid rgba(34,197,94,.25);">-
+                                                                <%= p.discount %>%
+                                                            </span>
+                                                        </li>
+                                                        <% }) %>
+                                                </ul>
+                                                <% } else { %>
+                                                    <span class="text-muted">Hiện chưa có sản phẩm khuyến mãi</span>
+                                                    <% } %>
+                                        </div>
+                                        <div class="card-footer d-flex align-items-center justify-content-between">
+                                            <a class="dash-link" href="/admin/promo">Quản lý khuyến mãi</a>
+                                            <div class="text-white-50"><i class="fas fa-angle-right"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
 
+                                <!-- Chart: Top products -->
+                                <div class="col-xl-8">
+                                    <div class="card glass-card">
+                                        <div class="card-header d-flex align-items-center gap-2">
+                                            <i class="fas fa-chart-line me-1"></i> Biểu đồ Top sản phẩm bán chạy
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="chart-wrap">
+                                                <canvas id="topProductsChart"
+                                                    data-labels='<%- JSON.stringify(info?.topProducts?.map(p => p.name) || []) %>'
+                                                    data-values='<%- JSON.stringify(info?.topProducts?.map(p => p.quantitySold) || []) %>'></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                                <!-- Modal nhập thêm hàng -->
-                                <div class="modal fade" id="restockModal" tabindex="-1"
-                                    aria-labelledby="restockModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <form id="restockForm" method="post" action="/admin/product/restock">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="restockModalLabel">Nhập thêm hàng</h5>
-                                                    <button type="button" class="btn-close"
-                                                        data-bs-dismiss="modal"></button>
+                            <!-- Restock Modal -->
+                            <div class="modal fade" id="restockModal" tabindex="-1" aria-labelledby="restockModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form id="restockForm" method="post" action="/admin/product/restock">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="restockModalLabel">Nhập thêm hàng</h5>
+                                                <button type="button" class="btn-close"
+                                                    data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <input type="hidden" name="productId" id="restockProductId">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Sản phẩm</label>
+                                                    <input type="text" class="form-control" id="restockProductName"
+                                                        disabled>
                                                 </div>
-                                                <div class="modal-body">
-                                                    <input type="hidden" name="productId" id="restockProductId">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Sản phẩm</label>
-                                                        <input type="text" class="form-control" id="restockProductName"
-                                                            disabled>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Số lượng thêm</label>
-                                                        <input type="number" name="quantity" class="form-control"
-                                                            min="1" required>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">Hủy</button>
-                                                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Số lượng thêm</label>
+                                                    <input type="number" name="quantity" class="form-control" min="1"
+                                                        required>
                                                 </div>
                                             </div>
-                                        </form>
-                                    </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-bs-dismiss="modal">Hủy</button>
+                                                <button type="submit" class="btn btn-primary">Xác nhận</button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
-
                             </div>
+                        </div>
                     </main>
+
                     <%- include('../layout/footer'); -%>
-
                 </div>
-
         </div>
+
+        <!-- Bootstrap core -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
             crossorigin="anonymous"></script>
         <script src="/admin/js/scripts.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"
-            crossorigin="anonymous"></script>
-        <script src="/admin/assets/demo/chart-area-demo.js"></script>
-        <script src="/admin/assets/demo/chart-bar-demo.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-            crossorigin="anonymous"></script>
-        <script src="/admin/js/datatables-simple-demo.js"></script>
-        // modal sp sắp hết hàng
+
+        <!-- Modal helpers -->
         <script>
             const restockModal = document.getElementById('restockModal');
-            restockModal.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const productId = button.getAttribute('data-product-id');
-                const productName = button.getAttribute('data-product-name');
-
-                document.getElementById('restockProductId').value = productId;
-                document.getElementById('restockProductName').value = productName;
-            });
+            if (restockModal) {
+                restockModal.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    if (!button) return;
+                    const productId = button.getAttribute('data-product-id');
+                    const productName = button.getAttribute('data-product-name');
+                    document.getElementById('restockProductId').value = productId || '';
+                    document.getElementById('restockProductName').value = productName || '';
+                });
+            }
         </script>
 
-        // biểu đồ sản phẩm bán chạy theo thời gian
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Chart.js v4 setup with gradient bars -->
         <script>
-            document.addEventListener("DOMContentLoaded", function () {
+            document.addEventListener('DOMContentLoaded', function () {
                 const canvas = document.getElementById('topProductsChart');
-                const labels = JSON.parse(canvas.dataset.labels || "[]");
-                const values = JSON.parse(canvas.dataset.values || "[]");
+                if (!canvas) return;
+                const labels = JSON.parse(canvas.dataset.labels || '[]');
+                const values = JSON.parse(canvas.dataset.values || '[]');
 
-                new Chart(canvas, {
+                const ctx = canvas.getContext('2d');
+                const grad = ctx.createLinearGradient(0, 0, 0, 400);
+                grad.addColorStop(0, 'rgba(79,140,255,0.85)');
+                grad.addColorStop(1, 'rgba(139,92,246,0.55)');
+
+                const borderGrad = ctx.createLinearGradient(0, 0, 0, 400);
+                borderGrad.addColorStop(0, 'rgba(79,140,255,1)');
+                borderGrad.addColorStop(1, 'rgba(139,92,246,1)');
+
+                new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels,
                         datasets: [{
                             label: 'Số lượng đã bán',
                             data: values,
-                            backgroundColor: [
-                                'rgba(54, 162, 235, 0.7)',
-                                'rgba(255, 99, 132, 0.7)',
-                                'rgba(255, 206, 86, 0.7)',
-                                'rgba(75, 192, 192, 0.7)',
-                                'rgba(153, 102, 255, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)'
-                            ],
-                            borderWidth: 1
+                            backgroundColor: grad,
+                            borderColor: borderGrad,
+                            borderWidth: 1.5,
+                            borderRadius: 10,
+                            barThickness: 'flex',
+                            categoryPercentage: 0.62,
+                            maxBarThickness: 50,
                         }]
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
                             legend: { display: false },
-                            tooltip: { enabled: true }
+                            tooltip: { enabled: true, backgroundColor: 'rgba(3,7,18,0.9)', borderColor: 'rgba(255,255,255,.1)', borderWidth: 1 }
                         },
                         scales: {
+                            x: {
+                                grid: { color: 'rgba(255,255,255,.06)' },
+                                ticks: { color: '#cbd5ff' }
+                            },
                             y: {
                                 beginAtZero: true,
-                                ticks: { precision: 0 }
+                                grid: { color: 'rgba(255,255,255,.06)' },
+                                ticks: { color: '#cbd5ff', precision: 0 }
                             }
                         }
                     }
                 });
             });
         </script>
-
-
 </body>
 
 </html>

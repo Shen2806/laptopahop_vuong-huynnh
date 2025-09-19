@@ -1,8 +1,8 @@
-<footer class="py-4 bg-light mt-auto">
+<footer class="app-footer mt-auto">
     <div class="container-fluid px-4">
-        <div class="d-flex align-items-center justify-content-between small">
-            <div class="text-muted">Copyright &copy; MinhVuong & QuocHuynh</div>
-            <div>
+        <div class="footer-inner small">
+            <div class="text-muted">Copyright &copy; MinhVuong &amp; QuocHuynh</div>
+            <div class="footer-links">
                 <a href="#" target="_blank">Website</a>
                 &middot;
                 <a href="#" target="_blank">LaptopShop</a>
@@ -10,3 +10,61 @@
         </div>
     </div>
 </footer>
+
+<style>
+    :root {
+        --brand: #4f8cff;
+        --glass: rgba(255, 255, 255, .06);
+        --glass-bd: rgba(255, 255, 255, .10);
+    }
+
+    .app-footer {
+        border-top: 1px solid var(--glass-bd);
+        background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02));
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: #cfd6ff;
+        padding: 14px 0;
+    }
+
+    .app-footer .footer-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 44px;
+    }
+
+    .app-footer .text-muted {
+        color: #aeb6c8 !important;
+    }
+
+    .app-footer .footer-links a {
+        color: #dfe6ff;
+        text-decoration: none;
+        transition: all .18s ease;
+        border-bottom: 1px dashed transparent;
+    }
+
+    .app-footer .footer-links a:hover {
+        color: #fff;
+        border-bottom-color: rgba(255, 255, 255, .35);
+    }
+
+    /* Dark table theme consistency (nếu footer nằm sau bảng) */
+    .table thead.table-light {
+        background: rgba(255, 255, 255, .06);
+        color: #161d41;
+    }
+
+    .table {
+        color: #e8ecff;
+    }
+
+    @media (max-width: 576px) {
+        .app-footer .footer-inner {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>

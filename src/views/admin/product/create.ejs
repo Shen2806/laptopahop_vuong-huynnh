@@ -12,47 +12,85 @@
     <link href="/admin/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-    <!-- TinyMCE (CDN) -->
     <script src="https://cdn.tiny.cloud/1/1dtzi1n2b488rghqj103opvbjkkyk3kvz7mmh0fm99xh95hq/tinymce/7/tinymce.min.js"
         referrerpolicy="origin"></script>
 
     <style>
-        body {
-            background-color: #f8f9fa;
+        :root {
+            --brand: #4f8cff;
+            --glass: rgba(255, 255, 255, .06);
+            --glass-bd: rgba(255, 255, 255, .10);
         }
 
-        .card-header {
-            background-color: #0d6efd;
-            color: #fff;
-            font-weight: 600;
+        body.sb-nav-fixed {
+            background: radial-gradient(1200px 800px at 10% 10%, #10172a 0%, #0a0f1f 45%, #080c18 100%) fixed;
         }
 
-        .btn-primary-custom {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-            color: #fff;
+        .page-title {
+            color: #eef2ff;
+            font-weight: 800;
+            letter-spacing: .2px;
         }
 
-        .btn-primary-custom:hover {
-            background-color: #0b5ed7;
-            border-color: #0b5ed7;
+        .card.glass {
+            border: 1px solid var(--glass-bd);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+            color: #e8ecff;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, .25);
+        }
+
+        .card.glass .card-header {
+            background: transparent;
+            color: #1d2030;
+            font-weight: 700;
+            border-bottom: 1px solid var(--glass-bd);
         }
 
         .form-label {
+            color: #e8ecff;
             font-weight: 500;
         }
 
-        .avatar-container {
-            text-align: center;
-            margin-bottom: 1rem;
+        .form-control,
+        .form-select {
+            background: rgba(255, 255, 255, .06);
+            color: #46559d;
+            border: 1px solid var(--glass-bd);
+            border-radius: 12px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            color: #cc6161;
+            background: rgba(255, 255, 255, .09);
+            border-color: rgba(79, 140, 255, .4);
+            box-shadow: none;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, rgba(79, 140, 255, .8), rgba(139, 92, 246, .7));
+            border: 1px solid rgba(255, 255, 255, .15);
+            color: #fff;
+            border-radius: 12px;
+        }
+
+        .btn-primary-custom:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            border-radius: 12px;
         }
 
         #avatarPreview {
             max-height: 250px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            border: 1px solid var(--glass-bd);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .25);
             display: none;
         }
 
@@ -60,7 +98,30 @@
             content: " *";
             color: #dc3545;
         }
+
+        .breadcrumb {
+            background: transparent;
+        }
+
+        .breadcrumb a {
+            color: #cbd5ff;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
     </style>
+
+    <script>
+        $(function () {
+            $("#avatarFile").on("change", function (e) {
+                const file = e.target.files && e.target.files[0]; if (!file) return;
+                const url = URL.createObjectURL(file);
+                $("#avatarPreview").attr("src", url).css("display", "block");
+            });
+        });
+    </script>
 </head>
 
 <body class="sb-nav-fixed">
@@ -70,16 +131,15 @@
                 <div id="layoutSidenav_content">
                     <main>
                         <div class="container-fluid px-4">
-                            <h1 class="mt-4 text-primary"><i class="fas fa-box-open me-2"></i> Tạo mới sản phẩm</h1>
+                            <h1 class="page-title mt-4"><i class="fas fa-box-open me-2"></i> Tạo mới sản phẩm</h1>
                             <ol class="breadcrumb mb-4">
                                 <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/product">Sản phẩm</a></li>
-                                <li class="breadcrumb-item active">Tạo mới</li>
+                                <li class="breadcrumb-item active text-light">Tạo mới</li>
                             </ol>
 
                             <div class="row">
                                 <div class="col-12 col-lg-10 mx-auto">
-                                    <!-- Errors -->
                                     <% if (Array.isArray(errors) && errors.length) { %>
                                         <div class="mb-3">
                                             <% errors.forEach(function(error){ %>
@@ -93,12 +153,11 @@
                                         </div>
                                         <% } %>
 
-                                            <div class="card shadow-sm mb-4 rounded-3">
+                                            <div class="card glass shadow-sm mb-4 rounded-3">
                                                 <div class="card-header">Thông tin sản phẩm</div>
                                                 <div class="card-body">
                                                     <form action="/admin/create-product" method="post"
                                                         enctype="multipart/form-data">
-                                                        <!-- Hàng 1: Tên / Giá -->
                                                         <div class="row">
                                                             <div class="mb-3 col-md-6">
                                                                 <label class="form-label required">Tên sản phẩm</label>
@@ -116,7 +175,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Hàng 2: Mô tả ngắn / Số lượng -->
                                                         <div class="row">
                                                             <div class="mb-3 col-md-8">
                                                                 <label class="form-label">Mô tả ngắn</label>
@@ -133,7 +191,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Hàng 3: Hãng / Mục đích / Giảm giá -->
                                                         <div class="row">
                                                             <div class="mb-3 col-md-4">
                                                                 <label class="form-label required">Hãng sản xuất</label>
@@ -190,7 +247,6 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Hàng 4: Ảnh -->
                                                         <div class="mb-3">
                                                             <label class="form-label">Ảnh đại diện</label>
                                                             <input name="image" class="form-control" type="file"
@@ -200,22 +256,17 @@
                                                             </div>
                                                         </div>
 
-                                                        <!-- Hàng 5: Mô tả chi tiết (TinyMCE) -->
                                                         <div class="mb-3">
                                                             <label class="form-label">Mô tả chi tiết</label>
-                                                            <textarea id="detailDesc" name="detailDesc" rows="8">
-<%= (oldData && oldData.detailDesc) ? oldData.detailDesc : '' %>
-                      </textarea>
+                                                            <textarea id="detailDesc" name="detailDesc"
+                                                                rows="8"><%= (oldData && oldData.detailDesc) ? oldData.detailDesc : '' %></textarea>
                                                         </div>
 
-                                                        <!-- Actions -->
                                                         <div class="d-flex justify-content-between">
-                                                            <a href="/admin/product" class="btn btn-secondary">
-                                                                <i class="fas fa-arrow-left me-1"></i> Quay lại
-                                                            </a>
-                                                            <button class="btn btn-primary-custom" type="submit">
-                                                                <i class="fas fa-save me-1"></i> Tạo mới
-                                                            </button>
+                                                            <a href="/admin/product" class="btn btn-secondary"><i
+                                                                    class="fas fa-arrow-left me-1"></i> Quay lại</a>
+                                                            <button class="btn btn-primary-custom" type="submit"><i
+                                                                    class="fas fa-save me-1"></i> Tạo mới</button>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -246,21 +297,13 @@
                 });
             });
 
-            // Khởi tạo TinyMCE
+            // TinyMCE
             tinymce.init({
                 selector: '#detailDesc',
                 height: 420,
                 menubar: true,
                 plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
-                toolbar: 'undo redo | blocks | bold italic underline forecolor backcolor removeformat | ' +
-                    'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | ' +
-                    'link image media table | charmap emoticons | codesample | searchreplace',
-                // Nếu muốn tiếng Việt: thêm language_url & language (có file vi.js hợp lệ)
-                // language_url: '/path/to/vi.js',
-                // language: 'vi',
-                image_caption: true,
-                image_title: true,
-                automatic_uploads: false,
+                toolbar: 'undo redo | blocks | bold italic underline forecolor backcolor removeformat | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | charmap emoticons | codesample | searchreplace',
                 branding: false,
                 content_style: 'body { font-family: Inter, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; font-size: 14px; }'
             });

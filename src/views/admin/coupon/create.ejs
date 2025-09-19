@@ -6,23 +6,91 @@
     <title>Thêm mã giảm giá</title>
     <link href="/admin/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --brand: #4f8cff;
+            --glass: rgba(255, 255, 255, .06);
+            --glass-bd: rgba(255, 255, 255, .10);
+        }
+
+        body.sb-nav-fixed {
+            background: radial-gradient(1200px 800px at 10% 10%, #10172a 0%, #0a0f1f 45%, #080c18 100%) fixed;
+        }
+
+        .page-title {
+            color: #eef2ff;
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .breadcrumb {
+            background: transparent;
+        }
+
+        .breadcrumb a {
+            color: #cbd5ff;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .card.glass {
+            border: 1px solid var(--glass-bd);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+            color: #e8ecff;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, .25);
+        }
+
+        .card-header.bg-success {
+            background: transparent !important;
+            color: #b7f7c6 !important;
+            font-weight: 700;
+            border-bottom: 1px solid var(--glass-bd);
+        }
+
+        .form-label {
+            color: #e8ecff;
+            font-weight: 500;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, .06);
+            color: #e8ecff;
+            border: 1px solid var(--glass-bd);
+            border-radius: 12px;
+        }
+
+        .form-control:focus {
+            color: #fff;
+            background: rgba(255, 255, 255, .09);
+            border-color: rgba(79, 140, 255, .4);
+            box-shadow: none;
+        }
+
+        .btn-success,
+        .btn-secondary {
+            border-radius: 12px;
+        }
+    </style>
 </head>
 
-<body class="sb-nav-fixed bg-light">
-    <!-- Header -->
+<body class="sb-nav-fixed">
     <%- include('../layout/header'); -%>
-
         <div id="layoutSidenav">
-            <!-- Sidebar -->
             <%- include('../layout/sidenav'); -%>
-
                 <div id="layoutSidenav_content">
                     <main>
                         <div class="container-fluid px-4">
                             <!-- Tiêu đề + nút back -->
                             <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-                                <h1 class="h3 fw-bold text-primary">
-                                    <i class="fa-solid fa-ticket"></i> Thêm mã giảm giá
+                                <h1 class="page-title h3">
+                                    <i class="fa-solid fa-ticket me-2"></i> Thêm mã giảm giá
                                 </h1>
                                 <a href="/admin/coupon" class="btn btn-secondary">
                                     <i class="fas fa-arrow-left"></i> Quay lại
@@ -33,11 +101,11 @@
                             <ol class="breadcrumb mb-4">
                                 <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
                                 <li class="breadcrumb-item"><a href="/admin/coupon">Mã giảm giá</a></li>
-                                <li class="breadcrumb-item active">Thêm mới</li>
+                                <li class="breadcrumb-item active text-light">Thêm mới</li>
                             </ol>
 
                             <!-- Form thêm coupon -->
-                            <div class="card shadow-sm border-0 rounded-3">
+                            <div class="card glass shadow-sm border-0 rounded-3">
                                 <div class="card-header bg-success text-white fw-semibold">
                                     <i class="fa-solid fa-plus me-2"></i> Nhập thông tin mã giảm giá
                                 </div>
@@ -68,7 +136,6 @@
                         </div>
                     </main>
 
-                    <!-- Footer -->
                     <%- include('../layout/footer'); -%>
                 </div>
         </div>
