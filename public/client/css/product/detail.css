@@ -149,3 +149,124 @@
         background: #8BC34A;
         color: #000;
     }
+
+
+    /* css body */
+    /* ===== Scoped styles — chỉ áp dụng trong #product-detail ===== */
+
+/* menu */
+/* Style dropdown menu */
+#product-detail .navbar .dropdown-menu{
+  border-radius: 8px;
+  padding: 8px 0;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  min-width: 220px;
+  z-index: 1050; /* nổi vừa đủ */
+}
+
+/* Style item trong dropdown */
+#product-detail .navbar .dropdown-menu .dropdown-item{
+  padding: 10px 18px;
+  color: #333;
+  font-weight: 500;
+  transition: all .2s ease-in-out;
+  border-radius: 6px;
+}
+
+/* Hover item */
+#product-detail .navbar .dropdown-menu .dropdown-item:hover{
+  background-color: #8BC34A; /* xanh lá nhạt theo header */
+  color: #fff;
+}
+
+/* Dropdown mở khi hover — CHỈ desktop, tránh phá mobile tap */
+@media (min-width: 992px){
+  #product-detail .nav-item.dropdown:hover > .dropdown-menu{
+    display: block;
+    margin-top: 0;
+    animation: productDetailFadeIn .3s ease-in-out;
+  }
+}
+
+/* Hiệu ứng fade */
+@keyframes productDetailFadeIn{
+  from{ opacity:0; transform: translateY(10px); }
+  to{ opacity:1; transform: translateY(0); }
+}
+
+/* Trạng thái thu gọn mô tả */
+#product-detail #desc-wrapper.desc-collapsed{
+  max-height: 150px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Hiệu ứng mờ dưới khi thu gọn (nền trắng) */
+#product-detail #desc-wrapper.desc-collapsed::after{
+  content:"";
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:40px;
+  background: linear-gradient(to top, #fff, transparent);
+}
+
+/* Trạng thái mở rộng */
+#product-detail #desc-wrapper{
+  transition: max-height .3s ease;
+}
+
+/* css số sao đánh giá */
+#product-detail .rating .star{
+  cursor: pointer;
+  margin-right: 5px;
+}
+/* Sao rỗng (far) */
+#product-detail .rating .star i.far{ color:#ccc; }
+/* Sao đầy (fas) */
+#product-detail .rating .star i.fas{ color:#ffc107; }
+
+/* Logo css — chỉ trong phạm vi #product-detail (không đè header chung) */
+#product-detail .logo-circle{
+  margin-right: 10px;
+  height: 70px; width: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #8BC34A; /* đồng bộ header */
+  padding: 3px;
+  background: #fff;
+}
+
+/* Policy card */
+#product-detail .policy-card{
+  border-radius: 12px;
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+#product-detail .policy-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+}
+#product-detail .policy-card ul li{
+  line-height: 1.5;
+  color: #555;
+}
+
+/* Footer (nếu muốn chỉ áp dụng ở trang này, nên thêm class body.page-product, xem ghi chú bên dưới) */
+.page-product .footer .btn-link{
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  transition: .3s;
+}
+.page-product .footer .btn-link:hover{
+  color: #8BC34A;
+  padding-left: 5px;
+}
+.page-product .btn-social{
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  transition: .3s;
+}
+.page-product .btn-social:hover{
+  background: #8BC34A;
+  color: #000;
+}

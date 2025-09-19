@@ -1,4 +1,5 @@
 /* Pagination của promo-swiper */
+/*sản phẩm nổi bật*/
 .promo-swiper {
   padding-bottom: 50px;
   /* chừa khoảng trống ở dưới */
@@ -111,7 +112,7 @@
   min-height: 28px;
   margin-bottom: 8px;
 }
-
+/*------------------------------------------*/
 /*Đớm lửa*/
 .fire-title-wrapper {
   position: relative;
@@ -149,76 +150,7 @@
   margin-bottom: 20px;
 }
 
-.news-card {
-  background: #fff;
-  border: 1px solid #eee;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
 
-.news-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-}
-
-.news-img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 6px 6px 0 0;
-}
-
-.news-summary {
-  font-size: 14px;
-  line-height: 1.5;
-  max-height: 60px;
-  /* 3 dòng */
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.promo-swiper .swiper-button-next,
-.promo-swiper .swiper-button-prev,
-.news-swiper .swiper-button-next,
-.news-swiper .swiper-button-prev {
-  color: #6c757d;
-  width: 28px;
-  height: 28px;
-  font-size: 14px;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 50%;
-  transition: all 0.3s ease;
-}
-
-.promo-swiper .swiper-button-next:hover,
-.promo-swiper .swiper-button-prev:hover,
-.news-swiper .swiper-button-next:hover,
-.news-swiper .swiper-button-prev:hover {
-  color: #343a40;
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.promo-swiper .swiper-button-next::after,
-.promo-swiper .swiper-button-prev::after,
-.news-swiper .swiper-button-next::after,
-.news-swiper .swiper-button-prev::after {
-  font-size: 14px;
-  font-weight: bold;
-}
-
-/*ảnh*/
-.news-img {
-  width: 100%;
-  height: 160px;
-  /* hoặc 180px nếu muốn cao hơn */
-  object-fit: cover;
-  /* cắt ảnh cho vừa khung */
-  border-radius: 6px 6px 0 0;
-  /* bo góc trên giống card */
-  display: block;
-}
 
 /*-----sản phẩm khuyến mãi*/
 /* ===== PATCH: làm nhẹ mọi đổ bóng trong khu SẢN PHẨM KHUYẾN MÃI ===== */
@@ -525,3 +457,4 @@
   color: #fff !important;
   /* Màu icon khi hover */
 }
+

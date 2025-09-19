@@ -187,81 +187,7 @@
     color: #fff;
 }
 
-/* Container giá */
-.price-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* căn giữa */
-    gap: 4px;
-    min-height: 76px;
-    /* cố định chiều cao cho đều */
-}
 
-/* Giá giảm */
-.price-box .discount-price {
-    font-size: 15px;
-    font-weight: 700;
-    color: #e53935;
-    /* đỏ */
-}
-
-/* Giá gốc */
-.price-box .original-price {
-    font-size: 13px;
-    text-decoration: line-through;
-    color: #9e9e9e;
-}
-
-/* Badge giảm giá */
-.price-box .discount-badge {
-    font-size: 12px;
-    font-weight: 600;
-    background: #f44336;
-    color: white;
-    border-radius: 12px;
-    padding: 2px 8px;
-    margin-top: 2px;
-}
-
-/*footer*/
-.footer .btn-link {
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: none;
-    transition: 0.3s;
-}
-
-.footer .btn-link:hover {
-    color: #8BC34A;
-    padding-left: 5px;
-}
-
-.btn-social {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: 0.3s;
-}
-
-.btn-social:hover {
-    background: #8BC34A;
-    color: #000;
-}
-
-.card-header {
-  user-select: none;
-}
-
-.card-header[aria-expanded="true"] .fa-chevron-down {
-  transform: rotate(180deg);
-  transition: transform 0.3s;
-}
-
-.card-header .fa-chevron-down {
-  transition: transform 0.3s;
-}
 
 /**/
 .btnAddToCartHomePage:hover {
@@ -343,3 +269,211 @@
   pointer-events: none;
   opacity: 0.5;
 }
+
+/*css thêm phần body*/
+/* ===== Brand chips (no logo) ===== */
+#product-list .brand-chips{
+  display: flex; flex-wrap: wrap; gap: .5rem .6rem;
+}
+
+#product-list .chip-check{
+  display: inline-flex; align-items: center; gap: .4rem;
+}
+
+/* ẩn checkbox mặc định, vẫn giữ logic */
+#product-list .chip-check .form-check-input{
+  position: absolute; opacity: 0; width: 0; height: 0;
+}
+
+/* nút chip */
+#product-list .chip{
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: .45rem .8rem;
+  border: 1px solid var(--line, #e6ebf0);
+  border-radius: 999px;
+  background: var(--bg, #fff);
+  color: var(--text, #0f172a);
+  font-weight: 600; font-size: .9rem;
+  cursor: pointer; user-select: none;
+  transition: background .15s ease, color .15s ease, border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+
+#product-list .chip:hover{
+  background: var(--brand-50, #F1F8E9);
+  border-color: var(--brand, #8BC34A);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(16,24,40,.08);
+}
+
+/* trạng thái checked */
+#product-list .chip-check .form-check-input:checked + .chip{
+  background: var(--brand-50, #F1F8E9);
+  color: var(--brand-600, #689F38);
+  border-color: var(--brand, #8BC34A);
+}
+
+/* focus a11y khi dùng bàn phím */
+#product-list .chip:focus-visible{
+  outline: 3px solid rgba(139,195,74,.35);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/*phần sản phẩm */
+/* ================== PRO POLISH (scoped) ================== */
+#product-list {
+  --brand: #8BC34A;
+  --brand-600: #689F38;
+  --muted: #6b7280;
+  --line: #e6ebf0;
+  --danger: #e53935;
+}
+
+/* Card tổng quan */
+#product-list section.col-12.col-lg-9 .fruite-item{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 6px 18px rgba(16,24,40,.08);
+  overflow:hidden;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+#product-list section.col-12.col-lg-9 .fruite-item:hover{
+  transform: translateY(-3px);
+  box-shadow:0 16px 28px rgba(16,24,40,.12);
+}
+
+/* Ảnh */
+#product-list section.col-12.col-lg-9 .fruite-img img{
+  aspect-ratio: 4/3;
+  object-fit: cover;
+}
+
+/* Chip “Laptop” tinh gọn */
+#product-list section.col-12.col-lg-9 .category-chip{
+  background: var(--brand) !important;
+  font-weight:600;
+  border-radius: 999px !important;
+}
+
+/* Body card: căn giữa & nhịp dọc đều */
+#product-list section.col-12.col-lg-9 .fruite-item .p-3{
+  text-align: center;
+  display:flex; flex-direction:column;
+  gap:.35rem;
+  border-top:1px solid var(--line) !important;
+}
+
+/* Tên & mô tả: clamp dòng, chuẩn font */
+#product-list section.col-12.col-lg-9 .fruite-item h4{
+  font-size: 15px !important;       /* ghi đè inline style */
+  line-height: 1.35;
+  margin:0;
+  display:-webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow:hidden;
+}
+#product-list section.col-12.col-lg-9 .fruite-item h4 a{
+  color:#0f172a; text-decoration:none; font-weight:700;
+}
+#product-list section.col-12.col-lg-9 .fruite-item h4 a:hover{ color: var(--brand); }
+
+#product-list section.col-12.col-lg-9 .fruite-item p[style*="font-size:13px"]{
+  color: var(--muted) !important;
+  margin:0;
+  display:-webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow:hidden;
+}
+
+/* ====== CỤM GIÁ CHUYÊN NGHIỆP ====== */
+#product-list section.col-12.col-lg-9 .price-box{
+  display:flex; flex-direction:column; align-items:center;
+  gap:4px; min-height:76px;
+}
+
+/* Hàng 1: giá gốc + badge %OFF (nhỏ, tinh tế) */
+#product-list section.col-12.col-lg-9 .price-box .text-muted.text-decoration-line-through{
+  font-size:12.5px; color:#9ea3a9;
+}
+#product-list section.col-12.col-lg-9 .price-box .badge.bg-danger{
+  background: rgba(229,57,53,.1) !important;
+  color: var(--danger);
+  border: 1px solid rgba(229,57,53,.25);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 12px; font-weight: 700;
+  margin-left: .4rem;
+}
+
+/* Hàng 2: giá sau giảm/giá thường – nổi bật nhưng không gắt */
+#product-list section.col-12.col-lg-9 .price-box .text-danger.fw-bold{
+  color: var(--danger) !important;
+  font-size: 16px; font-weight: 800;
+  letter-spacing:.1px;
+}
+#product-list section.col-12.col-lg-9 .price-box .text-dark.fw-bold{
+  color:#0f172a !important;
+  font-size: 16px; font-weight: 800;
+}
+
+/* CTA & tồn kho */
+#product-list section.col-12.col-lg-9 .btnAddToCartHomePage{
+  border-color: var(--brand) !important;
+  color: var(--brand) !important;
+  font-weight: 700;
+  transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+}
+#product-list section.col-12.col-lg-9 .btnAddToCartHomePage:hover{
+  background: var(--brand); color:#fff !important; border-color: var(--brand) !important;
+  transform: translateY(-1px);
+}
+#product-list section.col-12.col-lg-9 .btnAddToCartHomePage:hover i{ color:#fff !important; }
+#product-list section.col-12.col-lg-9 .badge.bg-primary{ background: var(--brand) !important; }
+
+/* Phân trang cao cấp */
+#product-list section.col-12.col-lg-9 .pagination{ gap: .5rem; }
+#product-list section.col-12.col-lg-9 .page-item .page-link{
+  border:1px solid #d9dee3; background:#fff; color:#003B3B;
+  border-radius: 12px; padding:8px 14px;
+  transition: all .2s ease; box-shadow: 0 1px 2px rgba(16,24,40,.06);
+}
+#product-list section.col-12.col-lg-9 .page-item .page-link:hover{
+  background: #eef7ee; border-color:#198754; color:#198754;
+  transform: translateY(-1px);
+}
+#product-list section.col-12.col-lg-9 .page-item a.page-link{
+  width:40px; height:40px; padding:0; text-align:center; line-height:40px;
+  border-radius:50%; font-weight:600;
+}
+#product-list section.col-12.col-lg-9 .page-item a.page-link.active,
+#product-list section.col-12.col-lg-9 .page-item .page-link.active{
+  background:#28a745; color:#fff !important; border:none;
+  box-shadow: 0 0 0 3px rgba(40,167,69,.15);
+}
+#product-list section.col-12.col-lg-9 .page-item.disabled .page-link{ opacity:.5; pointer-events:none; }
+
+/* Khoảng cách đều & căn giữa hàng nút */
+#product-list section.col-12.col-lg-9 .mt-auto{ margin-top:auto; }
+
+/*css footer*/
+    .footer .btn-link {
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .footer .btn-link:hover {
+        color: #8BC34A;
+        padding-left: 5px;
+    }
+
+    .btn-social {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+    }
+
+    .btn-social:hover {
+        background: #8BC34A;
+        color: #000;
+    }

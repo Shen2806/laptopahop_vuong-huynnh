@@ -326,249 +326,254 @@
             </script>
             <!-- HEADER END -->
             <div class="py-1"></div>
+
             <!-- Single Product Start -->
-            <div class="container-fluid">
-                <div class="container">
-                    <div class="row g-4 mb-5">
-                        <div>
-                            <nav aria-label="breadcrumb">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Danh Sách Sản Phẩm
-                                    </li>
-                                </ol>
-                            </nav>
-                        </div>
+            <div class="container-fluid" id="product-list">
+                <div class="container py-3">
+                    <!-- Breadcrumb -->
+                    <nav class="mb-3" aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Danh Sách Sản Phẩm</li>
+                        </ol>
+                    </nav>
 
-                        <div class="row g-4 fruite">
-                            <div class="col-12 col-md-4">
-                                <div class="row g-4">
-                                    <!-- Hãng sản xuất -->
-                                    <div class="col-12" id="factoryFilter">
-                                        <div class="card border-0 shadow-sm rounded-3">
-                                            <div class="card-body">
-                                                <h6 class="fw-bold mb-3">Hãng sản xuất</h6>
-                                                <div class="d-flex flex-wrap gap-2">
-                                                    <% ["Apple","Asus","Lenovo","Dell","LG","Acer"].forEach((brand,
-                                                        idx)=> { %>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                id="factory-<%= idx %>"
-                                                                value="<%= brand.toUpperCase() %>">
-                                                            <label class="form-check-label" for="factory-<%= idx %>">
-                                                                <%= brand %>
-                                                            </label>
-                                                        </div>
-                                                        <% }) %>
-                                                </div>
+                    <div class="row g-4">
+                        <!-- Sidebar Filters -->
+                        <aside class="col-12 col-lg-3">
+                            <div class="row g-4">
+                                <!-- Hãng sản xuất (chips không logo) -->
+                                <div class="col-12" id="factoryFilter">
+                                    <div class="card border-0 shadow-sm rounded-3">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3">Hãng sản xuất</h6>
+                                            <div class="brand-chips">
+                                                <% ["Apple","Asus","Lenovo","Dell","LG","Acer"].forEach((brand, idx)=> {
+                                                    %>
+                                                    <div class="chip-check">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            id="factory-<%= idx %>" value="<%= brand.toUpperCase() %>">
+                                                        <label class="chip" for="factory-<%= idx %>">
+                                                            <%= brand %>
+                                                        </label>
+                                                    </div>
+                                                    <% }) %>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <!-- Mục đích sử dụng -->
-                                    <div class="col-12" id="targetFilter">
-                                        <div class="card border-0 shadow-sm rounded-3">
-                                            <div class="card-body">
-                                                <h6 class="fw-bold mb-3">Mục đích sử dụng</h6>
-                                                <div class="d-flex flex-wrap gap-2">
-                                                    <div class="form-check"><input class="form-check-input"
-                                                            type="checkbox" id="target-1" value="GAMING"><label
-                                                            class="form-check-label" for="target-1">Gaming</label></div>
-                                                    <div class="form-check"><input class="form-check-input"
-                                                            type="checkbox" id="target-2"
-                                                            value="SINHVIEN-VANPHONG"><label class="form-check-label"
-                                                            for="target-2">Sinh viên - Văn
-                                                            phòng</label></div>
-                                                    <div class="form-check"><input class="form-check-input"
-                                                            type="checkbox" id="target-3" value="THIET-KE-DO-HOA"><label
-                                                            class="form-check-label" for="target-3">Thiết kế đồ
-                                                            họa</label>
-                                                    </div>
-                                                    <div class="form-check"><input class="form-check-input"
-                                                            type="checkbox" id="target-4" value="MONG-NHE"><label
-                                                            class="form-check-label" for="target-4">Mỏng nhẹ</label>
-                                                    </div>
-                                                    <div class="form-check"><input class="form-check-input"
-                                                            type="checkbox" id="target-5" value="DOANH-NHAN"><label
-                                                            class="form-check-label" for="target-5">Doanh nhân</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Mức giá -->
-                                    <div class="col-12" id="priceFilter">
-                                        <div class="card border-0 shadow-sm rounded-3">
-                                            <div class="card-body">
-                                                <h6 class="fw-bold mb-3">Mức giá</h6>
-                                                <div class="d-flex flex-column gap-2">
-                                                    <div class="form-check"><input class="form-check-input"
-                                                            type="checkbox" id="price-1" value="duoi-10-trieu"><label
-                                                            class="form-check-label" for="price-1">Dưới 10 triệu</label>
-                                                    </div>
-                                                    <div class="form-check"><input class="form-check-input"
-                                                            type="checkbox" id="price-2" value="10-15-trieu"><label
-                                                            class="form-check-label" for="price-2">10 - 15 triệu</label>
-                                                    </div>
-                                                    <div class="form-check"><input class="form-check-input"
-                                                            type="checkbox" id="price-3" value="15-20-trieu"><label
-                                                            class="form-check-label" for="price-3">15 - 20 triệu</label>
-                                                    </div>
-                                                    <div class="form-check"><input class="form-check-input"
-                                                            type="checkbox" id="price-4" value="tren-20-trieu"><label
-                                                            class="form-check-label" for="price-4">Trên 20 triệu</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Sắp xếp -->
-                                    <div class="col-12" id="sortFilter">
-                                        <div class="card border-0 shadow-sm rounded-3">
-                                            <div class="card-body">
-                                                <h6 class="fw-bold mb-3">Sắp xếp</h6>
-                                                <div class="d-flex flex-column gap-2">
-                                                    <div class="form-check"><input class="form-check-input" type="radio"
-                                                            name="radio-sort" id="sort-1" value="gia-tang-dan"><label
-                                                            class="form-check-label" for="sort-1">Giá tăng dần</label>
-                                                    </div>
-                                                    <div class="form-check"><input class="form-check-input" type="radio"
-                                                            name="radio-sort" id="sort-2" value="gia-giam-dan"><label
-                                                            class="form-check-label" for="sort-2">Giá giảm dần</label>
-                                                    </div>
-                                                    <div class="form-check"><input class="form-check-input" type="radio"
-                                                            name="radio-sort" id="sort-3" value="gia-khong-sap-xep"
-                                                            checked><label class="form-check-label" for="sort-3">Không
-                                                            sắp
-                                                            xếp</label></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Nút filter -->
-                                    <div class="col-5 d-flex gap-2 text-center" style="margin-left: 30%;">
-                                        <button id="btnFilter"
-                                            class="btn btn-success rounded-pill px-4 py-2 flex-fill">Lọc sản
-                                            phẩm</button>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="col-12 col-md-8 text-center">
-                                <div class="row g-4">
-                                    <% products.forEach(function(product) { const discountPrice=product.discount> 0
-                                        ? Math.round(product.price * (100 - product.discount) / 100)
-                                        : product.price;
-                                        %>
-                                        <div class="col-md-6 col-lg-4">
-                                            <div class="rounded position-relative fruite-item">
-                                                <div class="fruite-img">
+                                <!-- Mục đích sử dụng -->
+                                <div class="col-12" id="targetFilter">
+                                    <div class="card border-0 shadow-sm rounded-3">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3">Mục đích sử dụng</h6>
+                                            <div class="stack-choices">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="target-1"
+                                                        value="GAMING">
+                                                    <label class="form-check-label" for="target-1">Gaming</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="target-2"
+                                                        value="SINHVIEN-VANPHONG">
+                                                    <label class="form-check-label" for="target-2">Sinh viên - Văn
+                                                        phòng</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="target-3"
+                                                        value="THIET-KE-DO-HOA">
+                                                    <label class="form-check-label" for="target-3">Thiết kế đồ
+                                                        họa</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="target-4"
+                                                        value="MONG-NHE">
+                                                    <label class="form-check-label" for="target-4">Mỏng nhẹ</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="target-5"
+                                                        value="DOANH-NHAN">
+                                                    <label class="form-check-label" for="target-5">Doanh nhân</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mức giá -->
+                                <div class="col-12" id="priceFilter">
+                                    <div class="card border-0 shadow-sm rounded-3">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3">Mức giá</h6>
+                                            <div class="stack-choices">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="price-1"
+                                                        value="duoi-10-trieu">
+                                                    <label class="form-check-label" for="price-1">Dưới 10 triệu</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="price-2"
+                                                        value="10-15-trieu">
+                                                    <label class="form-check-label" for="price-2">10 - 15 triệu</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="price-3"
+                                                        value="15-20-trieu">
+                                                    <label class="form-check-label" for="price-3">15 - 20 triệu</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="price-4"
+                                                        value="tren-20-trieu">
+                                                    <label class="form-check-label" for="price-4">Trên 20 triệu</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sắp xếp -->
+                                <div class="col-12" id="sortFilter">
+                                    <div class="card border-0 shadow-sm rounded-3">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3">Sắp xếp</h6>
+                                            <div class="stack-choices">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="radio-sort"
+                                                        id="sort-1" value="gia-tang-dan">
+                                                    <label class="form-check-label" for="sort-1">Giá tăng dần</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="radio-sort"
+                                                        id="sort-2" value="gia-giam-dan">
+                                                    <label class="form-check-label" for="sort-2">Giá giảm dần</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="radio-sort"
+                                                        id="sort-3" value="gia-khong-sap-xep" checked>
+                                                    <label class="form-check-label" for="sort-3">Không sắp xếp</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Nút filter -->
+                                <div class="col-12">
+                                    <button id="btnFilter" class="btn btn-success rounded-pill w-100 py-2">Lọc sản
+                                        phẩm</button>
+                                </div>
+                            </div>
+                        </aside>
+
+                        <!-- Product Grid -->
+                        <section class="col-12 col-lg-9">
+                            <div class="row g-4">
+                                <% products.forEach(function(product) { const discountPrice=product.discount> 0
+                                    ? Math.round(product.price * (100 - product.discount) / 100)
+                                    : product.price;
+                                    %>
+                                    <div class="col-6 col-xl-4">
+                                        <div class="rounded position-relative fruite-item h-100 d-flex flex-column">
+                                            <div class="fruite-img">
+                                                <a href="/product/<%= product.id %>">
                                                     <img src="/images/product/<%= product.image %>"
                                                         class="img-fluid w-100 rounded-top" alt="">
-                                                </div>
-                                                <div class="text-white bg-secondary px-3 py-1 rounded position-absolute"
-                                                    style="top: 10px; left: 10px;">Laptop</div>
-                                                <div class="p-4 border border-top-0 rounded-bottom">
-                                                    <h4 style="font-size: 15px;">
-                                                        <a href="/product/<%= product.id %>">
-                                                            <%= product.name %>
-                                                        </a>
-                                                    </h4>
-                                                    <p style="font-size: 13px;">
-                                                        <%= product.shortDesc %>
-                                                    </p>
+                                                </a>
+                                            </div>
 
-                                                    <!-- Giá -->
-                                                    <div class="d-flex flex-column align-items-center mb-3 price-box">
-                                                        <% if(product.discount> 0) { %>
+                                            <span
+                                                class="text-white bg-secondary px-3 py-1 rounded position-absolute category-chip"
+                                                style="top:10px;left:10px;">Laptop</span>
 
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-center ">
-                                                                <small class="text-muted text-decoration-line-through">
-                                                                    <%= new
-                                                                        Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
-                                                                        %>
-                                                                </small>
-                                                                <span class="badge bg-danger ms-2">-<%= product.discount
-                                                                        %>
-                                                                        %</span>
-                                                            </div>
+                                            <div class="p-3 border border-top-0 rounded-bottom d-flex flex-column">
+                                                <h4 class="mb-1" style="font-size:15px;">
+                                                    <a href="/product/<%= product.id %>">
+                                                        <%= product.name %>
+                                                    </a>
+                                                </h4>
+                                                <p class="mb-2" style="font-size:13px;">
+                                                    <%= product.shortDesc %>
+                                                </p>
 
-                                                            <p class="text-danger fw-bold mb-1 d-flex align-items-center justify-content-center  "
-                                                                style="font-size: 15px;">
+                                                <!-- Giá -->
+                                                <div class="d-flex flex-column align-items-center mb-2 price-box">
+                                                    <% if(product.discount> 0) { %>
+                                                        <div class="d-flex align-items-center justify-content-center">
+                                                            <small class="text-muted text-decoration-line-through">
                                                                 <%= new
-                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountPrice)
+                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
+                                                                    %>
+                                                            </small>
+                                                            <span class="badge bg-danger ms-2">-<%= product.discount %>
+                                                                    %</span>
+                                                        </div>
+                                                        <p class="text-danger fw-bold mb-1 d-flex align-items-center justify-content-center"
+                                                            style="font-size:15px;">
+                                                            <%= new
+                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountPrice)
+                                                                %>
+                                                        </p>
+                                                        <% } else { %>
+                                                            <p class="text-dark fw-bold mb-1" style="font-size:15px;">
+                                                                <%= new
+                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
                                                                     %>
                                                             </p>
+                                                            <% } %>
+                                                </div>
 
-                                                            <% } else { %>
-                                                                <p class="text-dark fw-bold mb-1"
-                                                                    style="font-size: 15px;">
-                                                                    <%= new
-                                                                        Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
-                                                                        %>
-                                                                </p>
-                                                                <% } %>
-                                                    </div>
-
-                                                    <!-- Thêm giỏ hàng -->
-                                                    <div class="d-flex justify-content-between align-items-center mt-1">
-                                                        <form method="post"
-                                                            action="/add-product-to-cart/<%= product.id %>">
-                                                            <button data-product-id="<%=product.id%>"
-                                                                class="btnAddToCartHomePage mx-auto btn border rounded-pill px-3 text-primary">
-                                                                <i class="fa fa-shopping-bag me-2 text-primary"></i>
-                                                                Thêm vào giỏ hàng
-                                                            </button>
-                                                        </form>
-                                                        <span class="badge bg-primary ms-3">
-                                                            Còn: <%= product.quantity %>
-                                                        </span>
-                                                    </div>
+                                                <!-- CTA -->
+                                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                                    <form method="post" action="/add-product-to-cart/<%= product.id %>">
+                                                        <button data-product-id="<%= product.id %>"
+                                                            class="btnAddToCartHomePage btn border rounded-pill px-3">
+                                                            <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ
+                                                        </button>
+                                                    </form>
+                                                    <span class="badge bg-primary ms-3">Còn: <%= product.quantity %>
+                                                            </span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <% }) %>
+                                    </div>
+                                    <% }) %>
 
-                                            <% if(products?.length) { %>
-                                                <div class="pagination d-flex justify-content-center mt-5">
-                                                    <li class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
-                                                        <a class="page-link" href="/products?page=<%= page - 1  %>"
-                                                            aria-label="Previous">
-                                                            <span aria-hidden="true">&laquo;</span>
+                                        <!-- Pagination -->
+                                        <% if (products?.length) { %>
+                                            <ul class="pagination d-flex justify-content-center mt-4">
+                                                <li class="<%= page === 1 ? 'disabled page-item' : 'page-item' %>">
+                                                    <a class="page-link" href="/products?page=<%= page - 1 %>"
+                                                        aria-label="Previous">
+                                                        <span aria-hidden="true">&laquo;</span>
+                                                    </a>
+                                                </li>
+                                                <% for (var i=1; i <=totalPages; i++) { %>
+                                                    <li class="page-item">
+                                                        <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
+                                                            href="/products?page=<%= i %>">
+                                                            <%= i %>
                                                         </a>
                                                     </li>
-                                                    <% for(var i=1; i <=totalPages; i++) {%>
-                                                        <li class="page-item">
-                                                            <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
-                                                                href="/products?page=<%= i  %>">
-                                                                <%= i %>
+                                                    <% } %>
+                                                        <li
+                                                            class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %>">
+                                                            <a class="page-link" href="/products?page=<%= page + 1 %>"
+                                                                aria-label="Next">
+                                                                <span aria-hidden="true">&raquo;</span>
                                                             </a>
                                                         </li>
-                                                        <% } %>
-                                                            <li
-                                                                class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
-                                                                <a class="page-link"
-                                                                    href="/products?page=<%= page + 1  %>"
-                                                                    aria-label="Next">
-                                                                    <span aria-hidden="true">&raquo;</span>
-                                                                </a>
-                                                            </li>
-                                                </div>
-                                                <% } else {%>
-                                                    <div> Không tồn tại sản phẩm này !</div>
-                                                    <%}%>
-
-                                </div>
+                                            </ul>
+                                            <% } else { %>
+                                                <div class="text-center py-5">Không tồn tại sản phẩm này!</div>
+                                                <% } %>
                             </div>
-                        </div>
+                        </section>
                     </div>
                 </div>
             </div>
             <!-- Single Product End -->
+
 
             <!-- Footer Start -->
             <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
