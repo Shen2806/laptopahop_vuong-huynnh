@@ -35,7 +35,9 @@
     <%- include('../layout/header'); -%>
         <!-- /HEADER -->
 
-        <div class="container my-4">
+        <!-- RETURNS: START -->
+        <div class="container my-4 returns">
+            <!-- Breadcrumb -->
             <nav aria-label="breadcrumb" class="mb-3">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
@@ -43,89 +45,258 @@
                 </ol>
             </nav>
 
+            <!-- Hero -->
+            <div class="rt-hero rounded-4 overflow-hidden mb-4">
+                <div class="rt-hero__overlay"></div>
+                <div class="rt-hero__content">
+                    <h1 class="mb-2" style="color: white;">Chính sách đổi trả</h1>
+                    <p class="mb-0">Nhanh gọn • Minh bạch • Bảo vệ quyền lợi khách hàng</p>
+                </div>
+            </div>
+
+            <!-- Summary chips -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="rt-chip">
+                        <i class="fas fa-rotate"></i>
+                        <div>
+                            <strong>Đổi 1–1 trong 7 ngày*</strong>
+                            <small>Lỗi từ NSX</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="rt-chip">
+                        <i class="fas fa-box-open"></i>
+                        <div>
+                            <strong>Hộp & phụ kiện đủ</strong>
+                            <small>Tem/Serial nguyên vẹn</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="rt-chip">
+                        <i class="fas fa-credit-card"></i>
+                        <div>
+                            <strong>Hoàn tiền</strong>
+                            <small>Theo phương thức thanh toán</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="rt-chip">
+                        <i class="fas fa-headset"></i>
+                        <div>
+                            <strong>Hỗ trợ 24/7</strong>
+                            <small>Tư vấn & theo dõi yêu cầu</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row g-4">
-                <!-- Sidebar -->
-                <div class="col-12 col-lg-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="mb-3">Mục lục</h5>
-                            <ul class="list-unstyled toc">
-                                <li><a href="#conditions">1. Điều kiện đổi trả</a></li>
-                                <li><a href="#process">2. Quy trình đổi trả</a></li>
-                                <li><a href="#refund">3. Hình thức hoàn tiền</a></li>
-                                <li><a href="#exceptions">4. Trường hợp không áp dụng</a></li>
-                                <li><a href="#contact">5. Liên hệ hỗ trợ</a></li>
-                            </ul>
-                            <div class="terms-updated mt-3">
-                                Cập nhật lần cuối:
+                <!-- LEFT: Main content -->
+                <div class="col-lg-8">
+                    <!-- 1. Điều kiện áp dụng -->
+                    <section id="rt-eligibility" class="rt-card">
+                        <h2>1. Điều kiện đổi trả</h2>
+                        <ul class="rt-list">
+                            <li>Sản phẩm lỗi kỹ thuật do nhà sản xuất (<strong>trong 07 ngày</strong> kể từ ngày nhận).
+                            </li>
+                            <li>Máy/linh kiện còn nguyên tem niêm phong, số serial khớp hóa đơn.</li>
+                            <li>Đầy đủ phụ kiện đi kèm, quà tặng (nếu có), tình trạng như lúc nhận.</li>
+                            <li>Hóa đơn/phiếu bảo hành còn giữ để đối chiếu.</li>
+                        </ul>
+                        <small class="text-muted">(*) Sau 07 ngày, chuyển sang hình thức bảo hành theo chính sách
+                            Warranty.</small>
+                    </section>
+
+                    <!-- 2. Không áp dụng đổi trả -->
+                    <section id="rt-nonreturn" class="rt-card">
+                        <h2>2. Trường hợp không áp dụng</h2>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="rt-bad">
+                                    <i class="fas fa-water"></i>
+                                    <div>
+                                        <h6>Vào nước / cháy nổ</h6>
+                                        <p>Oxy hóa, ẩm mốc, chập cháy, biến dạng vật lý.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="rt-bad">
+                                    <i class="fas fa-hammer"></i>
+                                    <div>
+                                        <h6>Rơi vỡ / móp méo</h6>
+                                        <p>Màn hình nứt, khung vỏ cong vênh, bể bản lề…</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="rt-bad">
+                                    <i class="fas fa-user-gear"></i>
+                                    <div>
+                                        <h6>Can thiệp trái phép</h6>
+                                        <p>Tự ý sửa/chỉnh sửa phần cứng, tem/serial bất thường.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="rt-bad">
+                                    <i class="fas fa-bug"></i>
+                                    <div>
+                                        <h6>Lỗi phần mềm</h6>
+                                        <p>Cấu hình sai, virus, OC vượt mức khuyến nghị.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 3. Mốc thời gian & mức xử lý -->
+                    <section id="rt-window" class="rt-card">
+                        <h2>3. Thời gian & hình thức xử lý</h2>
+                        <div class="table-responsive">
+                            <table class="table rt-table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Mốc thời gian</th>
+                                        <th>Điều kiện</th>
+                                        <th>Hình thức</th>
+                                        <th>Phí</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>0–7 ngày</td>
+                                        <td>Lỗi do NSX</td>
+                                        <td>Đổi mới 1–1 (cùng model/tương đương)</td>
+                                        <td>0₫</td>
+                                    </tr>
+                                    <tr>
+                                        <td>0–7 ngày</td>
+                                        <td>Không lỗi (đổi ý)</td>
+                                        <td>Đổi sang sản phẩm khác*</td>
+                                        <td><span class="badge bg-warning text-dark">Có thể áp dụng phí</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>> 7 ngày</td>
+                                        <td>Lỗi kỹ thuật</td>
+                                        <td>Chuyển bảo hành (RMA 7–15 ngày)</td>
+                                        <td>0₫</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <small class="text-muted">(*) Áp dụng khi hàng còn nguyên seal, chưa kích hoạt/bị xước; phí định
+                            giá theo tình trạng & thời điểm.</small>
+                    </section>
+
+                    <!-- 4. Quy trình đổi trả (timeline) -->
+                    <section id="rt-process" class="rt-card">
+                        <h2>4. Quy trình đổi trả</h2>
+                        <ol class="rt-steps">
+                            <li>
+                                <h6>Bước 1 — Đăng ký yêu cầu</h6>
+                                <p>Liên hệ <a href="/contact">trang liên hệ</a> hoặc hotline để mở yêu cầu đổi trả.</p>
+                            </li>
+                            <li>
+                                <h6>Bước 2 — Kiểm tra nhanh</h6>
+                                <p>Kỹ thuật kiểm tra tình trạng/serial/tem & lập biên nhận.</p>
+                            </li>
+                            <li>
+                                <h6>Bước 3 — Xử lý</h6>
+                                <p>Đổi mới/đổi tương đương hoặc chuyển bảo hành theo kết quả chẩn đoán.</p>
+                            </li>
+                            <li>
+                                <h6>Bước 4 — Hoàn tất</h6>
+                                <p>Bàn giao lại sản phẩm / hoàn tiền (nếu áp dụng) & hướng dẫn sử dụng.</p>
+                            </li>
+                        </ol>
+                    </section>
+
+                    <!-- 5. Hoàn tiền -->
+                    <section id="rt-refund" class="rt-card">
+                        <h2>5. Hoàn tiền</h2>
+                        <ul class="rt-list">
+                            <li><strong>Phương thức hoàn:</strong> khớp với phương thức thanh toán ban đầu (tiền
+                                mặt/chuyển khoản/thẻ).</li>
+                            <li><strong>Thời gian:</strong> 1–3 ngày làm việc (tiền mặt/chuyển khoản); 3–7 ngày làm việc
+                                (thẻ/qua cổng trung gian).</li>
+                            <li><strong>Phí:</strong> Một số cổng thanh toán có thể khấu trừ phí dịch vụ theo quy định.
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- 6. Hướng dẫn đóng gói/ký gửi -->
+                    <section id="rt-pack" class="rt-card">
+                        <h2>6. Hướng dẫn đóng gói & gửi hàng</h2>
+                        <ul class="rt-list">
+                            <li>Sao lưu dữ liệu quan trọng trước khi gửi.</li>
+                            <li>Đóng gói 2 lớp (hộp sản phẩm bên trong + thùng carton ngoài), chèn mút xốp chống sốc.
+                            </li>
+                            <li>Ghi rõ: “Hàng điện tử dễ vỡ – không chồng đè/không quăng ném”.</li>
+                            <li>Đính kèm bản sao hóa đơn & thông tin liên hệ.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 7. FAQ -->
+                    <section id="rt-faq" class="rt-card">
+                        <h2>7. Câu hỏi thường gặp</h2>
+                        <details class="rt-faq">
+                            <summary>Đổi ý sau khi mua nhưng máy đã kích hoạt?</summary>
+                            <p>Tùy tình trạng thực tế, cửa hàng sẽ hỗ trợ đổi sang model khác có giá trị tương đương/gần
+                                nhất kèm mức phí định giá.</p>
+                        </details>
+                        <details class="rt-faq">
+                            <summary>Phụ kiện tặng kèm bị thiếu có ảnh hưởng đổi trả?</summary>
+                            <p>Thiếu phụ kiện có thể phát sinh phí bù theo giá trị phụ kiện hoặc từ chối đổi nếu ảnh
+                                hưởng đến giá trị sản phẩm.</p>
+                        </details>
+                        <details class="rt-faq">
+                            <summary>Thời gian kiểm tra tại chỗ là bao lâu?</summary>
+                            <p>Thông thường 15–45 phút, có thể lâu hơn với các lỗi phức tạp hoặc cần test dài.</p>
+                        </details>
+                    </section>
+                </div>
+
+                <!-- RIGHT: Support & updated -->
+                <div class="col-lg-4">
+                    <div class="rt-support rt-card">
+                        <h5>Hỗ trợ đổi trả nhanh</h5>
+                        <p class="text-muted">Cần xác nhận điều kiện hay mốc thời gian cụ thể?</p>
+                        <div class="d-grid gap-2">
+                            <a href="/contact" class="btn btn-success rounded-pill"><i class="fas fa-message me-2"></i>
+                                Liên hệ hỗ trợ</a>
+                            <a href="tel:0999887744" class="btn btn-outline-success rounded-pill"><i
+                                    class="fas fa-phone me-2"></i> 0999 887 744</a>
+                            <a href="mailto:support@laptopshop.vn" class="btn btn-ghost rounded-pill"><i
+                                    class="fas fa-envelope me-2"></i> support@laptopshop.vn</a>
+                        </div>
+                        <hr>
+                        <div class="rt-updated">
+                            Cập nhật lần cuối:
+                            <strong>
                                 <%= typeof lastUpdated !=='undefined' ? lastUpdated : (new
                                     Date()).toLocaleDateString('vi-VN') %>
-                            </div>
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="rt-note rt-card">
+                        <i class="fas fa-circle-info"></i>
+                        <div>
+                            <h6>Lưu ý</h6>
+                            <p class="mb-0">Chính sách có thể thay đổi theo hãng/model & tình trạng thực tế. Vui lòng
+                                liên hệ tư vấn viên để được hướng dẫn tốt nhất.</p>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <!-- RETURNS: END -->
 
-                <!-- Main Content -->
-                <div class="col-12 col-lg-9 terms-section">
-                    <div class="card">
-                        <div class="card-body">
-                            <h2 class="mb-3">Chính sách đổi trả</h2>
-                            <p>
-                                LaptopShop cam kết mang lại trải nghiệm mua sắm hài lòng cho khách hàng.
-                                Nếu sản phẩm gặp sự cố hoặc không đáp ứng mong đợi, quý khách có thể tham khảo chính
-                                sách đổi trả dưới đây.
-                            </p>
-
-                            <hr class="my-4">
-
-                            <h3 id="conditions">1. Điều kiện đổi trả</h3>
-                            <ul>
-                                <li>Sản phẩm còn nguyên tem niêm phong, chưa qua sử dụng.</li>
-                                <li>Thời gian yêu cầu đổi trả trong vòng <strong>7 ngày</strong> kể từ ngày nhận hàng.
-                                </li>
-                                <li>Có đầy đủ hóa đơn mua hàng và phụ kiện đi kèm.</li>
-                                <li>Lỗi do nhà sản xuất hoặc sản phẩm không đúng mô tả.</li>
-                            </ul>
-
-                            <h3 id="process" class="mt-4">2. Quy trình đổi trả</h3>
-                            <ol>
-                                <li>Khách hàng liên hệ bộ phận CSKH qua hotline/email.</li>
-                                <li>Cung cấp thông tin đơn hàng và lý do đổi trả.</li>
-                                <li>Gửi sản phẩm về cửa hàng hoặc chi nhánh gần nhất.</li>
-                                <li>Sau khi kiểm tra, chúng tôi sẽ tiến hành đổi sản phẩm mới hoặc hoàn tiền.</li>
-                            </ol>
-
-                            <h3 id="refund" class="mt-4">3. Hình thức hoàn tiền</h3>
-                            <ul>
-                                <li>Hoàn tiền mặt tại cửa hàng.</li>
-                                <li>Chuyển khoản ngân hàng (trong vòng 3–5 ngày làm việc).</li>
-                                <li>Hoàn về thẻ/tài khoản thanh toán ban đầu.</li>
-                            </ul>
-
-                            <h3 id="exceptions" class="mt-4">4. Trường hợp không áp dụng</h3>
-                            <p class="text-muted">
-                                Các sản phẩm nằm trong chương trình khuyến mãi lớn, quà tặng hoặc đặt hàng theo yêu cầu
-                                riêng sẽ <strong>không áp dụng đổi trả</strong>.
-                            </p>
-
-                            <h3 id="contact" class="mt-4">5. Liên hệ hỗ trợ</h3>
-                            <ul>
-                                <li>Địa chỉ: 99 ABC, Thống Nhất, Gò Vấp, TP.HCM</li>
-                                <li>Email: support@laptopshop.vn</li>
-                                <li>Hotline: 0999 887 744</li>
-                            </ul>
-
-                            <div class="callout mt-4">
-                                <small>
-                                    Quý khách vui lòng giữ sản phẩm trong tình trạng tốt nhất khi gửi đổi trả để quá
-                                    trình diễn ra nhanh chóng.
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div><!-- row -->
-        </div><!-- container -->
 
         <!-- FOOTER -->
         <%- include('../layout/footer'); -%>

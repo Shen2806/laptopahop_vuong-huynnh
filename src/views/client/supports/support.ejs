@@ -26,119 +26,194 @@
 <body>
     <%- include('../layout/header'); -%>
 
-        <div class="container my-4">
+        <!-- SUPPORT: START -->
+        <div class="container my-4 support">
             <!-- Breadcrumb -->
             <nav aria-label="breadcrumb" class="mb-3">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Hỗ trợ</li>
+                    <li class="breadcrumb-item active" aria-current="page">Trung tâm hỗ trợ</li>
                 </ol>
             </nav>
 
-            <!-- Giới thiệu -->
-            <div class="mb-4 text-center">
-                <h2 class="fw-bold mb-2">Trung tâm hỗ trợ khách hàng</h2>
-                <p class="text-muted">Chào mừng bạn đến với trung tâm hỗ trợ của LaptopShop.
-                    Tại đây, bạn có thể tìm thấy thông tin về bảo hành, đổi trả, hướng dẫn sử dụng sản phẩm và liên
-                    hệ với đội ngũ chăm sóc khách hàng.
-                </p>
+            <!-- Hero -->
+            <div class="sp-hero rounded-4 overflow-hidden mb-4">
+                <div class="sp-hero__overlay"></div>
+                <div class="sp-hero__content">
+                    <h1 class="mb-2" style="color: white;">Trung tâm hỗ trợ LaptopShop</h1>
+                    <p class="mb-3">Cần trợ giúp về đơn hàng, bảo hành, đổi trả hoặc kỹ thuật? Tụi mình ở đây!</p>
+                    <form class="sp-search mx-auto" role="search" onsubmit="event.preventDefault();">
+                        <div class="input-group input-group-lg" >
+
+                        </div>
+                        <div class="sp-suggest">
+                            Gợi ý:
+                            <a href="/warranty">bảo hành</a><span>•</span>
+                            <a href="/return">đổi trả</a><span>•</span>
+                            <a href="/privacy">quyền riêng tư</a><span>•</span>
+                            <a href="/terms">điều khoản</a>
+                        </div>
+                    </form>
+                </div>
             </div>
 
-            <!-- Dịch vụ hỗ trợ -->
-            <div class="row g-4 mb-5">
-                <div class="col-md-4">
-                    <div class="service-card h-100">
-                        <i class="fas fa-tools"></i>
-                        <h5 class="fw-bold">Hỗ trợ kỹ thuật</h5>
-                        <p>Hướng dẫn cài đặt, khắc phục sự cố phần mềm & phần cứng.</p>
-                        <a href="/contact" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="service-card h-100">
-                        <i class="fas fa-shield-alt"></i>
-                        <h5 class="fw-bold">Bảo hành</h5>
-                        <p>Thông tin chi tiết về chính sách bảo hành laptop tại LaptopShop.</p>
-                        <a href="/warranty" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="service-card h-100">
-                        <i class="fas fa-exchange-alt"></i>
-                        <h5 class="fw-bold">Đổi trả</h5>
-                        <p>Điều kiện & quy trình đổi trả sản phẩm nhanh chóng.</p>
-                        <a href="/return" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
-                    </div>
-                </div>
+            <!-- Status bar -->
+            <div class="sp-status sp-card d-flex align-items-center gap-3 mb-4">
+                <span class="badge status up"><i class="fas fa-circle"></i> Hệ thống hoạt động bình thường</span>
+                <small class="text-muted">Cập nhật gần nhất: <span id="spStatusTime"></span></small>
             </div>
 
             <div class="row g-4">
-                <!-- FAQ -->
-                <div class="col-lg-7">
-                    <h5 class="fw-bold mb-3"><i class="fas fa-question-circle text-danger me-2"></i> Câu hỏi thường gặp
-                        (FAQ)</h5>
-                    <div class="accordion" id="faqAccordion">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq1">
-                                    Làm sao để kiểm tra tình trạng bảo hành?
-                                </button>
-                            </h2>
-                            <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Bạn có thể nhập số serial laptop trên website hoặc liên hệ trực tiếp hotline để được
-                                    hỗ trợ kiểm tra.
-                                </div>
+                <!-- LEFT: categories + quick help -->
+                <div class="col-lg-8">
+                    <!-- Categories -->
+                    <section class="sp-card">
+                        <h2>Danh mục trợ giúp</h2>
+                        <div class="row g-3">
+                            <div class="col-6 col-md-4">
+                                <a class="sp-cat" href="/warranty">
+                                    <i class="fas fa-shield-halved"></i>
+                                    <strong>Bảo hành</strong>
+                                    <small>Thời hạn, RMA, kiểm tra tình trạng</small>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <a class="sp-cat" href="/return">
+                                    <i class="fas fa-rotate"></i>
+                                    <strong>Đổi & trả</strong>
+                                    <small>Điều kiện, quy trình, hoàn tiền</small>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <a class="sp-cat" href="/privacy">
+                                    <i class="fas fa-user-shield"></i>
+                                    <strong>Quyền riêng tư</strong>
+                                    <small>Dữ liệu, cookie, chia sẻ</small>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <a class="sp-cat" href="/terms">
+                                    <i class="fas fa-file-contract"></i>
+                                    <strong>Điều khoản</strong>
+                                    <small>Sử dụng, trách nhiệm, IP</small>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <a class="sp-cat" href="/contact">
+                                    <i class="fas fa-truck"></i>
+                                    <strong>Giao hàng</strong>
+                                    <small>Thời gian, theo dõi vận đơn</small>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-4">
+                                <a class="sp-cat" href="/contact">
+                                    <i class="fas fa-screwdriver-wrench"></i>
+                                    <strong>Kỹ thuật</strong>
+                                    <small>Cài đặt, driver, tư vấn cấu hình</small>
+                                </a>
                             </div>
                         </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq2">
-                                    Tôi có thể đổi trả laptop sau bao lâu?
-                                </button>
-                            </h2>
-                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Sản phẩm có thể được đổi trả trong vòng <strong>7 ngày</strong> kể từ ngày mua, với
-                                    điều kiện còn nguyên vẹn và đầy đủ phụ kiện.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#faq3">
-                                    Shop có hỗ trợ cài đặt phần mềm không?
-                                </button>
-                            </h2>
-                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Có, LaptopShop hỗ trợ cài đặt phần mềm cơ bản miễn phí khi bạn mua laptop
-                                    tại cửa hàng.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </section>
+
+                    <!-- FAQ -->
+                    <section class="sp-card">
+                        <h2>FAQ – Câu hỏi thường gặp</h2>
+                        <details class="sp-faq">
+                            <summary>Làm sao kiểm tra tình trạng bảo hành/RMA?</summary>
+                            <p>Gọi <a href="tel:0999887744">0999 887 744</a> hoặc email <a
+                                    href="mailto:support@laptopshop.vn">support@laptopshop.vn</a> kèm số biên nhận/hóa
+                                đơn.</p>
+                        </details>
+                        <details class="sp-faq">
+                            <summary>Đổi ý trong 7 ngày có đổi được không?</summary>
+                            <p>Có thể đổi khi hàng còn nguyên tem/serial/phụ kiện; có thể phát sinh phí định giá. Xem
+                                thêm <a href="/return">chính sách đổi trả</a>.</p>
+                        </details>
+                        <details class="sp-faq">
+                            <summary>Máy không lên nguồn phải làm gì?</summary>
+                            <p>Thử sạc/bộ sạc khác, nhấn giữ nguồn 15s; nếu không được, liên hệ kỹ thuật để hỗ trợ kiểm
+                                tra tại chỗ.</p>
+                        </details>
+                    </section>
                 </div>
 
-                <!-- Liên hệ -->
-                <div class="col-lg-5">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="fw-bold mb-3"><i class="fas fa-headset text-primary me-2"></i> Liên hệ trực tiếp
-                            </h5>
-                            <p><i class="fas fa-phone-alt text-primary me-2"></i> Hotline: 0999 887 744</p>
-                            <p><i class="fas fa-envelope text-primary me-2"></i> Email: support@laptopshop.vn</p>
-                            <p><i class="fas fa-map-marker-alt text-primary me-2"></i> 99 ABC, Thống Nhất, Gò Vấp,
-                                TP.HCM</p>
-                            <p><i class="fas fa-clock text-primary me-2"></i> Thứ 2 - Chủ nhật: 8:00 - 21:00</p>
+                <!-- RIGHT: contact + SLA + ticket form -->
+                <div class="col-lg-4">
+                    <!-- Quick contact -->
+                    <section class="sp-card">
+                        <h5>Liên hệ nhanh</h5>
+                        <div class="d-grid gap-2">
+                            <a href="tel:0999887744" class="btn btn-success rounded-pill"><i
+                                    class="fas fa-phone me-2"></i> 0999 887 744</a>
+                            <a href="mailto:support@laptopshop.vn" class="btn btn-outline-success rounded-pill"><i
+                                    class="fas fa-envelope me-2"></i> support@laptopshop.vn</a>
+                            <a href="/contact" class="btn btn-ghost rounded-pill"><i class="fas fa-comments me-2"></i>
+                                Chat hỗ trợ</a>
                         </div>
-                    </div>
+                        <hr>
+                        <ul class="list-unstyled sp-hours mb-0">
+                            <li><i class="fas fa-clock"></i> 9:00 – 21:00 (T2–CN)</li>
+                            <li><i class="fas fa-location-dot"></i> 99 ABC, Thống Nhất, Gò Vấp, TP.HCM</li>
+                        </ul>
+                    </section>
+
+                    <!-- SLA -->
+                    <section class="sp-card">
+                        <h5>Thời gian phản hồi (SLA)</h5>
+                        <ul class="sp-sla list-unstyled mb-0">
+                            <li><span class="badge sla green">Cấp tốc</span> Trong vòng 2 giờ làm việc</li>
+                            <li><span class="badge sla blue">Chuẩn</span> Trong 24 giờ làm việc</li>
+                            <li><span class="badge sla gray">RMA</span> 7–15 ngày (tùy lỗi/nhà sản xuất)</li>
+                        </ul>
+                    </section>
+
+                    <!-- Ticket form -->
+                    <section class="sp-card">
+                        <h5>Tạo yêu cầu hỗ trợ</h5>
+                        <form id="supportTicket" action="#" method="post" novalidate>
+                            <div class="mb-2">
+                                <label class="form-label">Họ tên</label>
+                                <input type="text" class="form-control" name="name" placeholder="Nguyễn Văn A" required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" placeholder="ban@domain.com"
+                                    required>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Loại yêu cầu</label>
+                                <select class="form-select" name="type" required>
+                                    <option value="">— Chọn —</option>
+                                    <option value="warranty">Bảo hành</option>
+                                    <option value="return">Đổi/Trả</option>
+                                    <option value="order">Đơn hàng/Giao hàng</option>
+                                    <option value="tech">Hỗ trợ kỹ thuật</option>
+                                    <option value="other">Khác</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">Nội dung</label>
+                                <textarea class="form-control" rows="4" name="message"
+                                    placeholder="Mô tả chi tiết vấn đề/bạn cần hỗ trợ…" required></textarea>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="consentSupport" required>
+                                <label class="form-check-label" for="consentSupport">
+                                    Tôi đồng ý để LaptopShop liên hệ lại qua email/điện thoại.
+                                </label>
+                            </div>
+                            <button class="btn btn-primary w-100 rounded-pill" type="submit">
+                                <i class="fas fa-paper-plane me-2"></i> Gửi yêu cầu
+                            </button>
+                            <div id="spSuccess" class="alert alert-success mt-3 d-none mb-0">
+                                ✅ Đã gửi yêu cầu! Mã tham chiếu: <strong id="spRef"></strong>
+                            </div>
+                        </form>
+                    </section>
                 </div>
             </div>
         </div>
+        <!-- SUPPORT: END -->
 
         <%- include('../layout/footer'); -%>
 
@@ -148,6 +223,38 @@
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
             <script src="/client/js/main.js"></script>
+            <!-- (Optional) JS nhỏ cho status time + ticket ref -->
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Cập nhật thời gian status
+                    const t = document.getElementById('spStatusTime');
+                    if (t) {
+                        const d = new Date();
+                        t.textContent = d.toLocaleString('vi-VN');
+                    }
+
+                    // Demo gửi form
+                    const f = document.getElementById('supportTicket');
+                    const ok = document.getElementById('spSuccess');
+                    const ref = document.getElementById('spRef');
+                    if (f) {
+                        f.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            // TODO: Gửi payload thật về server của bạn bằng fetch
+                            // const data = Object.fromEntries(new FormData(f).entries());
+                            // await fetch('/api/support', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) })
+
+                            // Fake ref
+                            const ticket = 'SP-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+                            ref.textContent = ticket;
+                            ok.classList.remove('d-none');
+                            f.reset();
+                            document.getElementById('consentSupport').checked = false;
+                            window.scrollTo({ top: ok.getBoundingClientRect().top + window.scrollY - 120, behavior: 'smooth' });
+                        });
+                    }
+                });
+            </script>
 </body>
 
 </html>

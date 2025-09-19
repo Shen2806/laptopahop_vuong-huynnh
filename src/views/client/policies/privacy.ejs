@@ -35,117 +35,189 @@
 
         <div class="py-1"></div>
 
-        <div class="container my-4">
-            <nav aria-label="breadcrumb" class="mb-3">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Chính sách bảo mật</li>
-                </ol>
-            </nav>
+        <!-- PRIVACY: START -->
+<div class="container my-4 privacy">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Chính sách quyền riêng tư</li>
+    </ol>
+  </nav>
 
-            <div class="row g-4">
-                <!-- Sidebar mục lục -->
-                <div class="col-12 col-lg-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="mb-3">Mục lục</h5>
-                            <ul class="list-unstyled toc">
-                                <li><a href="#intro">1. Giới thiệu</a></li>
-                                <li><a href="#collect">2. Thông tin thu thập</a></li>
-                                <li><a href="#use">3. Mục đích sử dụng</a></li>
-                                <li><a href="#protect">4. Bảo mật thông tin</a></li>
-                                <li><a href="#rights">5. Quyền của khách hàng</a></li>
-                                <li><a href="#share">6. Chia sẻ thông tin</a></li>
-                                <li><a href="#changes">7. Thay đổi chính sách</a></li>
-                                <li><a href="#contact">8. Liên hệ</a></li>
-                            </ul>
-                            <div class="terms-updated mt-3">
-                                Cập nhật lần cuối: <%= typeof lastUpdated !=='undefined' ? lastUpdated : (new
-                                    Date()).toLocaleDateString('vi-VN') %>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <!-- Hero -->
+  <div class="pv-hero rounded-4 overflow-hidden mb-4">
+    <div class="pv-hero__overlay"></div>
+    <div class="pv-hero__content">
+      <h1 class="mb-2" style="color: white;">Chính sách quyền riêng tư</h1>
+      <p class="mb-0">Bảo vệ dữ liệu của bạn • Minh bạch • Tuân thủ pháp luật</p>
+    </div>
+  </div>
 
-                <!-- Nội dung -->
-                <div class="col-12 col-lg-9 terms-section">
-                    <div class="card">
-                        <div class="card-body">
-                            <h2 class="mb-3">Chính sách bảo mật</h2>
-                            <p>
-                                <strong>
-                                    <%= typeof companyName !=='undefined' ? companyName : 'LaptopShop' %>
-                                </strong>
-                                cam kết bảo vệ tuyệt đối thông tin cá nhân và quyền riêng tư của khách hàng khi truy cập
-                                website và mua sắm tại cửa hàng.
-                            </p>
-                            <hr class="my-4">
+  <div class="row g-4">
+    <!-- TOC -->
+    <aside class="col-lg-3">
+      <div class="pv-card sticky-card">
+        <h6 class="mb-2">Mục lục</h6>
+        <ul class="pv-toc list-unstyled mb-0">
+          <li><a href="#pv-intro">1. Tổng quan</a></li>
+          <li><a href="#pv-collect">2. Dữ liệu thu thập</a></li>
+          <li><a href="#pv-use">3. Cách chúng tôi sử dụng</a></li>
+          <li><a href="#pv-cookies">4. Cookie & công nghệ tương tự</a></li>
+          <li><a href="#pv-share">5. Chia sẻ với bên thứ ba</a></li>
+          <li><a href="#pv-retention">6. Thời gian lưu trữ</a></li>
+          <li><a href="#pv-rights">7. Quyền của người dùng</a></li>
+          <li><a href="#pv-security">8. Bảo mật</a></li>
+          <li><a href="#pv-contact">9. Liên hệ</a></li>
+        </ul>
+        <hr class="my-3">
+        <div class="pv-updated">
+          Cập nhật lần cuối:
+          <strong><%= typeof lastUpdated !== 'undefined' ? lastUpdated : (new Date()).toLocaleDateString('vi-VN') %></strong>
+        </div>
+      </div>
+    </aside>
 
-                            <h3 id="intro" class="mt-4">1. Giới thiệu</h3>
-                            <p>
-                                Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu cá nhân của
-                                khách hàng. Khi sử dụng website, bạn đồng ý với các điều khoản trong chính sách này.
-                            </p>
+    <!-- CONTENT -->
+    <div class="col-lg-9">
+      <!-- Intro -->
+      <section id="pv-intro" class="pv-card">
+        <h2>1. Tổng quan</h2>
+        <p>
+          Chính sách này mô tả cách
+          <strong><%= typeof companyName !== 'undefined' ? companyName : 'LaptopShop' %></strong>
+          thu thập, sử dụng, chia sẻ và bảo vệ thông tin cá nhân khi bạn truy cập website, mua hàng hoặc liên hệ hỗ trợ.
+          Bằng việc sử dụng dịch vụ, bạn đồng ý với các điều khoản dưới đây.
+        </p>
+      </section>
 
-                            <h3 id="collect" class="mt-4">2. Thông tin thu thập</h3>
-                            <ul>
-                                <li>Thông tin cá nhân: họ tên, số điện thoại, email, địa chỉ giao hàng.</li>
-                                <li>Thông tin giao dịch: sản phẩm đã mua, phương thức thanh toán.</li>
-                                <li>Dữ liệu kỹ thuật: cookies, địa chỉ IP, lịch sử truy cập website.</li>
-                            </ul>
+      <!-- Collect -->
+      <section id="pv-collect" class="pv-card">
+        <h2>2. Dữ liệu chúng tôi thu thập</h2>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="pv-chip">
+              <i class="fas fa-user"></i>
+              <div>
+                <strong>Thông tin định danh</strong>
+                <small>Họ tên, email, số điện thoại, địa chỉ</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="pv-chip">
+              <i class="fas fa-truck"></i>
+              <div>
+                <strong>Giao nhận & thanh toán</strong>
+                <small>Địa chỉ nhận hàng, mã vận đơn, phương thức thanh toán</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="pv-chip">
+              <i class="fas fa-laptop"></i>
+              <div>
+                <strong>Dịch vụ & bảo hành</strong>
+                <small>Thông tin sản phẩm, số serial, biên nhận RMA</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="pv-chip">
+              <i class="fas fa-globe"></i>
+              <div>
+                <strong>Dữ liệu kỹ thuật</strong>
+                <small>IP, loại trình duyệt, cookie, tương tác trên website</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="text-muted mb-0"><small>Chúng tôi chỉ thu thập dữ liệu cần thiết để cung cấp dịch vụ và tuân thủ pháp luật.</small></p>
+      </section>
 
-                            <h3 id="use" class="mt-4">3. Mục đích sử dụng</h3>
-                            <ul>
-                                <li>Xử lý đơn hàng, giao hàng và hỗ trợ khách hàng.</li>
-                                <li>Thông báo chương trình khuyến mãi, ưu đãi.</li>
-                                <li>Nâng cao chất lượng sản phẩm, dịch vụ.</li>
-                            </ul>
+      <!-- Use -->
+      <section id="pv-use" class="pv-card">
+        <h2>3. Mục đích sử dụng dữ liệu</h2>
+        <ul class="pv-list">
+          <li>Xử lý đơn hàng, giao nhận và chăm sóc sau bán.</li>
+          <li>Thiết lập bảo hành, đổi trả và hỗ trợ kỹ thuật.</li>
+          <li>Gửi thông báo quan trọng (trạng thái đơn, RMA, cập nhật chính sách).</li>
+          <li>Cải thiện trải nghiệm, tùy biến nội dung và đo lường hiệu quả.</li>
+          <li>Tuân thủ yêu cầu pháp lý và phòng chống gian lận.</li>
+        </ul>
+      </section>
 
-                            <h3 id="protect" class="mt-4">4. Bảo mật thông tin</h3>
-                            <p>
-                                Chúng tôi áp dụng biện pháp bảo mật kỹ thuật và tổ chức nhằm ngăn chặn truy cập trái
-                                phép, mất mát hoặc lạm dụng thông tin.
-                                LaptopShop không chia sẻ thông tin khách hàng cho bên thứ ba trừ khi được sự đồng ý hoặc
-                                theo yêu cầu pháp luật.
-                            </p>
+      <!-- Cookies -->
+      <section id="pv-cookies" class="pv-card">
+        <h2>4. Cookie & công nghệ tương tự</h2>
+        <ul class="pv-list">
+          <li><strong>Cookie thiết yếu:</strong> cần cho chức năng đăng nhập, giỏ hàng, thanh toán.</li>
+          <li><strong>Hiệu năng & phân tích:</strong> giúp hiểu cách bạn sử dụng website để cải thiện.</li>
+          <li><strong>Tiếp thị:</strong> hiển thị ưu đãi phù hợp sở thích (có thể tùy chọn tắt).</li>
+        </ul>
+        <p class="mb-0">Bạn có thể quản lý cookie trong cài đặt trình duyệt. Việc tắt cookie có thể làm giảm một số chức năng.</p>
+      </section>
 
-                            <h3 id="rights" class="mt-4">5. Quyền của khách hàng</h3>
-                            <ul>
-                                <li>Yêu cầu truy cập, chỉnh sửa hoặc xóa dữ liệu cá nhân.</li>
-                                <li>Yêu cầu ngừng nhận thông tin quảng cáo, khuyến mãi.</li>
-                            </ul>
+      <!-- Share -->
+      <section id="pv-share" class="pv-card">
+        <h2>5. Chia sẻ với bên thứ ba</h2>
+        <ul class="pv-list">
+          <li><strong>Đối tác vận chuyển:</strong> để giao hàng và cập nhật trạng thái.</li>
+          <li><strong>Đối tác thanh toán:</strong> xử lý giao dịch, hoàn tiền.</li>
+          <li><strong>Hãng/TT bảo hành:</strong> xác minh serial và xử lý RMA.</li>
+          <li><strong>Pháp luật:</strong> khi có yêu cầu hợp lệ từ cơ quan chức năng.</li>
+        </ul>
+        <p class="text-muted mb-0"><small>Không bán dữ liệu cá nhân cho bên thứ ba.</small></p>
+      </section>
 
-                            <h3 id="share" class="mt-4">6. Chia sẻ thông tin</h3>
-                            <p>
-                                Thông tin khách hàng chỉ được chia sẻ với đối tác vận chuyển, thanh toán trong phạm vi
-                                cần thiết để hoàn tất đơn hàng.
-                            </p>
+      <!-- Retention -->
+      <section id="pv-retention" class="pv-card">
+        <h2>6. Thời gian lưu trữ</h2>
+        <p>Chúng tôi lưu dữ liệu trong thời gian cần thiết để cung cấp dịch vụ và theo quy định pháp luật (kế toán, thuế, bảo hành…). Khi không còn mục đích hợp lệ, dữ liệu sẽ được ẩn danh hoặc xóa an toàn.</p>
+      </section>
 
-                            <h3 id="changes" class="mt-4">7. Thay đổi chính sách</h3>
-                            <p>
-                                Chính sách bảo mật có thể được điều chỉnh để phù hợp với quy định pháp luật hoặc nhu cầu
-                                hoạt động. Mọi thay đổi sẽ được công bố trên website.
-                            </p>
+      <!-- Rights -->
+      <section id="pv-rights" class="pv-card">
+        <h2>7. Quyền của bạn</h2>
+        <ul class="pv-list">
+          <li>Yêu cầu truy cập, cập nhật hoặc xóa dữ liệu cá nhân.</li>
+          <li>Rút lại sự đồng ý đối với tiếp thị (nếu đã đồng ý trước đó).</li>
+          <li>Phản đối/giới hạn xử lý trong một số trường hợp.</li>
+          <li>Khiếu nại tới cơ quan quản lý (nếu cần).</li>
+        </ul>
+        <p class="mb-0">Để thực hiện quyền, vui lòng liên hệ <a href="mailto:support@laptopshop.vn">support@laptopshop.vn</a>.</p>
+      </section>
 
-                            <h3 id="contact" class="mt-4">8. Liên hệ</h3>
-                            <p>Nếu có thắc mắc về chính sách bảo mật, vui lòng liên hệ:</p>
-                            <ul>
-                                <li>Địa chỉ: 99 ABC, Thống Nhất, Gò Vấp, TP.HCM</li>
-                                <li>Email: support@laptopshop.vn</li>
-                                <li>Hotline: 0999 887 744</li>
-                            </ul>
+      <!-- Security -->
+      <section id="pv-security" class="pv-card">
+        <h2>8. Bảo mật</h2>
+        <ul class="pv-list">
+          <li>Áp dụng biện pháp kỹ thuật & tổ chức phù hợp (mã hóa, phân quyền, ghi nhật ký).</li>
+          <li>Chỉ nhân sự có thẩm quyền mới được truy cập dữ liệu cần thiết để thực hiện công việc.</li>
+          <li>Rà soát định kỳ, vá lỗ hổng và nâng cấp hệ thống.</li>
+        </ul>
+      </section>
 
-                            <div class="callout mt-4">
-                                <small>
-                                    Khi tiếp tục sử dụng website, bạn xác nhận đã đọc, hiểu và đồng ý với Chính sách bảo
-                                    mật này.
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div><!-- row -->
-        </div><!-- /container -->
+      <!-- Contact -->
+      <section id="pv-contact" class="pv-card">
+        <h2>9. Liên hệ</h2>
+        <ul class="pv-contact list-unstyled">
+          <li><i class="fas fa-map-marker-alt"></i> 99 ABC, Thống Nhất, Gò Vấp, TP.HCM</li>
+          <li><i class="fas fa-envelope"></i> support@laptopshop.vn</li>
+          <li><i class="fas fa-phone"></i> 0999 887 744</li>
+          <li><i class="fas fa-clock"></i> 9:00 – 21:00 (T2–CN)</li>
+        </ul>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="/contact" class="btn btn-success rounded-pill"><i class="fas fa-message me-2"></i> Liên hệ hỗ trợ</a>
+          <a href="/warranty" class="btn btn-outline-success rounded-pill"><i class="fas fa-file-shield me-2"></i> Chính sách bảo hành</a>
+          <a href="/return" class="btn btn-ghost rounded-pill"><i class="fas fa-rotate me-2"></i> Chính sách đổi trả</a>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<!-- PRIVACY: END -->
+
 
         <%- include('../layout/footer'); -%>
 

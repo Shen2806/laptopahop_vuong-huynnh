@@ -38,111 +38,231 @@
 
         <div class="py-1"></div>
 
-        <!-- CONTENT -->
-        <div class="container my-4">
-            <nav aria-label="breadcrumb" class="mb-3">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Chính sách bảo hành</li>
-                </ol>
-            </nav>
+        <!-- WARRANTY: START -->
+<div class="container my-4 warranty">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Chính sách bảo hành</li>
+    </ol>
+  </nav>
 
-            <div class="row g-4">
-                <div class="col-12 col-lg-3">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="mb-3">Mục lục</h5>
-                            <ul class="list-unstyled toc">
-                                <li><a href="#general">1. Chính sách chung</a></li>
-                                <li><a href="#warranty">2. Bảo hành sản phẩm</a></li>
-                                <li><a href="#return">3. Chính sách đổi trả</a></li>
-                                <li><a href="#exceptions">4. Trường hợp từ chối bảo hành</a></li>
-                                <li><a href="#process">5. Quy trình bảo hành</a></li>
-                                <li><a href="#contact">6. Liên hệ hỗ trợ</a></li>
-                            </ul>
-                            <div class="terms-updated mt-3">
-                                Cập nhật lần cuối:
-                                <%= typeof lastUpdated !=='undefined' ? lastUpdated : (new
-                                    Date()).toLocaleDateString('vi-VN') %>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <!-- Hero -->
+  <div class="wty-hero rounded-4 overflow-hidden mb-4">
+    <div class="wty-hero__overlay"></div>
+    <div class="wty-hero__content">
+      <h1 class="mb-2" style="color: white;">Chính sách bảo hành & đổi trả</h1>
+      <p class="mb-0">Chính hãng • Minh bạch • Xử lý nhanh</p>
+    </div>
+  </div>
 
-                <div class="col-12 col-lg-9 terms-section">
-                    <div class="card">
-                        <div class="card-body">
-                            <h2 class="mb-3">Chính sách bảo hành & đổi trả</h2>
-                            <p>
-                                Cảm ơn bạn đã tin tưởng lựa chọn
-                                <strong>
-                                    <%= typeof companyName !=='undefined' ? companyName : 'Laptop-Shop' %>
-                                </strong>.
-                                Chúng tôi cam kết cung cấp sản phẩm chất lượng cao cùng chính sách bảo hành, đổi trả
-                                minh bạch nhằm bảo vệ quyền lợi khách hàng.
-                            </p>
+  <!-- Summary cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="wty-chip">
+        <i class="fas fa-shield-check"></i>
+        <div>
+          <strong>100% chính hãng</strong>
+          <small>Hóa đơn/VAT đầy đủ</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="wty-chip">
+        <i class="fas fa-rotate"></i>
+        <div>
+          <strong>Đổi 1–1 trong 7 ngày*</strong>
+          <small>Lỗi do NSX</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="wty-chip">
+        <i class="fas fa-screwdriver-wrench"></i>
+        <div>
+          <strong>RMA 7–15 ngày</strong>
+          <small>Tùy tình trạng</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="wty-chip">
+        <i class="fas fa-headset"></i>
+        <div>
+          <strong>Hỗ trợ 24/7</strong>
+          <small>Kỹ thuật & tư vấn</small>
+        </div>
+      </div>
+    </div>
+  </div>
 
-                            <hr class="my-4">
+  <div class="row g-4">
+    <!-- LEFT: Main content -->
+    <div class="col-lg-8">
+      <!-- 1. Chính sách chung -->
+      <section id="wty-general" class="wty-card">
+        <h2>1. Chính sách chung</h2>
+        <ul class="wty-list">
+          <li>Tất cả laptop/phụ kiện áp dụng bảo hành chính hãng hoặc bảo hành tại LaptopShop.</li>
+          <li>Vui lòng giữ <strong>hóa đơn</strong>, <strong>phiếu bảo hành</strong> để được hỗ trợ nhanh.</li>
+          <li>Tem niêm phong/serial phải còn nguyên vẹn, không tẩy xóa.</li>
+        </ul>
+      </section>
 
-                            <h3 id="general" class="mt-4">1. Chính sách chung</h3>
-                            <ul>
-                                <li>Tất cả sản phẩm laptop và phụ kiện đều được áp dụng bảo hành chính hãng hoặc của
-                                    Laptop-Shop.</li>
-                                <li>Khách hàng cần giữ lại hóa đơn mua hàng hoặc phiếu bảo hành để được hỗ trợ.</li>
-                            </ul>
+      <!-- 2. Bảo hành theo nhóm sản phẩm -->
+      <section id="wty-matrix" class="wty-card">
+        <h2>2. Thời hạn & phạm vi bảo hành</h2>
+        <div class="table-responsive">
+          <table class="table wty-table align-middle">
+            <thead>
+              <tr>
+                <th>Nhóm</th>
+                <th>Thời hạn</th>
+                <th>Phạm vi</th>
+                <th>Hình thức</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><i class="fas fa-laptop me-2"></i>Laptop (Dell/Asus/Lenovo/Apple…)</td>
+                <td>12–24 tháng</td>
+                <td>Lỗi kỹ thuật từ NSX, linh kiện phần cứng</td>
+                <td>Trực tiếp hãng / Trung tâm LaptopShop</td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-memory me-2"></i>RAM/SSD</td>
+                <td>24–60 tháng (tùy hãng)</td>
+                <td>Lỗi phần cứng, bad sector, không nhận</td>
+                <td>Đổi mới/đổi tương đương</td>
+              </tr>
+              <tr>
+                <td><i class="fas fa-computer me-2"></i>Chuột, bàn phím, phụ kiện</td>
+                <td>12 tháng</td>
+                <td>Lỗi sản xuất, không hoạt động</td>
+                <td>Đổi mới theo tình trạng</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <small class="text-muted">(*) Thời hạn cụ thể thể hiện trên tem hoặc hóa đơn theo từng model/hãng.</small>
+      </section>
 
-                            <h3 id="warranty" class="mt-4">2. Bảo hành sản phẩm</h3>
-                            <ul>
-                                <li>Thời gian bảo hành: từ 12 đến 24 tháng tùy sản phẩm.</li>
-                                <li>Bảo hành bao gồm: lỗi kỹ thuật từ nhà sản xuất, lỗi linh kiện phần cứng.</li>
-                                <li>Thời gian xử lý bảo hành: 7 – 15 ngày làm việc (tùy tình trạng sản phẩm).</li>
-                            </ul>
+      <!-- 3. Quy trình bảo hành (timeline) -->
+      <section id="wty-process" class="wty-card">
+        <h2>3. Quy trình bảo hành (RMA)</h2>
+        <ol class="wty-steps">
+          <li>
+            <h6>Bước 1 — Tiếp nhận</h6>
+            <p>Mang sản phẩm & chứng từ đến cửa hàng hoặc gửi về trung tâm bảo hành.</p>
+          </li>
+          <li>
+            <h6>Bước 2 — Kiểm tra</h6>
+            <p>Kỹ thuật viên chẩn đoán, lập biên bản & báo thời gian dự kiến (7–15 ngày).</p>
+          </li>
+          <li>
+            <h6>Bước 3 — Xử lý</h6>
+            <p>Gửi hãng hoặc xử lý tại trung tâm theo chính sách từng trường hợp.</p>
+          </li>
+          <li>
+            <h6>Bước 4 — Bàn giao</h6>
+            <p>Thông báo kết quả, bàn giao lại sản phẩm. Hỗ trợ cài đặt miễn phí (nếu cần).</p>
+          </li>
+        </ol>
+      </section>
 
-                            <h3 id="return" class="mt-4">3. Chính sách đổi trả</h3>
-                            <ul>
-                                <li>Đổi trả miễn phí trong 7 ngày nếu sản phẩm lỗi do nhà sản xuất.</li>
-                                <li>Sản phẩm phải còn nguyên tem, phiếu bảo hành, phụ kiện kèm theo và không có dấu hiệu
-                                    đã qua sửa chữa.</li>
-                                <li>Không áp dụng đổi trả với các trường hợp hao mòn tự nhiên, hỏng hóc do sử dụng sai
-                                    cách.</li>
-                            </ul>
+      <!-- 4. Trường hợp từ chối bảo hành -->
+      <section id="wty-exceptions" class="wty-card">
+        <h2>4. Trường hợp từ chối bảo hành</h2>
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="wty-bad">
+              <i class="fas fa-water"></i>
+              <div>
+                <h6>Vào nước / cháy nổ</h6>
+                <p>Oxid, ẩm, chập cháy, biến dạng vật lý.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="wty-bad">
+              <i class="fas fa-hammer"></i>
+              <div>
+                <h6>Tác động ngoại lực</h6>
+                <p>Rơi vỡ, móp méo, nứt vỡ màn hình/khung.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="wty-bad">
+              <i class="fas fa-user-gear"></i>
+              <div>
+                <h6>Sửa chữa trái phép</h6>
+                <p>Can thiệp bởi đơn vị không ủy quyền.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="wty-bad">
+              <i class="fas fa-bug"></i>
+              <div>
+                <h6>Phần mềm/virus</h6>
+                <p>Lỗi do cài đặt sai, nhiễm mã độc, OC quá mức.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-                            <h3 id="exceptions" class="mt-4">4. Trường hợp từ chối bảo hành</h3>
-                            <ul>
-                                <li>Sản phẩm bị hư hỏng do va đập, rơi vỡ, nước vào, cháy nổ.</li>
-                                <li>Sản phẩm bị sửa chữa bởi đơn vị không thuộc hệ thống bảo hành ủy quyền.</li>
-                                <li>Hỏng hóc do lỗi người dùng (cài đặt sai phần mềm, virus, sử dụng sai nguồn điện…).
-                                </li>
-                            </ul>
+      <!-- 5. FAQ -->
+      <section id="wty-faq" class="wty-card">
+        <h2>5. Câu hỏi thường gặp</h2>
+        <details class="wty-faq">
+          <summary>Tôi có được máy mượn trong thời gian bảo hành?</summary>
+          <p>Tùy tình trạng & tồn kho máy mượn tại thời điểm tiếp nhận. Vui lòng hỏi tư vấn viên.</p>
+        </details>
+        <details class="wty-faq">
+          <summary>Bảo hành pin/sạc như thế nào?</summary>
+          <p>Pin/sạc là vật tư tiêu hao, đa số hãng bảo hành 12 tháng (hoặc theo TBH máy nếu ghi rõ).</p>
+        </details>
+        <details class="wty-faq">
+          <summary>Làm sao kiểm tra tình trạng RMA?</summary>
+          <p>Gọi <a href="tel:0999887744">0999 887 744</a> hoặc email <a href="mailto:support@laptopshop.vn">support@laptopshop.vn</a> kèm số biên nhận.</p>
+        </details>
+      </section>
+    </div>
 
-                            <h3 id="process" class="mt-4">5. Quy trình bảo hành</h3>
-                            <ol>
-                                <li>Khách hàng mang sản phẩm đến cửa hàng hoặc gửi về trung tâm bảo hành.</li>
-                                <li>Nhân viên kiểm tra và lập biên bản tiếp nhận.</li>
-                                <li>Sản phẩm được chuyển đến hãng hoặc trung tâm bảo hành Laptop-Shop.</li>
-                                <li>Khách hàng nhận lại sản phẩm sau khi xử lý xong.</li>
-                            </ol>
+    <!-- RIGHT: Support & last updated -->
+    <div class="col-lg-4">
+      <div class="wty-support wty-card">
+        <h5>Hỗ trợ nhanh</h5>
+        <p class="text-muted">Cần tư vấn quy trình, thời gian hay chính sách cụ thể?</p>
+        <div class="d-grid gap-2">
+          <a href="/contact" class="btn btn-success rounded-pill"><i class="fas fa-message me-2"></i> Liên hệ hỗ trợ</a>
+          <a href="tel:0999887744" class="btn btn-outline-success rounded-pill"><i class="fas fa-phone me-2"></i> 0999 887 744</a>
+          <a href="mailto:support@laptopshop.vn" class="btn btn-ghost rounded-pill"><i class="fas fa-envelope me-2"></i> support@laptopshop.vn</a>
+        </div>
+        <hr>
+        <div class="wty-updated">
+          Cập nhật lần cuối:
+          <strong>
+            <%= typeof lastUpdated !== 'undefined' ? lastUpdated : (new Date()).toLocaleDateString('vi-VN') %>
+          </strong>
+        </div>
+      </div>
 
-                            <h3 id="contact" class="mt-4">6. Liên hệ hỗ trợ</h3>
-                            <p>Nếu cần hỗ trợ thêm, vui lòng liên hệ:</p>
-                            <ul>
-                                <li>Địa chỉ: 99 ABC, Thống Nhất, Gò Vấp, TP.HCM</li>
-                                <li>Email: support@laptop-shop.vn</li>
-                                <li>Điện thoại: 0999 887 744</li>
-                            </ul>
+      <div class="wty-note wty-card">
+        <i class="fas fa-circle-info"></i>
+        <div>
+          <h6>Lưu ý</h6>
+          <p class="mb-0">Chính sách có thể thay đổi theo từng hãng/model. Vui lòng xem trên tem/hoá đơn hoặc hỏi tư vấn viên.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- WARRANTY: END -->
 
-                            <div class="callout mt-4">
-                                <small>
-                                    Laptop-Shop cam kết luôn đồng hành cùng khách hàng trong suốt quá trình sử dụng sản
-                                    phẩm.
-                                    Mọi thắc mắc sẽ được giải đáp tận tình để mang lại trải nghiệm mua sắm tốt nhất.
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div><!-- row -->
-        </div><!-- /container -->
 
     <!-- FOOTER START -->
     <%- include('../layout/footer'); -%>
