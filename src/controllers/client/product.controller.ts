@@ -12,6 +12,7 @@ const STATUS_LABEL_VI: Record<string, string> = {
     DELIVERED: "Đã giao hàng",
     CANCELED: "Đã hủy",
 };
+
 // Thứ tự các bước (không tính CANCELED)
 const ORDER_STEPS: $Enums.OrderStatus[] = [
     "PENDING",
@@ -21,6 +22,7 @@ const ORDER_STEPS: $Enums.OrderStatus[] = [
     "DELIVERED",
     "CANCELED"
 ];
+
 const getProductPage = async (req: Request, res: Response) => {
     const { id } = req.params;
     const product = await getProductById(+id);
@@ -59,6 +61,7 @@ const getCartPage = async (req: Request, res: Response) => {
         cart, cartDetails, totalPrice, cartId
     });
 }
+
 const postDeleteProductInCart = async (req: Request, res: Response) => {
     const { id } = req.params;
     const user = req.user;
@@ -136,7 +139,6 @@ const getCheckOutPage = async (req: Request, res: Response) => {
     }
 };
 
-
 const postHandleCartToCheckOut = async (req: Request, res: Response) => {
     const user = (req as any).user;
     if (!user) return res.redirect("/login");
@@ -157,7 +159,6 @@ const postHandleCartToCheckOut = async (req: Request, res: Response) => {
         return res.redirect("/cart");
     }
 };
-
 
 const postPlaceOrder = async (req: Request, res: Response) => {
     const user = (req as any).user;
@@ -214,7 +215,6 @@ const postPlaceOrder = async (req: Request, res: Response) => {
     }
 };
 
-
 const getThanksPage = async (req: Request, res: Response) => {
     let order: any = null;
 
@@ -256,7 +256,6 @@ const postAddToCartFromDetailPage = async (req: Request, res: Response) => {
     return res.redirect(`/product/${id}`)
 }
 
-
 // Xử lý hủy đơn
 const postCancelOrder = async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -293,7 +292,6 @@ const postCancelOrder = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại" });
     }
 };
-
 
 // xem chi tiết đơn hàng ở phần trạng thái
 const getOrderDetailPage = async (req: Request, res: Response) => {
@@ -333,6 +331,7 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
         canceled,
     });
 };
+
 
 
 export { getProductPage, postAddProductToCart, getCartPage, postDeleteProductInCart, getCheckOutPage, postHandleCartToCheckOut, postPlaceOrder, getThanksPage, getOrderHistoryPage, postAddToCartFromDetailPage, postCancelOrder, getOrderDetailPage };
