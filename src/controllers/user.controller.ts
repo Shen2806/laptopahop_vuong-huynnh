@@ -4,44 +4,75 @@ import { countTotalProductClientPages, getProducts } from 'services/client/item.
 import { getProductWithFilter, getSortIncProduct, userFilter } from 'services/client/product.filter';
 import { getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById } from 'services/user.service';
 
+
 // const getHomePage = async (req: Request, res: Response) => {
 //     const { page } = req.query;
 
 //     let currentPage = page ? +page : 1;
 //     if (currentPage <= 0) currentPage = 1;
+
+//     // Lấy phân trang sản phẩm thường
 //     const totalPages = await countTotalProductClientPages(8);
 //     const products = await getProducts(currentPage, 8);
+
+//     // Lấy sản phẩm khuyến mãi
+//     const promoProducts = await prisma.product.findMany({
+//         where: { discount: { gt: 0 } },
+//         take: 6, // ví dụ: chỉ lấy 6 sp nổi bật
+//         select: { id: true, name: true, price: true, discount: true, image: true }
+//     });
+
 //     return res.render("client/home/show.ejs", {
 //         products,
 //         totalPages: +totalPages,
-//         page: +currentPage
+//         page: +currentPage,
+//         promoProducts // 👈 truyền thêm
 //     });
-// }
+// };
 
+// getHomePage (bổ sung phần lấy blog & truyền vào render)
 const getHomePage = async (req: Request, res: Response) => {
     const { page } = req.query;
 
     let currentPage = page ? +page : 1;
     if (currentPage <= 0) currentPage = 1;
 
-    // Lấy phân trang sản phẩm thường
+    // Phân trang sản phẩm
     const totalPages = await countTotalProductClientPages(8);
     const products = await getProducts(currentPage, 8);
 
-    // Lấy sản phẩm khuyến mãi
+    // Sản phẩm khuyến mãi
     const promoProducts = await prisma.product.findMany({
         where: { discount: { gt: 0 } },
-        take: 6, // ví dụ: chỉ lấy 6 sp nổi bật
+        take: 6,
         select: { id: true, name: true, price: true, discount: true, image: true }
+    });
+
+    // === Tin tức công nghệ (blog) ===
+    const latestBlogs = await prisma.blog.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        take: 8,
+        select: {
+            id: true,
+            title: true,
+            slug: true,
+            thumbnail: true,
+            author: true,
+            createdAt: true,
+            content: true, // dùng để rút gọn nếu không có summary
+        },
     });
 
     return res.render("client/home/show.ejs", {
         products,
         totalPages: +totalPages,
         page: +currentPage,
-        promoProducts // 👈 truyền thêm
+        promoProducts,
+        latestBlogs,
     });
 };
+
 
 const getCreateUserPage = async (req: Request, res: Response) => {
     const roles = await getAllRoles();
