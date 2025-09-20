@@ -278,5 +278,18 @@
                         '</div>'
                     );
                 });
+                uSocket.on('chat-incoming', (data) => {
+                    try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                    uUpdateBadge(1);
+                    uPrepend(
+                        '<div class="d-flex justify-content-between align-items-start">' +
+                        '<div>' +
+                        '<div class="fw-semibold">Tin nhắn mới từ hỗ trợ</div>' +
+                        '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                        '</div>' +
+                        '<a href="javascript:void(0)" onclick="document.getElementById(\'chatOpen\').click()" class="btn btn-sm btn-primary ms-2">Mở</a>' +
+                        '</div>'
+                    );
+                });
             })();
         </script>

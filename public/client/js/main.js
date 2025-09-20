@@ -405,4 +405,292 @@
         return true;
     }
 
+    
+    // public/client/js/product-detail.js
+(function () {
+  const productId = window.__PRODUCT_ID__;
+  const isAuth = window.__IS_AUTH__;
+  const currentUserId = window.__USER_ID__ ?? null;
+
+  // ====== phần review/Q&A ở cuối file (mục 2,3) ======
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const boot = document.getElementById('boot');
+  if (!boot) return console.error('Boot element missing');
+
+  const PRODUCT_ID = Number(boot.dataset.productId || '0');
+  const IS_AUTH    = boot.dataset.isAuth === '1';
+  const USER_ID    = boot.dataset.userId ? Number(boot.dataset.userId) : null;
+
+// ===== CHAT =====
+
+// 1) Singleton socket cho toàn trang
+const socket = (window.__CHAT_SOCKET__ ||= io());
+
+// 2) Guard: đảm bảo init 1 lần duy nhất cho widget
+if (window.__CHAT_WIDGET_INIT__) {
+  // đã init rồi thì không làm lại (tránh đăng ký listener lặp)
+} else {
+  window.__CHAT_WIDGET_INIT__ = true;
+
+  let sessionId = null;
+  const LS_KEY = `chat_session_product_${PRODUCT_ID}`;
+
+  const $open  = document.getElementById("chatOpen");
+  const $card  = document.getElementById("chatCard");
+  const $close = document.getElementById("chatClose");
+  const $pre   = document.getElementById("preChat");
+  const $main  = document.getElementById("chatMain");
+  const $name  = document.getElementById("preName");
+  const $start = document.getElementById("btnStartChat");
+  const $body  = document.getElementById("chatBody");
+  const $form  = document.getElementById("chatForm");
+  const $input = document.getElementById("chatInput");
+  const $typing= document.getElementById("typingHint");
+  const $sound = document.getElementById("chatSound");
+  const $miniBadge = document.getElementById("chatMiniBadge");
+
+  let closed = false;
+
+  // 3) Set ID để khử trùng lặp message
+  const seenMsgIds = (window.__CHAT_SEEN_IDS__ ||= new Set());
+
+  function showCard() { $open.classList.add("d-none"); $card.classList.remove("d-none"); }
+  function hideCard() { $card.classList.add("d-none"); $open.classList.remove("d-none"); }
+  function showMain() { $pre.classList.add("d-none"); $main.classList.remove("d-none"); }
+  function showPre()  { $main.classList.add("d-none"); $pre.classList.remove("d-none"); }
+  function playSound(){ try { $sound.currentTime=0; $sound.play().catch(()=>{}); } catch{} }
+  function incMiniBadge(){ $miniBadge.classList.remove("d-none"); $miniBadge.textContent="1"; }
+  function clearMiniBadge(){ $miniBadge.classList.add("d-none"); }
+
+  function setClosedUI() {
+    if (closed) return;
+    closed = true;
+    if ($input) $input.disabled = true;
+    const btn = $form?.querySelector('button'); if (btn) btn.disabled = true;
+    appendMsg("ADMIN", "Phiên chat đã kết thúc.");
+  }
+
+  function appendMsg(who, text, isRead=false) {
+    const div = document.createElement("div");
+    div.className = `d-flex ${who==="USER"?"justify-content-end":"justify-content-start"} mb-2`;
+    const status = who==="USER" ? `<span class="ms-2 small ${isRead?"text-primary":"text-muted"}">${isRead?"✓✓":"✓"}</span>` : "";
+    div.innerHTML = `<div class="p-2 rounded ${who==="USER"?"bg-primary text-white":"bg-light"}" style="max-width:80%">${text}${status}</div>`;
+    $body.appendChild(div);
+    $body.scrollTop = $body.scrollHeight;
+  }
+
+  async function loadHistory() {
+    const res = await fetch(`/api/chat/sessions/${sessionId}/messages`);
+    const list = await res.json();
+    $body.innerHTML = "";
+
+    // reset vết & nạp lại
+    seenMsgIds.clear();
+    list.forEach(m => {
+      if (typeof m.id !== "undefined") seenMsgIds.add(m.id);
+      appendMsg(m.sender, m.content, !!m.isRead);
+    });
+
+    socket.emit("chat:read", { sessionId, readerRole: "USER" });
+  }
+
+  function ensureSessionThen() {
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved) {
+      sessionId = Number(saved);
+      socket.emit("chat:join", { sessionId });
+      showMain();
+      loadHistory();
+      return;
+    }
+    showPre();
+    $start.onclick = () => {
+      const name = ($name.value || "Khách").trim();
+      const gender = (document.querySelector('input[name="preGender"]:checked')?.value) || "OTHER";
+      socket.emit("chat:create_session", { name, gender, productId: PRODUCT_ID, userId: USER_ID }, (sess) => {
+        sessionId = sess.id;
+        localStorage.setItem(LS_KEY, String(sessionId));
+        showMain();
+        loadHistory();
+      });
+    };
+  }
+
+  $open.addEventListener("click", () => { showCard(); clearMiniBadge(); ensureSessionThen(); });
+  $close.addEventListener("click", () => { hideCard(); });
+
+  $form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (closed) return;
+    const content = ($input.value || "").trim(); if (!content) return;
+    socket.emit("chat:message", { sessionId, sender: "USER", content });
+    appendMsg("USER", content, false);
+    $input.value = "";
+  });
+
+  let tmr;
+  $input?.addEventListener("input", () => {
+    if (!sessionId || closed) return;
+    socket.emit("chat:typing", { sessionId, who: "USER", isTyping: true });
+    clearTimeout(tmr);
+    tmr = setTimeout(()=> socket.emit("chat:typing", { sessionId, who: "USER", isTyping: false }), 800);
+  });
+
+  // 👉 Trước khi đăng ký, gỡ mọi listener cũ để chắc chắn không bị lặp
+  socket.off("chat:message");
+  socket.off("chat:typing");
+  socket.off("chat:read");
+  socket.off("chat:status");
+  socket.off("chat:closed");
+
+  socket.on("chat:message", (msg) => {
+    // Khử trùng theo id
+    if (msg && typeof msg.id !== "undefined") {
+      if (seenMsgIds.has(msg.id)) return;
+      seenMsgIds.add(msg.id);
+    }
+    // Sai phòng thì bỏ
+    if (Number(msg.sessionId) !== Number(sessionId)) return;
+
+    if (msg.sender === "ADMIN") {
+      appendMsg("ADMIN", msg.content);
+      if ($card.classList.contains("d-none")) { incMiniBadge(); playSound(); }
+      socket.emit("chat:read", { sessionId, readerRole: "USER" });
+    }
+  });
+
+  socket.on("chat:typing", ({ who, isTyping }) => {
+    if (who === "ADMIN") $typing.classList.toggle("d-none", !isTyping);
+  });
+
+  socket.on("chat:read", ({ sessionId: sid, readerRole }) => {
+    if (Number(sid) !== Number(sessionId)) return;
+    if (readerRole === "ADMIN") loadHistory();
+  });
+
+  socket.on("chat:status", ({ sessionId: sid, status }) => {
+    if (Number(sid) !== Number(sessionId)) return;
+    if (status === "CLOSED") setClosedUI();
+  });
+
+  socket.on("chat:closed", () => setClosedUI());
+}
+  });
+
+  // ====== CTA Mua ngay & các phần khác sẽ ở mục dưới ======
+    // ====== RENDER SAO ======
+  function renderStarsValue(v, size = "1.1rem") {
+    const full = Math.floor(v), half = v - full >= 0.5 ? 1 : 0, empty = 5 - full - half;
+    let html = "";
+    for (let i = 0; i < full; i++) html += `<i class="fa fa-star text-warning" style="font-size:${size}"></i>`;
+    if (half) html += `<i class="fa fa-star-half-alt text-warning" style="font-size:${size}"></i>`;
+    for (let i = 0; i < empty; i++) html += `<i class="fa fa-star text-secondary" style="font-size:${size}"></i>`;
+    return html;
+  }
+
+  async function loadMetaBasic() {
+    const res = await fetch(`/api/products/${productId}/meta`);
+    const data = await res.json();
+    const avg = Number(data.ratingAvg || 0);
+    const count = Number(data.ratingCount || 0);
+    const $avg = document.getElementById("avgStars");
+    const $cnt = document.getElementById("ratingCount");
+    if ($avg) $avg.innerHTML = renderStarsValue(avg) + `<span class="ms-2 fw-semibold">${avg}</span>`;
+    if ($cnt) $cnt.textContent = `(${count} đánh giá)`;
+  }
+
+  async function loadReviews() {
+    const res = await fetch(`/api/products/${productId}/reviews`);
+    const reviews = await res.json();
+    const $list = document.getElementById("reviewList");
+    if (!$list) return;
+    $list.innerHTML = reviews.map(r => `
+      <div class="border rounded p-2 mb-2">
+        <div class="d-flex align-items-center gap-2">
+          <img src="/images/${r.user.avatar||'default-avatar.png'}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" />
+          <strong>${r.user.name}</strong>
+          <span class="small text-muted">${new Date(r.createdAt).toLocaleString('vi-VN')}</span>
+        </div>
+        <div class="mt-1">${renderStarsValue(r.rating)}</div>
+        <div class="mt-1">${r.comment || ""}</div>
+      </div>
+    `).join("");
+    // nếu là review của tôi -> set lại UI chọn sao & comment
+    const mine = reviews.find(x => Number(x.user.id) === Number(currentUserId));
+    if (mine) {
+      const $rf = document.getElementById("reviewForm");
+      if ($rf) {
+        const ta = $rf.querySelector("textarea");
+        if (ta) ta.value = mine.comment || "";
+        // vẽ lại sao
+        let current = mine.rating;
+        const $box = document.getElementById("ratingStars");
+        if ($box) {
+          function paint(n) {
+            $box.innerHTML = Array.from({ length: 5 }, (_, i) =>
+              `<i data-v="${i+1}" class="fa ${i+1<=n?"fa-star":"fa-star-o"} text-warning fs-4" style="cursor:pointer"></i>`
+            ).join("");
+          }
+          paint(current);
+          $box.onclick = (e) => {
+            const v = Number(e.target?.dataset?.v || 0);
+            if (v) { current = v; paint(current); $box.dataset.value = String(current); }
+          };
+          $box.dataset.value = String(current);
+        }
+      }
+    }
+  }
+
+  // init rating selector (nếu chưa có mine)
+  (function initRatingSelector(){
+    const $box = document.getElementById("ratingStars");
+    if (!$box) return;
+    let current = 5;
+    function paint(n) {
+      $box.innerHTML = Array.from({ length: 5 }, (_, i) =>
+        `<i data-v="${i+1}" class="fa ${i+1<=n?"fa-star":"fa-star-o"} text-warning fs-4" style="cursor:pointer"></i>`
+      ).join("");
+    }
+    paint(current);
+    $box.onclick = (e)=> {
+      const v = Number(e.target?.dataset?.v || 0);
+      if (v) { current = v; paint(current); $box.dataset.value = String(current); }
+    };
+    $box.dataset.value = String(current);
+  })();
+
+  // submit review (upsert, không reload)
+  (function bindReviewSubmit(){
+    const $rf = document.getElementById("reviewForm");
+    if (!$rf) return;
+    $rf.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const rbox = document.getElementById("ratingStars");
+      const rating = Number(rbox?.dataset?.value || 5);
+      const comment = $rf.querySelector("textarea").value.trim();
+      const res = await fetch(`/api/products/${productId}/reviews`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating, comment }),
+      });
+      const data = await res.json();
+      await loadMetaBasic();
+      await loadReviews(); // cập nhật danh sách, giữ dữ liệu
+    });
+  })();
+
+  // khởi tạo lần đầu
+  loadMetaBasic();
+  loadReviews();
+
+(() => {
+  const boot = document.getElementById('boot');
+  window.__PRODUCT_ID__ = Number(boot?.dataset.productId);
+  window.__IS_AUTH__    = boot?.dataset.isAuth === '1';
+  window.__USER_ID__    = boot?.dataset.userId ? Number(boot.dataset.userId) : null;
+})();
+
+})();
+
 })(jQuery);

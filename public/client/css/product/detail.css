@@ -1,172 +1,172 @@
-
-        /* menu
+/* menu
         /* Style dropdown menu */
-        .navbar .dropdown-menu {
-            border-radius: 8px;
-            /* bo góc */
-            padding: 8px 0;
-            /* khoảng cách bên trong */
-            border: none;
-            /* bỏ viền */
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-            /* đổ bóng nhẹ */
-            min-width: 220px;
-            /* độ rộng tối thiểu */
-        }
-
-        /* Style item trong dropdown */
-        .navbar .dropdown-menu .dropdown-item {
-            padding: 10px 18px;
-            color: #333;
-            font-weight: 500;
-            transition: all 0.2s ease-in-out;
-            border-radius: 6px;
-            /* bo góc item */
-        }
-
-        /* Hover item */
-        .navbar .dropdown-menu .dropdown-item:hover {
-            background-color: #8BC34A;
-            /* xanh lá nhạt */
-            color: #fff;
-            /* chữ trắng */
-        }
-
-        /* Dropdown mở khi hover */
-        .nav-item.dropdown:hover .dropdown-menu {
-            display: block;
-            margin-top: 0;
-            animation: fadeIn 0.3s ease-in-out;
-            /* hiệu ứng mượt */
-        }
-
-        /* Hiệu ứng fade */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Trạng thái thu gọn */
-        #desc-wrapper.desc-collapsed {
-            max-height: 150px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Hiệu ứng mờ dưới */
-        #desc-wrapper.desc-collapsed::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 40px;
-            background: linear-gradient(to top, #fff, transparent);
-        }
-
-        /* Trạng thái mở rộng */
-        #desc-wrapper {
-            transition: max-height 0.3s ease;
-        }
-
-        /* css số sao đánh giá */
-        .rating .star {
-            cursor: pointer;
-            margin-right: 5px;
-        }
-
-        /* Sao rỗng (far) mặc định màu xám */
-        .rating .star i.far {
-            color: #ccc;
-        }
-
-        /* Sao đầy (fas) màu vàng */
-        .rating .star i.fas {
-            color: #ffc107;
-        }
-
-        /* Logo css */
-        .logo-circle {
-            margin-right: 10px;
-            height: 70px;
-            width: 70px;
-            /* nên để bằng nhau để bo tròn đẹp */
-            border-radius: 50%;
-            /* bo tròn */
-            object-fit: cover;
-            /* giữ hình không méo */
-            border: 3px solid #8BC34A;
-            /* viền xanh lá đồng bộ với web */
-            padding: 3px;
-            /* cách viền một chút nếu muốn */
-            background: white;
-            /* nền trắng để viền nổi bật hơn */
-        }
-
-        .policy-card {
-            border-radius: 12px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .policy-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.1);
-        }
-
-        .policy-card ul li {
-            line-height: 1.5;
-            color: #555;
-        }
-
-    .footer .btn-link {
-        color: rgba(255, 255, 255, 0.7);
-        text-decoration: none;
-        transition: 0.3s;
-    }
-
-    .footer .btn-link:hover {
-        color: #8BC34A;
-        padding-left: 5px;
-    }
-
-    .btn-social {
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.3s;
-    }
-
-    .btn-social:hover {
-        background: #8BC34A;
-        color: #000;
-    }
-
-
-    /* css body */
-    /* ===== Scoped styles — chỉ áp dụng trong #product-detail ===== */
-
-/* menu */
-/* Style dropdown menu */
-#product-detail .navbar .dropdown-menu{
+.navbar .dropdown-menu {
   border-radius: 8px;
+  /* bo góc */
   padding: 8px 0;
+  /* khoảng cách bên trong */
   border: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  /* bỏ viền */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  /* đổ bóng nhẹ */
   min-width: 220px;
-  z-index: 1050; /* nổi vừa đủ */
+  /* độ rộng tối thiểu */
 }
 
 /* Style item trong dropdown */
-#product-detail .navbar .dropdown-menu .dropdown-item{
+.navbar .dropdown-menu .dropdown-item {
+  padding: 10px 18px;
+  color: #333;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border-radius: 6px;
+  /* bo góc item */
+}
+
+/* Hover item */
+.navbar .dropdown-menu .dropdown-item:hover {
+  background-color: #8BC34A;
+  /* xanh lá nhạt */
+  color: #fff;
+  /* chữ trắng */
+}
+
+/* Dropdown mở khi hover */
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+  margin-top: 0;
+  animation: fadeIn 0.3s ease-in-out;
+  /* hiệu ứng mượt */
+}
+
+/* Hiệu ứng fade */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Trạng thái thu gọn */
+#desc-wrapper.desc-collapsed {
+  max-height: 150px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Hiệu ứng mờ dưới */
+#desc-wrapper.desc-collapsed::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to top, #fff, transparent);
+}
+
+/* Trạng thái mở rộng */
+#desc-wrapper {
+  transition: max-height 0.3s ease;
+}
+
+/* css số sao đánh giá */
+.rating .star {
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+/* Sao rỗng (far) mặc định màu xám */
+.rating .star i.far {
+  color: #ccc;
+}
+
+/* Sao đầy (fas) màu vàng */
+.rating .star i.fas {
+  color: #ffc107;
+}
+
+/* Logo css */
+.logo-circle {
+  margin-right: 10px;
+  height: 70px;
+  width: 70px;
+  /* nên để bằng nhau để bo tròn đẹp */
+  border-radius: 50%;
+  /* bo tròn */
+  object-fit: cover;
+  /* giữ hình không méo */
+  border: 3px solid #8BC34A;
+  /* viền xanh lá đồng bộ với web */
+  padding: 3px;
+  /* cách viền một chút nếu muốn */
+  background: white;
+  /* nền trắng để viền nổi bật hơn */
+}
+
+.policy-card {
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.policy-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+.policy-card ul li {
+  line-height: 1.5;
+  color: #555;
+}
+
+.footer .btn-link {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.footer .btn-link:hover {
+  color: #8BC34A;
+  padding-left: 5px;
+}
+
+.btn-social {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+
+.btn-social:hover {
+  background: #8BC34A;
+  color: #000;
+}
+
+
+/* css body */
+/* ===== Scoped styles — chỉ áp dụng trong #product-detail ===== */
+
+/* menu */
+/* Style dropdown menu */
+#product-detail .navbar .dropdown-menu {
+  border-radius: 8px;
+  padding: 8px 0;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
+  z-index: 1050;
+  /* nổi vừa đủ */
+}
+
+/* Style item trong dropdown */
+#product-detail .navbar .dropdown-menu .dropdown-item {
   padding: 10px 18px;
   color: #333;
   font-weight: 500;
@@ -175,14 +175,15 @@
 }
 
 /* Hover item */
-#product-detail .navbar .dropdown-menu .dropdown-item:hover{
-  background-color: #8BC34A; /* xanh lá nhạt theo header */
+#product-detail .navbar .dropdown-menu .dropdown-item:hover {
+  background-color: #8BC34A;
+  /* xanh lá nhạt theo header */
   color: #fff;
 }
 
 /* Dropdown mở khi hover — CHỈ desktop, tránh phá mobile tap */
-@media (min-width: 992px){
-  #product-detail .nav-item.dropdown:hover > .dropdown-menu{
+@media (min-width: 992px) {
+  #product-detail .nav-item.dropdown:hover>.dropdown-menu {
     display: block;
     margin-top: 0;
     animation: productDetailFadeIn .3s ease-in-out;
@@ -190,83 +191,404 @@
 }
 
 /* Hiệu ứng fade */
-@keyframes productDetailFadeIn{
-  from{ opacity:0; transform: translateY(10px); }
-  to{ opacity:1; transform: translateY(0); }
+@keyframes productDetailFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Trạng thái thu gọn mô tả */
-#product-detail #desc-wrapper.desc-collapsed{
+#product-detail #desc-wrapper.desc-collapsed {
   max-height: 150px;
   overflow: hidden;
   position: relative;
 }
 
 /* Hiệu ứng mờ dưới khi thu gọn (nền trắng) */
-#product-detail #desc-wrapper.desc-collapsed::after{
-  content:"";
-  position:absolute;
-  bottom:0; left:0; right:0;
-  height:40px;
+#product-detail #desc-wrapper.desc-collapsed::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
   background: linear-gradient(to top, #fff, transparent);
 }
 
 /* Trạng thái mở rộng */
-#product-detail #desc-wrapper{
+#product-detail #desc-wrapper {
   transition: max-height .3s ease;
 }
 
 /* css số sao đánh giá */
-#product-detail .rating .star{
+#product-detail .rating .star {
   cursor: pointer;
   margin-right: 5px;
 }
+
 /* Sao rỗng (far) */
-#product-detail .rating .star i.far{ color:#ccc; }
+#product-detail .rating .star i.far {
+  color: #ccc;
+}
+
 /* Sao đầy (fas) */
-#product-detail .rating .star i.fas{ color:#ffc107; }
+#product-detail .rating .star i.fas {
+  color: #ffc107;
+}
 
 /* Logo css — chỉ trong phạm vi #product-detail (không đè header chung) */
-#product-detail .logo-circle{
+#product-detail .logo-circle {
   margin-right: 10px;
-  height: 70px; width: 70px;
+  height: 70px;
+  width: 70px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #8BC34A; /* đồng bộ header */
+  border: 3px solid #8BC34A;
+  /* đồng bộ header */
   padding: 3px;
   background: #fff;
 }
 
 /* Policy card */
-#product-detail .policy-card{
+#product-detail .policy-card {
   border-radius: 12px;
   transition: transform .3s ease, box-shadow .3s ease;
 }
-#product-detail .policy-card:hover{
+
+#product-detail .policy-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
 }
-#product-detail .policy-card ul li{
+
+#product-detail .policy-card ul li {
   line-height: 1.5;
   color: #555;
 }
 
 /* Footer (nếu muốn chỉ áp dụng ở trang này, nên thêm class body.page-product, xem ghi chú bên dưới) */
-.page-product .footer .btn-link{
-  color: rgba(255,255,255,0.7);
+.page-product .footer .btn-link {
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   transition: .3s;
 }
-.page-product .footer .btn-link:hover{
+
+.page-product .footer .btn-link:hover {
   color: #8BC34A;
   padding-left: 5px;
 }
-.page-product .btn-social{
-  width: 36px; height: 36px;
-  display: flex; align-items: center; justify-content: center;
+
+.page-product .btn-social {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: .3s;
 }
-.page-product .btn-social:hover{
+
+.page-product .btn-social:hover {
   background: #8BC34A;
   color: #000;
+}
+
+/* ==== Floating FAB & Card ==== */
+.chat-fab {
+  position: fixed;
+  right: clamp(12px, 2vw, 24px);
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 1050;
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+}
+
+.chat-fab__btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  font-size: 20px;
+  background: linear-gradient(135deg, #4f8cff, #8b5cf6);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .28);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.chat-fab__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .34);
+}
+
+.chat-fab__badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 18px;
+  background: #ef4444;
+  color: #fff;
+  text-align: center;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.chat-card {
+  width: min(360px, 92vw);
+  max-height: min(64vh, 540px);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .88));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, .06);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .28);
+  overflow: hidden;
+  transform-origin: 100% 100%;
+  opacity: 0;
+  transform: translateY(14px) scale(.98);
+  transition: transform .18s ease, opacity .18s ease;
+}
+
+.chat-card.enter {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.chat-card.leaving {
+  opacity: 0;
+  transform: translateY(14px) scale(.98);
+}
+
+/* ==== Header ==== */
+.chat-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #4f8cff, #8b5cf6);
+  color: #fff;
+}
+
+.chat-card__agent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chat-card__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, .2);
+  position: relative;
+}
+
+.chat-card__avatar i {
+  font-size: 16px;
+}
+
+.chat-card__dot {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #7c97ff;
+}
+
+.chat-card__title {
+  font-weight: 800;
+  line-height: 1;
+}
+
+.chat-card__sub {
+  font-size: 12px;
+  opacity: .9;
+  margin-top: 2px;
+}
+
+.chat-card__close {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: none;
+  color: #fff;
+  background: rgba(255, 255, 255, .18);
+  cursor: pointer;
+}
+
+.chat-card__close:hover {
+  background: rgba(255, 255, 255, .28);
+}
+
+/* ==== Body ==== */
+.chat-card__body {
+  padding: 12px;
+}
+
+.chat-card__scroll {
+  height: 300px;
+  overflow: auto;
+  background: rgba(0, 0, 0, .03);
+  border: 1px solid rgba(0, 0, 0, .06);
+  border-radius: 14px;
+  padding: 10px;
+}
+
+/* Bubbles (tận dụng bg-primary/bg-light sẵn có) */
+#chatBody .p-2.rounded {
+  border-radius: 14px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+  position: relative;
+}
+
+#chatBody .bg-primary {
+  background: linear-gradient(135deg, #4f8cff, #8b5cf6) !important;
+  color: #fff;
+}
+
+#chatBody .bg-light {
+  background: #f4f6fb !important;
+  color: #0b1222 !important;
+  border: 1px solid rgba(0, 0, 0, .05) !important;
+}
+
+#chatBody .justify-content-end .p-2.rounded::after,
+#chatBody .justify-content-start .p-2.rounded::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+}
+
+#chatBody .justify-content-end .p-2.rounded::after {
+  right: 10px;
+  background: linear-gradient(135deg, #4f8cff, #8b5cf6);
+}
+
+#chatBody .justify-content-start .p-2.rounded::after {
+  left: 10px;
+  background: #f4f6fb;
+  border-right: 1px solid rgba(0, 0, 0, .05);
+  border-bottom: 1px solid rgba(0, 0, 0, .05);
+}
+
+/* Tick trạng thái nhỏ gọn */
+#chatBody .small {
+  opacity: .85;
+}
+
+/* Typing */
+.chat-card__typing {
+  padding: 6px 2px 0;
+  font-size: 12px;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.typing-dots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #9aa3b2;
+  animation: blink 1s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: .15s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: .3s;
+}
+
+@keyframes blink {
+
+  0%,
+  80%,
+  100% {
+    opacity: .25
+  }
+
+  40% {
+    opacity: 1
+  }
+}
+
+/* Input row */
+.chat-card__footer {
+  padding-top: 6px;
+}
+
+.chat-input {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.chat-input .form-control {
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, .08);
+  background: #fff;
+}
+
+.chat-input__send {
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+/* Mobile fit */
+@media (max-width: 480px) {
+  .chat-card {
+    max-height: 70vh;
+  }
+}
+
+.accordion-button {
+  font-size: 1rem;
+}
+
+.accordion-item {
+  border: 1px solid #e9ecef;
+}
+
+.accordion-item .accordion-button:not(.collapsed) {
+  background: rgba(13, 110, 253, .06);
 }

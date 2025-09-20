@@ -166,6 +166,13 @@
                         <div class="sb-nav-link-icon"><i class="fas fa-ticket-alt"></i></div>
                         Mã giảm giá
                     </a>
+                    <a class="nav-link" href="/admin/chat">
+                        <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
+                        Tin nhắn
+                        <span id="adminChatBadge" class="badge rounded-pill bg-danger ms-auto d-none">0</span>
+                    </a>
+                    <audio id="adminChatSound" src="/ring.wav" preload="auto"></audio>
+
                     <!-- Đăng xuất -->
                     <form method="post" action="/logout" class="nav-logout m-0">
                         <button type="submit" class="nav-link w-100 text-start">
@@ -181,6 +188,7 @@
             </div>
         </nav>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         (function () {
             // Đường dẫn hiện tại, bỏ slash thừa ở cuối
@@ -207,6 +215,42 @@
                 .reduce((acc, cur) => (cur.score > acc.score ? cur : acc), { score: -1 });
 
             if (best.score >= 0) best.a.classList.add('active');
+        })();
+    </script>
+    <script>
+        (function () {
+            const socket = io();
+            const $badge = document.getElementById("adminChatBadge");
+            const $sound = document.getElementById("adminChatSound");
+
+            function incBadge() {
+                const cur = Number($badge.textContent || "0") + 1;
+                $badge.textContent = String(cur);
+                $badge.classList.remove("d-none");
+            }
+            function play() { try { $sound.currentTime = 0; $sound.play().catch(() => { }); } catch { } }
+
+            socket.on("connect", () => socket.emit("join-admin-room"));
+
+            // Khi có tin nhắn mới từ user
+            socket.on("notify:chat_message", ({ sessionId, preview, at }) => {
+                incBadge(); play();
+            });
+        })();
+    </script>
+    <script>
+        (function () {
+            const socket = io();
+            const $badge = document.getElementById("adminChatBadge");
+            const $sound = document.getElementById("adminChatSound");
+            function inc() {
+                const cur = Number($badge.textContent || "0") + 1;
+                $badge.textContent = String(cur);
+                $badge.classList.remove("d-none");
+            }
+            function play() { try { $sound.currentTime = 0; $sound.play().catch(() => { }); } catch { } }
+            socket.on("connect", () => socket.emit("join-admin-room"));
+            socket.on("notify:chat_message", () => { inc(); play(); });
         })();
     </script>
 

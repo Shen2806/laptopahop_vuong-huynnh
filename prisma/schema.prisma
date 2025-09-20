@@ -1,3 +1,7 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 enum OrderStatus {
   PENDING
   CONFIRMED
@@ -7,8 +11,15 @@ enum OrderStatus {
   CANCELED
 }
 
-generator client {
-  provider = "prisma-client-js"
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum SenderRole {
+  USER
+  ADMIN
 }
 
 datasource db {
@@ -33,12 +44,13 @@ model User {
   accountType String  @db.VarChar(50)
   avatar      String? @db.VarChar(255)
 
-  role          Role           @relation(fields: [roleId], references: [id])
-  roleId        Int
-  cart          Cart?
-  orders        Order[]
-  notifications Notification[]
-  Review        Review[]
+  role            Role              @relation(fields: [roleId], references: [id])
+  roleId          Int
+  cart            Cart?
+  orders          Order[]
+  notifications   Notification[]
+  Review          Review[]
+  ProductQuestion ProductQuestion[]
 
   @@map("users")
 }
@@ -53,22 +65,37 @@ model Role {
 }
 
 model Product {
-  id           Int           @id @default(autoincrement())
-  name         String        @db.VarChar(255)
-  price        Int
-  discount     Int           @default(0)
-  detailDesc   String        @db.MediumText
-  shortDesc    String        @db.VarChar(255)
-  quantity     Int
-  sold         Int?          @default(0)
-  factory      String        @db.VarChar(255)
-  target       String        @db.VarChar(255)
-  image        String?       @db.VarChar(255)
-  CartDetails  CartDetail[]
-  OrderDetails OrderDetail[]
-  Review       Review[]
+  id               Int               @id @default(autoincrement())
+  name             String            @db.VarChar(255)
+  price            Int
+  discount         Int               @default(0)
+  detailDesc       String            @db.MediumText
+  shortDesc        String            @db.VarChar(255)
+  quantity         Int
+  sold             Int?              @default(0)
+  factory          String            @db.VarChar(255)
+  target           String            @db.VarChar(255)
+  image            String?           @db.VarChar(255)
+  CartDetails      CartDetail[]
+  OrderDetails     OrderDetail[]
+  Review           Review[]
+  ProductQuestions ProductQuestion[]
 
   @@map("products")
+}
+
+model ProductQuestion {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  userId    Int
+  content   String
+  createdAt DateTime @default(now())
+
+  product Product                @relation(fields: [productId], references: [id])
+  user    User                   @relation(fields: [userId], references: [id])
+  replies ProductQuestionReply[]
+
+  @@index([productId])
 }
 
 model Cart {
@@ -160,6 +187,20 @@ model OrderDetail {
   @@map("order_detail")
 }
 
+model Blog {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(255)
+  slug      String   @unique @db.VarChar(255)
+  content   String   @db.MediumText
+  thumbnail String?  @db.VarChar(255)
+  author    String?  @db.VarChar(100)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("blogs")
+}
+
 model Review {
   id        Int      @id @default(autoincrement())
   rating    Int
@@ -174,16 +215,38 @@ model Review {
   userId Int
 }
 
-model Blog {
-  id        Int      @id @default(autoincrement())
-  title     String   @db.VarChar(255)
-  slug      String   @unique @db.VarChar(255)
-  content   String   @db.MediumText
-  thumbnail String?  @db.VarChar(255)
-  author    String?  @db.VarChar(100)
-  published Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model ProductQuestionReply {
+  id         Int        @id @default(autoincrement())
+  questionId Int
+  userId     Int?
+  role       SenderRole
+  content    String
+  createdAt  DateTime   @default(now())
 
-  @@map("blogs")
+  question ProductQuestion @relation(fields: [questionId], references: [id])
+}
+
+model ChatSession {
+  id        Int      @id @default(autoincrement())
+  productId Int?
+  userId    Int?
+  name      String
+  gender    Gender
+  status    String   @default("OPEN") // OPEN/CLOSED
+  createdAt DateTime @default(now())
+
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id        Int        @id @default(autoincrement())
+  sessionId Int
+  sender    SenderRole
+  content   String
+  createdAt DateTime   @default(now())
+  isRead    Boolean    @default(false)
+
+  session ChatSession @relation(fields: [sessionId], references: [id])
+
+  @@index([sessionId])
 }

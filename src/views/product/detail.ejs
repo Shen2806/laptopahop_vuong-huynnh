@@ -415,7 +415,18 @@
                                             class="btnAddToCartDetail btn btn-primary rounded-pill px-4 py-2 mb-4">
                                             <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ hàng
                                         </button>
+                                        <button id="btnBuyNow" class="btn btn-success rounded-pill px-4 ms-2">
+                                            <i class="fa fa-bolt me-1"></i> Mua ngay
+                                        </button>
                                     </form>
+                                    <!-- chưa xử lý nút mua ngay -->
+                                    <!-- <form method="post" action="/add-to-cart-from-detail-page/<%= product.id %>">
+                                        <input value="1" type="hidden" id="quantityDetail" name="quantity" />
+                                        <button type="submit" data-product-id="<%= product.id %>"
+                                            class="btnAddToCartDetail btn btn-primary rounded-pill px-4 py-2 mb-4">
+                                            <i class="fa fa-shopping-bag me-2"></i> Mua ngay
+                                        </button>
+                                    </form> -->
                                 </div>
 
                                 <div class="col-lg-2">
@@ -460,52 +471,143 @@
                                 </div>
 
                                 <div class="col-lg-10">
-                                    <nav>
-                                        <div class="nav nav-tabs mb-3">
-                                            <button class="nav-link active border-white border-bottom-0" type="button"
-                                                role="tab" id="nav-about-tab" data-bs-toggle="tab"
-                                                data-bs-target="#nav-about" aria-controls="nav-about"
-                                                aria-selected="true">
-                                                Mô tả chi tiết
-                                            </button>
-                                        </div>
-                                    </nav>
+                                    <!-- Accordion: xổ dọc, mặc định mở hết -->
+                                    <div class="accordion" id="productAccordion">
 
-                                    <div class="tab-content mb-5">
-                                        <div class="tab-pane active" id="nav-about" role="tabpanel"
-                                            aria-labelledby="nav-about-tab">
-
-                                            <!-- Hiển thị mô tả chi tiết dưới dạng HTML -->
-                                            <div id="desc-wrapper" class="desc-collapsed">
-                                                <%- product.detailDesc %>
-                                            </div>
-
-
-
-                                            <!-- Nút xem thêm -->
-                                            <div class="text-center mt-2">
-                                                <button type="button" id="toggle-desc"
-                                                    class="btn btn-outline-primary btn-sm">
-                                                    Xem thêm
+                                        <!-- THÔNG SỐ -->
+                                        <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button fw-semibold" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#accSpecs"
+                                                    aria-expanded="true" aria-controls="accSpecs">
+                                                    Thông số kỹ thuật
                                                 </button>
+                                            </h2>
+                                            <div id="accSpecs" class="accordion-collapse collapse show">
+                                                <div class="accordion-body">
+                                                    <table class="table table-sm mb-0">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th style="width:180px">Hãng</th>
+                                                                <td>
+                                                                    <%= product.factory %>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Đối tượng</th>
+                                                                <td>
+                                                                    <%= product.target %>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Tồn kho</th>
+                                                                <td>
+                                                                    <%= product.quantity %>
+                                                                </td>
+                                                            </tr>
+                                                            <!-- bổ sung các hàng thông số khác nếu cần -->
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
+
+                                        <!-- MÔ TẢ -->
+                                        <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button fw-semibold" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#accDesc"
+                                                    aria-expanded="true" aria-controls="accDesc">
+                                                    Mô tả chi tiết
+                                                </button>
+                                            </h2>
+                                            <div id="accDesc" class="accordion-collapse collapse show">
+                                                <div class="accordion-body">
+                                                    <div id="desc-wrapper" class="desc-collapsed"><%- product.detailDesc
+                                                            %></div>
+                                                    <div class="text-center mt-2">
+                                                        <button type="button" id="toggle-desc"
+                                                            class="btn btn-outline-primary btn-sm">
+                                                            Xem thêm
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ĐÁNH GIÁ -->
+                                        <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
+                                            id="reviewsSection">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button fw-semibold" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#accReviews"
+                                                    aria-expanded="true" aria-controls="accReviews">
+                                                    Đánh giá
+                                                </button>
+                                            </h2>
+                                            <div id="accReviews" class="accordion-collapse collapse show">
+                                                <div class="accordion-body">
+                                                    <!-- Tóm tắt rating -->
+                                                    <div class="d-flex align-items-center mb-2">
+                                                        <div id="avgStars" class="me-2"></div>
+                                                        <small id="ratingCount" class="text-muted"></small>
+                                                    </div>
+
+                                                    <% if (user) { %>
+                                                        <!-- Form đánh giá -->
+                                                        <form id="reviewForm" class="mb-3">
+                                                            <div class="mb-2">Đánh giá của bạn:</div>
+                                                            <div id="ratingStars" class="mb-2"></div>
+                                                            <textarea class="form-control" name="comment" rows="3"
+                                                                placeholder="Cảm nhận của bạn..."></textarea>
+                                                            <button class="btn btn-primary mt-2">Gửi đánh giá</button>
+                                                        </form>
+                                                        <% } else { %>
+                                                            <div class="alert alert-warning">
+                                                                Bạn cần <a href="/login">đăng nhập</a> để đánh giá.
+                                                            </div>
+                                                            <% } %>
+
+                                                                <!-- Danh sách đánh giá -->
+                                                                <div id="reviewList" class="small text-muted">
+                                                                    <!-- JS client sẽ render danh sách -->
+                                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Q&A -->
+                                        <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
+                                            id="qaSection">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button fw-semibold" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#accQA"
+                                                    aria-expanded="true" aria-controls="accQA">
+                                                    Hỏi & Đáp (Q&A)
+                                                </button>
+                                            </h2>
+                                            <div id="accQA" class="accordion-collapse collapse show">
+                                                <div class="accordion-body">
+                                                    <% if (user) { %>
+                                                        <form id="qaForm" class="mb-3">
+                                                            <textarea class="form-control" name="content" rows="2"
+                                                                placeholder="Đặt câu hỏi về sản phẩm..."></textarea>
+                                                            <button class="btn btn-success mt-2">Gửi câu hỏi</button>
+                                                        </form>
+                                                        <% } else { %>
+                                                            <div class="alert alert-info">Đăng nhập để xem và đặt câu
+                                                                hỏi.</div>
+                                                            <% } %>
+
+                                                                <div id="qaList">
+                                                                    <!-- JS client sẽ render danh sách Q&A --></div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
-
                                 </div>
 
-                                <div class="col-lg-10">
-                                    <% if (user) { %>
-                                        <h5>Đánh giá của bạn</h5>
-                                        <div id="user-review" class="border p-3 rounded bg-light">
-                                            <em>Đang tải đánh giá của bạn...</em>
-                                        </div>
-                                        <% } else { %>
-                                            <div class="alert alert-warning">
-                                                <a href="/login">Đăng nhập</a> để xem và viết đánh giá.
-                                            </div>
-                                            <% } %>
-                                </div>
 
                             </div>
                         </div>
@@ -514,6 +616,82 @@
                 </div>
             </div>
             <!-- Single Product End -->
+            <!-- Boot data -->
+            <div id="boot" data-product-id="<%= product.id %>" data-is-auth="<%= user ? 1 : 0 %>"
+                data-user-id="<%= user ? user.id : '' %>"></div>
+
+            <!-- Chat widget (drop-in) -->
+            <div id="chatWidget" class="chat-fab">
+                <!-- Minimized button -->
+                <button id="chatOpen" class="chat-fab__btn" aria-label="Mở chat">
+                    <i class="fas fa-comments"></i>
+                    <span id="chatMiniBadge" class="chat-fab__badge d-none">1</span>
+                </button>
+
+                <!-- Card -->
+                <div id="chatCard" class="chat-card d-none" aria-live="polite">
+                    <div class="chat-card__header">
+                        <div class="chat-card__agent">
+                            <span class="chat-card__avatar">
+                                <i class="fas fa-headset"></i>
+                                <span class="chat-card__dot"></span>
+                            </span>
+                            <div>
+                                <div class="chat-card__title">Hỗ trợ tư vấn</div>
+                                <div class="chat-card__sub">LaptopShop trực tuyến</div>
+                            </div>
+                        </div>
+                        <button class="chat-card__close" id="chatClose" aria-label="Đóng chat">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <!-- Pre-chat -->
+                    <div id="preChat" class="chat-card__body">
+                        <div class="mb-2 fw-semibold">Trước khi bắt đầu, vui lòng nhập:</div>
+                        <div class="mb-2">
+                            <label class="form-label small">Tên của bạn</label>
+                            <input id="preName" class="form-control form-control-sm" placeholder="Ví dụ: An Nguyen">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small me-2">Giới tính</label>
+                            <div class="d-flex gap-3 small">
+                                <label class="mb-0"><input type="radio" name="preGender" value="MALE"> Nam</label>
+                                <label class="mb-0"><input type="radio" name="preGender" value="FEMALE"> Nữ</label>
+                                <label class="mb-0"><input type="radio" name="preGender" value="OTHER" checked>
+                                    Khác</label>
+                            </div>
+                        </div>
+                        <button id="btnStartChat" class="btn btn-primary w-100">
+                            <i class="fa-regular fa-paper-plane me-1"></i> Bắt đầu
+                        </button>
+                    </div>
+
+                    <!-- Main chat -->
+                    <div id="chatMain" class="chat-card__body d-none">
+                        <div id="chatBody" class="chat-card__scroll"></div>
+
+                        <div id="typingHint" class="chat-card__typing d-none">
+                            Đang nhập
+                            <span class="typing-dots"><span></span><span></span><span></span></span>
+                        </div>
+
+                        <div class="chat-card__footer">
+                            <form id="chatForm" class="chat-input">
+                                <input id="chatInput" class="form-control" placeholder="Nhập tin nhắn...">
+                                <button class="btn btn-primary chat-input__send" aria-label="Gửi">
+                                    <i class="fa-regular fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Âm thanh -->
+                <audio id="chatSound" src="/ring.wav" preload="auto"></audio>
+            </div>
+
+
             <!-- Footer Start -->
             <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
                 <div class="container py-5">
@@ -632,7 +810,56 @@
 
             </script>
 
-            <!-- đánh giá -->
+            <script id="boot-json" type="application/json">
+  <%- JSON.stringify({ productId: product.id, isAuth: !!user }) %>
+            </script>
+            <script>
+                const boot = JSON.parse(document.getElementById('boot-json').textContent);
+                window.__PRODUCT_ID__ = boot.productId;
+                window.__IS_AUTH__ = boot.isAuth;
+            </script>
+            <script>
+                (function () {
+                    const $root = document.getElementById('chatWidget');
+                    const $card = document.getElementById('chatCard');
+                    const $open = document.getElementById('chatOpen');
+                    const $close = document.getElementById('chatClose');
+
+                    if (!$root || !$card || !$open || !$close) return;
+
+                    function openCard() {
+                        // nếu bạn có logic cũ: vẫn giữ, chỉ thêm lớp để animate
+                        $card.classList.remove('d-none');
+                        requestAnimationFrame(() => $card.classList.add('enter'));
+                        // ẩn badge nhỏ khi mở
+                        const b = document.getElementById('chatMiniBadge');
+                        if (b) b.classList.add('d-none');
+                    }
+                    function closeCard() {
+                        $card.classList.add('leaving');
+                        $card.addEventListener('transitionend', () => {
+                            $card.classList.remove('leaving', 'enter');
+                            $card.classList.add('d-none');
+                        }, { once: true });
+                    }
+
+                    // Nếu bạn đã gán click open/close ở file JS cũ, có thể bỏ addEventListener dưới.
+                    // Hoặc giữ cũng được (không hại), vì chỉ chèn thêm hiệu ứng.
+                    $open.addEventListener('click', openCard);
+                    $close.addEventListener('click', closeCard);
+
+                    // Khi nhận sự kiện "chat:closed" từ server, khóa input (nếu bạn đã làm, bỏ qua)
+                    const input = document.getElementById('chatInput');
+                    const formBtn = document.querySelector('#chatForm button');
+                    window.setClosedUI = function () {
+                        if (input) input.disabled = true;
+                        if (formBtn) formBtn.disabled = true;
+                    };
+                })();
+            </script>
+
+            <script src="/socket.io/socket.io.js"></script>
+            <script src="/client/js/main.js"></script>
 
             <!-- Font Awesome (icon sao) -->
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">

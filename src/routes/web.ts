@@ -13,6 +13,7 @@ import { getAdminBlogPage, getAdminCreateBlogPage, getAdminEditBlogPage, postAdm
 import { getBlogDetailPage, getBlogListPage } from 'controllers/client/blog.controller';
 import { deleteCoupon, getCoupons, getCreateCoupon, getEditCoupon, postCreateCoupon, postEditCoupon } from 'controllers/admin/coupon.controller';
 import { generateAccessToken, generateRefreshToken } from 'services/client/token.service';
+import { getAdminChatSessions, getChatMessages } from 'controllers/admin/chat.controller';
 
 const router = express.Router();
 
@@ -129,11 +130,175 @@ const webRoutes = (app: Express) => {
     // chi tiết đơn hàng của user
     router.get("/order/:id", ensureAuthenticated, getOrderDetailPage);
 
+    // Blog routes - Client
+    router.get("/blogs", getBlogListPage);
+    router.get("/blogs/:slug", getBlogDetailPage);
 
     // Xử lý hủy đơn với lý do
     router.post("/order-history/:id/cancel", postCancelOrderByUser);
     // them trang chi tiet tu gio hang
     router.post("/add-to-cart-from-detail-page/:id", postAddToCartFromDetailPage)
+
+    // Lấy avg rating + count + Q&A (public)
+    router.get("/api/products/:productId/meta", async (req, res) => {
+        const productId = Number(req.params.productId);
+        if (!Number.isFinite(productId)) return res.status(400).json({ message: "invalid productId" });
+
+        const [agg, dist, qna] = await Promise.all([
+            prisma.review.aggregate({
+                _avg: { rating: true },
+                _count: true,
+                where: { productId },
+            }),
+            prisma.review.groupBy({
+                by: ["rating"],
+                _count: { rating: true },
+                where: { productId },
+            }),
+            prisma.productQuestion.findMany({
+                where: { productId },
+                orderBy: { createdAt: "desc" },
+                include: { user: true, replies: { orderBy: { createdAt: "asc" } } },
+            }),
+        ]);
+
+        res.json({
+            ratingAvg: Number(agg._avg.rating ?? 0).toFixed(1),
+            ratingCount: agg._count,
+            distribution: Object.fromEntries(dist.map(d => [d.rating, d._count.rating])),
+            qna,
+        });
+    });
+
+    // Gửi review (cần login)
+    router.post("/api/products/:productId/reviews", ensureAuthenticated, async (req: any, res) => {
+        const productId = Number(req.params.productId);
+        const { rating, comment } = req.body || {};
+        if (!Number.isFinite(productId) || !rating || rating < 1 || rating > 5) {
+            return res.status(400).json({ message: "rating 1..5" });
+        }
+        await prisma.review.create({
+            data: { productId, userId: req.user.id, rating: Number(rating), comment: String(comment || "") },
+        });
+        const agg = await prisma.review.aggregate({
+            _avg: { rating: true }, _count: true, where: { productId },
+        });
+        res.json({
+            ratingAvg: Number(agg._avg.rating ?? 0).toFixed(1),
+            ratingCount: agg._count,
+        });
+    });
+
+    // Đặt câu hỏi (cần login)
+    router.post("/api/products/:productId/questions", ensureAuthenticated, async (req: any, res) => {
+        const productId = Number(req.params.productId);
+        const content = String(req.body?.content || "").trim();
+        if (!content) return res.status(400).json({ message: "content required" });
+        const q = await prisma.productQuestion.create({
+            data: { productId, userId: req.user.id, content },
+            include: { user: true, replies: true },
+        });
+        res.json(q);
+    });
+
+    // Trả lời câu hỏi (CHỈ ADMIN)
+    router.post("/api/products/questions/:questionId/replies", ensureAuthenticated, async (req: any, res) => {
+        const questionId = Number(req.params.questionId);
+        const content = String(req.body?.content || "").trim();
+        // chỉ admin
+        if (req.user?.role?.name !== "ADMIN") {
+            return res.status(403).json({ message: "Chỉ Admin được trả lời câu hỏi" });
+        }
+        if (!content) return res.status(400).json({ message: "content required" });
+
+        const rep = await prisma.productQuestionReply.create({
+            data: { questionId, userId: req.user.id, role: "ADMIN", content },
+        });
+        res.json(rep);
+    });
+
+
+    // Lấy lịch sử tin nhắn (user & admin dùng chung)
+    router.get("/api/chat/sessions/:id/messages", async (req, res) => {
+        const id = Number(req.params.id);
+        if (!Number.isFinite(id)) return res.status(400).json({ message: "invalid id" });
+        const messages = await prisma.chatMessage.findMany({
+            where: { sessionId: id },
+            orderBy: { createdAt: "asc" },
+        });
+        res.json(messages);
+    });
+
+    // Trang & API admin chat
+    router.get("/admin/chat", isAdmin, (req, res) => res.render("admin/chat/index.ejs"));
+    router.get("/admin/api/chat/sessions", isAdmin, async (req, res) => {
+        const sessions = await prisma.chatSession.findMany({
+            where: { status: "OPEN" },
+            orderBy: { createdAt: "desc" },
+        });
+        // tính unread theo góc nhìn ADMIN (tin từ USER, isRead=false)
+        const result = await Promise.all(sessions.map(async s => {
+            const unread = await prisma.chatMessage.count({
+                where: { sessionId: s.id, sender: "USER", isRead: false },
+            });
+            return { ...s, unread };
+        }));
+        res.json(result);
+    });
+
+    // Lấy danh sách review (ai đăng nhập cũng thấy)
+    router.get("/api/products/:productId/reviews", async (req, res) => {
+        const productId = Number(req.params.productId);
+        const reviews = await prisma.review.findMany({
+            where: { productId },
+            orderBy: { createdAt: "desc" },
+            include: { user: true },
+        });
+        res.json(reviews.map(r => ({
+            id: r.id,
+            rating: r.rating,
+            comment: r.comment,
+            createdAt: r.createdAt,
+            user: {
+                id: r.userId,
+                name: r.user?.fullName || r.user?.username || `User #${r.userId}`,
+                avatar: r.user?.avatar || null,
+            }
+        })));
+    });
+
+    // Upsert review (nếu đã có -> update; chưa có -> create)
+    router.post("/api/products/:productId/reviews", ensureAuthenticated, async (req: any, res) => {
+        const productId = Number(req.params.productId);
+        const { rating, comment } = req.body || {};
+        if (!Number.isFinite(productId) || !rating || rating < 1 || rating > 5) {
+            return res.status(400).json({ message: "rating 1..5" });
+        }
+        const existing = await prisma.review.findFirst({
+            where: { productId, userId: req.user.id },
+            select: { id: true },
+        });
+        if (existing) {
+            await prisma.review.update({
+                where: { id: existing.id },
+                data: { rating: Number(rating), comment: String(comment || "") },
+            });
+        } else {
+            await prisma.review.create({
+                data: { productId, userId: req.user.id, rating: Number(rating), comment: String(comment || "") },
+            });
+        }
+        const agg = await prisma.review.aggregate({
+            _avg: { rating: true }, _count: true, where: { productId },
+        });
+        res.json({
+            ok: true,
+            ratingAvg: Number(agg._avg.rating ?? 0).toFixed(1),
+            ratingCount: agg._count,
+        });
+    });
+
+
     // admin routes
     router.get("/admin", getDashboardPage);
     // cập nhật số lượng sắp hết hàng
@@ -181,11 +346,16 @@ const webRoutes = (app: Express) => {
     router.post("/admin/order/:id/cancel", postCancelOrderByAdmin);
     router.post("/admin/order/:id/status", postUpdateOrderStatus);
     app.use("/", isAdmin, router);
+    // Admin chat
+    router.get("/admin/chat", isAdmin, (req, res) => res.render("admin/chat/index.ejs"));
+    router.get("/admin/api/chat/sessions", isAdmin, async (req, res) => {
+        const list = await prisma.chatSession.findMany({ where: { status: "OPEN" }, orderBy: { createdAt: "desc" } });
+        res.json(list);
+    });
+    // API lấy danh sách phiên chat (cần login & là admin)
+    router.get("/admin/api/chat/sessions", getAdminChatSessions); // add isAdmin nếu muốn
+    router.get("/api/chat/sessions/:id/messages", getChatMessages); // có thể thêm isAdmin nếu muốn
 
-    // Blog routes - Client
-    // Client Blog
-    router.get("/blogs", getBlogListPage);
-    router.get("/blogs/:slug", getBlogDetailPage);
     // routes cho client   
     app.use("/", router);
 
