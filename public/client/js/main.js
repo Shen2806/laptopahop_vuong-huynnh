@@ -578,118 +578,106 @@ if (window.__CHAT_WIDGET_INIT__) {
 }
   });
 
-  // ====== CTA Mua ngay & các phần khác sẽ ở mục dưới ======
-    // ====== RENDER SAO ======
-  function renderStarsValue(v, size = "1.1rem") {
-    const full = Math.floor(v), half = v - full >= 0.5 ? 1 : 0, empty = 5 - full - half;
-    let html = "";
-    for (let i = 0; i < full; i++) html += `<i class="fa fa-star text-warning" style="font-size:${size}"></i>`;
-    if (half) html += `<i class="fa fa-star-half-alt text-warning" style="font-size:${size}"></i>`;
-    for (let i = 0; i < empty; i++) html += `<i class="fa fa-star text-secondary" style="font-size:${size}"></i>`;
-    return html;
-  }
-
-  async function loadMetaBasic() {
-    const res = await fetch(`/api/products/${productId}/meta`);
-    const data = await res.json();
-    const avg = Number(data.ratingAvg || 0);
-    const count = Number(data.ratingCount || 0);
-    const $avg = document.getElementById("avgStars");
-    const $cnt = document.getElementById("ratingCount");
-    if ($avg) $avg.innerHTML = renderStarsValue(avg) + `<span class="ms-2 fw-semibold">${avg}</span>`;
-    if ($cnt) $cnt.textContent = `(${count} đánh giá)`;
-  }
-
-  async function loadReviews() {
-    const res = await fetch(`/api/products/${productId}/reviews`);
-    const reviews = await res.json();
-    const $list = document.getElementById("reviewList");
-    if (!$list) return;
-    $list.innerHTML = reviews.map(r => `
-      <div class="border rounded p-2 mb-2">
-        <div class="d-flex align-items-center gap-2">
-          <img src="/images/${r.user.avatar||'default-avatar.png'}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" />
-          <strong>${r.user.name}</strong>
-          <span class="small text-muted">${new Date(r.createdAt).toLocaleString('vi-VN')}</span>
-        </div>
-        <div class="mt-1">${renderStarsValue(r.rating)}</div>
-        <div class="mt-1">${r.comment || ""}</div>
-      </div>
-    `).join("");
-    // nếu là review của tôi -> set lại UI chọn sao & comment
-    const mine = reviews.find(x => Number(x.user.id) === Number(currentUserId));
-    if (mine) {
-      const $rf = document.getElementById("reviewForm");
-      if ($rf) {
-        const ta = $rf.querySelector("textarea");
-        if (ta) ta.value = mine.comment || "";
-        // vẽ lại sao
-        let current = mine.rating;
-        const $box = document.getElementById("ratingStars");
-        if ($box) {
-          function paint(n) {
-            $box.innerHTML = Array.from({ length: 5 }, (_, i) =>
-              `<i data-v="${i+1}" class="fa ${i+1<=n?"fa-star":"fa-star-o"} text-warning fs-4" style="cursor:pointer"></i>`
-            ).join("");
-          }
-          paint(current);
-          $box.onclick = (e) => {
-            const v = Number(e.target?.dataset?.v || 0);
-            if (v) { current = v; paint(current); $box.dataset.value = String(current); }
-          };
-          $box.dataset.value = String(current);
-        }
-      }
-    }
-  }
-
-  // init rating selector (nếu chưa có mine)
-  (function initRatingSelector(){
-    const $box = document.getElementById("ratingStars");
-    if (!$box) return;
-    let current = 5;
-    function paint(n) {
-      $box.innerHTML = Array.from({ length: 5 }, (_, i) =>
-        `<i data-v="${i+1}" class="fa ${i+1<=n?"fa-star":"fa-star-o"} text-warning fs-4" style="cursor:pointer"></i>`
-      ).join("");
-    }
-    paint(current);
-    $box.onclick = (e)=> {
-      const v = Number(e.target?.dataset?.v || 0);
-      if (v) { current = v; paint(current); $box.dataset.value = String(current); }
-    };
-    $box.dataset.value = String(current);
-  })();
-
-  // submit review (upsert, không reload)
-  (function bindReviewSubmit(){
-    const $rf = document.getElementById("reviewForm");
-    if (!$rf) return;
-    $rf.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const rbox = document.getElementById("ratingStars");
-      const rating = Number(rbox?.dataset?.value || 5);
-      const comment = $rf.querySelector("textarea").value.trim();
-      const res = await fetch(`/api/products/${productId}/reviews`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating, comment }),
-      });
-      const data = await res.json();
-      await loadMetaBasic();
-      await loadReviews(); // cập nhật danh sách, giữ dữ liệu
-    });
-  })();
-
-  // khởi tạo lần đầu
-  loadMetaBasic();
-  loadReviews();
-
+  // =============== Q&A (Ask -> Admin Answer) ===============
 (() => {
   const boot = document.getElementById('boot');
-  window.__PRODUCT_ID__ = Number(boot?.dataset.productId);
-  window.__IS_AUTH__    = boot?.dataset.isAuth === '1';
-  window.__USER_ID__    = boot?.dataset.userId ? Number(boot.dataset.userId) : null;
+  const PRODUCT_ID = Number(boot?.dataset?.productId || 0);
+  const IS_AUTH = (boot?.dataset?.isAuth || '0') === '1';
+
+  const $qaList = document.getElementById('qaList');
+  const $qaForm = document.getElementById('qaForm');
+
+  function escapeHtml(s) {
+    return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderQAItem(q) {
+    // q = { id, content, createdAt, user:{id,name,avatar}, reply?:{content,createdAt} }
+    const userName = escapeHtml(q.user?.name || 'Ẩn danh');
+    const userAvatar = q.user?.avatar ? `/images/${q.user.avatar}` : '/images/default-avatar.png';
+    const at = new Date(q.createdAt).toLocaleString('vi-VN');
+
+    const hasReply = !!q.reply;
+    const replyHtml = hasReply
+      ? `<div class="mt-2 ps-3 border-start">
+          <div class="small text-success fw-semibold"><i class="fas fa-user-shield me-1"></i>Admin</div>
+          <div>${escapeHtml(q.reply.content)}</div>
+          <div class="small text-muted">${new Date(q.reply.createdAt).toLocaleString('vi-VN')}</div>
+        </div>`
+      : `<div class="mt-2 small text-muted"><em>Đang chờ phản hồi từ Admin...</em></div>`;
+
+    return `
+      <div class="border rounded p-2 mb-2">
+        <div class="d-flex align-items-center gap-2">
+          <img src="${userAvatar}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" />
+          <strong>${userName}</strong>
+          <small class="text-muted">${at}</small>
+        </div>
+        <div class="mt-1">${escapeHtml(q.content)}</div>
+        ${replyHtml}
+      </div>
+    `;
+  }
+
+  async function loadQuestions() {
+    if (!IS_AUTH) {
+      // nếu bạn muốn ẩn hoàn toàn khi chưa đăng nhập thì thôi không fetch
+      // còn muốn cho xem public thì có thể vẫn fetch.
+    }
+    const r = await fetch(`/api/products/${PRODUCT_ID}/questions`);
+    const list = await r.json();
+    if ($qaList) {
+      $qaList.innerHTML = list.map(renderQAItem).join('') || '<div class="text-muted">Chưa có câu hỏi nào.</div>';
+    }
+  }
+
+  // Submit hỏi (không reload)
+  if ($qaForm) {
+    $qaForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const ta = $qaForm.querySelector('textarea[name="content"]');
+      const content = (ta?.value || '').trim();
+      if (!content) return;
+
+      const res = await fetch(`/api/products/${PRODUCT_ID}/questions`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content })
+      });
+
+      if (!res.ok) {
+        const msg = await res.json().catch(()=>({}));
+        alert(msg?.error || 'Gửi câu hỏi thất bại');
+        return;
+      }
+
+      const created = await res.json();
+      // prepend câu hỏi mới
+      if ($qaList) {
+        $qaList.insertAdjacentHTML('afterbegin', renderQAItem(created));
+      }
+      ta.value = '';
+    });
+  }
+
+  // (Tuỳ chọn) realtime: nhận trả lời từ admin → cập nhật UI
+  // User đã login sẽ join room user-{id} ở header script của bạn rồi.
+  try {
+    const s = io?.();
+    s?.on?.('qa:answered', ({ questionId, content, createdAt }) => {
+      // tìm block câu hỏi chưa có reply và gắn vào
+      const blocks = Array.from($qaList.querySelectorAll('.border.rounded.p-2.mb-2'));
+      for (const el of blocks) {
+        // không có data-id -> thêm vào render để tìm dễ; hoặc fallback: refresh list
+      }
+      // Cách đơn giản nhất: reload danh sách Q&A
+      loadQuestions();
+    });
+  } catch {}
+
+  // Init
+  loadQuestions();
 })();
+
 
 })();
 

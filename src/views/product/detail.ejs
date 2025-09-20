@@ -382,16 +382,9 @@
                                                 <% } %>
 
                                     </h2>
-
-                                    <!-- Rating -->
-                                    <div class="d-flex align-items-center mb-3">
-                                        <i class="fa fa-star text-warning"></i>
-                                        <i class="fa fa-star text-warning"></i>
-                                        <i class="fa fa-star text-warning"></i>
-                                        <i class="fa fa-star text-warning"></i>
-                                        <i class="fa fa-star text-secondary"></i>
-                                        <span class="ms-2 small text-muted">(128 đánh giá)</span>
-                                    </div>
+                                    <!-- Rating động ở đầu trang -->
+                                    <span id="productRatingStars"></span>
+                                    <span id="productRatingCount" class="ms-2 small text-muted"></span>
 
                                     <!-- Số lượng -->
                                     <div class="d-flex align-items-center mb-4">
@@ -600,7 +593,8 @@
                                                             <% } %>
 
                                                                 <div id="qaList">
-                                                                    <!-- JS client sẽ render danh sách Q&A --></div>
+                                                                    <!-- JS client sẽ render danh sách Q&A -->
+                                                                </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -858,11 +852,213 @@
                 })();
             </script>
 
-            <script src="/socket.io/socket.io.js"></script>
-            <script src="/client/js/main.js"></script>
+            <!-- render sao  -->
+            <script>
+                (() => {
+                    // ---- Boot ----
+                    const boot = document.getElementById('boot');
+                    const PRODUCT_ID = Number(boot?.dataset?.productId || 0);
+                    const CURRENT_USER_ID = boot?.dataset?.userId ? Number(boot.dataset.userId) : null;
 
-            <!-- Font Awesome (icon sao) -->
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+                    // ---- DOM ----
+                    const $topStars = document.getElementById('productRatingStars');
+                    const $topCount = document.getElementById('productRatingCount');
+                    const $avgStars = document.getElementById('avgStars');
+                    const $ratingCount = document.getElementById('ratingCount');
+                    const $reviewList = document.getElementById('reviewList');
+                    const $reviewForm = document.getElementById('reviewForm');
+                    const $ratingStars = document.getElementById('ratingStars');
+
+                    // ---- helpers ----
+                    const escapeHtml = (s = '') =>
+                        s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+                    function starsHtml(val) {
+                        const v = Number(val || 0);
+                        let out = '';
+                        for (let i = 1; i <= 5; i++) {
+                            if (v >= i) out += '<i class="fas fa-star text-warning"></i>';
+                            else if (v >= i - 0.5) out += '<i class="fas fa-star-half-alt text-warning"></i>';
+                            else out += '<i class="far fa-star text-secondary"></i>';
+                        }
+                        return out;
+                    }
+                    function renderSummary(sum = { avg: 0, count: 0 }) {
+                        const avg = Number(sum.avg || 0), count = Number(sum.count || 0);
+                        if ($topStars) $topStars.innerHTML = starsHtml(avg);
+                        if ($topCount) $topCount.textContent = `(${count} đánh giá)`;
+                        if ($avgStars) $avgStars.innerHTML = `${starsHtml(avg)} <span class="ms-2">${avg.toFixed(1)}/5</span>`;
+                        if ($ratingCount) $ratingCount.textContent = `${count} lượt đánh giá`;
+                    }
+                    async function loadSummary() {
+                        let sum = null;
+                        try {
+                            const r = await fetch(`/api/products/${PRODUCT_ID}/reviews/summary`);
+                            if (r.ok) sum = await r.json();
+                        } catch { }
+                        if (!sum) {
+                            try {
+                                const r2 = await fetch(`/api/products/${PRODUCT_ID}/meta`);
+                                if (r2.ok) {
+                                    const d = await r2.json();
+                                    sum = { avg: d.ratingAvg || 0, count: d.ratingCount || 0 };
+                                }
+                            } catch { }
+                        }
+                        renderSummary(sum || { avg: 0, count: 0 });
+                    }
+                    function renderReviewList(list = []) {
+                        if (!$reviewList) return;
+                        $reviewList.innerHTML = list.map(r => `
+      <div class="border rounded p-2 mb-2">
+        <div class="d-flex align-items-center mb-1">
+          <strong class="me-2">${escapeHtml(r.user?.fullName || r.user?.name || r.user?.username || 'Ẩn danh')}</strong>
+          <span>${starsHtml(r.rating)}</span>
+          <small class="text-muted ms-2">${new Date(r.createdAt).toLocaleString('vi-VN')}</small>
+        </div>
+        <div>${escapeHtml(r.comment || '')}</div>
+      </div>
+    `).join('');
+                    }
+                    async function loadReviews() {
+                        const r = await fetch(`/api/products/${PRODUCT_ID}/reviews`);
+                        const list = r.ok ? await r.json() : [];
+                        renderReviewList(list);
+                        // nếu đã có review của tôi -> khóa form + fill lại sao/comment
+                        if ($reviewForm && $ratingStars) {
+                            const mine = list.find(x => Number(x.user?.id) === Number(CURRENT_USER_ID));
+                            if (mine) {
+                                paintInteractive(mine.rating);
+                                const ta = $reviewForm.querySelector('textarea[name="comment"]');
+                                if (ta) ta.value = mine.comment || '';
+                                disableForm();
+                            }
+                        }
+                    }
+
+                    // ---- sao tương tác ----
+                    let selectedRating = 5;
+                    function paintInteractive(r = selectedRating) {
+                        selectedRating = Number(r) || 5;
+                        if (!$ratingStars) return;
+                        $ratingStars.innerHTML = Array.from({ length: 5 }, (_, i) => {
+                            const n = i + 1;
+                            return `<i data-star="${n}" class="${n <= selectedRating ? 'fas' : 'far'} fa-star ${n <= selectedRating ? 'text-warning' : 'text-secondary'}" style="cursor:pointer"></i>`;
+                        }).join('');
+                    }
+                    if ($ratingStars) {
+                        paintInteractive(5);
+                        // event delegation: click ở icon hoặc svg con đều bắt được
+                        $ratingStars.addEventListener('click', (e) => {
+                            const el = e.target.closest?.('[data-star]');
+                            if (!el) return;
+                            paintInteractive(Number(el.getAttribute('data-star')));
+                        });
+                    }
+                    function disableForm() {
+                        if (!$reviewForm) return;
+                        $reviewForm.querySelector('button')?.setAttribute('disabled', 'true');
+                        $reviewForm.querySelectorAll('textarea, input').forEach(el => el.setAttribute('disabled', 'true'));
+                        if ($ratingStars) $ratingStars.style.pointerEvents = 'none';
+                    }
+
+                    // ---- submit (ONLY ONE handler) ----
+                    if ($reviewForm) {
+                        $reviewForm.addEventListener('submit', async (e) => {
+                            e.preventDefault();
+                            const comment = ($reviewForm.querySelector('textarea[name="comment"]')?.value || '').trim();
+
+                            const resp = await fetch(`/api/products/${PRODUCT_ID}/reviews`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ rating: selectedRating, comment }),
+                            });
+
+                            // đọc JSON nếu có
+                            let payload = null;
+                            const ct = resp.headers.get('content-type') || '';
+                            if (ct.includes('application/json')) {
+                                try { payload = await resp.json(); } catch { }
+                            }
+
+                            if (resp.status === 409) { // đã có review
+                                disableForm();
+                                await loadReviews();
+                                await loadSummary();
+                                return;
+                            }
+                            if (!resp.ok) {
+                                console.error('POST /reviews failed', resp.status, await resp.text().catch(() => ''));
+                                // Không alert nữa để tránh báo lỗi giả
+                                return;
+                            }
+
+                            disableForm();
+                            await loadReviews();
+                            if (payload?.summary) renderSummary(payload.summary);
+                            else await loadSummary();
+                        }, { once: true }); // tránh bị bind trùng lần 2
+                    }
+
+                    // ---- init ----
+                    loadSummary();
+                    loadReviews();
+                })();
+            </script>
+
+            <!-- admin có thể trả lời -->
+            <% if (user && user.role && user.role.name==='ADMIN' ) { %>
+                <!-- thêm script sau để admin reply -->
+                <script>
+                    (function () {
+                        const $qaList = document.getElementById('qaList');
+                        if (!$qaList) return;
+
+                        // gắn nút "Trả lời" cho item chưa có reply (sau khi render xong)
+                        function addReplyButtons() {
+                            $qaList.querySelectorAll('[data-qid]').forEach(el => {
+                                if (el.querySelector('[data-replied="1"]')) return; // đã có reply
+                                if (el.querySelector('.btn-reply')) return;
+
+                                const btn = document.createElement('button');
+                                btn.className = 'btn btn-sm btn-outline-primary btn-reply mt-2';
+                                btn.textContent = 'Trả lời';
+                                btn.addEventListener('click', async () => {
+                                    const content = prompt('Nhập nội dung trả lời:');
+                                    if (!content) return;
+                                    const qid = Number(el.dataset.qid);
+                                    const res = await fetch(`/api/questions/${qid}/replies`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ content })
+                                    });
+                                    if (!res.ok) {
+                                        const msg = await res.json().catch(() => ({}));
+                                        alert(msg?.error || 'Trả lời thất bại');
+                                        return;
+                                    }
+                                    // refresh khối Q&A
+                                    const { loadQuestions } = window; // hoặc gọi lại hàm loadQuestions trong scope của bạn
+                                    // nếu không có global, tạm thời reload:
+                                    location.reload();
+                                });
+
+                                el.appendChild(btn);
+                            });
+                        }
+
+                        // nếu bạn dùng loadQuestions() ở trên, hãy expose nó ra global
+                        window.addEventListener('load', addReplyButtons);
+                        // hoặc sau loadQuestions() xong, gọi addReplyButtons();
+                    })();
+                </script>
+                <% } %>
+
+                    <script src="/socket.io/socket.io.js"></script>
+                    <script src="/client/js/main.js"></script>
+
+                    <!-- Font Awesome (icon sao) -->
+                    <link rel="stylesheet"
+                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 
 </body>

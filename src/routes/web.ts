@@ -14,6 +14,7 @@ import { getBlogDetailPage, getBlogListPage } from 'controllers/client/blog.cont
 import { deleteCoupon, getCoupons, getCreateCoupon, getEditCoupon, postCreateCoupon, postEditCoupon } from 'controllers/admin/coupon.controller';
 import { generateAccessToken, generateRefreshToken } from 'services/client/token.service';
 import { getAdminChatSessions, getChatMessages } from 'controllers/admin/chat.controller';
+import { getProductReviews, getProductReviewSummary, postCreateReview } from 'controllers/client/review.controller';
 
 const router = express.Router();
 
@@ -297,6 +298,10 @@ const webRoutes = (app: Express) => {
             ratingCount: agg._count,
         });
     });
+
+    router.get("/api/products/:id/reviews", getProductReviews);
+    router.get("/api/products/:id/reviews/summary", getProductReviewSummary);
+    router.post("/api/products/:id/reviews", ensureAuthenticated, postCreateReview);
 
 
     // admin routes

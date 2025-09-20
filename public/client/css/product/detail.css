@@ -592,3 +592,13 @@
 .accordion-item .accordion-button:not(.collapsed) {
   background: rgba(13, 110, 253, .06);
 }
+
+#ratingStars i {
+  font-size: 20px;
+  margin-right: 4px;
+}
+
+#productRatingStars i,
+#avgStars i {
+  font-size: 16px;
+}

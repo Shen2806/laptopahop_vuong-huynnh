@@ -9,6 +9,7 @@ import {
     updateUserByIdAPI
 } from 'controllers/client/api.controller';
 import { postLogin, refreshToken } from 'controllers/client/auth.controller';
+import { getProductQuestionsAPI, postAdminReplyAPI, postProductQuestionAPI } from 'controllers/client/qa.controller';
 
 import express, { Express } from 'express';
 import { checkValidJWT } from 'src/middleware/jwt.middleware';
@@ -33,6 +34,13 @@ const apiRoutes = (app: Express) => {
     router.delete("/users/:id", checkValidJWT, deleteUserByIdAPI);
 
     router.get("/account", checkValidJWT, fetchAccountAPI);
+
+    // Q&A public GET
+    router.get("/products/:id/questions", getProductQuestionsAPI);
+    // Q&A: user hỏi
+    router.post("/products/:id/questions", checkValidJWT, postProductQuestionAPI);
+    // Q&A: admin trả lời
+    router.post("/questions/:id/replies", checkValidJWT, postAdminReplyAPI);
 
     // ------------------ Mount router ------------------
     app.use("/api", router);
