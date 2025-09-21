@@ -812,6 +812,7 @@
                 window.__PRODUCT_ID__ = boot.productId;
                 window.__IS_AUTH__ = boot.isAuth;
             </script>
+            <!-- chat widget -->
             <script>
                 (function () {
                     const $root = document.getElementById('chatWidget');
@@ -1006,59 +1007,104 @@
             </script>
 
             <!-- admin có thể trả lời -->
-            <% if (user && user.role && user.role.name==='ADMIN' ) { %>
-                <!-- thêm script sau để admin reply -->
-                <script>
-                    (function () {
-                        const $qaList = document.getElementById('qaList');
-                        if (!$qaList) return;
+            <script>
+                (() => {
+                    const boot = document.getElementById('boot');
+                    const PRODUCT_ID = Number(boot?.dataset?.productId || 0);
+                    const USER_ID = boot?.dataset?.userId ? Number(boot.dataset.userId) : null;
+                    const IS_AUTH = (boot?.dataset?.isAuth || '0') === '1';
 
-                        // gắn nút "Trả lời" cho item chưa có reply (sau khi render xong)
-                        function addReplyButtons() {
-                            $qaList.querySelectorAll('[data-qid]').forEach(el => {
-                                if (el.querySelector('[data-replied="1"]')) return; // đã có reply
-                                if (el.querySelector('.btn-reply')) return;
+                    const $qaList = document.getElementById('qaList');
+                    const $qaForm = document.getElementById('qaForm');
 
-                                const btn = document.createElement('button');
-                                btn.className = 'btn btn-sm btn-outline-primary btn-reply mt-2';
-                                btn.textContent = 'Trả lời';
-                                btn.addEventListener('click', async () => {
-                                    const content = prompt('Nhập nội dung trả lời:');
-                                    if (!content) return;
-                                    const qid = Number(el.dataset.qid);
-                                    const res = await fetch(`/api/questions/${qid}/replies`, {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ content })
-                                    });
-                                    if (!res.ok) {
-                                        const msg = await res.json().catch(() => ({}));
-                                        alert(msg?.error || 'Trả lời thất bại');
-                                        return;
-                                    }
-                                    // refresh khối Q&A
-                                    const { loadQuestions } = window; // hoặc gọi lại hàm loadQuestions trong scope của bạn
-                                    // nếu không có global, tạm thời reload:
-                                    location.reload();
+                    const esc = (s = '') => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+                    const tpl = (q) => {
+                        const name = esc(q.user?.name || `User #${q.user?.id || ''}`);
+                        const avatar = q.user?.avatar ? `/images/${q.user.avatar}` : '/images/default-avatar.png';
+                        const at = new Date(q.createdAt).toLocaleString('vi-VN');
+                        const hasRep = q.replies && q.replies.length > 0;
+                        const rep = hasRep ? q.replies[0] : null;
+                        const repHtml = hasRep
+                            ? `<div class="mt-2 ps-3 border-start">
+           <div class="small text-success fw-semibold"><i class="fas fa-user-shield me-1"></i>Admin</div>
+           <div>${esc(rep.content)}</div>
+           <div class="small text-muted">${new Date(rep.createdAt).toLocaleString('vi-VN')}</div>
+         </div>`
+                            : `<div class="mt-2 small text-muted fst-italic">Đang chờ phản hồi từ Admin...</div>`;
+                        return `
+      <div class="border rounded p-2 mb-2" data-qid="${q.id}">
+        <div class="d-flex align-items-center gap-2">
+          <img src="${avatar}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
+          <strong>${name}</strong>
+          <small class="text-muted">${at}</small>
+        </div>
+        <div class="mt-1">${esc(q.content)}</div>
+        ${repHtml}
+      </div>`;
+                    };
+
+                    async function loadQA() {
+                        const r = await fetch(`/api/products/${PRODUCT_ID}/questions`);
+                        const data = r.ok ? await r.json() : [];
+                        $qaList.innerHTML = data.map(tpl).join('') || '<div class="text-muted">Chưa có câu hỏi nào.</div>';
+                    }
+
+                    // Submit (1 lần, có chặn double)
+                    if ($qaForm && !$qaForm.dataset.bound) {
+                        $qaForm.dataset.bound = '1';
+                        let busy = false;
+                        $qaForm.addEventListener('submit', async (e) => {
+                            e.preventDefault();
+                            if (busy) return; busy = true;
+                            const ta = $qaForm.querySelector('textarea[name="content"]');
+                            const btn = $qaForm.querySelector('button');
+                            const content = (ta?.value || '').trim();
+                            if (!content) { busy = false; return; }
+                            btn?.setAttribute('disabled', 'true');
+                            try {
+                                const r = await fetch(`/api/products/${PRODUCT_ID}/questions`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ content })
                                 });
+                                if (!r.ok) {
+                                    const j = await r.json().catch(() => ({ message: 'Gửi thất bại' }));
+                                    alert(j.message || 'Gửi thất bại');
+                                } else {
+                                    const q = await r.json();
+                                    $qaList.insertAdjacentHTML('afterbegin', tpl(q));
+                                    ta.value = '';
+                                }
+                            } finally {
+                                btn?.removeAttribute('disabled');
+                                busy = false;
+                            }
+                        });
+                    }
 
-                                el.appendChild(btn);
-                            });
-                        }
+                    // Socket: join user room & nghe trả lời
+                    try {
+                        const s = (window.__CHAT_SOCKET__ ||= io());
+                        if (USER_ID) s.emit('join-user-room', USER_ID);
 
-                        // nếu bạn dùng loadQuestions() ở trên, hãy expose nó ra global
-                        window.addEventListener('load', addReplyButtons);
-                        // hoặc sau loadQuestions() xong, gọi addReplyButtons();
-                    })();
-                </script>
-                <% } %>
+                        s.off('qa:answer_available');         // tránh đăng ký trùng
+                        s.on('qa:answer_available', (p) => {
+                            if (Number(p.productId) === PRODUCT_ID) loadQA();
+                        });
+                    } catch { }
 
-                    <script src="/socket.io/socket.io.js"></script>
-                    <script src="/client/js/main.js"></script>
+                    // init
+                    loadQA();
+                })();
+            </script>
 
-                    <!-- Font Awesome (icon sao) -->
-                    <link rel="stylesheet"
-                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+            <script src="/socket.io/socket.io.js"></script>
+            <script src="/client/js/main.js"></script>
+
+            <!-- Font Awesome (icon sao) -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 
 </body>

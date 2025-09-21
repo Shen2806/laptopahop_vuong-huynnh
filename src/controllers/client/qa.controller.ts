@@ -1,117 +1,162 @@
-// src/controllers/client/qa.controller.ts
 import { Request, Response } from "express";
 import { prisma } from "config/client";
+import { getIO } from "src/socket"; // dùng để bắn socket
 
-function isAdmin(req: Request) {
-    const u: any = (req as any).user;
-    // JWT của bạn trước đó đã include role
-    return !!u && (u.role?.name === "ADMIN" || u.accountType === "ADMIN");
+// GET /products/:id/questions  (public)
+export async function getProductQuestionsAPI(req: Request, res: Response) {
+    try {
+        const productId = Number(req.params.id);
+        if (!Number.isFinite(productId)) {
+            return res.status(400).json({ message: "invalid productId" });
+        }
+
+        const list = await prisma.productQuestion.findMany({
+            where: { productId },
+            orderBy: { createdAt: "desc" },
+            include: {
+                user: true,
+                replies: { orderBy: { createdAt: "asc" } },
+            },
+        });
+
+        // Chuẩn hoá dữ liệu trả ra FE
+        const data = list.map((q) => ({
+            id: q.id,
+            productId: q.productId,
+            content: q.content,
+            createdAt: q.createdAt,
+            user: {
+                id: q.userId,
+                name: q.user?.fullName || q.user?.username || `User #${q.userId}`,
+                avatar: q.user?.avatar || null,
+            },
+            replies: q.replies.map((r) => ({
+                id: r.id,
+                role: r.role, // "ADMIN"
+                content: r.content,
+                createdAt: r.createdAt,
+            })),
+        }));
+
+        res.json(data);
+    } catch (err) {
+        console.error("getProductQuestionsAPI error:", err);
+        res.status(500).json({ message: "server error" });
+    }
 }
 
-// GET /api/products/:id/questions
-export const getProductQuestionsAPI = async (req: Request, res: Response) => {
-    const productId = Number(req.params.id);
-    if (!Number.isFinite(productId)) return res.status(400).json({ error: "Invalid product id" });
-
-    const questions = await prisma.productQuestion.findMany({
-        where: { productId },
-        orderBy: { createdAt: "desc" },
-        include: {
-            user: { select: { id: true, fullName: true, avatar: true } },
-            replies: { orderBy: { createdAt: "asc" }, take: 1 }, // 1 câu trả lời tối đa
-        },
-    });
-
-    const data = questions.map(q => ({
-        id: q.id,
-        content: q.content,
-        createdAt: q.createdAt,
-        user: { id: q.user.id, name: q.user.fullName || `User#${q.user.id}`, avatar: q.user.avatar || null },
-        reply: q.replies[0] ? {
-            id: q.replies[0].id,
-            content: q.replies[0].content,
-            createdAt: q.replies[0].createdAt,
-            role: q.replies[0].role,
-        } : null,
-    }));
-    return res.json(data);
-};
-
-// POST /api/products/:id/questions  (user gửi câu hỏi)
-export const postProductQuestionAPI = async (req: Request, res: Response) => {
-    const productId = Number(req.params.id);
-    const user = (req as any).user;
-    if (!user) return res.status(401).json({ error: "Unauthorized" });
-
-    const content = String(req.body?.content || "").trim();
-    if (!content) return res.status(400).json({ error: "Nội dung câu hỏi không được rỗng" });
-
-    const q = await prisma.productQuestion.create({
-        data: { productId, userId: Number(user.id), content },
-        include: {
-            user: { select: { id: true, fullName: true, avatar: true } },
-            replies: true,
-        },
-    });
-
-    // Thông báo cho admin qua socket (nếu thích)
+// POST /products/:id/questions  (user hỏi; admin KHÔNG được hỏi)
+export async function postProductQuestionAPI(req: any, res: Response) {
     try {
-        const { getIO } = await import("src/socket");
-        const io = getIO();
-        io.to("admins").emit("qa:new_question", {
-            productId, questionId: q.id, preview: content.slice(0, 80)
+        const productId = Number(req.params.id);
+        const content = String(req.body?.content || "").trim();
+
+        if (!Number.isFinite(productId)) {
+            return res.status(400).json({ message: "invalid productId" });
+        }
+        if (!content) return res.status(400).json({ message: "content required" });
+
+        // chặn admin đặt câu hỏi
+        if (req.user?.role?.name === "ADMIN") {
+            return res.status(403).json({ message: "Admin không được đặt câu hỏi" });
+        }
+
+        const q = await prisma.productQuestion.create({
+            data: { productId, userId: req.user.id, content },
+            include: { user: true, replies: true },
         });
-    } catch { /* socket chưa init thì bỏ qua */ }
 
-    return res.json({
-        id: q.id,
-        content: q.content,
-        createdAt: q.createdAt,
-        user: { id: q.user.id, name: q.user.fullName || `User#${q.user.id}`, avatar: q.user.avatar || null },
-        reply: null,
-    });
-};
-
-// POST /api/questions/:id/replies (admin trả lời)
-export const postAdminReplyAPI = async (req: Request, res: Response) => {
-    if (!isAdmin(req)) return res.status(403).json({ error: "Forbidden" });
-
-    const questionId = Number(req.params.id);
-    const content = String(req.body?.content || "").trim();
-    if (!content) return res.status(400).json({ error: "Nội dung trả lời không được rỗng" });
-
-    const q = await prisma.productQuestion.findUnique({
-        where: { id: questionId },
-        select: { id: true, userId: true, productId: true, replies: { select: { id: true } } },
-    });
-    if (!q) return res.status(404).json({ error: "Question not found" });
-
-    // Chỉ cho 1 câu trả lời
-    if (q.replies.length > 0) return res.status(409).json({ error: "Câu hỏi đã được trả lời" });
-
-    const adminUser: any = (req as any).user;
-
-    const reply = await prisma.productQuestionReply.create({
-        data: {
-            questionId,
-            userId: Number(adminUser.id), // lưu id admin trả lời (nếu muốn)
-            role: "ADMIN",
-            content,
-        }
-    });
-
-    // thông báo realtime cho user đã hỏi (nếu đang online)
-    try {
-        const { getIO } = await import("src/socket");
-        const io = getIO();
-        if (q.userId) {
-            io.to(`user-${q.userId}`).emit("qa:answered", {
-                questionId: q.id,
-                content: reply.content,
-                createdAt: reply.createdAt
+        // Thông báo cho admin có câu hỏi mới
+        try {
+            const io = getIO();
+            io.to("admins").emit("qa:new_question", {
+                id: q.id,
+                productId: q.productId,
+                preview: q.content.slice(0, 100),
+                by: q.user?.fullName || q.user?.username || `User #${q.userId}`,
+                at: new Date().toISOString(),
             });
+        } catch (e) {
+            // socket optional
+            console.warn("socket emit qa:new_question failed:", e);
         }
-    } catch { }
 
-    return res.json({ ok: true, reply: { id: reply.id, content: reply.content, createdAt: reply.createdAt } });
-};
+        return res.json({
+            id: q.id,
+            productId: q.productId,
+            content: q.content,
+            createdAt: q.createdAt,
+            user: {
+                id: q.userId,
+                name: q.user?.fullName || q.user?.username || `User #${q.userId}`,
+                avatar: q.user?.avatar || null,
+            },
+            replies: [],
+        });
+    } catch (err) {
+        console.error("postProductQuestionAPI error:", err);
+        res.status(500).json({ message: "server error" });
+    }
+}
+
+// POST /questions/:id/replies  (chỉ ADMIN trả lời, mỗi câu hỏi chỉ 1 reply)
+export async function postAdminReplyAPI(req: any, res: Response) {
+    try {
+        const questionId = Number(req.params.id);
+        const content = String(req.body?.content || "").trim();
+
+        if (!Number.isFinite(questionId)) {
+            return res.status(400).json({ message: "invalid questionId" });
+        }
+        if (req.user?.role?.name !== "ADMIN") {
+            return res.status(403).json({ message: "Chỉ Admin được trả lời câu hỏi" });
+        }
+        if (!content) return res.status(400).json({ message: "content required" });
+
+        // mỗi câu hỏi chỉ 1 trả lời
+        const existed = await prisma.productQuestionReply.count({ where: { questionId } });
+        if (existed > 0) {
+            return res.status(409).json({ message: "Câu hỏi này đã có câu trả lời" });
+        }
+
+        const q = await prisma.productQuestion.findUnique({
+            where: { id: questionId },
+            select: { id: true, productId: true, userId: true },
+        });
+        if (!q) return res.status(404).json({ message: "Question not found" });
+
+        const rep = await prisma.productQuestionReply.create({
+            data: { questionId, userId: req.user.id, role: "ADMIN", content },
+        });
+
+        // Bắn socket: báo admin panel + báo về user đã hỏi
+        try {
+            const io = getIO();
+            io.to("admins").emit("qa:answered", {
+                questionId: q.id,
+                productId: q.productId!,
+                contentPreview: rep.content.slice(0, 100),
+                at: new Date().toISOString(),
+            });
+            if (q.userId) {
+                io.to(`user-${q.userId}`).emit("qa:answer_available", {
+                    questionId: q.id,
+                    productId: q.productId!,
+                    at: new Date().toISOString(),
+                });
+            }
+        } catch (e) {
+            console.warn("socket emit qa:answered/qa:answer_available failed:", e);
+        }
+
+        return res.json({
+            id: rep.id,
+            role: rep.role,
+            content: rep.content,
+            createdAt: rep.createdAt,
+        });
+    } catch (err) {
+        console.error("postAdminReplyAPI error:", err);
+        res.status(500).json({ message: "server error" });
+    }
+}

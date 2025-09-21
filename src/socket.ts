@@ -5,6 +5,40 @@ import { prisma } from "config/client";
 
 let io: Server | null = null;
 
+/**
+ * ===== Q&A NOTIFY HELPERS =====
+ * Controller có thể gọi:
+ *  - qaSocket.notifyQANew({ id, productId, preview, by, at })
+ *  - qaSocket.notifyQAAnswered({ questionId, productId, contentPreview, at, userId? })
+ */
+function notifyQANew(question: {
+    id: number;
+    productId: number;
+    preview: string;
+    by: string;
+    at: string; // ISO string
+}) {
+    if (!io) return;
+    io.to("admins").emit("notify:qa_new_question", question);
+}
+
+function notifyQAAnswered(payload: {
+    questionId: number;
+    productId: number;
+    contentPreview: string;
+    at: string; // ISO string
+    userId?: number; // nếu biết user đặt câu hỏi -> ping về phòng user
+}) {
+    if (!io) return;
+    io.to("admins").emit("notify:qa_answered", payload);
+    if (payload.userId) {
+        io.to(`user-${payload.userId}`).emit("notify:qa_answered", payload);
+    }
+}
+
+// Export cho controller sử dụng
+// export const qaSocket = { notifyQANew, notifyQAAnswered };
+
 export const initSocket = (server: HttpServer) => {
     io = new Server(server, {
         cors: {
@@ -92,21 +126,19 @@ export const initSocket = (server: HttpServer) => {
 
             // ====== (1) USER nhắn → tăng unread cho ADMIN + thông báo chuông ======
             if (sender === "USER") {
-                // thông báo chuông + preview
                 io!.to("admins").emit("notify:chat_message", {
                     sessionId: sidNum,
                     preview: content.slice(0, 80),
                     at: new Date().toISOString(),
                 });
 
-                // >>> CẬP NHẬT SỐ UNREAD CHO PHIÊN (USER → ADMIN)
                 const unread = await prisma.chatMessage.count({
                     where: { sessionId: sidNum, sender: "USER", isRead: false },
                 });
                 io!.to("admins").emit("admin:session_unread", { sessionId: sidNum, unread });
             }
 
-            // ADMIN nhắn → báo về user-room để hiện badge/âm thanh mini (nếu cần)
+            // ADMIN nhắn → ping user
             if (sender === "ADMIN" && sess.userId) {
                 io!.to(`user-${sess.userId}`).emit("chat-incoming", {
                     sessionId: sidNum,
@@ -163,6 +195,18 @@ export const initSocket = (server: HttpServer) => {
     });
 
     return io;
+};
+// === Q&A helper socket events ===
+export const qaSocket = {
+    notifyQANew: (p: { id: number; productId: number; preview: string; by: string; at: string }) => {
+        io?.to("admins").emit("qa:new_question", p);
+    },
+    notifyQAAnswered: (p: { questionId: number; productId: number; contentPreview: string; at: string; userId?: number }) => {
+        io?.to("admins").emit("qa:answered", p);
+        if (p.userId) {
+            io?.to(`user-${p.userId}`).emit("qa:answer_available", p);
+        }
+    },
 };
 
 export const getIO = () => {

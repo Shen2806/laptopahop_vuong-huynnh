@@ -20,7 +20,7 @@ const apiRoutes = (app: Express) => {
     // ------------------ Public routes ------------------
     router.post("/add-product-to-cart", postAddProductToCartAPI);
     router.post("/login", loginAPI);
-    router.post("/login", postLogin);
+    // router.post("/login", postLogin);
     router.post("/refresh", refreshToken);
 
 

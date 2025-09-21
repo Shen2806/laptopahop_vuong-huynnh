@@ -15,6 +15,7 @@ import { deleteCoupon, getCoupons, getCreateCoupon, getEditCoupon, postCreateCou
 import { generateAccessToken, generateRefreshToken } from 'services/client/token.service';
 import { getAdminChatSessions, getChatMessages } from 'controllers/admin/chat.controller';
 import { getProductReviews, getProductReviewSummary, postCreateReview } from 'controllers/client/review.controller';
+import { adminAnswerQuestionAPI, adminListQuestionsAPI, getAdminQAPage } from 'controllers/admin/qa.controller';
 
 const router = express.Router();
 
@@ -350,7 +351,7 @@ const webRoutes = (app: Express) => {
     router.post("/admin/order/:id/confirm", postConfirmOrder);
     router.post("/admin/order/:id/cancel", postCancelOrderByAdmin);
     router.post("/admin/order/:id/status", postUpdateOrderStatus);
-    app.use("/", isAdmin, router);
+    // app.use("/", isAdmin, router);
     // Admin chat
     router.get("/admin/chat", isAdmin, (req, res) => res.render("admin/chat/index.ejs"));
     router.get("/admin/api/chat/sessions", isAdmin, async (req, res) => {
@@ -361,6 +362,10 @@ const webRoutes = (app: Express) => {
     router.get("/admin/api/chat/sessions", getAdminChatSessions); // add isAdmin nếu muốn
     router.get("/api/chat/sessions/:id/messages", getChatMessages); // có thể thêm isAdmin nếu muốn
 
+    // ... bên dưới các route admin khác:
+    router.get("/admin/qa", getAdminQAPage);
+    router.get("/admin/api/qa/questions", adminListQuestionsAPI);
+    router.post("/admin/api/qa/questions/:id/answer", adminAnswerQuestionAPI);
     // routes cho client   
     app.use("/", router);
 
