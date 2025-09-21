@@ -233,58 +233,95 @@
 
 
     //handle filter products
-    $('#btnFilter').click(function (event) {
-        event.preventDefault();
+    // $('#btnFilter').click(function (event) {
+    //     event.preventDefault();
 
-        let factoryArr = [];
-        let targetArr = [];
-        let priceArr = [];
-        //factory filter
-        $("#factoryFilter .form-check-input:checked").each(function () {
-            factoryArr.push($(this).val());
-        });
+    //     let factoryArr = [];
+    //     let targetArr = [];
+    //     let priceArr = [];
+    //     //factory filter
+    //     $("#factoryFilter .form-check-input:checked").each(function () {
+    //         factoryArr.push($(this).val());
+    //     });
 
-        //target filter
-        $("#targetFilter .form-check-input:checked").each(function () {
-            targetArr.push($(this).val());
-        });
+    //     //target filter
+    //     $("#targetFilter .form-check-input:checked").each(function () {
+    //         targetArr.push($(this).val());
+    //     });
 
-        //price filter
-        $("#priceFilter .form-check-input:checked").each(function () {
-            priceArr.push($(this).val());
-        });
+    //     //price filter
+    //     $("#priceFilter .form-check-input:checked").each(function () {
+    //         priceArr.push($(this).val());
+    //     });
 
-        //sort order
-        let sortValue = $('input[name="radio-sort"]:checked').val();
+    //     //sort order
+    //     // let sortValue = $('input[name="radio-sort"]:checked').val();
+    //     const sortValue = $('input[name="radio-sort"]:checked').val();
+    //     if (sortValue) searchParams.set('sort', sortValue);
+    //     else searchParams.delete('sort');
 
-        const currentUrl = new URL(window.location.href);
-        const searchParams = currentUrl.searchParams;
+    //     const currentUrl = new URL(window.location.href);
+    //     const searchParams = currentUrl.searchParams;
 
-        const currentPage = searchParams?.get("page") ?? "1"
-        // Add or update query parameters
-        searchParams.set('page', currentPage);
-        searchParams.set('sort', sortValue);
+    //     const currentPage = searchParams?.get("page") ?? "1"
+    //     // Add or update query parameters
+    //     searchParams.set('page', currentPage);
+    //     searchParams.set('sort', sortValue);
 
-        //reset
-        searchParams.delete('factory');
-        searchParams.delete('target');
-        searchParams.delete('price');
+    //     //reset
+    //     searchParams.delete('factory');
+    //     searchParams.delete('target');
+    //     searchParams.delete('price');
 
-        if (factoryArr.length > 0) {
-            searchParams.set('factory', factoryArr.join(','));
-        }
+    //     if (factoryArr.length > 0) {
+    //         searchParams.set('factory', factoryArr.join(','));
+    //     }
 
-        if (targetArr.length > 0) {
-            searchParams.set('target', targetArr.join(','));
-        }
+    //     if (targetArr.length > 0) {
+    //         searchParams.set('target', targetArr.join(','));
+    //     }
 
-        if (priceArr.length > 0) {
-            searchParams.set('price', priceArr.join(','));
-        }
+    //     if (priceArr.length > 0) {
+    //         searchParams.set('price', priceArr.join(','));
+    //     }
 
-        // Update the URL and reload the page
-        window.location.href = currentUrl.toString();
-    });
+    //     // Update the URL and reload the page
+    //     window.location.href = currentUrl.toString();
+    // });
+    // đảm bảo jQuery đã load trước đoạn này
+$(document).on('click', '#btnFilter', function (event) {
+  event.preventDefault();
+
+  // Lấy URL & query trước, rồi mới set
+  const currentUrl = new URL(window.location.href);
+  const searchParams = currentUrl.searchParams;
+
+  // Thu thập filter
+  const factoryArr = $("#factoryFilter .form-check-input:checked").map(function(){ return this.value; }).get();
+  const targetArr  = $("#targetFilter .form-check-input:checked").map(function(){ return this.value; }).get();
+  const priceArr   = $("#priceFilter  .form-check-input:checked").map(function(){ return this.value; }).get();
+  const sortValue  = $('input[name="radio-sort"]:checked').val();
+
+  // Reset các param cũ
+  searchParams.delete('factory');
+  searchParams.delete('target');
+  searchParams.delete('price');
+  searchParams.delete('sort');
+  // khi lọc thường nên về trang 1
+  searchParams.set('page', '1');
+
+  // Set lại theo lựa chọn
+  if (factoryArr.length) searchParams.set('factory', factoryArr.join(','));
+  if (targetArr.length)  searchParams.set('target',  targetArr.join(','));
+  if (priceArr.length)   searchParams.set('price',   priceArr.join(','));
+  if (sortValue && sortValue !== 'gia-khong-sap-xep') {
+    searchParams.set('sort', sortValue);
+  }
+
+  // Điều hướng
+  window.location.href = currentUrl.toString();
+});
+
 
     //handle auto checkbox after page loading
     // Parse the URL parameters
@@ -579,5 +616,43 @@ if (window.__CHAT_WIDGET_INIT__) {
   });
 
 })();
+// ===== Buy Now (idempotent) =====
+$(document).off('click.buyNow', '#btnBuyNow')
+           .on('click.buyNow', '#btnBuyNow', function (e) {
+  e.preventDefault();
+
+  if (!isLogin()) {
+    $.toast({
+      heading: "Lỗi thao tác !",
+      text: "Bạn cần đăng nhập vào tài khoản.",
+      position: "top-right",
+      icon: "error"
+    });
+    return;
+  }
+
+  const productId = $('.btnAddToCartDetail').attr('data-product-id'); // reuse id trên nút thêm giỏ
+  const quantity  = Number($('#quantityDetail').val() || '1');
+
+  $.ajax({
+    url: `${window.location.origin}/api/add-product-to-cart`,
+    type: "POST",
+    data: JSON.stringify({ quantity, productId }),
+    contentType: "application/json",
+    success: function () {
+      // chuyển thẳng tới checkout
+      window.location.href = "/checkout";
+    },
+    error: function (xhr) {
+      console.error('BuyNow error:', xhr);
+      $.toast({
+        heading: "Lỗi",
+        text: "Không thể thực hiện Mua ngay. Vui lòng thử lại.",
+        position: "top-right",
+        icon: "error"
+      });
+    }
+  });
+});
 
 })(jQuery);

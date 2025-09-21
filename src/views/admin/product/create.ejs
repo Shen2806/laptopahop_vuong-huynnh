@@ -196,26 +196,30 @@
                                                                 <label class="form-label required">Hãng sản xuất</label>
                                                                 <select name="factory" class="form-select" required>
                                                                     <option value="">-- Chọn hãng --</option>
-                                                                    <option value="APPLE" <%=oldData &&
-                                                                        oldData.factory==='APPLE' ? 'selected' : '' %>
-                                                                        >Apple (MacBook)</option>
-                                                                    <option value="ASUS" <%=oldData &&
-                                                                        oldData.factory==='ASUS' ? 'selected' : '' %>
-                                                                        >Asus</option>
-                                                                    <option value="LENOVO" <%=oldData &&
-                                                                        oldData.factory==='LENOVO' ? 'selected' : '' %>
-                                                                        >Lenovo</option>
-                                                                    <option value="DELL" <%=oldData &&
-                                                                        oldData.factory==='DELL' ? 'selected' : '' %>
-                                                                        >Dell</option>
-                                                                    <option value="LG" <%=oldData &&
-                                                                        oldData.factory==='LG' ? 'selected' : '' %>>LG
-                                                                    </option>
-                                                                    <option value="ACER" <%=oldData &&
-                                                                        oldData.factory==='ACER' ? 'selected' : '' %>
-                                                                        >Acer</option>
+
+                                                                    <% var FO=(typeof factoryOptions !=='undefined' &&
+                                                                        Array.isArray(factoryOptions) &&
+                                                                        factoryOptions.length) ? factoryOptions : [ {
+                                                                        value: 'APPLE' , name: 'Apple (MacBook)' }, {
+                                                                        value: 'ASUS' , name: 'Asus' }, {
+                                                                        value: 'LENOVO' , name: 'Lenovo' }, {
+                                                                        value: 'DELL' , name: 'Dell' }, { value: 'LG' ,
+                                                                        name: 'LG' }, { value: 'ACER' , name: 'Acer' },
+                                                                        { value: 'HP' , name: 'HP' }, { value: 'MSI' ,
+                                                                        name: 'MSI' }, { value: 'GIGABYTE' ,
+                                                                        name: 'Gigabyte' }, { value: 'ALIENWARE' ,
+                                                                        name: 'Alienware' }, ]; %>
+
+                                                                        <% FO.forEach(opt=> { %>
+                                                                            <option value="<%= opt.value %>" <%=(oldData
+                                                                                && oldData.factory===opt.value)
+                                                                                ? 'selected' : '' %>>
+                                                                                <%= opt.name %>
+                                                                            </option>
+                                                                            <% }) %>
                                                                 </select>
                                                             </div>
+
                                                             <div class="mb-3 col-md-5">
                                                                 <label class="form-label required">Mục đích sử
                                                                     dụng</label>

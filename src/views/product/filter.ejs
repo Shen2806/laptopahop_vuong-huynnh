@@ -37,7 +37,25 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/client/css/product/filter.css">
 
+    <style>
+        .rating-stars {
+            line-height: 1;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center
+        }
 
+        .rating-stars i {
+            color: #f59e0b
+        }
+
+        /* tất cả sao màu cam */
+        .rating-stars .count {
+            margin-left: .4rem;
+            font-size: 12px;
+            color: #6b7280
+        }
+    </style>
 </head>
 
 <body>
@@ -342,26 +360,44 @@
                         <!-- Sidebar Filters -->
                         <aside class="col-12 col-lg-3">
                             <div class="row g-4">
-                                <!-- Hãng sản xuất (chips không logo) -->
+                                <!-- Hãng sản xuất -->
                                 <div class="col-12" id="factoryFilter">
                                     <div class="card border-0 shadow-sm rounded-3">
                                         <div class="card-body">
                                             <h6 class="fw-bold mb-3">Hãng sản xuất</h6>
-                                            <div class="brand-chips">
-                                                <% ["Apple","Asus","Lenovo","Dell","LG","Acer"].forEach((brand, idx)=> {
-                                                    %>
-                                                    <div class="chip-check">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            id="factory-<%= idx %>" value="<%= brand.toUpperCase() %>">
-                                                        <label class="chip" for="factory-<%= idx %>">
-                                                            <%= brand %>
-                                                        </label>
-                                                    </div>
-                                                    <% }) %>
-                                            </div>
+
+                                            <% var FO=[]; FO.push({ value: 'APPLE' , name: 'Apple (MacBook)' });
+                                                FO.push({ value: 'ASUS' , name: 'Asus' }); FO.push({ value: 'LENOVO' ,
+                                                name: 'Lenovo' }); FO.push({ value: 'DELL' , name: 'Dell' }); FO.push({
+                                                value: 'LG' , name: 'LG' }); FO.push({ value: 'ACER' , name: 'Acer' });
+                                                FO.push({ value: 'HP' , name: 'HP' }); FO.push({ value: 'MSI' ,
+                                                name: 'MSI' }); FO.push({ value: 'GIGABYTE' , name: 'Gigabyte' });
+                                                FO.push({ value: 'ALIENWARE' , name: 'Alienware' }); if (typeof
+                                                factoryOptions !=='undefined' && Array.isArray(factoryOptions) &&
+                                                factoryOptions.length) { FO=factoryOptions; } var pre=[]; if (typeof
+                                                precheckedFactories !=='undefined' &&
+                                                Array.isArray(precheckedFactories)) { pre=precheckedFactories; } %>
+
+                                                <div class="brand-chips d-flex flex-wrap gap-3">
+                                                    <% FO.forEach(function (opt, idx) { var
+                                                        isChecked=pre.indexOf(opt.value) !==-1; %>
+                                                        <div class="chip-check">
+                                                            <input class="form-check-input" type="checkbox"
+                                                                id="factory-<%= idx %>" value="<%= opt.value %>"
+                                                                <%=isChecked ? 'checked' : '' %> >
+                                                            <label class="chip" for="factory-<%= idx %>">
+                                                                <%= opt.name %>
+                                                            </label>
+                                                        </div>
+                                                        <% }); %>
+                                                </div>
+
                                         </div>
                                     </div>
                                 </div>
+
+
+
 
                                 <!-- Mục đích sử dụng -->
                                 <div class="col-12" id="targetFilter">
@@ -457,12 +493,10 @@
                                         </div>
                                     </div>
                                 </div>
+                                <button id="btnFilter" type="button" class="btn btn-success rounded-pill w-100 py-2">
+                                    Lọc sản phẩm
+                                </button>
 
-                                <!-- Nút filter -->
-                                <div class="col-12">
-                                    <button id="btnFilter" class="btn btn-success rounded-pill w-100 py-2">Lọc sản
-                                        phẩm</button>
-                                </div>
                             </div>
                         </aside>
 
@@ -495,32 +529,69 @@
                                                 <p class="mb-2" style="font-size:13px;">
                                                     <%= product.shortDesc %>
                                                 </p>
+                                                <div class="mb-2 text-center">
+                                                    <span class="rating-stars"
+                                                        title="<%= (product.ratingAvg || 0).toFixed(1) %>/5">
+                                                        <% (product.starsArr || []).forEach(function(s){ %>
+                                                            <% if (s==='full' ) { %><i class="fas fa-star"></i>
+                                                                <% } %>
+                                                                    <% if (s==='half' ) { %><i
+                                                                            class="fas fa-star-half-alt"></i>
+                                                                        <% } %>
+                                                                            <% if (s==='empty' ) { %><i
+                                                                                    class="far fa-star"></i>
+                                                                                <% } %>
+                                                                                    <% }); %>
+                                                                                        <span class="count">(<%=
+                                                                                                product.ratingCount || 0
+                                                                                                %>)</span>
+                                                    </span>
+                                                </div>
 
                                                 <!-- Giá -->
                                                 <div class="d-flex flex-column align-items-center mb-2 price-box">
-                                                    <% if(product.discount> 0) { %>
-                                                        <div class="d-flex align-items-center justify-content-center">
-                                                            <small class="text-muted text-decoration-line-through">
-                                                                <%= new
-                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
-                                                                    %>
-                                                            </small>
-                                                            <span class="badge bg-danger ms-2">-<%= product.discount %>
-                                                                    %</span>
+                                                    <% const _avg=Number(product?.ratingAvg ?? 0); const
+                                                        _count=Number(product?.ratingCount ?? 0); const _pct=Math.max(0,
+                                                        Math.min(100, (_avg / 5) * 100)).toFixed(2) + '%' ; %>
+                                                        <div class="mb-2 text-center">
+                                                            <span class="ls-rating d-inline-flex align-items-center"
+                                                                style="--w:<%- _pct %>"
+                                                                title="<%= _avg.toFixed(1) %>/5">
+                                                                <span class="stars">
+                                                                    <span class="stars-back">★★★★★</span>
+                                                                    <span class="stars-front">★★★★★</span>
+                                                                </span>
+                                                                <span class="ms-1 small text-muted">(<%= _count %>
+                                                                        )</span>
+                                                            </span>
                                                         </div>
-                                                        <p class="text-danger fw-bold mb-1 d-flex align-items-center justify-content-center"
-                                                            style="font-size:15px;">
-                                                            <%= new
-                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountPrice)
-                                                                %>
-                                                        </p>
-                                                        <% } else { %>
-                                                            <p class="text-dark fw-bold mb-1" style="font-size:15px;">
+
+                                                        <% if(product.discount> 0) { %>
+                                                            <div
+                                                                class="d-flex align-items-center justify-content-center">
+                                                                <small class="text-muted text-decoration-line-through">
+                                                                    <%= new
+                                                                        Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
+                                                                        %>
+                                                                </small>
+                                                                <span class="badge bg-danger ms-2">-<%= product.discount
+                                                                        %>
+                                                                        %</span>
+                                                            </div>
+                                                            <p class="text-danger fw-bold mb-1 d-flex align-items-center justify-content-center"
+                                                                style="font-size:15px;">
                                                                 <%= new
-                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
+                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountPrice)
                                                                     %>
                                                             </p>
-                                                            <% } %>
+                                                            <% } else { %>
+                                                                <p class="text-dark fw-bold mb-1"
+                                                                    style="font-size:15px;">
+                                                                    <%= new
+                                                                        Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
+                                                                        %>
+                                                                </p>
+                                                                <% } %>
                                                 </div>
 
                                                 <!-- CTA -->
@@ -532,7 +603,7 @@
                                                         </button>
                                                     </form>
                                                     <span class="badge bg-primary ms-3">Còn: <%= product.quantity %>
-                                                            </span>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -673,9 +744,8 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
                 integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
                 crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-            <script>
 
-            </script>
+
 
 </body>
 

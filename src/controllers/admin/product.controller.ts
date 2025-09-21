@@ -66,7 +66,10 @@ const getViewProduct = async (req: Request, res: Response) => {
         { name: "Lenovo", value: "LENOVO" },
         { name: "Dell", value: "DELL" },
         { name: "LG", value: "LG" },
-        { name: "Acer", value: "ACER" },
+        { name: "Hp", value: "HP" },// mới cập nhật
+        { name: "Msi", value: "MSI" },// mới cập nhật
+        { name: "Gigabyte", value: "GIGABYTE" },// mới cập nhật
+        { name: "Alienware", value: "ALIENWARE" },// mới cập nhật
     ];
 
     const targetOptions = [

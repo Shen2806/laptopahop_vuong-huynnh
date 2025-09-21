@@ -408,18 +408,12 @@
                                             class="btnAddToCartDetail btn btn-primary rounded-pill px-4 py-2 mb-4">
                                             <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ hàng
                                         </button>
-                                        <button id="btnBuyNow" class="btn btn-success rounded-pill px-4 ms-2">
+                                        <button id="btnBuyNow" type="button"
+                                            class="btn btn-success rounded-pill px-4 ms-2">
                                             <i class="fa fa-bolt me-1"></i> Mua ngay
                                         </button>
                                     </form>
-                                    <!-- chưa xử lý nút mua ngay -->
-                                    <!-- <form method="post" action="/add-to-cart-from-detail-page/<%= product.id %>">
-                                        <input value="1" type="hidden" id="quantityDetail" name="quantity" />
-                                        <button type="submit" data-product-id="<%= product.id %>"
-                                            class="btnAddToCartDetail btn btn-primary rounded-pill px-4 py-2 mb-4">
-                                            <i class="fa fa-shopping-bag me-2"></i> Mua ngay
-                                        </button>
-                                    </form> -->
+
                                 </div>
 
                                 <div class="col-lg-2">
@@ -780,6 +774,8 @@
 
             <!-- Template Javascript -->
             <script src="/client/js/main.js"></script>
+            <!-- Font Awesome (icon sao) -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
                 integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
                 crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -1100,11 +1096,6 @@
             </script>
 
 
-            <script src="/socket.io/socket.io.js"></script>
-            <script src="/client/js/main.js"></script>
-
-            <!-- Font Awesome (icon sao) -->
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 
 </body>

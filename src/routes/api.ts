@@ -41,7 +41,6 @@ const apiRoutes = (app: Express) => {
     router.post("/products/:id/questions", checkValidJWT, postProductQuestionAPI);
     // Q&A: admin trả lời
     router.post("/questions/:id/replies", checkValidJWT, postAdminReplyAPI);
-
     // ------------------ Mount router ------------------
     app.use("/api", router);
 };
