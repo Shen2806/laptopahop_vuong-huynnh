@@ -55,6 +55,24 @@
             </button>
 
             <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                <!-- SEARCH BOX -->
+                <div class="header-search position-relative my-2 my-xl-0 mx-xl-3" style="min-width: 320px;">
+                    <form id="headerSearchForm" action="/products" method="get"
+                        class="d-flex align-items-center rounded-pill border px-2 bg-white">
+                        <input class="form-control border-0 shadow-none" id="headerSearch" name="q" type="search"
+                            placeholder="Tìm laptop, hãng, từ khóa..." aria-label="Tìm kiếm" autocomplete="off" />
+                        <button class="btn btn-link px-2" type="submit" aria-label="Tìm kiếm">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+
+                    <!-- Popup gợi ý -->
+                    <div id="searchPopup" class="shadow" style="
+    display:none; position:absolute; top:110%; left:0; right:0; z-index: 2000;
+    background:#fff; border-radius:12px; overflow:hidden; max-height:420px; overflow-y:auto;">
+                    </div>
+                </div>
+
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item"><a href="/" class="nav-link active">Trang chủ</a></li>
                     <li class="nav-item"><a href="/products" class="nav-link">Sản phẩm</a></li>
@@ -290,6 +308,150 @@
                         '<a href="javascript:void(0)" onclick="document.getElementById(\'chatOpen\').click()" class="btn btn-sm btn-primary ms-2">Mở</a>' +
                         '</div>'
                     );
+                });
+            })();
+        </script>
+        <script>
+            (() => {
+                const form = document.getElementById('headerSearchForm');
+                const input = document.getElementById('headerSearch');
+                const popup = document.getElementById('searchPopup');
+
+                let timer = null;
+                let activeIndex = -1;
+                let currentItems = []; // giữ dữ liệu gợi ý hiện tại
+
+                const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, s => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                }[s]));
+
+                const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
+
+                const highlight = (text, q) => {
+                    if (!q) return escapeHtml(text);
+                    const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+                    return escapeHtml(text).replace(re, '<mark>$1</mark>');
+                };
+
+                // Chuẩn hoá đường dẫn ảnh từ DB
+                const toImg = (v) => {
+                    if (!v) return '/images/no-image.png';
+                    if (/^https?:\/\//.test(v)) return v;   // URL tuyệt đối
+                    if (v.startsWith('/')) return v;        // đã có slash
+                    if (v.startsWith('images/')) return '/' + v; // có thư mục sẵn
+                    // còn lại coi như chỉ là filename
+                    return '/images/product/' + encodeURIComponent(v);
+                };
+
+                async function fetchSuggest(q) {
+                    const url = '/api/suggest?q=' + encodeURIComponent(q);
+                    const res = await fetch(url, { credentials: 'same-origin' });
+                    if (!res.ok) throw new Error('Network');
+                    return res.json();
+                }
+
+                function render(items, q) {
+                    currentItems = items;           // lưu lại để điều hướng bàn phím
+                    activeIndex = -1;
+
+                    if (!items.length) {
+                        popup.innerHTML = `<div class="empty">Không tìm thấy sản phẩm phù hợp.</div>`;
+                        popup.style.display = 'block';
+                        return;
+                    }
+
+                    popup.innerHTML = items.map((x, i) => {
+                        const img = toImg(x.image);
+                        const href = `/product/${encodeURIComponent(String(x.id))}`;
+                        return `
+        <a class="sug-item" data-index="${i}" data-href="${href}" href="${href}">
+          <img src="${img}" alt="">
+          <div class="flex-1">
+            <div class="title">${highlight(x.name, q)}</div>
+            <div class="price">${money(x.price)}</div>
+          </div>
+        </a>
+      `;
+                    }).join('');
+
+                    // Gán hover để set active
+                    popup.querySelectorAll('.sug-item').forEach(el => {
+                        el.addEventListener('mouseenter', () => {
+                            setActive(Number(el.dataset.index));
+                        });
+                    });
+
+                    popup.style.display = 'block';
+                }
+
+                function hide() {
+                    popup.style.display = 'none';
+                    activeIndex = -1;
+                    currentItems = [];
+                }
+
+                function setActive(index) {
+                    const items = popup.querySelectorAll('.sug-item');
+                    items.forEach(a => a.classList.remove('active'));
+                    if (items[index]) {
+                        items[index].classList.add('active');
+                        activeIndex = index;
+                    } else {
+                        activeIndex = -1;
+                    }
+                }
+
+                input.addEventListener('input', () => {
+                    const q = input.value.trim();
+                    clearTimeout(timer);
+                    if (!q) return hide();
+                    timer = setTimeout(async () => {
+                        try {
+                            const items = await fetchSuggest(q);
+                            render(items, q);
+                        } catch {
+                            hide();
+                        }
+                    }, 200);
+                });
+
+                input.addEventListener('focus', () => {
+                    if (popup.innerHTML.trim()) popup.style.display = 'block';
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!popup.contains(e.target) && e.target !== input) hide();
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    const items = popup.querySelectorAll('.sug-item');
+                    if (!items.length) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const next = (activeIndex + 1) % items.length;
+                        setActive(next);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prev = (activeIndex - 1 + items.length) % items.length;
+                        setActive(prev);
+                    } else if (e.key === 'Enter') {
+                        if (activeIndex >= 0 && items[activeIndex]) {
+                            e.preventDefault();
+                            // Điều hướng thẳng tới sản phẩm đang chọn
+                            const href = items[activeIndex].dataset.href;
+                            window.location.href = href;
+                        }
+                        // nếu không có item đang active, để form submit bình thường
+                    } else if (e.key === 'Escape') {
+                        hide();
+                    }
+                });
+
+                // Submit form: chuyển đến /products?q=...
+                form.addEventListener('submit', (e) => {
+                    const q = input.value.trim();
+                    if (!q) { e.preventDefault(); hide(); }
                 });
             })();
         </script>

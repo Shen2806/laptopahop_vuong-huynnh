@@ -137,4 +137,84 @@
   });
 
   socket.on("admin:new_session", () => loadSessions());
+
+})();
+
+
+(function(){
+  const socket   = window.__adminSocket || (window.__adminSocket = io());
+  const $badge   = document.getElementById('adminChatBadgeHeader');
+  const $panel   = document.getElementById('panel');
+  const $sessions= document.getElementById('sessions');
+  const $form    = document.getElementById('adminForm');
+  const $input   = document.getElementById('adminInput');
+  const $hint    = document.getElementById('typingHintAdmin');
+  const $close   = document.getElementById('closeSession');
+
+  let currentSessionId = null;
+  let clearBadgeOnNextOpen = false;
+  let sessionClosed = false;
+
+  function clearAllBadges(){
+    document.querySelectorAll('[data-admin-badge="chat"]').forEach(el=>{
+      el.textContent = '0';
+      el.classList.add('d-none');
+    });
+  }
+  function setClosedUI(closed){
+    sessionClosed = !!closed;
+    if ($input) $input.disabled = sessionClosed;
+    const btn = $form?.querySelector('button[type="submit"]');
+    if (btn) { btn.disabled = sessionClosed; btn.classList.toggle('btn-primary', !closed); btn.classList.toggle('btn-secondary', closed); }
+    if ($hint) { $hint.classList.remove('d-none'); $hint.textContent = closed ? 'Phiên đã kết thúc — không thể gửi tin.' : 'Khách đang nhập…'; }
+  }
+
+  // Click badge => bật panel, chờ clear khi chọn 1 phiên
+  $badge?.addEventListener('click', ()=>{
+    clearBadgeOnNextOpen = true;
+    $panel?.classList.remove('d-none');
+    document.getElementById('sessions')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Chọn 1 phiên (item phải có data-conv-id = sessionId)
+  $sessions?.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-conv-id]');
+    if (!btn) return;
+    const sessionId = Number(btn.dataset.convId);
+    if (!Number.isFinite(sessionId)) return;
+
+    currentSessionId = sessionId;
+    socket.emit('session:join', { sessionId }, ()=>{});
+    socket.emit('message:read', { sessionId }, ()=>{});
+    if (clearBadgeOnNextOpen) { clearAllBadges(); clearBadgeOnNextOpen = false; }
+    setClosedUI(false);
+  });
+
+  // Đóng phiên
+  $close?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    if (!currentSessionId) return;
+    socket.emit('session:close', { sessionId: currentSessionId }, (res)=>{
+      if (res?.ok) setClosedUI(true);
+    });
+  });
+
+  // Cấm gửi khi đóng
+  $form?.addEventListener('submit', (e)=>{
+    if (sessionClosed) { e.preventDefault(); return false; }
+  });
+
+  // Server báo phiên đã đóng
+  socket.off('session:closed');
+  socket.on('session:closed', ({ sessionId })=>{
+    if (currentSessionId && sessionId === currentSessionId) setClosedUI(true);
+  });
+
+  // Nếu đang mở phiên và có tin mới trong chính phiên đó -> mark read luôn
+  socket.off('message:new');
+  socket.on('message:new', (msg)=>{
+    if (currentSessionId && msg.sessionId === currentSessionId) {
+      socket.emit('message:read', { sessionId: currentSessionId }, ()=>{});
+    }
+  });
 })();
