@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { registerNewUser } from "services/client/auth.service";
+import { getUserWithRoleById, registerNewUser } from "services/client/auth.service";
 import { RegisterSchema, TRegisterSchema } from "src/validation/register.shema";
 import jwt from "jsonwebtoken";
 import passport from "passport";
@@ -162,15 +162,46 @@ const postRegister = async (req: Request, res: Response) => {
     return res.redirect("/login");
 }
 
-const getSuccessRedirectPage = async (req: Request, res: Response) => {
-    const user = req.user as any;
-    if (user?.role?.name === "ADMIN") {
-        return res.redirect("/admin");
-    } else {
-        return res.redirect("/");
+// const getSuccessRedirectPage = async (req: Request, res: Response) => {
+//     const user = req.user as any;
+//     if (user?.role?.name === "ADMIN") {
+//         return res.redirect("/admin");
+//     } else {
+//         return res.redirect("/");
+//     }
+
+// }
+
+const getSuccessRedirectPage = async (req: any, res: any) => {
+    const hasAT = Boolean(req.cookies?.access_token);
+    const hasRT = Boolean(req.cookies?.refresh_token);
+
+    if (!hasAT && hasRT) {
+        try {
+            const payload: any = jwt.verify(req.cookies.refresh_token, process.env.JWT_REFRESH_SECRET!);
+            const user = await getUserWithRoleById(payload.id);
+            if (user) {
+                const at = generateAccessToken(user);
+                const isProd = process.env.NODE_ENV === "production";
+                res.cookie("access_token", at, {
+                    httpOnly: true,
+                    sameSite: isProd ? "none" : "lax",
+                    secure: isProd,
+                    path: "/",
+                    maxAge: 15 * 60 * 1000,
+                });
+            }
+        } catch (e) {
+            // refresh hỏng thì quay lại login
+            return res.redirect("/login");
+        }
     }
 
-}
+    const roleName = String(req.user?.role?.name || req.user?.roleName || "").toLowerCase();
+    if (roleName.includes("admin")) return res.redirect("/admin");
+    return res.redirect("/");
+};
+
 const postLogout = async (req: Request, res: Response, next: NextFunction) => {
     req.logout(function (err) {
         if (err) { return next(err); }

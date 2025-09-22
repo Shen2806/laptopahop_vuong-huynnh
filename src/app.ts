@@ -1,6 +1,6 @@
 /// <reference path="./types/index.d.ts" />
 import express from 'express';
-require('dotenv').config();
+import 'dotenv/config'; // phải đứng trước mọi import khác
 import webRoutes from 'src/routes/web';
 import initDatabase from 'config/seed';
 import passport from 'passport';
@@ -13,7 +13,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import http from "http";
 import { initSocket } from "./socket";
-
+import "./middleware/passport.google";
+import "./middleware/passport.jwt";
 
 const app = express();
 app.use(cookieParser());

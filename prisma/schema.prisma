@@ -46,6 +46,7 @@ model User {
 
   role            Role              @relation(fields: [roleId], references: [id])
   roleId          Int
+  googleId        String?           @unique
   cart            Cart?
   orders          Order[]
   notifications   Notification[]

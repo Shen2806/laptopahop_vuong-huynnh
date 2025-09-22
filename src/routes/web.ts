@@ -1,5 +1,6 @@
-import express, { Express, Request, Response } from 'express';
+import express, { CookieOptions, Express, Request, Response } from 'express';
 import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser, getUserOrders } from 'controllers/user.controller';
+import 'dotenv/config';
 import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage, getPromoPage, postAddPromo, postCancelOrderByAdmin, postConfirmOrder, postDeletePromo, postRestockProduct, postUpdateOrderStatus, postUpdatePromo } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
 import { getCartPage, getCheckOutPage, getOrderDetailPage, getOrderHistoryPage, getProductPage, getThanksPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
@@ -16,10 +17,46 @@ import { generateAccessToken, generateRefreshToken } from 'services/client/token
 import { getAdminChatSessions, getChatMessages } from 'controllers/admin/chat.controller';
 import { getProductReviews, getProductReviewSummary, postCreateReview } from 'controllers/client/review.controller';
 import { adminAnswerQuestionAPI, adminListQuestionsAPI, getAdminQAPage } from 'controllers/admin/qa.controller';
+import { getUserWithRoleById } from 'services/client/auth.service';
 
 const router = express.Router();
 
 const webRoutes = (app: Express) => {
+
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieBase: CookieOptions = {
+        httpOnly: true,
+        sameSite: isProd ? 'none' : 'lax',
+        secure: isProd,
+        path: '/',
+    };
+
+
+    // Step 1: redirect to Google via Passport
+    router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+
+    // Step 2: Google callback → req.user is set by Passport
+    router.get('/auth/google/callback', (req, res, next) => {
+        passport.authenticate('google', async (err, user: any) => {
+            if (err || !user) {
+                console.error('[Google OAuth ERROR]', err);
+                return res.redirect('/login');
+            }
+            req.logIn(user, async (err2) => {
+                if (err2) return next(err2);
+                const full = await getUserWithRoleById(user.id);
+                const safe = full || user;
+                const at = generateAccessToken(safe);
+                const rt = generateRefreshToken(safe);
+                res.cookie('access_token', at, { ...cookieBase, maxAge: 15 * 60 * 1000 });
+                res.cookie('refresh_token', rt, { ...cookieBase, maxAge: 7 * 24 * 60 * 60 * 1000 });
+                return res.redirect('/success-redirect');
+            });
+        })(req, res, next);
+    });
+
+    // các route web khác
     router.get("/", getHomePage);
     router.get('/products', getProductFilterPage)
     router.get("/success-redirect", getSuccessRedirectPage);
@@ -304,7 +341,8 @@ const webRoutes = (app: Express) => {
     router.get("/api/products/:id/reviews/summary", getProductReviewSummary);
     router.post("/api/products/:id/reviews", ensureAuthenticated, postCreateReview);
 
-
+    // ====== ADMIN GUARD CHO TOÀN NHÁNH /admin ======
+    router.use('/admin', isAdmin);
     // admin routes
     router.get("/admin", getDashboardPage);
     // cập nhật số lượng sắp hết hàng
