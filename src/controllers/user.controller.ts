@@ -1,10 +1,90 @@
 import { prisma } from 'config/client';
 import { Request, Response } from 'express';
 import { countTotalProductClientPages, getProducts } from 'services/client/item.service';
-import { getProductWithFilter, getSortIncProduct, userFilter } from 'services/client/product.filter';
-import { attachRatings, getRatingMap } from 'services/client/review.service';
 import { getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById } from 'services/user.service';
 
+// const getHomePage = async (req: Request, res: Response) => {
+//     const { page } = req.query;
+
+//     let currentPage = page ? +page : 1;
+//     if (currentPage <= 0) currentPage = 1;
+
+//     // Phân trang sản phẩm
+//     const pageSize = 8;
+//     const totalPages = await countTotalProductClientPages(pageSize);
+//     const products = await getProducts(currentPage, pageSize);
+
+//     // Sản phẩm khuyến mãi (giữ field view đang dùng)
+//     const promoProducts = await prisma.product.findMany({
+//         where: { discount: { gt: 0 } },
+//         take: 6,
+//         select: { id: true, name: true, price: true, discount: true, image: true, shortDesc: true, quantity: true },
+//     });
+
+//     // Blog
+//     const latestBlogs = await prisma.blog.findMany({
+//         where: { published: true },
+//         orderBy: { createdAt: "desc" },
+//         take: 8,
+//         select: { id: true, title: true, slug: true, thumbnail: true, author: true, createdAt: true, content: true },
+//     });
+
+//     // ====== LẤY RATING ĐỘNG CHO TẤT CẢ SẢN PHẨM 1 LẦN ======
+//     const ids = Array.from(new Set([
+//         ...products.map(p => Number(p.id)),
+//         ...promoProducts.map(p => Number(p.id)),
+//     ])).filter(Number.isFinite);
+
+//     type ReviewRow = { productId: number; rating: number };
+//     const reviews: ReviewRow[] = ids.length
+//         ? await prisma.review.findMany({
+//             where: { productId: { in: ids } },
+//             select: { productId: true, rating: true },
+//         })
+//         : [];
+
+//     // Gom nhóm -> sum & count -> avg
+//     const agg: Record<number, { sum: number; count: number }> = {};
+//     for (const r of reviews) {
+//         const k = r.productId;
+//         if (!agg[k]) agg[k] = { sum: 0, count: 0 };
+//         agg[k].sum += Number(r.rating) || 0;
+//         agg[k].count += 1;
+//     }
+//     const attach = <T extends { id: number }>(arr: T[]) =>
+//         arr.map(p => {
+//             const a = agg[p.id];
+//             const count = a?.count ?? 0;
+//             const avg = count ? a!.sum / count : 0;
+//             return { ...p, ratingAvg: avg, ratingCount: count };
+//         });
+
+//     const productsWithRating = attach(products);
+//     const promoWithRating = attach(promoProducts);
+//     // lấy lịch sử sản phẩm đã xem
+//     const KEY = "recent_products";
+//     let recentIds: number[] = [];
+//     try { recentIds = JSON.parse((req as any).cookies?.[KEY] || "[]"); } catch { }
+//     recentIds = recentIds.slice(0, 5);
+
+//     let recentProducts: any[] = [];
+//     if (recentIds.length) {
+//         const rows = await prisma.product.findMany({
+//             where: { id: { in: recentIds } },
+//             select: { id: true, name: true, price: true, discount: true, image: true }
+//         });
+//         const map = new Map(rows.map(r => [r.id, r]));
+//         recentProducts = recentIds.map(id => map.get(id)).filter(Boolean);
+//     }
+//     return res.render("client/home/show.ejs", {
+//         products: productsWithRating,   // ⬅️ đã có ratingAvg & ratingCount
+//         totalPages,
+//         page: currentPage,
+//         promoProducts: promoWithRating, // nếu view dùng tới
+//         latestBlogs,
+//         recentProducts
+//     });
+// };
 const getHomePage = async (req: Request, res: Response) => {
     const { page } = req.query;
 
@@ -16,11 +96,14 @@ const getHomePage = async (req: Request, res: Response) => {
     const totalPages = await countTotalProductClientPages(pageSize);
     const products = await getProducts(currentPage, pageSize);
 
-    // Sản phẩm khuyến mãi (giữ field view đang dùng)
+    // Sản phẩm khuyến mãi
     const promoProducts = await prisma.product.findMany({
         where: { discount: { gt: 0 } },
         take: 6,
-        select: { id: true, name: true, price: true, discount: true, image: true, shortDesc: true, quantity: true },
+        select: {
+            id: true, name: true, price: true, discount: true,
+            image: true, shortDesc: true, quantity: true
+        },
     });
 
     // Blog
@@ -28,10 +111,13 @@ const getHomePage = async (req: Request, res: Response) => {
         where: { published: true },
         orderBy: { createdAt: "desc" },
         take: 8,
-        select: { id: true, title: true, slug: true, thumbnail: true, author: true, createdAt: true, content: true },
+        select: {
+            id: true, title: true, slug: true, thumbnail: true,
+            author: true, createdAt: true, content: true
+        },
     });
 
-    // ====== LẤY RATING ĐỘNG CHO TẤT CẢ SẢN PHẨM 1 LẦN ======
+    // ===== Rating động (gom 1 lần) =====
     const ids = Array.from(new Set([
         ...products.map(p => Number(p.id)),
         ...promoProducts.map(p => Number(p.id)),
@@ -45,7 +131,6 @@ const getHomePage = async (req: Request, res: Response) => {
         })
         : [];
 
-    // Gom nhóm -> sum & count -> avg
     const agg: Record<number, { sum: number; count: number }> = {};
     for (const r of reviews) {
         const k = r.productId;
@@ -64,12 +149,68 @@ const getHomePage = async (req: Request, res: Response) => {
     const productsWithRating = attach(products);
     const promoWithRating = attach(promoProducts);
 
+    // ===== Sản phẩm đã xem (tối đa 5) + chuẩn hoá ảnh =====
+    const KEY = "recent_products";
+    let recentIds: number[] = [];
+    try { recentIds = JSON.parse((req as any).cookies?.[KEY] || "[]"); } catch { }
+    recentIds = recentIds.slice(0, 6);
+
+    let recentProducts: Array<{ id: number; name: string; price: number; discount: number; finalPrice: number; thumb: string }> = [];
+    if (recentIds.length) {
+        // lấy full column để bắt mọi trường ảnh có thể có
+        const rows = await prisma.product.findMany({ where: { id: { in: recentIds } } });
+
+        const map = new Map(rows.map(r => [r.id, r]));
+
+        const pickThumb = (r: any): string => {
+            const cand =
+                r?.image ||
+                r?.imageUrl ||
+                r?.thumbnail ||
+                (Array.isArray(r?.images) ? r.images[0] : null) ||
+                (typeof r?.gallery === "string"
+                    ? r.gallery.split(",").map((s: string) => s.trim()).find(Boolean)
+                    : null);
+
+            if (!cand) return "/images/no-image.png";
+
+            const s = String(cand);
+            if (/^https?:\/\//i.test(s)) return s;   // URL tuyệt đối
+            if (s.startsWith("/")) return s;         // đã có dấu /
+
+            // chuẩn hoá đường dẫn local phổ biến
+            if (s.startsWith("uploads/") || s.startsWith("upload/")) return "/" + s;
+            return "/uploads/" + s;                  // mặc định: nằm trong /uploads
+        };
+
+        recentProducts = recentIds
+            .map(id => {
+                const r: any = map.get(id);
+                if (!r) return null as any;
+                const price = Number(r.price || 0);
+                const discount = Number(r.discount || 0);
+                const finalPrice = discount > 0
+                    ? Math.max(0, price - Math.round(price * discount / 100))
+                    : price;
+                return {
+                    id: r.id,
+                    name: r.name,
+                    price,
+                    discount,
+                    finalPrice,
+                    thumb: pickThumb(r) // ✅ luôn có ảnh
+                };
+            })
+            .filter(Boolean);
+    }
+
     return res.render("client/home/show.ejs", {
-        products: productsWithRating,   // ⬅️ đã có ratingAvg & ratingCount
+        products: productsWithRating,
         totalPages,
         page: currentPage,
-        promoProducts: promoWithRating, // nếu view dùng tới
+        promoProducts: promoWithRating,
         latestBlogs,
+        recentProducts, // view dùng p.thumb
     });
 };
 
@@ -125,86 +266,6 @@ const postUpdateUser = async (req: Request, res: Response) => {
     return res.redirect("/admin/user");
 };
 
-
-// const getProductFilterPage = async (req: Request, res: Response) => {
-//     const { page, factory = "", target = "", price = "", sort = "" } = req.query as {
-//         page?: string; factory: string; target: string; price: string; sort: string;
-//     };
-
-//     let currentPage = page ? +page : 1;
-//     if (currentPage <= 0) currentPage = 1;
-
-//     const precheckedFactories = (req.query.factory?.toString() || "")
-//         .split(",").map(s => s.trim()).filter(Boolean);
-
-//     // Lấy sản phẩm theo filter
-//     const data = await getProductWithFilter(currentPage, 6, factory, target, price, sort);
-//     const products = data.products || [];
-
-//     // Lấy review một lần cho tất cả product
-//     const ids = products.map((p: any) => Number(p.id)).filter(Number.isFinite);
-
-//     type ReviewRow = { productId: number; rating: number };
-//     const reviews: ReviewRow[] = ids.length
-//         ? await prisma.review.findMany({
-//             where: { productId: { in: ids } },
-//             select: { productId: true, rating: true },
-//         })
-//         : [];
-
-//     // Gom review -> sum & count
-//     const agg: Record<number, { sum: number; count: number }> = {};
-//     for (const r of reviews) {
-//         const k = r.productId;
-//         if (!agg[k]) agg[k] = { sum: 0, count: 0 };
-//         agg[k].sum += Number(r.rating) || 0;
-//         agg[k].count += 1;
-//     }
-
-//     // Helper tạo mảng sao để view chỉ việc lặp (không khai báo biến)
-//     const makeStars = (avg: number) => {
-//         const rounded = Math.round(avg * 2) / 2; // làm tròn 0.5
-//         const full = Math.floor(rounded);
-//         const half = rounded - full === 0.5 ? 1 : 0;
-//         const empty = 5 - full - half;
-//         const arr: Array<'full' | 'half' | 'empty'> = [];
-//         for (let i = 0; i < full; i++) arr.push('full');
-//         if (half) arr.push('half');
-//         for (let i = 0; i < empty; i++) arr.push('empty');
-//         return arr;
-//     };
-
-//     const productsWithRating = products.map((p: any) => {
-//         const a = agg[p.id];
-//         const count = a?.count ?? 0;
-//         const avg = count ? a!.sum / count : 0;
-//         return {
-//             ...p,
-//             ratingAvg: avg,
-//             ratingCount: count,
-//             starsArr: makeStars(avg), // 👈 chỉ cần dùng cái này ở view
-//         };
-//     });
-
-//     return res.render("product/filter.ejs", {
-//         products: productsWithRating,
-//         totalPages: +data.totalPages,
-//         page: +currentPage,
-//         factoryOptions: [
-//             { value: "APPLE", name: "Apple (MacBook)" },
-//             { value: "ASUS", name: "Asus" },
-//             { value: "LENOVO", name: "Lenovo" },
-//             { value: "DELL", name: "Dell" },
-//             { value: "LG", name: "LG" },
-//             { value: "ACER", name: "Acer" },
-//             { value: "HP", name: "HP" },
-//             { value: "MSI", name: "MSI" },
-//             { value: "GIGABYTE", name: "Gigabyte" },
-//             { value: "ALIENWARE", name: "Alienware" },
-//         ],
-//         precheckedFactories,
-//     });
-// };
 
 const getProductFilterPage = async (req: Request, res: Response) => {
     const {

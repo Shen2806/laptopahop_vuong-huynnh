@@ -15,7 +15,7 @@ import http from "http";
 import { initSocket } from "./socket";
 import "./middleware/passport.google";
 import "./middleware/passport.jwt";
-
+import path from "path";
 const app = express();
 app.use(cookieParser());
 
@@ -33,6 +33,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //configure static files
 app.use(express.static('public'));
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 // config session
 app.use(session({
     cookie: {

@@ -1,114 +1,460 @@
-/* CSS rút gọn để gọn file, giữ nguyên logic */
-.navbar .dropdown-menu {
-    border-radius: 8px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    min-width: 220px;
+/* ===================== Header – Clean Pro ===================== */
+:root {
+    --brand: #2563eb;
+    /* primary */
+    --brand-600: #1d4ed8;
+    --ink: #0f172a;
+    /* text chính */
+    --muted: #64748b;
+    /* text phụ */
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --border: #e2e8f0;
+    --shadow: 0 14px 40px rgba(2, 6, 23, .10);
 }
 
-.navbar .dropdown-menu .dropdown-item {
-    padding: 10px 18px;
-    font-weight: 500;
-    transition: all 0.2s;
-    border-radius: 6px;
+/* 1) TOPBAR */
+header .topbar {
+    background: linear-gradient(90deg, var(--brand), #7c3aed);
+    color: #fff;
+    min-height: 36px;
+    border-radius: 12px 12px 0 0;
 }
 
-.navbar .dropdown-menu .dropdown-item:hover {
-    background-color: #8BC34A;
+header .topbar .d-flex {
+    min-height: 36px;
+    align-items: center;
+}
+
+header .topbar small {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    line-height: 1;
+    color: #fff;
+    opacity: .95;
+}
+
+header .topbar small a {
     color: #fff;
 }
 
-.nav-item.dropdown:hover .dropdown-menu {
-    display: block;
-    animation: fadeIn 0.3s ease-in-out;
+header .topbar small a:hover {
+    text-decoration: underline dotted;
+    opacity: 1;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+header .topbar i {
+    opacity: .9;
 }
 
+header .topbar .top-link a {
+    color: #fff;
+    opacity: .95;
+    transition: opacity .15s ease;
+}
+
+header .topbar .top-link a:hover {
+    opacity: 1;
+}
+
+/* 2) NAVBAR FRAME */
+header .navbar {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 0 0 16px 16px;
+    box-shadow: var(--shadow);
+    padding-block: .35rem;
+}
+
+header .navbar>.container {
+    align-items: stretch;
+}
+
+/* Logo */
 .logo-circle {
-    margin-right: 10px;
-    height: 70px;
-    width: 70px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #8BC34A;
-    padding: 3px;
-    background: white;
-}
-
-.navbar {
-    padding: 12px 20px;
-}
-
-.navbar-nav .nav-link {
-    font-weight: 500;
-    padding: 10px 15px;
-    transition: all 0.3s;
-    position: relative;
-}
-
-.navbar-nav .nav-link:hover,
-.navbar-nav .nav-link.active {
-    color: #4CAF50 !important;
-}
-
-.navbar-nav .nav-link::after {
-    content: "";
-    display: block;
-    height: 2px;
-    width: 0;
-    background: #4CAF50;
-    transition: width 0.3s;
-    margin: auto;
-}
-
-.navbar-nav .nav-link:hover::after,
-.navbar-nav .nav-link.active::after {
-    width: 60%;
-}
-
-/* --- Search popup styles --- */
-#searchPopup .sug-item {
-    display: flex;
-    gap: 10px;
-    padding: 10px 12px;
-    text-decoration: none;
-    color: #212529;
-}
-
-#searchPopup .sug-item:hover,
-#searchPopup .sug-item.active {
-    background: #f8f9fa;
-}
-
-#searchPopup .sug-item img {
     width: 44px;
     height: 44px;
-    object-fit: cover;
-    border-radius: 8px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: 0 6px 16px rgba(2, 6, 23, .08);
 }
 
-#searchPopup .title {
-    font-size: 14px;
-    line-height: 1.3;
+header .navbar-brand h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: .2px;
+    margin: 0;
+}
+
+/* 3) NAV LINKS */
+header .nav-link {
+    padding: .6rem .9rem;
+    color: var(--ink);
     font-weight: 600;
+    border-radius: 12px;
+    transition: background-color .15s, color .15s;
 }
 
-#searchPopup .price {
-    font-size: 13px;
-    opacity: .8;
+header .nav-link:hover {
+    background: var(--surface);
+    color: var(--brand);
 }
 
-#searchPopup .empty {
-    padding: 14px;
-    color: #6c757d;
+header .nav-link.active {
+    color: var(--brand-600);
+    background: color-mix(in oklab, var(--brand) 8%, #fff);
+}
+
+/* Dropdown menu */
+header .dropdown-menu {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 18px 46px rgba(2, 6, 23, .14);
+    overflow: hidden;
+}
+
+header .dropdown-item {
+    padding: .6rem .9rem;
+    font-weight: 500;
+}
+
+header .dropdown-item:hover {
+    background: var(--surface);
+}
+
+/* 4) SEARCH BOX */
+header .header-search form {
+    border: 1px solid var(--border) !important;
+    background: #fff;
+    height: 44px;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+header .header-search input {
+    height: 42px;
+    font-size: .95rem;
+    color: var(--ink);
+}
+
+header .header-search form:focus-within {
+    border-color: var(--brand) !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, .10);
+}
+
+header .header-search .btn {
+    color: var(--muted);
+}
+
+header .header-search .btn:hover {
+    color: var(--brand);
+}
+
+/* Search popup (chỉ style – không đổi HTML) */
+#searchPopup {
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 60px rgba(2, 6, 23, .18);
+    border-radius: 12px;
+}
+
+#searchPopup .sug-item {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+    padding: .5rem .7rem;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--ink);
+}
+
+#searchPopup .sug-item:last-child {
+    border-bottom: 0;
+}
+
+#searchPopup .sug-item .title {
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+#searchPopup .sug-item .price {
+    font-size: .9rem;
+    color: var(--muted);
+}
+
+#searchPopup .sug-item:hover {
+    background: var(--surface);
+    text-decoration: none;
+}
+
+/* 5) ICONS + BADGES (chuông, giỏ hàng, user) */
+.notification-icon {
+    color: var(--ink);
+    transition: color .15s ease, transform .15s ease;
+}
+
+.notification-icon:hover {
+    color: var(--brand);
+    transform: translateY(-1px);
+}
+
+#notificationBadge {
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 0 0 2px #fff;
+}
+
+/* Cart bubble */
+#sumCart {
+    top: -6px !important;
+    left: 16px !important;
+    height: 20px;
+    min-width: 20px;
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    box-shadow: 0 0 0 2px #fff;
+}
+
+/* 6) USER DROPDOWN BOX */
+header .dropdown-menu-end {
+    padding: .75rem 0;
+}
+
+header .dropdown-menu .text-center {
+    color: var(--ink);
+}
+
+header .dropdown-divider {
+    margin: .4rem 0;
+}
+
+/* Avatar trong menu user */
+header .dropdown-menu img {
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(2, 6, 23, .10);
+}
+
+/* 7) TOGGLER (mobile) */
+.navbar-toggler {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 .2rem rgba(37, 99, 235, .25);
+}
+
+/* 8) NOTIFICATION PANEL (dropdown riêng) */
+#uNotificationPanel {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: 0 24px 60px rgba(2, 6, 23, .18);
+    overflow: hidden;
+    background: #fff;
+}
+
+#uNotificationPanel .border-bottom {
+    border-color: var(--border) !important;
+}
+
+#uNotificationList .list-group-item {
+    border: 0;
+    border-bottom: 1px dashed var(--border);
+}
+
+#uNotificationList .list-group-item:last-child {
+    border-bottom: 0;
+}
+
+/* 9) RESPONSIVE */
+@media (max-width: 1399.98px) {
+    header .header-search {
+        min-width: 280px !important;
+    }
+}
+
+@media (max-width: 1199.98px) {
+    header .header-search {
+        width: 100%;
+        min-width: auto !important;
+    }
+
+    header .navbar .collapse {
+        padding: .5rem 0 .8rem;
+        border-top: 1px solid var(--border);
+    }
+
+    header .nav-link {
+        padding: .55rem .75rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .logo-circle {
+        width: 40px;
+        height: 40px;
+    }
+
+    header .navbar-brand h1 {
+        font-size: 1.3rem;
+    }
+}
+
+/* 10) REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* 11) DARK MODE (theo hệ thống) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0b0f14;
+        --surface: #0f141a;
+        --ink: #e5e7eb;
+        --muted: #9aa3af;
+        --border: #1f2937;
+        --shadow: 0 14px 40px rgba(0, 0, 0, .50);
+    }
+
+    header .navbar,
+    #uNotificationPanel,
+    #searchPopup {
+        background: #0b0f14;
+    }
+
+    header .nav-link:hover {
+        background: #0f141a;
+    }
+
+    header .dropdown-menu {
+        background: #0b0f14;
+    }
+
+    #searchPopup .sug-item {
+        border-bottom: 1px solid var(--border);
+    }
+}
+
+/* ===== THEME OVERRIDE: Xanh Chuối ===== */
+:root {
+    --brand: #7BDC2D;
+    /* xanh chuối tươi */
+    --brand-600: #57B212;
+    /* đậm hơn khi hover */
+    --brand-700: #3F8F0D;
+    /* nhấn/active */
+}
+
+/* Topbar dùng gradient xanh chuối */
+header .topbar {
+    background: linear-gradient(90deg, var(--brand), var(--brand-600)) !important;
+    color: #fff;
+}
+
+/* Logo text chuyển sang xanh chuối */
+header .navbar-brand h1 {
+    color: var(--brand) !important;
+}
+
+/* Nav links */
+header .nav-link:hover {
+    background: #f3f8eb;
+    color: var(--brand-600);
+}
+
+header .nav-link.active {
+    color: var(--brand-700);
+    background: #e9f6d7;
+    /* nền nhạt xanh chuối */
+}
+
+/* Dropdown highlight nhẹ màu brand */
+header .dropdown-item:hover {
+    background: #f3f8eb;
+    color: var(--brand-700);
+}
+
+/* Ô tìm kiếm + focus ring theo xanh chuối */
+header .header-search form {
+    border-color: #e3f3ce !important;
+}
+
+header .header-search form:focus-within {
+    border-color: var(--brand) !important;
+    /* fallback ring */
+    box-shadow: 0 0 0 4px rgba(123, 220, 45, .18);
+}
+
+header .header-search .btn:hover {
+    color: var(--brand-600);
+}
+
+/* Icon chuông hover xanh chuối */
+.notification-icon:hover {
+    color: var(--brand);
+}
+
+/* Nút toggler (mobile) focus xanh chuối */
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 .2rem rgba(123, 220, 45, .35);
+}
+
+/* Search popup hover tint theo brand */
+#searchPopup {
+    border-color: #e3f3ce;
+}
+
+#searchPopup .sug-item:hover {
+    background: #f3f8eb;
+}
+
+/* Notification panel viền nhạt xanh */
+#uNotificationPanel {
+    border-color: #e3f3ce;
+}
+
+/* Dark mode giữ cảm giác xanh chuối (nhẹ) */
+@media (prefers-color-scheme: dark) {
+    header .nav-link:hover {
+        background: #0f1410;
+        color: var(--brand);
+    }
+
+    header .dropdown-item:hover {
+        background: #0f1410;
+        color: var(--brand);
+    }
+
+    header .header-search form:focus-within {
+        box-shadow: 0 0 0 4px rgba(123, 220, 45, .20);
+    }
+
+    #searchPopup {
+        border-color: #23321b;
+    }
+
+    #searchPopup .sug-item:hover {
+        background: #0f1410;
+    }
+}
+
+.text-primary {
+    color: var(--brand) !important;
+}
+
+.btn-primary {
+    background: var(--brand) !important;
+    border-color: var(--brand-600) !important;
+}
+
+.btn-primary:hover {
+    background: var(--brand-600) !important;
+    border-color: var(--brand-700) !important;
 }

@@ -26,6 +26,32 @@ const ORDER_STEPS: $Enums.OrderStatus[] = [
 const getProductPage = async (req: Request, res: Response) => {
     const { id } = req.params;
     const product = await getProductById(+id);
+    if (!product) {
+        return res.status(404).render("status/404.ejs", { user: (req as any).user || null });
+    }
+
+    // ====== 🔽 CODE 2: cập nhật cookie recent_products 🔽
+    const KEY = "recent_products";
+
+    let ids: number[] = [];
+    try {
+        ids = JSON.parse((req as any).cookies?.[KEY] || "[]");
+    } catch {
+        ids = [];
+    }
+    // loại bỏ id hiện tại nếu đã có, rồi đưa lên đầu
+    ids = ids.filter((x) => x !== product.id);
+    ids.unshift(product.id);
+    // giữ tối đa 20 id (tuỳ bạn)
+    ids = ids.slice(0, 20);
+
+    res.cookie(KEY, JSON.stringify(ids), {
+        httpOnly: false,     // để client JS đọc được (nếu cần)
+        sameSite: "lax",
+        maxAge: 1000 * 60 * 60 * 24 * 30, // 30 ngày
+        path: "/",
+    });
+    // ====== 🔼 CODE 2: cập nhật cookie recent_products 🔼
     return res.render("product/detail", {
         product
     });
@@ -230,9 +256,6 @@ const getThanksPage = async (req: Request, res: Response) => {
             console.error("getThanksPage load order error:", e);
         }
     }
-
-    // ❌ ĐỪNG redirect("/") nếu không có order
-    // ✅ Luôn render thanks.ejs (có/không có chi tiết)
     return res.render("product/thanks", { order });
 }
 const getOrderHistoryPage = async (req: Request, res: Response) => {
@@ -297,6 +320,7 @@ const postCancelOrder = async (req: Request, res: Response) => {
 const getOrderDetailPage = async (req: Request, res: Response) => {
     const user = (req as any).user;
     const id = Number(req.params.id);
+
     if (!user) return res.redirect("/login");
     if (!Number.isFinite(id)) return res.status(400).send("Mã đơn không hợp lệ");
 

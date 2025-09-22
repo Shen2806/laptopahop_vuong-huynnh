@@ -333,6 +333,67 @@
             <%- include('../layout/feature'); -%>
                 <!-- Features Section End -->
 
+                <!-- Recently Viewed Start -->
+                <div class="container-fluid pt-3">
+                    <div class="container">
+                        <section id="recent-viewed" class="mt-4">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <h2 class="mb-0" style="color:#57B212">Sản phẩm đã xem</h2>
+                                <% if (recentProducts && recentProducts.length) { %>
+                                    <form method="post" action="/recent/clear">
+                                        <button class="btn btn-link p-0 text-muted small">Xóa lịch sử</button>
+                                    </form>
+                                    <% } %>
+                            </div>
+
+                            <% if (recentProducts && recentProducts.length) { %>
+                                <div class="row g-3">
+                                    <% recentProducts.forEach(p=> {
+                                        const price = Number(p.price||0);
+                                        const finalPrice = p.discount ? Math.max(0, price - Math.round(price *
+                                        p.discount / 100)) : price;
+                                        %>
+                                        <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                                            <a href="/product/<%= p.id %>"
+                                                class="card recent-card h-100 text-decoration-none">
+                                                <div class="ratio ratio-4x3">
+                                                    <img src="<%= p.thumb || '/images/no-image.png' %>"
+                                                        class="card-img-top object-fit-cover" alt="<%= p.name %>">
+                                                </div>
+                                                <div class="card-body p-2">
+                                                    <div class="line-clamp-2 small fw-semibold text-dark">
+                                                        <%= p.name %>
+                                                    </div>
+                                                    <div class="mt-1">
+                                                        <% if (p.discount && p.discount> 0) { %>
+                                                            <div class="d-flex align-items-baseline gap-2">
+                                                                <div class="fw-bold text-danger">
+                                                                    <%= finalPrice.toLocaleString('vi-VN') %>₫
+                                                                </div>
+                                                                <div
+                                                                    class="text-muted text-decoration-line-through small">
+                                                                    <%= price.toLocaleString('vi-VN') %>₫
+                                                                </div>
+                                                            </div>
+                                                            <% } else { %>
+                                                                <div class="fw-bold text-dark">
+                                                                    <%= price.toLocaleString('vi-VN') %>₫
+                                                                </div>
+                                                                <% } %>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <% }) %>
+                                </div>
+                                <% } else { %>
+                                    <div class="text-muted fst-italic">Chưa có sản phẩm nào.</div>
+                                    <% } %>
+                        </section>
+                    </div>
+                </div>
+                <!-- Recently Viewed End -->
+
                 <!-- Blogs Start-->
                 <div class="container-fluid">
                     <div class="container">

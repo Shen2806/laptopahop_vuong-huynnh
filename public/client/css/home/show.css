@@ -112,6 +112,7 @@
   min-height: 28px;
   margin-bottom: 8px;
 }
+
 /*------------------------------------------*/
 /*Đớm lửa*/
 .fire-title-wrapper {
@@ -458,3 +459,23 @@
   /* Màu icon khi hover */
 }
 
+.recent-card {
+  border: 1px solid #e3f3ce;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, .04);
+  transition: all .15s ease;
+}
+
+.recent-card:hover {
+  border-color: #b9e68b;
+  box-shadow: 0 16px 36px rgba(123, 220, 45, .18);
+  transform: translateY(-1px);
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

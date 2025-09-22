@@ -404,15 +404,20 @@
                                     <!-- Nút thêm giỏ -->
                                     <form method="post" action="/add-to-cart-from-detail-page/<%= product.id %>">
                                         <input value="1" type="hidden" id="quantityDetail" name="quantity" />
-                                        <button type="submit" data-product-id="<%= product.id %>"
-                                            class="btnAddToCartDetail btn btn-primary rounded-pill px-4 py-2 mb-4">
-                                            <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ hàng
-                                        </button>
-                                        <button id="btnBuyNow" type="button"
-                                            class="btn btn-success rounded-pill px-4 ms-2">
-                                            <i class="fa fa-bolt me-1"></i> Mua ngay
-                                        </button>
+                                        <div class="cta-stack mt-2">
+                                            <button type="submit" data-product-id="<%= product.id %>"
+                                                class="btnAddToCartDetail btn btn-primary rounded-pill w-100 py-2">
+                                                <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ hàng
+                                            </button>
+
+                                            <button id="btnBuyNow" type="button"
+                                                class="btn btn-outline-success rounded-pill w-100 py-2">
+                                                <i class="fa fa-bolt me-1"></i> Mua ngay
+                                            </button>
+                                        </div>
                                     </form>
+
+
 
                                 </div>
 
@@ -456,7 +461,82 @@
                                         </div>
                                     </div>
                                 </div>
+                                <!-- DROP-IN: Warranty & Commitment (keeps your logic intact) -->
+                                <!-- Place this right under the buy-cta block in your product detail page -->
+                                <div class="policy-grid my-3">
+                                    <!-- Warranty policy -->
+                                    <div class="policy-tile">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <h6 class="m-0">Chính sách bảo hành</h6>
+                                            <span class="warranty-badge"><i class="fa-solid fa-shield-halved"></i> Bảo
+                                                hành chính
+                                                hãng</span>
+                                        </div>
+                                        <div class="policy-line">
+                                            <i class="fa-regular fa-calendar-check"></i>
+                                            <div>
+                                                <div>Thời hạn: <strong>12–24 tháng</strong> (tuỳ dòng máy)</div>
+                                                <div class="policy-sub">Theo quy định nhà sản xuất hoặc gói bảo
+                                                    hành bạn chọn</div>
+                                            </div>
+                                        </div>
+                                        <div class="policy-line">
+                                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                                            <div>
+                                                <div>Trung tâm tiếp nhận: <strong>TTBH chính hãng &
+                                                        LaptopShop</strong></div>
+                                                <div class="policy-sub">Hỗ trợ nhận máy và gửi hãng nếu bạn bận
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="policy-line">
+                                            <i class="fa-solid fa-list-check"></i>
+                                            <div>
+                                                <div>Điều kiện: Tem/serial còn nguyên, không cong vênh, vào nước
+                                                </div>
+                                                <div class="policy-sub">Xem chi tiết tại trang <a href="/warranty">Bảo
+                                                        hành</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    <!-- Commitment policy -->
+                                    <div class="policy-tile">
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <h6 class="m-0">Cam kết sản phẩm</h6>
+                                            <span class="commit-badge"><i class="fa-solid fa-badge-check"></i>
+                                                Cam kết 100%</span>
+                                        </div>
+                                        <div class="policy-line">
+                                            <i class="fa-solid fa-box"></i>
+                                            <div>
+                                                <div>Hàng <strong>mới, chính hãng</strong>, đầy đủ hoá đơn</div>
+                                                <div class="policy-sub">Nguồn gốc rõ ràng, không hàng trôi nổi
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="policy-line">
+                                            <i class="fa-solid fa-rotate-left"></i>
+                                            <div>
+                                                <div>Đổi mới <strong>10 ngày</strong> nếu lỗi nhà sản xuất</div>
+                                                <div class="policy-sub">Áp dụng khi còn đầy đủ phụ kiện, hộp
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="policy-line">
+                                            <i class="fa-solid fa-truck-fast"></i>
+                                            <div>
+                                                <div>Giao nhanh nội thành, miễn phí đơn từ <strong>5
+                                                        triệu</strong></div>
+                                                <div class="policy-sub">Có hỗ trợ lắp đặt/khởi tạo theo yêu cầu
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- END DROP-IN -->
+
+                                <!-- thông số đánh giá và Q&A  -->
                                 <div class="col-lg-10">
                                     <!-- Accordion: xổ dọc, mặc định mở hết -->
                                     <div class="accordion" id="productAccordion">
@@ -498,6 +578,7 @@
                                                 </div>
                                             </div>
                                         </div>
+
 
                                         <!-- MÔ TẢ -->
                                         <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
