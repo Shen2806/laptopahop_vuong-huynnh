@@ -1,0 +1,220 @@
+body {
+            background: #f7f9fc;
+        }
+
+        .page-title {
+            font-weight: 700;
+            letter-spacing: .2px;
+        }
+
+        .card {
+            border: 0;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .06);
+        }
+
+        .card-header {
+            background: linear-gradient(180deg, #ffffff, #fafbff);
+            border-bottom: 1px solid #eef1f6;
+            border-top-left-radius: 14px !important;
+            border-top-right-radius: 14px !important;
+            font-weight: 600;
+        }
+
+        .badge-status {
+            font-size: .9rem;
+        }
+
+        /* ===== Stepper ===== */
+        .tracker {
+            padding: 20px 16px 10px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .steps::before {
+            content: "";
+            position: absolute;
+            left: 6%;
+            right: 6%;
+            top: 24px;
+            height: 4px;
+            background: #e9edf3;
+            border-radius: 999px;
+        }
+
+        .steps .progress-line {
+            position: absolute;
+            left: 6%;
+            top: 24px;
+            height: 4px;
+            background: linear-gradient(90deg, #0d6efd, #5aa1ff);
+            border-radius: 999px;
+            width: 0%;
+            transition: width .4s ease;
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .step .icon-wrap {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #e9edf3;
+            color: #6c757d;
+            margin-bottom: 8px;
+            font-size: 18px;
+            transition: all .25s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .05) inset;
+        }
+
+        .step.done .icon-wrap,
+        .step.active .icon-wrap {
+            background: #0d6efd;
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(13, 110, 253, .35);
+        }
+
+        .step .label {
+            font-size: .88rem;
+            line-height: 1.2;
+            color: #6c7a91;
+            min-height: 32px;
+        }
+
+        .step.done .label,
+        .step.active .label {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+
+        /* Table */
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
+
+        .price {
+            white-space: nowrap;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .steps {
+                grid-template-columns: repeat(3, 1fr);
+                row-gap: 16px;
+            }
+
+            .steps::before,
+            .steps .progress-line {
+                left: 4%;
+                right: 4%;
+            }
+        }
+
+        /* === Tinh chỉnh vị trí thanh & chữ === */
+.tracker .steps{
+  /* bạn có thể đổi các biến này cho phù hợp */
+  --icon: 44px;     /* kích thước vòng tròn icon */
+  --lineH: 6px;     /* độ dày của line */
+  --lineY: 12px;    /* vị trí Y của line tính từ top của .steps (số càng nhỏ -> line càng cao) */
+
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  /* chừa chỗ phía trên cho line, phía dưới cho icon + label */
+  padding-top: calc(var(--lineY) + 14px);
+  padding-bottom: 8px;
+  overflow: visible;
+}
+
+/* baseline xám */
+.tracker .steps::before{
+  content:"";
+  position:absolute;
+  left: calc(var(--icon)/2);
+  right: calc(var(--icon)/2);
+  top: var(--lineY);                 /* << line nằm cao hơn icon */
+  height: var(--lineH);
+  background: #e8edf3;
+  border-radius: var(--lineH);
+  z-index: 1;                        /* dưới icon */
+}
+
+/* progress xanh dương */
+.tracker .progress-line{
+  position:absolute;
+  left: calc(var(--icon)/2);
+  top: var(--lineY);                 /* << khớp với baseline */
+  height: var(--lineH);
+  width: 0%;
+  background: #3B82F6;
+  border-radius: var(--lineH);
+  z-index: 1;                        /* dưới icon */
+  transition: width .6s ease;
+}
+
+/* mỗi step: icon rồi đến chữ (chữ dưới icon) */
+.tracker .step{
+  position: relative;
+  width: 16.6%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;                        /* trên line */
+}
+
+.tracker .step .icon-wrap{
+  width: var(--icon);
+  height: var(--icon);
+  border-radius: 50%;
+  background: #fff;                  /* che line phía sau */
+  border: 2px solid #cfd8e3;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 14px rgba(17,24,39,.08);
+  /* đảm bảo icon cách line 1 chút (vì line ở trên) */
+  margin-top: 6px;
+}
+
+.tracker .step .icon-wrap i{
+  font-size: 18px;
+  color: #94a3b8;
+}
+
+.tracker .step .label{
+  margin-top: 8px;                   /* CHỮ Ở DƯỚI ICON */
+  font-weight: 600;
+  color: #374151;
+}
+
+/* done = xanh lá đặc, active = viền xanh lá */
+.tracker .step.done .icon-wrap{
+  background: #8BC34A;
+  border-color: #8BC34A;
+}
+.tracker .step.done .icon-wrap i{ color: #fff; }
+.tracker .step.active .icon-wrap{
+  border-color: #8BC34A;
+  box-shadow: 0 0 0 4px rgba(139,195,74,.18);
+}
+.tracker .step.active .icon-wrap i{ color: #8BC34A; }
+
+/* tắt ring/pseudo cũ nếu có */
+.tracker .step .icon-wrap::before,
+.tracker .step .icon-wrap::after{ content:none !important; display:none !important; }

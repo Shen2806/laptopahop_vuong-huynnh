@@ -394,6 +394,7 @@
 
 
 
+
 /**/
 .btnAddToCartHomePage:hover {
   background-color: #afbbb2;
@@ -730,6 +731,60 @@
 /* Khoảng cách đều & căn giữa hàng nút */
 #product-list section.col-12.col-lg-9 .mt-auto {
   margin-top: auto;
+}
+
+/* ——— GRID & COL ——— */
+.product-grid .product-col{ display:flex; }       /* để card cao đều */
+.fruite-item{                                     /* card của bạn */
+  background:#fff; border:1px solid #edf1f4;
+  border-radius:16px;
+  display:flex; flex-direction:column;
+  min-height:100%; overflow:hidden;
+  box-shadow:0 8px 24px rgba(0,0,0,.06);
+}
+.fruite-item .p-3{
+  flex:1 1 auto; display:flex; flex-direction:column; gap:.35rem;
+}
+
+/* ——— ẢNH GIỮ TỈ LỆ, KHÔNG TRÀN ——— */
+.fruite-img{ position:relative; width:100%; aspect-ratio:4/3; overflow:hidden; }
+.fruite-img img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+/* ——— TEXT KHÔNG ĐẨY VỠ LAYOUT ——— */
+.fruite-item h4 a{
+  color:#111; text-decoration:none;
+  display:-webkit-box; -webkit-box-orient:vertical;
+  -webkit-line-clamp:2; overflow:hidden;          /* clamp 2 dòng */
+  overflow-wrap:anywhere;                         /* xuống dòng khi quá dài */
+}
+.fruite-item p{
+  color:#6b7280; margin-bottom:.25rem;
+  display:-webkit-box; -webkit-box-orient:vertical;
+  -webkit-line-clamp:2; overflow:hidden;
+  min-height:2.6em; overflow-wrap:anywhere;
+}
+
+/* ——— GIÁ ——— */
+.price-box{ min-height:64px; }
+
+/* ——— CTA TỰ XUỐNG DÒNG KHI CHẬT ——— */
+.product-cta{
+  margin-top:auto; display:flex; align-items:center;
+  gap:.5rem; flex-wrap:wrap;                       /* cho phép wrap */
+}
+.product-cta .btnAddToCartHomePage{
+  border-color:#57B212; color:#2e7d32; background:#F1F8E9;
+  flex:1 1 180px;                                  /* co giãn, đủ chật sẽ nhảy xuống */
+}
+.product-cta .btnAddToCartHomePage:hover{ background:#57B212; color:#fff; }
+.product-cta .badge{ flex:0 0 auto; white-space:nowrap; }
+
+/* ——— CHIP "Laptop" không tràn ——— */
+.category-chip{ z-index:2; font-size:12px; white-space:nowrap; max-width:80%; }
+
+/* ——— tinh chỉnh padding col khi màn lớn ——— */
+@media (min-width:1200px){
+  .product-grid .col{ padding-left:12px; padding-right:12px; }
 }
 
 /*css footer*/

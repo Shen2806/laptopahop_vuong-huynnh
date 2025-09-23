@@ -913,3 +913,239 @@
     max-width: 100%;
   }
 }
+
+/*thêm mô tả*/
+/* ============ THEME TOKENS ============ */
+:root{
+  --brand: #8BC34A;
+  --brand-700:#57B212;
+  --accent:#0ea5e9;
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e5e7eb;
+  --card:#ffffff;
+  --soft:#f8fafc;
+  --shadow: 0 10px 28px rgba(2,6,23,.06);
+}
+
+/* ============ POLICY GRID ============ */
+.policy-grid{
+  display:grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap:18px;
+  margin-top:10px;
+}
+@media (max-width: 991.98px){ .policy-grid{ grid-template-columns:1fr; } }
+
+.policy-tile{
+  background:var(--card);
+  border:1px solid #eef2f7;
+  border-radius:16px;
+  padding:16px 16px 10px;
+  box-shadow: var(--shadow);
+  transition: border-color .2s ease, transform .15s ease, box-shadow .2s ease;
+}
+.policy-tile:hover{
+  transform: translateY(-2px);
+  border-color: rgba(139,195,74,.45);
+  box-shadow: 0 18px 40px rgba(2,6,23,.08);
+}
+
+/* header + badge trong tile */
+.policy-tile h6{
+  font-weight:800;
+  margin:0;
+  color:var(--ink);
+}
+.warranty-badge, .commit-badge{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:.35rem .65rem; border-radius:999px;
+  font-weight:800; font-size:.76rem; letter-spacing:.2px;
+  border:1px solid rgba(139,195,74,.35);
+  color:#1b5e20; background:rgba(139,195,74,.10);
+}
+.commit-badge{
+  color:#0b5e77; border-color:#67e8f9; background:#ecfeff;
+}
+
+/* dòng policy */
+.policy-line{
+  display:flex; align-items:flex-start; gap:12px;
+  padding:12px 0;
+}
+.policy-line + .policy-line{ border-top:1px dashed var(--line); }
+.policy-line i{
+  width:36px; height:36px; min-width:36px;
+  border-radius:12px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:rgba(139,195,74,.12);
+  color:var(--brand-700);
+  font-size:16px;
+}
+.policy-line strong{ font-weight:800; color:var(--ink); }
+.policy-sub{ color:var(--muted); font-size:.92rem; }
+.policy-tile a{ color:var(--accent); text-decoration:none; }
+.policy-tile a:hover{ text-decoration:underline; }
+
+/* ============ ACCORDION POLISH (Bootstrap 5) ============ */
+.accordion .accordion-item{
+  border:1px solid #eef2f7 !important;
+  border-radius:14px; overflow:hidden;
+  box-shadow: var(--shadow);
+}
+.accordion .accordion-item + .accordion-item{ margin-top:14px; }
+
+.accordion-button{
+  background:#fff; color:var(--ink);
+  font-weight:800; letter-spacing:.2px;
+  padding:14px 18px;
+}
+.accordion-button:not(.collapsed){
+  background:linear-gradient(180deg,#ffffff 0%,#f3ffe7 100%);
+  box-shadow: inset 0 -1px 0 #ecf1e6;
+}
+.accordion-button:focus{ box-shadow:none; border-color:transparent; }
+
+/* icon mũi tên của accordion */
+.accordion-button::after{
+  transform: scale(.9);
+}
+.accordion-button:not(.collapsed)::after{
+  transform: rotate(180deg) scale(.9);
+}
+
+/* Bảng thông số gọn gàng */
+#accSpecs .table{
+  margin:0;
+}
+#accSpecs .table th{
+  width:200px; color:#475569; background:#fafafa; 
+  border-bottom:1px dashed var(--line);
+  font-weight:800;
+}
+#accSpecs .table td{
+  border-bottom:1px dashed var(--line);
+}
+
+/* ============ MÔ TẢ: thu gọn/mở rộng có fade ============ */
+#desc-wrapper{
+  position:relative; transition:max-height .28s ease;
+}
+#desc-wrapper.desc-collapsed{
+  max-height: 260px; overflow:hidden;
+}
+#desc-wrapper.desc-collapsed::after{
+  content:"";
+  position:absolute; inset:auto 0 0 0; height:90px;
+  background:linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 65%);
+}
+#toggle-desc{
+  border-radius:999px; font-weight:800; 
+  padding:.45rem 1rem;
+  border:1px solid #cfe8b2;
+  color:#2a5d18; background: #f6ffec;
+}
+#toggle-desc:hover{ filter: brightness(.96); }
+
+/* ============ REVIEWS ============ */
+#reviewsSection #avgStars i,
+#reviewsSection #ratingStars i{
+  color:#f59e0b; font-size:18px; margin-right:2px;
+}
+#reviewForm textarea{ border-radius:12px; }
+#reviewList .review-item{
+  border-bottom:1px dashed var(--line);
+  padding:12px 0;
+}
+#reviewList .review-item:last-child{ border-bottom:0; }
+#ratingCount{ color:var(--muted); }
+
+/* ============ Q & A ============ */
+#qaForm textarea{ border-radius:12px; }
+#qaList .qa-item{
+  background:var(--soft);
+  border:1px dashed var(--line);
+  border-radius:12px;
+  padding:12px 14px; margin-bottom:10px;
+}
+
+/* ============ Buttons chung ============ */
+.btn-gradient{
+  background:linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+  border:none; color:#fff;
+}
+.btn-gradient:hover{ filter:brightness(.96); }
+.hover-scale{ transition: transform .12s ease, box-shadow .12s ease; }
+.hover-scale:hover{ transform:translateY(-1px); box-shadow:0 12px 26px rgba(2,6,23,.08); }
+
+/* ============ Helpers nhỏ ============ */
+.hover-primary:hover{ color:var(--brand-700)!important; }
+
+/* ===== POLICY GRID ===== */
+.policy-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+@media (max-width: 768px){ .policy-grid{ grid-template-columns:1fr; } }
+
+.policy-tile{
+  background:#fff;
+  border:1px solid #edf1f4;
+  border-radius:16px;
+  padding:18px 16px;
+  box-shadow:0 6px 22px rgba(0,0,0,.04);
+}
+.policy-tile h6{ font-weight:700; }
+.warranty-badge,.commit-badge{
+  display:inline-flex; align-items:center; gap:8px;
+  background:#F1F8E9; color:#2e7d32; border:1px solid #dcedc8;
+  padding:6px 10px; border-radius:999px; font-size:12.5px;
+}
+.policy-line{ display:flex; gap:12px; padding:10px 0; border-top:1px dashed #edf1f4; }
+.policy-line:first-of-type{ border-top:0; }
+.policy-line i{
+  width:36px;height:36px; display:grid; place-items:center;
+  border-radius:10px; background:#F4FAF2; color:#57B212;
+  box-shadow:inset 0 0 0 1px rgba(87,178,18,.2);
+}
+.policy-sub{ color:#6c757d; font-size:12.5px; }
+
+/* ===== FLATTEN ACCORDION → LUÔN MỞ =====
+   Không sửa HTML, chỉ vô hiệu hoá toggle & caret  */
+#productAccordion .accordion-item{
+  border:1px solid #edf1f4; border-radius:16px; overflow:hidden;
+  background:#fff; box-shadow:0 6px 22px rgba(33,37,41,.04);
+}
+#productAccordion .accordion-button{
+  background:#fff; font-weight:700; font-size:16px;
+  padding:16px 20px; box-shadow:none; cursor:default;
+  pointer-events:none;   /* khoá click */
+}
+#productAccordion .accordion-button::after{ display:none; }
+#productAccordion .accordion-collapse{
+  display:block !important; height:auto !important; visibility:visible !important;
+}
+#productAccordion .accordion-body{ padding:18px 20px; }
+
+/* ===== THÔNG SỐ KỸ THUẬT (bảng) ===== */
+#accSpecs table{ margin:0; }
+#accSpecs table th{
+  width:220px; background:#f8fafc; color:#64748b; font-weight:600;
+}
+#accSpecs table tr+tr th, #accSpecs table tr+tr td{
+  border-top:1px dashed #e9ecef;
+}
+
+/* ===== MÔ TẢ: bỏ thu gọn + ẩn nút Xem thêm ===== */
+#desc-wrapper.desc-collapsed{ max-height:none !important; -webkit-mask-image:none; mask-image:none; }
+#toggle-desc{ display:none !important; }
+
+/* ===== ĐÁNH GIÁ & Q&A ===== */
+#reviewsSection .accordion-body, #qaSection .accordion-body{ background:#fff; }
+#reviewForm textarea, #qaForm textarea{ border-radius:12px; }
+#ratingStars i, #avgStars i{ color:#f59e0b; } /* sao màu vàng */
+
+/* Nhẹ nhàng cho link trong danh sách */
+#reviewList a, #qaList a{ color:#0d6efd; text-decoration:none; }
+#reviewList a:hover, #qaList a:hover{ text-decoration:underline; }
