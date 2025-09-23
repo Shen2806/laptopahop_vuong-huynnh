@@ -5,12 +5,6 @@ import { prisma } from "config/client";
 
 let io: Server | null = null;
 
-/**
- * ===== Q&A NOTIFY HELPERS =====
- * Controller có thể gọi:
- *  - qaSocket.notifyQANew({ id, productId, preview, by, at })
- *  - qaSocket.notifyQAAnswered({ questionId, productId, contentPreview, at, userId? })
- */
 function notifyQANew(question: {
     id: number;
     productId: number;

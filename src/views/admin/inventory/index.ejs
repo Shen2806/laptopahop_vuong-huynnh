@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="MinhVuong&QuocHuynh - Dự án laptopshop" />
+    <meta name="author" content="MinhVuong&QuocHuynh" />
+    <title>Quản lý tồn kho - LaptopShop</title>
+
+    <!-- Base styles -->
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+
+    <!-- Polished overrides: giống Dashboard -->
+    <style>
+        :root {
+            --brand: #4f8cff;
+            --brand-2: #8b5cf6;
+            --ink: #0b1020;
+            --glass: rgba(255, 255, 255, .06);
+            --glass-border: rgba(255, 255, 255, .10);
+            --muted: #aeb6c8;
+        }
+
+        body.sb-nav-fixed {
+            background: radial-gradient(1200px 800px at 10% 10%, #10172a 0%, #0a0f1f 45%, #080c18 100%) fixed;
+        }
+
+        .page-title {
+            color: #eef2ff;
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .glass-card {
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+            color: #e8ecff;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, .25);
+        }
+
+        .glass-card .card-header {
+            background: transparent;
+            color: #cbd5ff;
+            font-weight: 700;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .btn-soft {
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--glass-border);
+            color: #e7ecff;
+            border-radius: 12px;
+        }
+
+        .btn-soft:hover {
+            background: rgba(255, 255, 255, .10);
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body class="sb-nav-fixed">
+    <%- include('../layout/header'); -%>
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); -%>
+
+                <div id="layoutSidenav_content">
+                    <main class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
+                            <h1 class="page-title">Quản lý tồn kho</h1>
+                            <div class="d-flex gap-2">
+                                <input id="invSearch" class="form-control" placeholder="Tìm theo tên / ID"
+                                    style="max-width:300px;">
+                                <select id="invFilter" class="form-select" style="width:180px;">
+                                    <option value="all">Tất cả</option>
+                                    <option value="oos">Hết hàng</option>
+                                    <option value="low">Tồn thấp</option>
+                                </select>
+                                <button id="invReload" class="btn btn-soft"><i class="fa fa-rotate"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="card glass-card">
+                            <div class="card-header"><i class="fa-solid fa-warehouse me-2"></i>Tổng quan tồn kho</div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table align-middle text-white">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Tên</th>
+                                                <th class="text-end">Tồn (onHand)</th>
+                                                <th class="text-end">Khả dụng</th>
+                                                <th class="text-end">Ngưỡng cảnh báo</th>
+                                                <th>Trạng thái</th>
+                                                <th class="text-end">Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="invBody">
+                                            <tr>
+                                                <td colspan="7" class="text-center text-muted py-4">Đang tải dữ liệu...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </main>
+                    <%- include('../layout/footer'); -%>
+                </div>
+        </div>
+
+        <!-- Modal Điều chỉnh -->
+        <div class="modal fade" id="invAdjustModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <form id="invAdjustForm" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Điều chỉnh tồn</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="invProductId">
+                        <div class="mb-2">Sản phẩm: <span id="invProductName" class="fw-semibold"></span></div>
+                        <div class="mb-2">
+                            <label class="form-label">Loại</label>
+                            <select id="invType" class="form-select">
+                                <option value="IN">Nhập kho (+)</option>
+                                <option value="OUT">Xuất kho (-)</option>
+                                <option value="ADJUST">Điều chỉnh</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Số lượng (+ hoặc -)</label>
+                            <input type="number" id="invQty" class="form-control" required>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Ghi chú</label>
+                            <input id="invNote" class="form-control" placeholder="Lý do điều chỉnh">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Hủy</button>
+                        <button class="btn btn-primary" type="submit">Xác nhận</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <!-- ✅ Modal Sửa ngưỡng cảnh báo -->
+        <div class="modal fade" id="invReorderModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <form id="reorderForm" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sửa ngưỡng cảnh báo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="reProductId">
+                        <div class="mb-2">Sản phẩm: <span id="reProductName" class="fw-semibold"></span></div>
+                        <div class="mb-2">
+                            <label class="form-label">Ngưỡng (>= 0)</label>
+                            <input id="reLevel" type="number" min="0" class="form-control" required>
+                        </div>
+                        <div class="small text-muted">* Cần DB có cột <code>reorderLevel</code>. Nếu chưa migrate, lưu
+                            sẽ báo lỗi nhẹ.</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Hủy</button>
+                        <button class="btn btn-primary" type="submit">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="/admin/js/inventory.js"></script>
+</body>
+
+</html>

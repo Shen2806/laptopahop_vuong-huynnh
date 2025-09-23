@@ -18,6 +18,7 @@ import { getAdminChatSessions, getChatMessages } from 'controllers/admin/chat.co
 import { getProductReviews, getProductReviewSummary, postCreateReview } from 'controllers/client/review.controller';
 import { adminAnswerQuestionAPI, adminListQuestionsAPI, getAdminQAPage } from 'controllers/admin/qa.controller';
 import { getUserWithRoleById } from 'services/client/auth.service';
+import { adminInventoryAdjustAPI, adminInventoryListAPI, adminInventoryPage, adminInventorySetReorderAPI } from 'controllers/admin/inventory.controller';
 
 const router = express.Router();
 
@@ -404,6 +405,14 @@ const webRoutes = (app: Express) => {
     router.get("/admin/qa", getAdminQAPage);
     router.get("/admin/api/qa/questions", adminListQuestionsAPI);
     router.post("/admin/api/qa/questions/:id/answer", adminAnswerQuestionAPI);
+
+    // quản lý tồn kho
+    router.get("/admin/inventory", adminInventoryPage);
+    // APIs quản lý tồn kho (admin)
+    router.get("/admin/api/inventory", adminInventoryListAPI);
+    router.post("/admin/api/inventory/adjust", adminInventoryAdjustAPI);
+    router.post("/admin/api/inventory/reorder", adminInventorySetReorderAPI);
+
     // routes cho client   
     app.use("/", router);
 

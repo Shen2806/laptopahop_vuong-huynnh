@@ -22,6 +22,13 @@ enum SenderRole {
   ADMIN
 }
 
+enum StockType {
+  IN
+  OUT
+  ADJUST
+  ORDER_COMMIT
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
@@ -52,6 +59,7 @@ model User {
   notifications   Notification[]
   Review          Review[]
   ProductQuestion ProductQuestion[]
+  StockMovement   StockMovement[]
 
   @@map("users")
 }
@@ -81,8 +89,24 @@ model Product {
   OrderDetails     OrderDetail[]
   Review           Review[]
   ProductQuestions ProductQuestion[]
+  reorderLevel     Int               @default(0)
+  stockMovements   StockMovement[]
 
   @@map("products")
+}
+
+model StockMovement {
+  id        Int       @id @default(autoincrement())
+  productId Int
+  qty       Int
+  type      StockType
+  note      String?   @db.VarChar(255)
+  orderId   Int?
+  actorId   Int?
+  createdAt DateTime  @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+  actor   User?   @relation(fields: [actorId], references: [id])
 }
 
 model ProductQuestion {

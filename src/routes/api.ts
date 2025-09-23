@@ -44,6 +44,7 @@ const apiRoutes = (app: Express) => {
     router.post("/products/:id/questions", checkValidJWT, postProductQuestionAPI);
     // Q&A: admin trả lời
     router.post("/questions/:id/replies", checkValidJWT, postAdminReplyAPI);
+
     // 🔎 Search APIs
     app.get("/api/suggest", suggestProducts);
     app.get("/api/search", searchProductsJson);
@@ -84,6 +85,8 @@ const apiRoutes = (app: Express) => {
             return res.status(500).json({ message: 'Lỗi server.' });
         }
     });
+    // API đánh giá sản phẩm
+
     // ------------------ Mount router ------------------
     app.use("/api", router);
 };

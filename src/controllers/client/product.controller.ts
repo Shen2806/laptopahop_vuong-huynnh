@@ -261,8 +261,133 @@ const postHandleCartToCheckOut = async (req: Request, res: Response) => {
     }
 };
 
+// const postPlaceOrder = async (req: Request, res: Response) => {
+//     const user = (req as any).user;
+//     if (!user) return res.redirect("/login");
+
+//     const {
+//         receiverName,
+//         receiverAddress,
+//         receiverPhone,
+//         receiverNote,
+//         couponCode,
+//         mode, // <-- thêm mode từ form: 'buy' | 'cart'
+//     } = req.body;
+
+//     // Chuẩn hoá coupon
+//     const coupon = (couponCode || "").trim() || null;
+
+//     try {
+//         // ===== BUY MODE: đặt hàng trực tiếp theo session.buyNow =====
+//         if (mode === "buy") {
+//             const ticket = req.session?.buyNow;
+//             if (!ticket) {
+//                 // Không có "vé" mua ngay -> trả về checkout buy-mode để user thao tác lại
+//                 (req.session as any).messages = [
+//                     { type: "warning", text: "Phiên 'Mua ngay' đã hết hạn. Vui lòng thao tác lại." },
+//                 ];
+//                 return res.redirect("/checkout?mode=buy");
+//             }
+
+//             // Bạn có thể truyền trực tiếp mảng items vào service
+//             // (Cần cập nhật handlePlaceOrder để hỗ trợ 'items' & 'mode')
+//             const result = await handlePlaceOrder({
+//                 userId: Number(user.id),
+//                 receiverName,
+//                 receiverAddress,
+//                 receiverPhone,
+//                 receiverNote,
+//                 couponCode: coupon,
+//                 mode: "buy", // <-- gợi ý thêm param cho service
+//                 items: [
+//                     {
+//                         productId: Number(ticket.productId),
+//                         quantity: Math.max(1, Number(ticket.quantity) || 1),
+//                     },
+//                 ],
+//             } as any); // nếu TS kêu gào do chưa mở rộng type thì tạm any
+
+//             if (!result?.success) {
+//                 (req.session as any).messages = [
+//                     { type: "danger", text: result?.error || "Đặt hàng thất bại. Vui lòng thử lại!" },
+//                 ];
+//                 return res.redirect("/checkout?mode=buy");
+//             }
+
+//             // Xoá vé 'Mua ngay' để tránh reuse
+//             req.session.buyNow = undefined;
+
+//             // ✅ Emit cho ADMIN
+//             try {
+//                 const io = getIO();
+//                 const payload = {
+//                     orderId: result.orderId,
+//                     userId: Number(user.id),
+//                     customerName: user.fullName || user.username || `User #${user.id}`,
+//                     totalPrice: result.totalPrice ?? null, // khuyến nghị service trả về
+//                     mode: "buy",
+//                     createdAt: new Date().toISOString(),
+//                 };
+//                 io.to("admins").emit("new-order", payload);
+//             } catch (e) {
+//                 console.error("emit new-order error:", e);
+//             }
+
+//             return res.redirect(`/thanks`);
+//         }
+
+//         // ===== CART MODE: logic cũ =====
+//         const result = await handlePlaceOrder({
+//             userId: Number(user.id),
+//             receiverName,
+//             receiverAddress,
+//             receiverPhone,
+//             receiverNote,
+//             couponCode: coupon,
+//             mode: "cart", // <-- gợi ý thêm param cho service (không bắt buộc)
+//         } as any);
+
+//         if (!result?.success) {
+//             (req.session as any).messages = [
+//                 { type: "danger", text: result?.error || "Đặt hàng thất bại. Vui lòng thử lại!" },
+//             ];
+//             return res.redirect("/checkout");
+//         }
+
+//         // ✅ Emit cho ADMIN biết có đơn mới (giữ nguyên)
+//         try {
+//             const io = getIO();
+//             const payload = {
+//                 orderId: result.orderId,
+//                 userId: Number(user.id),
+//                 customerName: user.fullName || user.username || `User #${user.id}`,
+//                 totalPrice: result.totalPrice ?? null,
+//                 mode: "cart",
+//                 createdAt: new Date().toISOString(),
+//             };
+//             io.to("admins").emit("new-order", payload);
+//         } catch (e) {
+//             console.error("emit new-order error:", e);
+//         }
+
+//         return res.redirect(`/thanks`);
+//     } catch (e) {
+//         console.error("postPlaceOrder error:", e);
+//         (req.session as any).messages = [{ type: "danger", text: "Có lỗi hệ thống. Thử lại sau." }];
+//         // Khi lỗi trong buy-mode thì quay lại buy-mode cho đúng trải nghiệm
+//         return res.redirect(mode === "buy" ? "/checkout?mode=buy" : "/checkout");
+//     }
+// };
+
+
+
+const toInt = (v: any) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.floor(n) : 0;
+};
+
 const postPlaceOrder = async (req: Request, res: Response) => {
-    const user = (req as any).user;
+    const user: any = (req as any).user;
     if (!user) return res.redirect("/login");
 
     const {
@@ -271,26 +396,38 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         receiverPhone,
         receiverNote,
         couponCode,
-        mode, // <-- thêm mode từ form: 'buy' | 'cart'
+        mode: modeRaw, // 'buy' | 'cart'
     } = req.body;
 
-    // Chuẩn hoá coupon
+    // sanitize
     const coupon = (couponCode || "").trim() || null;
+    const mode: "buy" | "cart" = modeRaw === "buy" ? "buy" : "cart";
+
+    // helper push message
+    const pushMsg = (type: "danger" | "warning" | "success", text: string) => {
+        const sess: any = (req as any).session || ((req as any).session = {});
+        if (!Array.isArray(sess.messages)) sess.messages = [];
+        sess.messages.push({ type, text });
+    };
 
     try {
-        // ===== BUY MODE: đặt hàng trực tiếp theo session.buyNow =====
+        // =========================
+        // ======== BUY MODE =======
+        // =========================
         if (mode === "buy") {
-            const ticket = req.session?.buyNow;
+            const ticket: any = (req as any).session?.buyNow;
             if (!ticket) {
-                // Không có "vé" mua ngay -> trả về checkout buy-mode để user thao tác lại
-                (req.session as any).messages = [
-                    { type: "warning", text: "Phiên 'Mua ngay' đã hết hạn. Vui lòng thao tác lại." },
-                ];
+                pushMsg("warning", "Phiên 'Mua ngay' đã hết hạn. Vui lòng thao tác lại.");
                 return res.redirect("/checkout?mode=buy");
             }
 
-            // Bạn có thể truyền trực tiếp mảng items vào service
-            // (Cần cập nhật handlePlaceOrder để hỗ trợ 'items' & 'mode')
+            const pid = toInt(ticket.productId);
+            const qty = Math.max(1, toInt(ticket.quantity));
+            if (!pid || !qty) {
+                pushMsg("warning", "Dữ liệu 'Mua ngay' không hợp lệ. Vui lòng thao tác lại.");
+                return res.redirect("/checkout?mode=buy");
+            }
+
             const result = await handlePlaceOrder({
                 userId: Number(user.id),
                 receiverName,
@@ -298,45 +435,39 @@ const postPlaceOrder = async (req: Request, res: Response) => {
                 receiverPhone,
                 receiverNote,
                 couponCode: coupon,
-                mode: "buy", // <-- gợi ý thêm param cho service
-                items: [
-                    {
-                        productId: Number(ticket.productId),
-                        quantity: Math.max(1, Number(ticket.quantity) || 1),
-                    },
-                ],
-            } as any); // nếu TS kêu gào do chưa mở rộng type thì tạm any
+                mode: "buy",
+                items: [{ productId: pid, quantity: qty }],
+            });
 
             if (!result?.success) {
-                (req.session as any).messages = [
-                    { type: "danger", text: result?.error || "Đặt hàng thất bại. Vui lòng thử lại!" },
-                ];
+                pushMsg("danger", result?.error || "Đặt hàng thất bại. Vui lòng thử lại!");
                 return res.redirect("/checkout?mode=buy");
             }
 
-            // Xoá vé 'Mua ngay' để tránh reuse
-            req.session.buyNow = undefined;
+            // Clear vé buyNow để tránh reuse
+            (req as any).session.buyNow = undefined;
 
-            // ✅ Emit cho ADMIN
+            // Emit cho admin
             try {
                 const io = getIO();
-                const payload = {
+                io.to("admins").emit("new-order", {
                     orderId: result.orderId,
                     userId: Number(user.id),
                     customerName: user.fullName || user.username || `User #${user.id}`,
-                    totalPrice: result.totalPrice ?? null, // khuyến nghị service trả về
+                    totalPrice: result.totalPrice ?? null,
                     mode: "buy",
                     createdAt: new Date().toISOString(),
-                };
-                io.to("admins").emit("new-order", payload);
+                });
             } catch (e) {
                 console.error("emit new-order error:", e);
             }
 
-            return res.redirect(`/thanks`);
+            return res.redirect("/thanks");
         }
 
-        // ===== CART MODE: logic cũ =====
+        // =========================
+        // ======= CART MODE =======
+        // =========================
         const result = await handlePlaceOrder({
             userId: Number(user.id),
             receiverName,
@@ -344,38 +475,36 @@ const postPlaceOrder = async (req: Request, res: Response) => {
             receiverPhone,
             receiverNote,
             couponCode: coupon,
-            mode: "cart", // <-- gợi ý thêm param cho service (không bắt buộc)
-        } as any);
+            mode: "cart",
+        });
 
         if (!result?.success) {
-            (req.session as any).messages = [
-                { type: "danger", text: result?.error || "Đặt hàng thất bại. Vui lòng thử lại!" },
-            ];
+            pushMsg("danger", result?.error || "Đặt hàng thất bại. Vui lòng thử lại!");
             return res.redirect("/checkout");
         }
 
-        // ✅ Emit cho ADMIN biết có đơn mới (giữ nguyên)
+        // Emit cho admin
         try {
             const io = getIO();
-            const payload = {
+            io.to("admins").emit("new-order", {
                 orderId: result.orderId,
                 userId: Number(user.id),
                 customerName: user.fullName || user.username || `User #${user.id}`,
                 totalPrice: result.totalPrice ?? null,
                 mode: "cart",
                 createdAt: new Date().toISOString(),
-            };
-            io.to("admins").emit("new-order", payload);
+            });
         } catch (e) {
             console.error("emit new-order error:", e);
         }
 
-        return res.redirect(`/thanks`);
+        return res.redirect("/thanks");
     } catch (e) {
         console.error("postPlaceOrder error:", e);
-        (req.session as any).messages = [{ type: "danger", text: "Có lỗi hệ thống. Thử lại sau." }];
-        // Khi lỗi trong buy-mode thì quay lại buy-mode cho đúng trải nghiệm
-        return res.redirect(mode === "buy" ? "/checkout?mode=buy" : "/checkout");
+        const back = mode === "buy" ? "/checkout?mode=buy" : "/checkout";
+        const sess: any = (req as any).session || ((req as any).session = {});
+        sess.messages = [{ type: "danger", text: "Có lỗi hệ thống. Thử lại sau." }];
+        return res.redirect(back);
     }
 };
 

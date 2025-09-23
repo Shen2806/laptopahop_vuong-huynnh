@@ -140,10 +140,21 @@
                         Người dùng
                     </a>
 
-                    <a class="nav-link" href="/admin/product">
-                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <!-- Nhóm Sản phẩm -->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseProduct"
+                        aria-expanded="false">
+                        <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
                         Sản phẩm
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                     </a>
+                    <div class="collapse" id="collapseProduct">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="/admin/product">Danh sách sản phẩm</a>
+                            <a class="nav-link" href="/admin/inventory">Quản lý tồn kho</a>
+                        </nav>
+                    </div>
+
+
 
                     <a class="nav-link" href="/admin/order">
                         <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
@@ -197,6 +208,7 @@
         </nav>
     </div>
     <script src="/socket.io/socket.io.js"></script>
+    <!-- Tự động đánh dấu active menu -->
     <script>
         (function () {
             // Đường dẫn hiện tại, bỏ slash thừa ở cuối
@@ -225,6 +237,7 @@
             if (best.score >= 0) best.a.classList.add('active');
         })();
     </script>
+    <!-- Socket.io - Thông báo tin nhắn mới -->
     <script>
         (function () {
 
@@ -256,6 +269,7 @@
             socket.on("notify:chat_message", incAllBadges);
         })();
     </script>
+    <!-- Socket.io - Thông báo tin nhắn mới (phiên bản nâng cao: tránh trùng lặp, âm thanh) -->
     <script>
         (function () {
             const socket = window.__adminSocket || (window.__adminSocket = io());
@@ -293,6 +307,21 @@
             });
         })();
     </script>
+    <!-- Actice menu trong nhóm (nếu có) -->
+    <!-- <script>
+        (function () {
+            const active = document.querySelector('#sidenavAccordion a.nav-link.active');
+            if (!active) return;
+            const collapse = active.closest('.collapse');
+            if (collapse && typeof bootstrap !== 'undefined') {
+                new bootstrap.Collapse(collapse, { toggle: true });
+                const header = document.querySelector(`[data-bs-target="#${collapse.id}"]`);
+                header && header.classList.add('active');
+            }
+        })();
+    </script> -->
+
+
 
 
 </body>

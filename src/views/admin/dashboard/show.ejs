@@ -5,130 +5,41 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="MinhVuong&QuocHuynh - Dự án laptopshop" />
-    <meta name="author" content="MinhVuong&QuocHuynh" />
     <title>Dashboard - LaptopShop</title>
 
-    <!-- Base styles (keep your originals) -->
+    <!-- Base -->
     <link href="/admin/css/styles.css" rel="stylesheet" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-
-    <!-- Single Chart.js (v4) -->
+    <!-- Chart.js v4 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 
-    <!-- Fancy Datatables (optional, keep if you use tables on this page) -->
-    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-        crossorigin="anonymous"></script>
-
-    <!-- Polished overrides -->
+    <!-- Look & feel đồng bộ blog/promo/qa -->
     <style>
         :root {
             --brand: #4f8cff;
-            --brand-2: #8b5cf6;
+            --brand2: #8b5cf6;
             --ink: #0b1020;
-            --glass: rgba(255, 255, 255, .06);
-            --glass-border: rgba(255, 255, 255, .10);
             --muted: #aeb6c8;
+            --glass: rgba(255, 255, 255, .06);
+            --glass-bd: rgba(255, 255, 255, .10);
+            --ok: #22c55e;
+            --warn: #f59e0b;
+            --bad: #ef4444;
         }
 
         body.sb-nav-fixed {
             background: radial-gradient(1200px 800px at 10% 10%, #10172a 0%, #0a0f1f 45%, #080c18 100%) fixed;
         }
 
-        /* Breadcrumb + title */
         .page-title {
             color: #eef2ff;
             font-weight: 800;
             letter-spacing: .2px;
         }
 
-        .breadcrumb {
-            background: transparent;
-        }
-
-        /* Revenue banner */
-        .revenue-banner {
-            background: linear-gradient(135deg, rgba(79, 140, 255, .18), rgba(139, 92, 246, .18));
-            color: #e7ecff;
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(255, 255, 255, .04);
-        }
-
-        .revenue-banner small {
-            color: var(--muted);
-        }
-
-        /* Cards */
-        .dash-card {
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--glass-border);
-            border-radius: 18px;
-            color: #e8ecff;
-            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, .28);
-            transition: transform .18s ease, box-shadow .18s ease;
-        }
-
-        .dash-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, .34);
-        }
-
-        .dash-card .card-body {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .dash-card .stat {
-            font-size: .95rem;
-            opacity: .85;
-        }
-
-        .dash-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            display: grid;
-            place-items: center;
-            font-size: 1.2rem;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-        }
-
-        .dash-link {
-            color: #e7ecff;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .dash-link:hover {
-            color: #fff;
-        }
-
-        /* Thematic accents */
-        .accent-primary {
-            background: linear-gradient(135deg, rgba(79, 140, 255, .24), rgba(56, 189, 248, .12));
-        }
-
-        .accent-danger {
-            background: linear-gradient(135deg, rgba(244, 63, 94, .22), rgba(251, 146, 60, .12));
-        }
-
-        .accent-success {
-            background: linear-gradient(135deg, rgba(16, 185, 129, .22), rgba(34, 197, 94, .12));
-        }
-
-        /* Info blocks */
-        .glass-card {
-            border: 1px solid var(--glass-border);
+        /* Glass card */
+        .glass {
+            border: 1px solid var(--glass-bd);
             border-radius: 18px;
             background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
             color: #e8ecff;
@@ -137,32 +48,137 @@
             box-shadow: 0 10px 26px rgba(0, 0, 0, .25);
         }
 
-        .glass-card .card-header {
+        .glass .card-header {
             background: transparent;
             color: #cbd5ff;
             font-weight: 700;
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-bd);
         }
 
-        .glass-card .list-group-item {
-            background: transparent;
-            color: #e8ecff;
-            border-color: var(--glass-border);
-        }
-
-        /* Chart container */
-        .chart-wrap {
-            height: 440px;
-            padding: 12px;
-            background: rgba(255, 255, 255, .03);
-            border: 1px solid var(--glass-border);
+        /* KPI cards */
+        .kpi {
+            position: relative;
+            overflow: hidden;
             border-radius: 18px;
         }
 
-        /* Buttons soft */
+        .kpi .body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px;
+            color: #e8ecff;
+        }
+
+        .kpi .icon {
+            width: 54px;
+            height: 54px;
+            display: grid;
+            place-items: center;
+            border-radius: 14px;
+            background: var(--glass);
+            border: 1px solid var(--glass-bd);
+            font-size: 1.25rem;
+        }
+
+        .kpi .val {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .kpi .lbl {
+            opacity: .85;
+            font-size: .95rem;
+        }
+
+        .accent-primary {
+            background: linear-gradient(135deg, rgba(79, 140, 255, .22), rgba(139, 92, 246, .16));
+        }
+
+        .accent-danger {
+            background: linear-gradient(135deg, rgba(244, 63, 94, .22), rgba(251, 146, 60, .12));
+        }
+
+        .accent-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, .22), rgba(34, 197, 94, .10));
+        }
+
+        /* Quick Actions (từ danh mục sidenav) */
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        @media (min-width: 992px) {
+            .qa-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        .qa-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+            border: 1px solid var(--glass-bd);
+            color: #e8ecff;
+            text-decoration: none;
+            transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+        }
+
+        .qa-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, .06);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, .25);
+            color: #fff;
+        }
+
+        .qa-ico {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: var(--glass);
+            border: 1px solid var(--glass-bd);
+        }
+
+        .qa-title {
+            font-weight: 700;
+        }
+
+        .qa-sub {
+            font-size: .85rem;
+            color: #cbd5ff;
+            opacity: .85;
+        }
+
+        /* Badges */
+        .b-ok {
+            background: rgba(34, 197, 94, .15);
+            border: 1px solid rgba(34, 197, 94, .25);
+            color: #86efac;
+        }
+
+        .b-warn {
+            background: rgba(245, 158, 11, .18);
+            border: 1px solid rgba(245, 158, 11, .28);
+            color: #fde68a;
+        }
+
+        .b-bad {
+            background: rgba(239, 68, 68, .18);
+            border: 1px solid rgba(239, 68, 68, .28);
+            color: #fecaca;
+        }
+
         .btn-soft {
             background: rgba(255, 255, 255, .06);
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--glass-bd);
             color: #e7ecff;
             border-radius: 12px;
         }
@@ -170,6 +186,14 @@
         .btn-soft:hover {
             background: rgba(255, 255, 255, .10);
             color: #fff;
+        }
+
+        .chart-wrap {
+            height: 420px;
+            padding: 12px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid var(--glass-bd);
+            border-radius: 18px;
         }
     </style>
 </head>
@@ -179,6 +203,7 @@
 
         <div id="layoutSidenav">
             <%- include('../layout/sidenav'); -%>
+
                 <div id="layoutSidenav_content">
                     <main>
                         <div class="container-fluid px-4">
@@ -189,82 +214,159 @@
                                 </ol>
                             </div>
 
-                            <!-- Revenue -->
-                            <div
-                                class="revenue-banner alert d-flex justify-content-between align-items-center fs-5 fw-bold">
-                                <span>
-                                    💰 Tổng doanh thu:
-                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                        }).format(info?.totalRevenue ?? 0) %>
+                            <!-- Banner doanh thu -->
+                            <div class="alert glass d-flex justify-content-between align-items-center fs-5 fw-bold mb-4"
+                                style="background:linear-gradient(135deg, rgba(79, 140, 255, .18), rgba(139, 92, 246, .18));">
+                                <span>💰 Tổng doanh thu:
+                                    <%= new
+                                        Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(info?.totalRevenue
+                                        ?? 0) %>
                                 </span>
-                                <small>* Chỉ tính đơn đã thanh toán</small>
+                                <small class="text-muted">* Chỉ tính đơn đã thanh toán</small>
                             </div>
 
-                            <!-- Row stats -->
+                            <!-- KPI -->
                             <div class="row g-4">
                                 <div class="col-xl-4 col-md-6">
-                                    <div class="card dash-card accent-primary mb-0">
-                                        <div class="card-body">
+                                    <div class="kpi accent-primary">
+                                        <div class="body">
                                             <div>
-                                                <div class="h5 fw-bold mb-1">Người dùng</div>
-                                                <div class="stat">Tổng: <span class="fw-bold">
-                                                        <%= info?.countUser ?? 0 %>
-                                                    </span></div>
+                                                <div class="lbl">Người dùng</div>
+                                                <div class="val">
+                                                    <%= info?.countUser ?? 0 %>
+                                                </div>
                                             </div>
-                                            <div class="dash-icon"><i class="fa-solid fa-users"></i></div>
+                                            <div class="icon"><i class="fa-solid fa-users"></i></div>
                                         </div>
                                         <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="dash-link stretched-link" href="/admin/user">Xem người dùng</a>
-                                            <div class="text-white-50"><i class="fas fa-angle-right"></i></div>
+                                            <a class="text-light text-decoration-none fw-semibold px-3 py-2 d-inline-block"
+                                                href="/admin/user">Xem người dùng</a>
+                                            <div class="text-white-50 me-3"><i class="fas fa-angle-right"></i></div>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="col-xl-4 col-md-6">
-                                    <div class="card dash-card accent-danger mb-0">
-                                        <div class="card-body">
+                                    <div class="kpi accent-danger">
+                                        <div class="body">
                                             <div>
-                                                <div class="h5 fw-bold mb-1">Sản phẩm</div>
-                                                <div class="stat">Tổng: <span class="fw-bold">
-                                                        <%= info?.countProduct ?? 0 %>
-                                                    </span></div>
+                                                <div class="lbl">Sản phẩm</div>
+                                                <div class="val">
+                                                    <%= info?.countProduct ?? 0 %>
+                                                </div>
                                             </div>
-                                            <div class="dash-icon"><i class="fa-solid fa-box-open"></i></div>
+                                            <div class="icon"><i class="fa-solid fa-box-open"></i></div>
                                         </div>
                                         <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="dash-link stretched-link" href="/admin/product">Xem sản phẩm</a>
-                                            <div class="text-white-50"><i class="fas fa-angle-right"></i></div>
+                                            <a class="text-light text-decoration-none fw-semibold px-3 py-2 d-inline-block"
+                                                href="/admin/product">Xem sản phẩm</a>
+                                            <div class="text-white-50 me-3"><i class="fas fa-angle-right"></i></div>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="col-xl-4 col-md-6">
-                                    <div class="card dash-card accent-success mb-0">
-                                        <div class="card-body">
+                                    <div class="kpi accent-success">
+                                        <div class="body">
                                             <div>
-                                                <div class="h5 fw-bold mb-1">Đơn hàng</div>
-                                                <div class="stat">Tổng: <span class="fw-bold">
-                                                        <%= info?.countOrder ?? 0 %>
-                                                    </span></div>
+                                                <div class="lbl">Đơn hàng</div>
+                                                <div class="val">
+                                                    <%= info?.countOrder ?? 0 %>
+                                                </div>
                                             </div>
-                                            <div class="dash-icon"><i class="fa-solid fa-receipt"></i></div>
+                                            <div class="icon"><i class="fa-solid fa-receipt"></i></div>
                                         </div>
                                         <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="dash-link stretched-link" href="/admin/order">Xem đơn hàng</a>
-                                            <div class="text-white-50"><i class="fas fa-angle-right"></i></div>
+                                            <a class="text-light text-decoration-none fw-semibold px-3 py-2 d-inline-block"
+                                                href="/admin/order">Xem đơn hàng</a>
+                                            <div class="text-white-50 me-3"><i class="fas fa-angle-right"></i></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Info row -->
+                            <!-- QUICK ACTIONS = các danh mục từ sidenav -->
+                            <div class="card glass mt-4">
+                                <div class="card-header"><i class="fa-solid fa-compass me-2"></i> Lối tắt tính năng
+                                </div>
+                                <div class="card-body">
+                                    <div class="qa-grid">
+                                        <a class="qa-item" href="/admin/user">
+                                            <span class="qa-ico"><i class="fa-solid fa-users"></i></span>
+                                            <div>
+                                                <div class="qa-title">Người dùng</div>
+                                                <div class="qa-sub">Quản lý tài khoản</div>
+                                            </div>
+                                        </a>
+                                        <a class="qa-item" href="/admin/product">
+                                            <span class="qa-ico"><i class="fa-solid fa-box-open"></i></span>
+                                            <div>
+                                                <div class="qa-title">Sản phẩm</div>
+                                                <div class="qa-sub">Danh mục & chi tiết</div>
+                                            </div>
+                                        </a>
+                                        <a class="qa-item" href="/admin/inventory">
+                                            <span class="qa-ico"><i class="fa-solid fa-warehouse"></i></span>
+                                            <div>
+                                                <div class="qa-title">Tồn kho</div>
+                                                <div class="qa-sub">Theo dõi & điều chỉnh</div>
+                                            </div>
+                                        </a>
+                                        <a class="qa-item" href="/admin/order">
+                                            <span class="qa-ico"><i class="fa-solid fa-receipt"></i></span>
+                                            <div>
+                                                <div class="qa-title">Đơn hàng</div>
+                                                <div class="qa-sub">Xử lý & trạng thái</div>
+                                            </div>
+                                        </a>
+                                        <a class="qa-item" href="/admin/blog">
+                                            <span class="qa-ico"><i class="fa-solid fa-blog"></i></span>
+                                            <div>
+                                                <div class="qa-title">Blog</div>
+                                                <div class="qa-sub">Tin tức & bài viết</div>
+                                            </div>
+                                        </a>
+                                        <a class="qa-item" href="/admin/promo">
+                                            <span class="qa-ico"><i class="fa-solid fa-tags"></i></span>
+                                            <div>
+                                                <div class="qa-title">Khuyến mãi</div>
+                                                <div class="qa-sub">Thiết lập giảm giá</div>
+                                            </div>
+                                        </a>
+                                        <a class="qa-item" href="/admin/coupon">
+                                            <span class="qa-ico"><i class="fa-solid fa-ticket-alt"></i></span>
+                                            <div>
+                                                <div class="qa-title">Mã giảm giá</div>
+                                                <div class="qa-sub">Coupon & hạn dùng</div>
+                                            </div>
+                                        </a>
+                                        <a class="qa-item" href="/admin/chat">
+                                            <span class="qa-ico"><i class="fa-solid fa-comments"></i></span>
+                                            <div>
+                                                <div class="qa-title">Tin nhắn</div>
+                                                <div class="qa-sub">Trả lời khách</div>
+                                            </div>
+                                        </a>
+                                        <a class="qa-item" href="/admin/qa">
+                                            <span class="qa-ico"><i class="fa-regular fa-circle-question"></i></span>
+                                            <div>
+                                                <div class="qa-title">Q&A sản phẩm</div>
+                                                <div class="qa-sub">Câu hỏi & phản hồi</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hàng bố cục chính: Low stock / Promo / Charts -->
                             <div class="row mt-4 g-4">
                                 <!-- Low stock -->
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="card glass-card h-100">
+                                <div class="col-xl-4 col-lg-6">
+                                    <div class="card glass h-100">
                                         <div class="card-header d-flex align-items-center gap-2">
                                             <i class="fa-solid fa-triangle-exclamation me-1"></i>
-                                            Sản phẩm sắp hết hàng (dưới 10 sp)
+                                            Sản phẩm sắp hết hàng
+                                            <span class="badge b-warn ms-2">
+                                                <%= (info?.lowStockProducts||[]).length %>
+                                            </span>
                                         </div>
                                         <div class="card-body">
                                             <% if(info?.lowStockProducts?.length>0){ %>
@@ -276,7 +378,7 @@
                                                                 <%= p.name %>
                                                             </span>
                                                             <div class="d-flex align-items-center gap-2">
-                                                                <span class="badge bg-danger rounded-pill">
+                                                                <span class="badge b-bad rounded-pill">
                                                                     <%= p.quantity %>
                                                                 </span>
                                                                 <button class="btn btn-sm btn-soft"
@@ -295,18 +397,22 @@
                                                     <% } %>
                                         </div>
                                         <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="dash-link" href="/admin/product">Quản lý kho</a>
+                                            <a class="text-decoration-none fw-semibold text-light"
+                                                href="/admin/inventory">Quản lý kho</a>
                                             <div class="text-white-50"><i class="fas fa-angle-right"></i></div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Promo products -->
-                                <div class="col-xl-4 col-md-6">
-                                    <div class="card glass-card h-100">
+                                <div class="col-xl-4 col-lg-6">
+                                    <div class="card glass h-100">
                                         <div class="card-header d-flex align-items-center gap-2">
                                             <i class="fa-solid fa-tags me-1"></i>
                                             Sản phẩm khuyến mãi
+                                            <span class="badge b-ok ms-2">
+                                                <%= (info?.promoProducts||[]).length %>
+                                            </span>
                                         </div>
                                         <div class="card-body">
                                             <% if(info?.promoProducts?.length>0){ %>
@@ -317,10 +423,7 @@
                                                             <span>
                                                                 <%= p.name %>
                                                             </span>
-                                                            <span class="badge bg-success-subtle text-success fw-bold"
-                                                                style="background:rgba(34,197,94,.15); border:1px solid rgba(34,197,94,.25);">-
-                                                                <%= p.discount %>%
-                                                            </span>
+                                                            <span class="badge b-ok fw-bold">- <%= p.discount %>%</span>
                                                         </li>
                                                         <% }) %>
                                                 </ul>
@@ -329,21 +432,32 @@
                                                     <% } %>
                                         </div>
                                         <div class="card-footer d-flex align-items-center justify-content-between">
-                                            <a class="dash-link" href="/admin/promo">Quản lý khuyến mãi</a>
+                                            <a class="text-decoration-none fw-semibold text-light"
+                                                href="/admin/promo">Quản lý khuyến mãi</a>
                                             <div class="text-white-50"><i class="fas fa-angle-right"></i></div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Chart: Top products -->
-                                <div class="col-xl-8">
-                                    <div class="card glass-card">
+                                <!-- Charts column -->
+                                <div class="col-xl-4">
+                                    <div class="card glass mb-4">
                                         <div class="card-header d-flex align-items-center gap-2">
-                                            <i class="fas fa-chart-line me-1"></i> Biểu đồ Top sản phẩm bán chạy
+                                            <i class="fas fa-chart-pie me-1"></i> Tỉ lệ sản phẩm khuyến mãi
+                                        </div>
+                                        <div class="card-body">
+                                            <canvas id="promoShare" data-total="<%= info?.countProduct ?? 0 %>"
+                                                data-promo="<%= (info?.promoProducts||[]).length %>"></canvas>
+                                        </div>
+                                    </div>
+
+                                    <div class="card glass">
+                                        <div class="card-header d-flex align-items-center gap-2">
+                                            <i class="fas fa-chart-line me-1"></i> Top sản phẩm bán chạy
                                         </div>
                                         <div class="card-body">
                                             <div class="chart-wrap">
-                                                <canvas id="topProductsChart"
+                                                <canvas id="topProducts"
                                                     data-labels='<%- JSON.stringify(info?.topProducts?.map(p => p.name) || []) %>'
                                                     data-values='<%- JSON.stringify(info?.topProducts?.map(p => p.quantitySold) || []) %>'></canvas>
                                             </div>
@@ -352,7 +466,7 @@
                                 </div>
                             </div>
 
-                            <!-- Restock Modal -->
+                            <!-- Modal nhập thêm (giữ logic cũ) -->
                             <div class="modal fade" id="restockModal" tabindex="-1" aria-labelledby="restockModalLabel"
                                 aria-hidden="true">
                                 <div class="modal-dialog">
@@ -385,86 +499,70 @@
                                     </form>
                                 </div>
                             </div>
+
                         </div>
                     </main>
-
                     <%- include('../layout/footer'); -%>
                 </div>
         </div>
 
-        <!-- Bootstrap core -->
+        <!-- Bootstrap -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
             crossorigin="anonymous"></script>
         <script src="/admin/js/scripts.js"></script>
 
-        <!-- Modal helpers -->
+        <!-- Helpers + Charts -->
         <script>
+            // điền dữ liệu modal "Nhập thêm"
             const restockModal = document.getElementById('restockModal');
             if (restockModal) {
                 restockModal.addEventListener('show.bs.modal', function (event) {
-                    const button = event.relatedTarget;
-                    if (!button) return;
-                    const productId = button.getAttribute('data-product-id');
-                    const productName = button.getAttribute('data-product-name');
-                    document.getElementById('restockProductId').value = productId || '';
-                    document.getElementById('restockProductName').value = productName || '';
+                    const button = event.relatedTarget; if (!button) return;
+                    document.getElementById('restockProductId').value = button.getAttribute('data-product-id') || '';
+                    document.getElementById('restockProductName').value = button.getAttribute('data-product-name') || '';
                 });
             }
-        </script>
 
-        <!-- Chart.js v4 setup with gradient bars -->
-        <script>
             document.addEventListener('DOMContentLoaded', function () {
-                const canvas = document.getElementById('topProductsChart');
-                if (!canvas) return;
-                const labels = JSON.parse(canvas.dataset.labels || '[]');
-                const values = JSON.parse(canvas.dataset.values || '[]');
-
-                const ctx = canvas.getContext('2d');
-                const grad = ctx.createLinearGradient(0, 0, 0, 400);
-                grad.addColorStop(0, 'rgba(79,140,255,0.85)');
-                grad.addColorStop(1, 'rgba(139,92,246,0.55)');
-
-                const borderGrad = ctx.createLinearGradient(0, 0, 0, 400);
-                borderGrad.addColorStop(0, 'rgba(79,140,255,1)');
-                borderGrad.addColorStop(1, 'rgba(139,92,246,1)');
-
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels,
-                        datasets: [{
-                            label: 'Số lượng đã bán',
-                            data: values,
-                            backgroundColor: grad,
-                            borderColor: borderGrad,
-                            borderWidth: 1.5,
-                            borderRadius: 10,
-                            barThickness: 'flex',
-                            categoryPercentage: 0.62,
-                            maxBarThickness: 50,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { enabled: true, backgroundColor: 'rgba(3,7,18,0.9)', borderColor: 'rgba(255,255,255,.1)', borderWidth: 1 }
+                // Donut tỉ lệ sản phẩm khuyến mãi
+                (function () {
+                    const el = document.getElementById('promoShare'); if (!el) return;
+                    const total = Number(el.dataset.total || 0);
+                    const promo = Number(el.dataset.promo || 0);
+                    const normal = Math.max(0, total - promo);
+                    new Chart(el.getContext('2d'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Khuyến mãi', 'Không KM'],
+                            datasets: [{
+                                data: [promo, normal],
+                                backgroundColor: ['rgba(34,197,94,0.85)', 'rgba(79,140,255,0.65)'],
+                                borderColor: ['rgba(34,197,94,1)', 'rgba(79,140,255,1)'],
+                                borderWidth: 1.5
+                            }]
                         },
-                        scales: {
-                            x: {
-                                grid: { color: 'rgba(255,255,255,.06)' },
-                                ticks: { color: '#cbd5ff' }
-                            },
-                            y: {
-                                beginAtZero: true,
-                                grid: { color: 'rgba(255,255,255,.06)' },
-                                ticks: { color: '#cbd5ff', precision: 0 }
-                            }
-                        }
-                    }
-                });
+                        options: { cutout: '62%', plugins: { legend: { labels: { color: '#cbd5ff' } } } }
+                    });
+                })();
+
+                // Bar ngang top bán chạy
+                (function () {
+                    const el = document.getElementById('topProducts'); if (!el) return;
+                    const labels = JSON.parse(el.dataset.labels || '[]');
+                    const values = JSON.parse(el.dataset.values || '[]');
+                    const ctx = el.getContext('2d');
+                    const grad = ctx.createLinearGradient(0, 0, 600, 0);
+                    grad.addColorStop(0, 'rgba(79,140,255,0.9)');
+                    grad.addColorStop(1, 'rgba(139,92,246,0.6)');
+                    const borderGrad = ctx.createLinearGradient(0, 0, 600, 0);
+                    borderGrad.addColorStop(0, 'rgba(79,140,255,1)');
+                    borderGrad.addColorStop(1, 'rgba(139,92,246,1)');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: { labels, datasets: [{ label: 'Số lượng đã bán', data: values, backgroundColor: grad, borderColor: borderGrad, borderWidth: 1.5, borderRadius: 10, barThickness: 'flex', categoryPercentage: .72, maxBarThickness: 46 }] },
+                        options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#cbd5ff', precision: 0 }, grid: { color: 'rgba(255,255,255,.06)' } }, y: { ticks: { color: '#cbd5ff' }, grid: { display: false } } } }
+                    });
+                })();
             });
         </script>
 </body>
