@@ -11,8 +11,10 @@ import {
 import { postLogin, refreshToken } from 'controllers/client/auth.controller';
 import { getProductQuestionsAPI, postAdminReplyAPI, postProductQuestionAPI } from 'controllers/client/qa.controller';
 import { searchProductsJson, suggestProducts } from 'controllers/client/search.controller';
-
-import express, { Express } from 'express';
+import { Express, Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+import express from 'express';
 import { checkValidJWT } from 'src/middleware/jwt.middleware';
 
 const router = express.Router();
@@ -45,6 +47,43 @@ const apiRoutes = (app: Express) => {
     // 🔎 Search APIs
     app.get("/api/suggest", suggestProducts);
     app.get("/api/search", searchProductsJson);
+    // API MUA NGAY: lưu "đơn tạm" vào session, không động vào giỏ
+    app.post('/api/buy-now', async (req: Request, res: Response) => {
+        try {
+            const { productId, quantity } = req.body || {};
+            const pid = Number(productId);
+            const qty = Number(quantity);
+
+            if (!Number.isFinite(pid) || pid <= 0 || !Number.isFinite(qty) || qty <= 0) {
+                return res.status(400).json({ message: 'Dữ liệu không hợp lệ.' });
+            }
+
+            // (Tuỳ bạn) Nếu bắt buộc đăng nhập thì kiểm tra:
+            // if (!req.user) return res.status(401).json({ message: 'Bạn cần đăng nhập.' });
+
+            const p = await prisma.product.findUnique({
+                where: { id: pid },
+                select: { id: true, name: true, price: true, discount: true, quantity: true, image: true }
+            });
+            if (!p) return res.status(404).json({ message: 'Không tìm thấy sản phẩm.' });
+
+            if (Number(p.quantity) < qty) {
+                return res.status(400).json({ message: 'Số lượng vượt quá tồn kho.' });
+            }
+
+            // Lưu "ticket Mua ngay" vào session (đơn mặt hàng đơn lẻ)
+            req.session.buyNow = {
+                productId: p.id,
+                quantity: qty,
+                at: Date.now()
+            };
+
+            return res.json({ ok: true, redirect: '/checkout?mode=buy' });
+        } catch (e) {
+            console.error(e);
+            return res.status(500).json({ message: 'Lỗi server.' });
+        }
+    });
     // ------------------ Mount router ------------------
     app.use("/api", router);
 };

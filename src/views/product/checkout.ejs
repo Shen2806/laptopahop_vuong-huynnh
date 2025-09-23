@@ -335,7 +335,7 @@
                         </ol>
                     </nav>
 
-                    <% if (user?.sumCart===0) { %>
+                    <% if (mode==='cart' && (!cartDetails || cartDetails.length===0)) { %>
                         <div class="alert alert-info text-center py-5 rounded">
                             Chưa có sản phẩm trong giỏ hàng
                         </div>
@@ -343,72 +343,76 @@
 
                             <!-- Cart Table -->
                             <div class="mb-5">
-                                <% let totalAfterDiscount=0; cartDetails.forEach(function(cartDetail,i) { const
-                                    discountedPrice=cartDetail.product.discount> 0
-                                    ? Math.round(cartDetail.product.price * (100 - cartDetail.product.discount) / 100)
-                                    : cartDetail.product.price;
+                                <% var totalAfterDiscount=0; %>
+                                    <% cartDetails.forEach(function(cartDetail){ %>
+                                        <% var p=cartDetail.product; var price=Number(p && p.price ? p.price : 0); var
+                                            disc=Number(p && p.discount ? p.discount : 0); var discountedPrice=disc> 0 ?
+                                            Math.round(price * (100 - disc) / 100) : price;
+                                            var qty = Number(cartDetail.quantity || 1);
+                                            totalAfterDiscount += discountedPrice * qty;
 
-                                    totalAfterDiscount += discountedPrice * cartDetail.quantity;
-                                    %>
-                                    <div
-                                        class="d-flex align-items-center justify-content-between bg-white rounded shadow-sm mb-3 p-3 hover-shadow">
+                                            // Ảnh: dự án bạn đang để trong /images/product/
+                                            var imageName = (p && p.image) ? String(p.image) : '';
+                                            var imgSrc = '/images/product/' + imageName;
+                                            %>
 
-                                        <!-- Product Info -->
-                                        <div class="d-flex align-items-center" style="flex: 2;">
-                                            <img src="/images/product/<%= cartDetail.product.image %>"
-                                                class="rounded me-3 shadow-sm"
-                                                style="width: 80px; height: 80px; object-fit: cover;" alt="">
-                                            <div>
-                                                <a href="/product/<%= cartDetail.product.id %>" target="_blank"
-                                                    class="fw-bold text-dark text-decoration-none">
-                                                    <%= cartDetail.product.name %>
-                                                </a>
-                                                <div class="text-muted mt-1">SKU: <%= cartDetail.product.id %>
+                                            <div
+                                                class="d-flex align-items-center justify-content-between bg-white rounded shadow-sm mb-3 p-3 hover-shadow">
+
+                                                <!-- Product Info -->
+                                                <div class="d-flex align-items-center" style="flex: 2;">
+                                                    <img src="<%= imgSrc %>" class="rounded me-3 shadow-sm"
+                                                        style="width: 80px; height: 80px; object-fit: cover;" alt="">
+                                                    <div>
+                                                        <a href="/product/<%= p.id %>" target="_blank"
+                                                            class="fw-bold text-dark text-decoration-none">
+                                                            <%= p.name %>
+                                                        </a>
+                                                        <div class="text-muted mt-1">SKU: <%= p.id %>
+                                                        </div>
+                                                    </div>
                                                 </div>
+
+                                                <!-- Price -->
+                                                <div class="text-center" style="flex: 1;">
+                                                    <% if (disc> 0) { %>
+                                                        <div class="text-muted text-decoration-line-through">
+                                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                                currency: 'VND' }).format(price) %>
+                                                        </div>
+                                                        <span class="fw-bold text-primary">
+                                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                                currency: 'VND' }).format(discountedPrice) %>
+                                                        </span>
+                                                        <% } else { %>
+                                                            <span class="fw-bold text-primary">
+                                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                                    currency: 'VND' }).format(price) %>
+                                                            </span>
+                                                            <% } %>
+                                                </div>
+
+                                                <!-- Quantity -->
+                                                <div class="text-center" style="flex: 1;">
+                                                    <input type="text"
+                                                        class="form-control form-control-sm text-center rounded-pill"
+                                                        style="width: 60px;" value="<%= qty %>" disabled>
+                                                </div>
+
+                                                <!-- Total -->
+                                                <div class="text-center fw-bold text-success" style="flex: 1;">
+                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                        currency: 'VND' }) .format(discountedPrice * qty) %>
+                                                </div>
+
                                             </div>
-                                        </div>
-
-                                        <!-- Price -->
-                                        <div class="text-center" style="flex: 1;">
-                                            <% if(cartDetail.product.discount> 0) { %>
-                                                <div class="text-muted text-decoration-line-through">
-                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                        currency: 'VND' }) .format(cartDetail.product.price) %>
-                                                </div>
-                                                <span class="fw-bold text-primary">
-                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                        currency: 'VND' }) .format(discountedPrice) %>
-                                                </span>
-                                                <% } else { %>
-                                                    <span class="fw-bold text-primary">
-                                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                            currency: 'VND' }) .format(cartDetail.product.price) %>
-                                                    </span>
-                                                    <% } %>
-                                        </div>
-
-                                        <!-- Quantity -->
-                                        <div class="text-center" style="flex: 1;">
-                                            <input type="text"
-                                                class="form-control form-control-sm text-center rounded-pill"
-                                                style="width: 60px;" value="<%= cartDetail.quantity %>" disabled>
-
-                                        </div>
-
-
-                                        <!-- Total -->
-                                        <div class="text-center fw-bold text-success" style="flex: 1;">
-                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND' })
-                                                .format(discountedPrice * cartDetail.quantity) %>
-                                        </div>
-
-                                    </div>
-                                    <% }) %>
+                                            <% }); %>
                             </div>
 
                             <!-- Checkout Form -->
                             <form action="/place-order" method="post">
-                                <input type="hidden" name="totalPrice" value="<%= totalAfterDiscount %>">
+                                <!-- quan trọng để server phân nhánh: buy/cart -->
+                                <input type="hidden" name="mode" value="<%= mode %>">
                                 <input type="hidden" name="discountAmount" id="discountAmount" value="0">
                                 <input type="hidden" name="couponCode" id="couponCode" value="">
 
@@ -438,10 +442,12 @@
                                                 <textarea class="form-control rounded" name="receiverNote"></textarea>
                                             </div>
 
-                                            <a href="/cart"
-                                                class="d-inline-flex align-items-center text-decoration-none text-primary fw-semibold mt-3">
-                                                <i class="fas fa-arrow-left me-2"></i>Quay lại giỏ hàng
-                                            </a>
+                                            <% if (mode==='cart' ) { %>
+                                                <a href="/cart"
+                                                    class="d-inline-flex align-items-center text-decoration-none text-primary fw-semibold mt-3">
+                                                    <i class="fas fa-arrow-left me-2"></i>Quay lại giỏ hàng
+                                                </a>
+                                                <% } %>
                                         </div>
                                     </div>
 
@@ -463,24 +469,26 @@
 
                                             <% if (coupons && coupons.length> 0) { %>
                                                 <div class="mb-4">
-                                                    <label class="fw-bold mb-2 text-primary"><i
-                                                            class="fa fa-ticket me-2"></i>Chọn mã giảm giá:</label>
-                                                    <% coupons.forEach(coupon=> { %>
+                                                    <label class="fw-bold mb-2 text-primary">
+                                                        <i class="fa fa-ticket me-2"></i>Chọn mã giảm giá:
+                                                    </label>
+                                                    <% coupons.forEach(function(coupon){ %>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="radio" name="couponId"
                                                                 value="<%= coupon.id %>"
-                                                                data-discount="<%= coupon.discount %>">
+                                                                data-discount="<%= coupon.discount %>"
+                                                                data-code="<%= coupon.code %>">
                                                             <label class="form-check-label">
                                                                 <%= coupon.code %> - Giảm <%= coupon.discount %>% (HSD:
                                                                         <%= coupon.expiryDate.toLocaleDateString("vi-VN")
                                                                             %>)
                                                             </label>
                                                         </div>
-                                                        <% }) %>
+                                                        <% }); %>
                                                 </div>
                                                 <% } %>
 
-                                                    <!-- Hidden tổng base gửi về server (đã sau KM SP) -->
+                                                    <!-- Hidden tổng base (server đã tính) -->
                                                     <input type="hidden" name="totalPrice" value="<%= totalPrice %>">
 
                                                     <div
@@ -493,16 +501,12 @@
                                                         </h5>
                                                     </div>
 
-
                                                     <button
                                                         class="btn w-100 py-3 fw-bold rounded-pill btn-gradient hover-scale">
                                                         Xác nhận thanh toán
                                                     </button>
                                         </div>
                                     </div>
-
-
-
                                 </div>
                             </form>
 
@@ -685,6 +689,36 @@
                 }
             </script>
 
+            <!-- cập nhật tổng khi chọn coupon -->
+            <script>
+                (function () {
+                    var totalEl = document.getElementById('checkout-total');
+                    if (!totalEl) return;
+
+                    var base = Number(totalEl.getAttribute('data-checkout-base') || '0');
+                    var discountAmountInput = document.getElementById('discountAmount');
+                    var couponCodeInput = document.getElementById('couponCode');
+
+                    function fmt(n) {
+                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n);
+                    }
+
+                    var radios = document.querySelectorAll('input[name="couponId"]');
+                    for (var i = 0; i < radios.length; i++) {
+                        radios[i].addEventListener('change', function (e) {
+                            var r = e.target;
+                            var pct = Number(r.getAttribute('data-discount') || '0');
+                            var code = r.getAttribute('data-code') || '';
+                            var discount = Math.round(base * pct / 100);
+                            var final = Math.max(0, base - discount);
+
+                            totalEl.textContent = fmt(final);
+                            if (discountAmountInput) discountAmountInput.value = String(discount);
+                            if (couponCodeInput) couponCodeInput.value = code;
+                        });
+                    }
+                })();
+            </script>
 
 </body>
 

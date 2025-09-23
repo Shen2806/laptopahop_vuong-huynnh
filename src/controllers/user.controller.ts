@@ -169,19 +169,26 @@ const getHomePage = async (req: Request, res: Response) => {
                 r?.thumbnail ||
                 (Array.isArray(r?.images) ? r.images[0] : null) ||
                 (typeof r?.gallery === "string"
-                    ? r.gallery.split(",").map((s: string) => s.trim()).find(Boolean)
+                    ? r.gallery
+                        .split(",")
+                        .map((s: string) => s.trim())
+                        .find(Boolean)
                     : null);
 
             if (!cand) return "/images/no-image.png";
 
-            const s = String(cand);
-            if (/^https?:\/\//i.test(s)) return s;   // URL tuyệt đối
-            if (s.startsWith("/")) return s;         // đã có dấu /
+            const s = String(cand).trim();
 
-            // chuẩn hoá đường dẫn local phổ biến
-            if (s.startsWith("uploads/") || s.startsWith("upload/")) return "/" + s;
-            return "/uploads/" + s;                  // mặc định: nằm trong /uploads
+            // Giữ nguyên nếu là URL tuyệt đối hoặc đường dẫn tuyệt đối
+            if (/^https?:\/\//i.test(s) || s.startsWith("/")) return s;
+
+            // Nếu DB đã lưu dạng tương đối có thư mục (vd: "images/product/abc.jpg" hay "uploads/abc.jpg")
+            if (s.includes("/")) return "/" + s.replace(/^\/+/, "");
+
+            // 👉 Trường hợp chỉ là tên file: dùng đúng thư mục ảnh seed hiện tại
+            return `/images/product/${s}`;
         };
+
 
         recentProducts = recentIds
             .map(id => {

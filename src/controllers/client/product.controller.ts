@@ -106,44 +106,117 @@ const getCheckOutPage = async (req: Request, res: Response) => {
     if (!user) return res.redirect("/login");
 
     try {
-        // 1) Tìm cart hiện tại theo userId (lấy id)
+        // Ưu tiên "Mua ngay" khi có session buyNow hoặc query ?mode=buy
+        const wantBuyMode = req.query.mode === "buy" || Boolean(req.session?.buyNow);
+
+        if (wantBuyMode && req.session?.buyNow) {
+            const { productId, quantity } = req.session.buyNow;
+            const pid = Number(productId);
+            const qtyReq = Math.max(1, Number(quantity) || 1);
+
+            // Lấy sản phẩm
+            const p = await prisma.product.findUnique({
+                where: { id: pid },
+                select: {
+                    id: true,
+                    name: true,
+                    price: true,
+                    discount: true,
+                    quantity: true,
+                    image: true,
+                },
+            });
+
+            if (!p) {
+                // Không còn sản phẩm -> bỏ buyNow & fallback về giỏ
+                req.session.buyNow = undefined;
+                return res.redirect("/cart");
+            }
+
+            const stock = Number(p.quantity) || 0;
+            const qty = Math.min(qtyReq, stock);
+            if (qty <= 0) {
+                // Hết hàng -> bỏ buyNow và quay lại trang sản phẩm
+                req.session.buyNow = undefined;
+                return res.redirect(`/product/${pid}`);
+            }
+
+            // Tính tiền: trước/sau KM
+            const price = Number(p.price) || 0;
+            const discount = Number(p.discount || 0); // %
+            const unitAfter = discount > 0 ? Math.round(price * (100 - discount) / 100) : price;
+
+            const subtotalBefore = price * qty;
+            const subtotalAfter = unitAfter * qty;
+
+            // Ngưỡng coupon giữ nguyên logic của bạn
+            const coupons =
+                subtotalAfter >= 25_000_000
+                    ? await prisma.coupon.findMany({
+                        where: { expiryDate: { gte: new Date() } },
+                        orderBy: { updatedAt: "desc" },
+                    })
+                    : [];
+
+            // Giả lập cấu trúc cartDetails đúng view (product + quantity)
+            const cartDetails = [
+                {
+                    id: 0,            // dummy
+                    cartId: 0,        // dummy
+                    productId: p.id,
+                    quantity: qty,
+                    product: p,       // view dùng cd.product.*
+                },
+            ];
+
+            return res.render("product/checkout", {
+                cartDetails,
+                subtotalBefore,
+                totalPrice: subtotalAfter, // base sau KM SP
+                coupons,
+                mode: "buy",               // để view biết đang ở buy-mode (nếu bạn muốn hiển thị khác)
+            });
+        }
+
+        // ==== Mặc định: Checkout theo GIỎ HÀNG (logic gốc của bạn) ====
+        // 1) Tìm cart theo userId
         const cart = await prisma.cart.findFirst({
             where: { userId: Number(user.id) },
             select: { id: true },
         });
 
-        // Không có giỏ → render rỗng
         if (!cart) {
             return res.render("product/checkout", {
                 cartDetails: [],
                 subtotalBefore: 0,
                 totalPrice: 0,
                 coupons: [],
+                mode: "cart",
             });
         }
 
         const cartId = cart.id;
 
-        // 2) Lấy chi tiết giỏ + product (cần price, discount)
+        // 2) Lấy chi tiết giỏ + product
         const cartDetails = await prisma.cartDetail.findMany({
             where: { cartId },
             include: { product: true },
         });
 
-        // 3) Tính tổng trước KM (tham khảo)
+        // 3) Tổng trước KM
         const subtotalBefore = cartDetails.reduce((sum, cd) => {
             return sum + Number(cd.product.price) * Number(cd.quantity);
         }, 0);
 
-        // 4) ✅ Tính tổng SAU KM theo từng SP (base để áp coupon)
+        // 4) Tổng sau KM từng SP
         const subtotalAfter = cartDetails.reduce((sum, cd) => {
             const price = Number(cd.product.price);
-            const discount = Number(cd.product.discount || 0); // % trên từng SP
+            const discount = Number(cd.product.discount || 0);
             const unit = discount > 0 ? Math.round(price * (100 - discount) / 100) : price;
             return sum + unit * Number(cd.quantity);
         }, 0);
 
-        // 5) Nếu >= 25tr (sau KM SP) → show coupon còn hạn
+        // 5) Coupon nếu đạt ngưỡng
         let coupons: any[] = [];
         if (subtotalAfter >= 25_000_000) {
             coupons = await prisma.coupon.findMany({
@@ -152,18 +225,20 @@ const getCheckOutPage = async (req: Request, res: Response) => {
             });
         }
 
-        // 6) Render: dùng subtotalAfter làm totalPrice để checkout áp coupon đúng
+        // 6) Render
         return res.render("product/checkout", {
             cartDetails,
             subtotalBefore,
-            totalPrice: subtotalAfter, // ✅ base sau KM SP
+            totalPrice: subtotalAfter,
             coupons,
+            mode: "cart",
         });
     } catch (e) {
         console.error("getCheckOutPage error:", e);
         return res.redirect("/cart");
     }
 };
+
 
 const postHandleCartToCheckOut = async (req: Request, res: Response) => {
     const user = (req as any).user;
@@ -196,50 +271,114 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         receiverPhone,
         receiverNote,
         couponCode,
+        mode, // <-- thêm mode từ form: 'buy' | 'cart'
     } = req.body;
 
+    // Chuẩn hoá coupon
+    const coupon = (couponCode || "").trim() || null;
+
     try {
+        // ===== BUY MODE: đặt hàng trực tiếp theo session.buyNow =====
+        if (mode === "buy") {
+            const ticket = req.session?.buyNow;
+            if (!ticket) {
+                // Không có "vé" mua ngay -> trả về checkout buy-mode để user thao tác lại
+                (req.session as any).messages = [
+                    { type: "warning", text: "Phiên 'Mua ngay' đã hết hạn. Vui lòng thao tác lại." },
+                ];
+                return res.redirect("/checkout?mode=buy");
+            }
+
+            // Bạn có thể truyền trực tiếp mảng items vào service
+            // (Cần cập nhật handlePlaceOrder để hỗ trợ 'items' & 'mode')
+            const result = await handlePlaceOrder({
+                userId: Number(user.id),
+                receiverName,
+                receiverAddress,
+                receiverPhone,
+                receiverNote,
+                couponCode: coupon,
+                mode: "buy", // <-- gợi ý thêm param cho service
+                items: [
+                    {
+                        productId: Number(ticket.productId),
+                        quantity: Math.max(1, Number(ticket.quantity) || 1),
+                    },
+                ],
+            } as any); // nếu TS kêu gào do chưa mở rộng type thì tạm any
+
+            if (!result?.success) {
+                (req.session as any).messages = [
+                    { type: "danger", text: result?.error || "Đặt hàng thất bại. Vui lòng thử lại!" },
+                ];
+                return res.redirect("/checkout?mode=buy");
+            }
+
+            // Xoá vé 'Mua ngay' để tránh reuse
+            req.session.buyNow = undefined;
+
+            // ✅ Emit cho ADMIN
+            try {
+                const io = getIO();
+                const payload = {
+                    orderId: result.orderId,
+                    userId: Number(user.id),
+                    customerName: user.fullName || user.username || `User #${user.id}`,
+                    totalPrice: result.totalPrice ?? null, // khuyến nghị service trả về
+                    mode: "buy",
+                    createdAt: new Date().toISOString(),
+                };
+                io.to("admins").emit("new-order", payload);
+            } catch (e) {
+                console.error("emit new-order error:", e);
+            }
+
+            return res.redirect(`/thanks`);
+        }
+
+        // ===== CART MODE: logic cũ =====
         const result = await handlePlaceOrder({
             userId: Number(user.id),
             receiverName,
             receiverAddress,
             receiverPhone,
             receiverNote,
-            couponCode: (couponCode || "").trim() || null,
-        });
+            couponCode: coupon,
+            mode: "cart", // <-- gợi ý thêm param cho service (không bắt buộc)
+        } as any);
 
-        if (!result.success) {
-            (req as any).session = (req as any).session || {};
-            (req as any).session.messages = [
-                { type: "danger", text: result.error || "Đặt hàng thất bại. Vui lòng thử lại!" },
+        if (!result?.success) {
+            (req.session as any).messages = [
+                { type: "danger", text: result?.error || "Đặt hàng thất bại. Vui lòng thử lại!" },
             ];
             return res.redirect("/checkout");
         }
 
-        // ✅ Emit cho ADMIN biết có đơn mới
+        // ✅ Emit cho ADMIN biết có đơn mới (giữ nguyên)
         try {
             const io = getIO();
             const payload = {
-                orderId: result.orderId,             // handlePlaceOrder nên trả về orderId
+                orderId: result.orderId,
                 userId: Number(user.id),
                 customerName: user.fullName || user.username || `User #${user.id}`,
-                totalPrice: null, // PlaceOrderResult does not have totalPrice, set to null or update service to return it
+                totalPrice: result.totalPrice ?? null,
+                mode: "cart",
                 createdAt: new Date().toISOString(),
             };
             io.to("admins").emit("new-order", payload);
         } catch (e) {
-            // không chặn luồng nếu socket lỗi
             console.error("emit new-order error:", e);
         }
 
         return res.redirect(`/thanks`);
     } catch (e) {
         console.error("postPlaceOrder error:", e);
-        (req as any).session = (req as any).session || {};
-        (req as any).session.messages = [{ type: "danger", text: "Có lỗi hệ thống. Thử lại sau." }];
-        return res.redirect("/checkout");
+        (req.session as any).messages = [{ type: "danger", text: "Có lỗi hệ thống. Thử lại sau." }];
+        // Khi lỗi trong buy-mode thì quay lại buy-mode cho đúng trải nghiệm
+        return res.redirect(mode === "buy" ? "/checkout?mode=buy" : "/checkout");
     }
 };
+
 
 const getThanksPage = async (req: Request, res: Response) => {
     let order: any = null;

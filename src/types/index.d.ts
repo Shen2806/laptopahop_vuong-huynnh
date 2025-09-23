@@ -18,4 +18,12 @@ declare module "express-session" {
     interface SessionData {
         successMessage?: string | null;
     }
+    interface SessionData {
+        buyNow?: {
+            productId: number;
+            quantity: number;
+            at: number;
+        };
+    }
+
 }
