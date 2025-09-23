@@ -25,8 +25,7 @@
 </head>
 
 <body>
-    <!-- HEADER START -->
-    <!-- HEADER START -->
+    <!-- Navbar start -->
     <header class="container-fluid shadow" style="margin-top:10px;">
         <!-- Topbar -->
         <div class="container topbar bg-primary d-none d-lg-block">
@@ -59,8 +58,8 @@
         </div>
 
         <!-- Navbar -->
-        <div class="container px-0 position-relative">
-            <nav class="navbar navbar-light bg-white navbar-expand-xl">
+        <div class="container px-0 position-relative bg-white ">
+            <nav class="navbar navbar-light bg-white  navbar-expand-xl">
                 <div class="d-flex align-items-center">
                     <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle" />
                     <a href="/" class="navbar-brand ms-2">
@@ -75,21 +74,41 @@
                 </button>
 
                 <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
-                    <ul class="navbar-nav mx-auto">
-                        <li class="nav-item"><a href="/" class="nav-link ">Trang chủ</a></li>
-                        <li class="nav-item"><a href="/products" class="nav-link">Sản phẩm</a></li>
-                        <li class="nav-item"><a href="/about" class="nav-link ">Giới thiệu</a></li>
-                        <li class="nav-item"><a href="/contact" class="nav-link active">Liên hệ</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">Thông tin và chính sách</a>
-                            <ul class="dropdown-menu" aria-labelledby="policyDropdown">
-                                <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
-                                <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
-                                <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
-                            </ul>
-                        </li>
-                    </ul>
+                    <div>
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item"><a href="/" class="nav-link ">Trang chủ</a></li>
+                            <li class="nav-item"><a href="/products" class="nav-link">Sản phẩm</a></li>
+                            <li class="nav-item"><a href="/about" class="nav-link">Giới thiệu</a></li>
+                            <li class="nav-item"><a href="/contact" class="nav-link active">Liên hệ</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">Thông tin và chính sách</a>
+                                <ul class="dropdown-menu" aria-labelledby="policyDropdown">
+                                    <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
+                                    <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
+                                    <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- SEARCH BOX -->
+                    <div class="header-search position-relative my-2 my-xl-0 mx-xl-3" style="min-width: 180px;">
+                        <form id="headerSearchForm" action="/products" method="get"
+                            class="d-flex align-items-center rounded-pill border px-2 bg-white">
+                            <input class="form-control border-0 shadow-none" id="headerSearch" name="q" type="search"
+                                placeholder="Tìm laptop, hãng, từ khóa..." aria-label="Tìm kiếm" autocomplete="off" />
+                            <button class="btn btn-link px-2" type="submit" aria-label="Tìm kiếm">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+
+                        <!-- Popup gợi ý -->
+                        <div id="searchPopup" class="shadow" style="
+    display:none; position:absolute; top:110%; left:0; right:0; z-index: 2000;
+    background:#fff; border-radius:12px; overflow:hidden; max-height:420px; overflow-y:auto;">
+                        </div>
+                    </div>
 
                     <div class="d-flex ms-auto align-items-center position-relative">
                         <% if (user) { %>
@@ -167,6 +186,316 @@
         </div>
 
     </header>
+
+    <% if (user) { %>
+        <script>
+            window.USER_ID = "<%= String(user.id) %>";
+        </script>
+        <% } %>
+
+            <!-- Socket.IO client -->
+            <script src="/socket.io/socket.io.js"></script>
+            <script>
+                (function () {
+                    if (!window.USER_ID) return; // chưa login thì thôi
+
+                    const uBadge = document.getElementById('notificationBadge');
+                    const uIcon = document.getElementById('notificationDropdown');
+                    const uPanel = document.getElementById('uNotificationPanel');
+                    const uList = document.getElementById('uNotificationList');
+                    const uSound = document.getElementById('notificationSound');
+                    const USER_ID = window.USER_ID;
+
+                    // Toggle panel
+                    if (uIcon && uPanel) {
+                        uIcon.addEventListener('click', () => {
+                            const shown = uPanel.style.display === 'block';
+                            uPanel.style.display = shown ? 'none' : 'block';
+                        });
+                    }
+
+                    // Unlock audio lần click đầu vào chuông
+                    let audioUnlocked = false;
+                    if (uIcon && uSound) {
+                        uIcon.addEventListener('click', () => {
+                            if (!audioUnlocked) {
+                                uSound.volume = 0.0;
+                                uSound.play().catch(() => { });
+                                setTimeout(() => {
+                                    try { uSound.pause(); uSound.currentTime = 0; } catch { }
+                                    uSound.volume = 1.0;
+                                    audioUnlocked = true;
+                                }, 50);
+                            }
+                        });
+                    }
+
+                    function uUpdateBadge(delta = 1) {
+                        if (!uBadge) return;
+                        let cur = parseInt(uBadge.textContent || "0", 10);
+                        cur = isNaN(cur) ? 0 : cur;
+                        cur += delta;
+                        if (cur <= 0) {
+                            uBadge.style.display = "none";
+                            uBadge.textContent = "0";
+                        } else {
+                            uBadge.style.display = "flex";
+                            uBadge.textContent = cur > 9 ? "9+" : String(cur);
+                        }
+                    }
+
+                    function uPrepend(itemHtml) {
+                        if (!uList) return;
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item';
+                        li.innerHTML = itemHtml;
+                        uList.prepend(li);
+                    }
+
+                    const markBtn = document.getElementById('uMarkAllRead');
+                    if (markBtn && uBadge) {
+                        markBtn.addEventListener('click', () => {
+                            uBadge.style.display = 'none';
+                            uBadge.textContent = '0';
+                        });
+                    }
+
+                    // Socket
+                    const uSocket = io(); // same-origin
+                    uSocket.on('connect', () => {
+                        console.log('[SOCKET] user connected, USER_ID=', USER_ID);
+                        uSocket.emit('join-user-room', USER_ID);
+                    });
+
+                    // Admin xác nhận
+                    uSocket.on('order-confirmed', (data) => {
+                        console.log('[SOCKET] order-confirmed:', data);
+                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                        uUpdateBadge(1);
+                        const url = `/order/${data.orderId}`;
+                        const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
+                        uPrepend(
+                            '<div class="d-flex justify-content-between align-items-start">' +
+                            '<div>' +
+                            '<div class="fw-semibold">' + msg + '</div>' +
+                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                            '</div>' +
+                            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                            '</div>'
+                        );
+                    });
+
+                    uSocket.on('order-canceled', (data) => {
+                        console.log('[SOCKET] order-canceled:', data);
+                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                        uUpdateBadge(1);
+                        const url = `/order/${data.orderId}`;
+                        const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
+                        uPrepend(
+                            '<div class="d-flex justify-content-between align-items-start">' +
+                            '<div>' +
+                            '<div class="fw-semibold">' + msg + '</div>' +
+                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                            '</div>' +
+                            '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
+                            '</div>'
+                        );
+                    });
+
+                    uSocket.on('order-updated', (data) => {
+                        console.log('[SOCKET] order-updated:', data);
+                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                        uUpdateBadge(1);
+                        const url = `/order/${data.orderId}`;
+                        const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
+                        uPrepend(
+                            '<div class="d-flex justify-content-between align-items-start">' +
+                            '<div>' +
+                            '<div class="fw-semibold">' + msg + '</div>' +
+                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                            '</div>' +
+                            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                            '</div>'
+                        );
+                    });
+                    uSocket.on('chat-incoming', (data) => {
+                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                        uUpdateBadge(1);
+                        uPrepend(
+                            '<div class="d-flex justify-content-between align-items-start">' +
+                            '<div>' +
+                            '<div class="fw-semibold">Tin nhắn mới từ hỗ trợ</div>' +
+                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                            '</div>' +
+                            '<a href="javascript:void(0)" onclick="document.getElementById(\'chatOpen\').click()" class="btn btn-sm btn-primary ms-2">Mở</a>' +
+                            '</div>'
+                        );
+                    });
+                })();
+            </script>
+            <script>
+                (() => {
+                    const form = document.getElementById('headerSearchForm');
+                    const input = document.getElementById('headerSearch');
+                    const popup = document.getElementById('searchPopup');
+
+                    let timer = null;
+                    let activeIndex = -1;
+                    let currentItems = []; // giữ dữ liệu gợi ý hiện tại
+
+                    const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, s => ({
+                        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                    }[s]));
+
+                    const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
+
+                    const highlight = (text, q) => {
+                        if (!q) return escapeHtml(text);
+                        const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+                        return escapeHtml(text).replace(re, '<mark>$1</mark>');
+                    };
+
+                    // Chuẩn hoá đường dẫn ảnh từ DB
+                    const toImg = (v) => {
+                        if (!v) return '/images/no-image.png';
+                        if (/^https?:\/\//.test(v)) return v;   // URL tuyệt đối
+                        if (v.startsWith('/')) return v;        // đã có slash
+                        if (v.startsWith('images/')) return '/' + v; // có thư mục sẵn
+                        // còn lại coi như chỉ là filename
+                        return '/images/product/' + encodeURIComponent(v);
+                    };
+
+                    async function fetchSuggest(q) {
+                        const url = '/api/suggest?q=' + encodeURIComponent(q);
+                        const res = await fetch(url, { credentials: 'same-origin' });
+                        if (!res.ok) throw new Error('Network');
+                        return res.json();
+                    }
+
+                    function render(items, q) {
+                        currentItems = items;           // lưu lại để điều hướng bàn phím
+                        activeIndex = -1;
+
+                        if (!items.length) {
+                            popup.innerHTML = `<div class="empty">Không tìm thấy sản phẩm phù hợp.</div>`;
+                            popup.style.display = 'block';
+                            return;
+                        }
+
+                        popup.innerHTML = items.map((x, i) => {
+                            const img = toImg(x.image);
+                            const href = `/product/${encodeURIComponent(String(x.id))}`;
+                            return `
+        <a class="sug-item" data-index="${i}" data-href="${href}" href="${href}">
+          <img src="${img}" alt="">
+          <div class="flex-1">
+            <div class="title">${highlight(x.name, q)}</div>
+            <div class="price">${money(x.price)}</div>
+          </div>
+        </a>
+      `;
+                        }).join('');
+
+                        // Gán hover để set active
+                        popup.querySelectorAll('.sug-item').forEach(el => {
+                            el.addEventListener('mouseenter', () => {
+                                setActive(Number(el.dataset.index));
+                            });
+                        });
+
+                        popup.style.display = 'block';
+                    }
+
+                    function hide() {
+                        popup.style.display = 'none';
+                        activeIndex = -1;
+                        currentItems = [];
+                    }
+
+                    function setActive(index) {
+                        const items = popup.querySelectorAll('.sug-item');
+                        items.forEach(a => a.classList.remove('active'));
+                        if (items[index]) {
+                            items[index].classList.add('active');
+                            activeIndex = index;
+                        } else {
+                            activeIndex = -1;
+                        }
+                    }
+
+                    input.addEventListener('input', () => {
+                        const q = input.value.trim();
+                        clearTimeout(timer);
+                        if (!q) return hide();
+                        timer = setTimeout(async () => {
+                            try {
+                                const items = await fetchSuggest(q);
+                                render(items, q);
+                            } catch {
+                                hide();
+                            }
+                        }, 200);
+                    });
+
+                    input.addEventListener('focus', () => {
+                        if (popup.innerHTML.trim()) popup.style.display = 'block';
+                    });
+
+                    document.addEventListener('click', (e) => {
+                        if (!popup.contains(e.target) && e.target !== input) hide();
+                    });
+
+                    input.addEventListener('keydown', (e) => {
+                        const items = popup.querySelectorAll('.sug-item');
+                        if (!items.length) return;
+
+                        if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            const next = (activeIndex + 1) % items.length;
+                            setActive(next);
+                        } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            const prev = (activeIndex - 1 + items.length) % items.length;
+                            setActive(prev);
+                        } else if (e.key === 'Enter') {
+                            if (activeIndex >= 0 && items[activeIndex]) {
+                                e.preventDefault();
+                                // Điều hướng thẳng tới sản phẩm đang chọn
+                                const href = items[activeIndex].dataset.href;
+                                window.location.href = href;
+                            }
+                            // nếu không có item đang active, để form submit bình thường
+                        } else if (e.key === 'Escape') {
+                            hide();
+                        }
+                    });
+
+                    // Submit form: chuyển đến /products?q=...
+                    form.addEventListener('submit', (e) => {
+                        const q = input.value.trim();
+                        if (!q) { e.preventDefault(); hide(); }
+                    });
+                })();
+
+                /**/
+                (() => {
+                    const form = document.getElementById('headerSearchForm');
+                    const input = document.getElementById('headerSearch');
+                    const btn = form?.querySelector('button[type="submit"]');
+                    if (!form || !input || !btn) return;
+
+                    // Click kính lúp: nếu ô trống => chỉ mở & focus (không submit)
+                    btn.addEventListener('click', (e) => {
+                        if (!input.value.trim()) { e.preventDefault(); form.classList.add('open'); input.focus(); }
+                    });
+
+                    // Rời khỏi input mà không gõ gì => thu gọn lại
+                    input.addEventListener('blur', () => {
+                        if (!input.value.trim()) form.classList.remove('open');
+                    });
+                })();
+            </script>
+            <!-- Navbar End -->
 
     <!-- HEADER END -->
 

@@ -479,3 +479,42 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/*animation*/
+  :root{
+    --reveal-duration: 650ms;
+    --reveal-ease: cubic-bezier(.2,.65,.3,1);
+  }
+
+  /* trạng thái ẩn ban đầu */
+  [data-reveal]{
+    opacity: 0;
+    transform: translate3d(0,24px,0);
+    transition:
+      transform var(--reveal-duration) var(--reveal-ease),
+      opacity   var(--reveal-duration) var(--reveal-ease);
+    will-change: transform, opacity;
+  }
+
+  /* hiện */
+  [data-reveal].is-visible{
+    opacity: 1;
+    transform: none;
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  /* biến thể */
+  [data-reveal="fade-up"]    { transform: translate3d(0,24px,0); }
+  [data-reveal="fade-down"]  { transform: translate3d(0,-24px,0); }
+  [data-reveal="fade-left"]  { transform: translate3d(-24px,0,0); }
+  [data-reveal="fade-right"] { transform: translate3d(24px,0,0); }
+  [data-reveal="zoom-in"]    { transform: scale(.96); }
+
+  /* nếu người dùng chọn giảm chuyển động */
+  @media (prefers-reduced-motion: reduce){
+    [data-reveal]{
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }

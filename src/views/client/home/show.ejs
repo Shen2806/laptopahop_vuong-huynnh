@@ -526,6 +526,54 @@
                             },
                         });
 
+
+                        /*animation*/
+                        // 1) Gán hiệu ứng cho phần tử theo selector (không cần sửa EJS)
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const attachReveal = (selector, effect = 'fade-up', step = 0) => {
+                                const els = document.querySelectorAll(selector);
+                                els.forEach((el, i) => {
+                                    el.setAttribute('data-reveal', effect);
+                                    if (step) el.style.setProperty('--reveal-delay', (i * step) + 'ms');
+                                });
+                            };
+
+                            // Tiêu đề/section
+                            attachReveal('.fire-title-wrapper', 'fade-up', 0);
+                            attachReveal('#tech-news .d-flex', 'fade-up', 0); // header của tin tức
+                            attachReveal('.tab-class h1', 'fade-up', 0);
+
+                            // Cards các khu vực
+                            attachReveal('.promo-card', 'zoom-in', 80);  // sản phẩm khuyến mãi (trong swiper)
+                            attachReveal('.fruite-item', 'fade-up', 60);  // lưới sản phẩm nổi bật
+                            attachReveal('.recent-card', 'fade-up', 60);  // đã xem gần đây
+                            attachReveal('.news-card', 'fade-up', 80);  // bài viết
+
+                            // Nếu file feature có class .featurs-item -> cũng animate luôn
+                            attachReveal('.featurs-item', 'fade-up', 80);
+                        });
+
+                        // 2) Observer: khi vào viewport thì hiện ra & unobserve (chỉ hiện 1 lần)
+                        (function () {
+                            const io = new IntersectionObserver((entries, obs) => {
+                                entries.forEach(ent => {
+                                    if (ent.isIntersecting) {
+                                        ent.target.classList.add('is-visible');
+                                        obs.unobserve(ent.target);
+                                    }
+                                });
+                            }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
+
+                            const hydrate = () => {
+                                document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+                            };
+
+                            if (document.readyState === 'loading') {
+                                document.addEventListener('DOMContentLoaded', hydrate);
+                            } else {
+                                hydrate();
+                            }
+                        })();
                     </script>
 
 
