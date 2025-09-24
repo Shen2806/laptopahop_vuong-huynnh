@@ -42,3 +42,149 @@
             background: transparent;
             margin-bottom: 0;
         }
+
+        /* ================== PRO LOOK (no logic change) ================== */
+:root{
+  --brand:#8BC34A;
+  --brand-700:#57B212;
+  --ink:#0f172a;
+  --muted:#586174;
+  --line:#e6e9ef;
+  --card:#ffffff;
+  --soft:#f7f9fc;
+  --shadow:0 12px 28px rgba(2,6,23,.06);
+  --shadow-lg:0 18px 40px rgba(2,6,23,.08);
+}
+
+/* Breadcrumb tinh gọn */
+.breadcrumb{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:.65rem .9rem;
+  margin-bottom:1.1rem;
+  box-shadow: var(--shadow);
+}
+.breadcrumb .breadcrumb-item a{ color:#0ea5e9; text-decoration:none; }
+.breadcrumb .breadcrumb-item a:hover{ text-decoration:underline; }
+
+/* Title trang */
+h2 .fa-shopping-bag{ color:var(--brand-700)!important; }
+
+/* ============ Card đơn hàng ============ */
+.order-card{
+  border:1px solid #eef2f7;
+  border-radius:16px;
+  background:var(--card);
+  overflow:hidden;
+  box-shadow: var(--shadow);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.order-card:hover{
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(139,195,74,.45);
+}
+.order-card .card-body{ padding:1.15rem 1.25rem 1rem; }
+
+.order-header{
+  display:flex; align-items:center; gap:.55rem;
+  font-weight:800; color:var(--ink);
+  letter-spacing:.2px;
+}
+.order-header::before{
+  content:""; width:8px; height:8px; border-radius:999px;
+  background:var(--brand); display:inline-block;
+}
+
+/* Meta + Tổng tiền */
+.order-card p{ margin-bottom:.3rem; color:var(--muted); }
+.order-card p b{ color:var(--ink); }
+.order-total{ font-weight:900; color:#ef4444; }
+
+/* ============ Badge trạng thái (giữ class BS, làm đẹp thôi) ============ */
+.order-card .badge{
+  border-radius:999px;
+  padding:.42rem .75rem;
+  font-weight:800;
+  letter-spacing:.2px;
+  border:1px solid transparent;
+  box-shadow: 0 1px 0 rgba(0,0,0,.03) inset;
+}
+.order-card .badge.bg-warning{ 
+  background:linear-gradient(180deg,#fef3c7,#fde68a);
+  color:#92400e; border-color:#fcd34d;
+}
+.order-card .badge.bg-info{ 
+  background:linear-gradient(180deg,#e0f2fe,#bae6fd);
+  color:#075985; border-color:#93c5fd;
+}
+.order-card .badge.bg-primary{ 
+  background:linear-gradient(180deg,#e1e9ff,#c7d2fe);
+  color:#1e3a8a; border-color:#a5b4fc;
+}
+.order-card .badge.bg-secondary{ 
+  background:linear-gradient(180deg,#f3f4f6,#e5e7eb);
+  color:#374151; border-color:#d1d5db;
+}
+.order-card .badge.bg-success{ 
+  background:linear-gradient(180deg,#dcfce7,#bbf7d0);
+  color:#166534; border-color:#86efac;
+}
+.order-card .badge.bg-danger{ 
+  background:linear-gradient(180deg,#fee2e2,#fecaca);
+  color:#991b1b; border-color:#fca5a5;
+}
+
+/* ============ Bảng sản phẩm ============ */
+.order-products .table{
+  margin:0;
+  border-color: var(--line);
+}
+.order-products thead th{
+  background:#f9fafb;
+  color:#334155;
+  font-weight:800;
+  border-bottom:1px solid var(--line);
+}
+.order-products tbody tr{
+  transition: background .12s ease;
+  border-top:1px dashed var(--line);
+}
+.order-products tbody tr:first-child{
+  border-top:0;
+}
+.order-products tbody tr:hover{
+  background:#fbfbfc;
+}
+.order-products img{
+  border-radius:12px;
+  box-shadow: 0 3px 10px rgba(15,23,42,.08);
+}
+
+/* Nút quay lại */
+.btn-success.btn-lg{
+  border-radius:999px;
+  padding:.85rem 1.3rem;
+  font-weight:800;
+}
+
+/* ============ Empty state đẹp ============ */
+.alert-info{
+  background: linear-gradient(180deg,#f0f9ff 0%, #ecfeff 100%);
+  border:1px solid #bae6fd;
+  color:#075985;
+  border-radius:16px;
+  box-shadow: var(--shadow);
+}
+
+/* Khoảng cách nhóm orders */
+.row.g-4 > [class*="col-"]{ scroll-margin-top: 90px; }
+
+/* ============ Responsive ============ */
+/* Trên mobile, giữ table-responsive để kéo ngang (tránh biến tấu khó đọc) */
+@media (max-width: 575.98px){
+  .order-card .card-body{ padding:1rem; }
+  .order-products .table{ font-size:.95rem; }
+  .order-products img{ width:54px; height:54px; }
+}

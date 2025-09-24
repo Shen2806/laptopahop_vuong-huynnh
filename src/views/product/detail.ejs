@@ -35,7 +35,13 @@
         integrity="sha512-wJgJNTBBkLit7ymC6vvzM1EcSWeM9mmOu+1USHaRBbHkm6W9EgM0HY27+UtUaprntaYQJF75rc8gjxllKs5OIQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/client/css/product/detail.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
 
+    <!-- Font Awesome 6 (fa-*) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Bootstrap Icons (bi-*) nếu bạn dùng thêm -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
 
 </head>
 
@@ -521,802 +527,825 @@
             </script>
             <!-- Navbar End -->
 
-    <% if (user) { %>
-        <script>
-            window.USER_ID = "<%= String(user.id) %>";
-        </script>
-        <% } %>
+            <% if (user) { %>
+                <script>
+                    window.USER_ID = "<%= String(user.id) %>";
+                </script>
+                <% } %>
 
-            <!-- Socket.IO client -->
-            <script src="/socket.io/socket.io.js"></script>
-            <script>
-                (function () {
-                    if (!window.USER_ID) return; // chưa login thì thôi
+                    <!-- Socket.IO client -->
+                    <script src="/socket.io/socket.io.js"></script>
+                    <script>
+                        (function () {
+                            if (!window.USER_ID) return; // chưa login thì thôi
 
-                    const uBadge = document.getElementById('notificationBadge');
-                    const uIcon = document.getElementById('notificationDropdown');
-                    const uPanel = document.getElementById('uNotificationPanel');
-                    const uList = document.getElementById('uNotificationList');
-                    const uSound = document.getElementById('notificationSound');
-                    const USER_ID = window.USER_ID;
+                            const uBadge = document.getElementById('notificationBadge');
+                            const uIcon = document.getElementById('notificationDropdown');
+                            const uPanel = document.getElementById('uNotificationPanel');
+                            const uList = document.getElementById('uNotificationList');
+                            const uSound = document.getElementById('notificationSound');
+                            const USER_ID = window.USER_ID;
 
-                    // Toggle panel
-                    if (uIcon && uPanel) {
-                        uIcon.addEventListener('click', () => {
-                            const shown = uPanel.style.display === 'block';
-                            uPanel.style.display = shown ? 'none' : 'block';
-                        });
-                    }
-
-                    // Unlock audio lần click đầu vào chuông
-                    let audioUnlocked = false;
-                    if (uIcon && uSound) {
-                        uIcon.addEventListener('click', () => {
-                            if (!audioUnlocked) {
-                                uSound.volume = 0.0;
-                                uSound.play().catch(() => { });
-                                setTimeout(() => {
-                                    try { uSound.pause(); uSound.currentTime = 0; } catch { }
-                                    uSound.volume = 1.0;
-                                    audioUnlocked = true;
-                                }, 50);
+                            // Toggle panel
+                            if (uIcon && uPanel) {
+                                uIcon.addEventListener('click', () => {
+                                    const shown = uPanel.style.display === 'block';
+                                    uPanel.style.display = shown ? 'none' : 'block';
+                                });
                             }
-                        });
-                    }
 
-                    function uUpdateBadge(delta = 1) {
-                        if (!uBadge) return;
-                        let cur = parseInt(uBadge.textContent || "0", 10);
-                        cur = isNaN(cur) ? 0 : cur;
-                        cur += delta;
-                        if (cur <= 0) {
-                            uBadge.style.display = "none";
-                            uBadge.textContent = "0";
-                        } else {
-                            uBadge.style.display = "flex";
-                            uBadge.textContent = cur > 9 ? "9+" : String(cur);
-                        }
-                    }
+                            // Unlock audio lần click đầu vào chuông
+                            let audioUnlocked = false;
+                            if (uIcon && uSound) {
+                                uIcon.addEventListener('click', () => {
+                                    if (!audioUnlocked) {
+                                        uSound.volume = 0.0;
+                                        uSound.play().catch(() => { });
+                                        setTimeout(() => {
+                                            try { uSound.pause(); uSound.currentTime = 0; } catch { }
+                                            uSound.volume = 1.0;
+                                            audioUnlocked = true;
+                                        }, 50);
+                                    }
+                                });
+                            }
 
-                    function uPrepend(itemHtml) {
-                        if (!uList) return;
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item';
-                        li.innerHTML = itemHtml;
-                        uList.prepend(li);
-                    }
+                            function uUpdateBadge(delta = 1) {
+                                if (!uBadge) return;
+                                let cur = parseInt(uBadge.textContent || "0", 10);
+                                cur = isNaN(cur) ? 0 : cur;
+                                cur += delta;
+                                if (cur <= 0) {
+                                    uBadge.style.display = "none";
+                                    uBadge.textContent = "0";
+                                } else {
+                                    uBadge.style.display = "flex";
+                                    uBadge.textContent = cur > 9 ? "9+" : String(cur);
+                                }
+                            }
 
-                    const markBtn = document.getElementById('uMarkAllRead');
-                    if (markBtn && uBadge) {
-                        markBtn.addEventListener('click', () => {
-                            uBadge.style.display = 'none';
-                            uBadge.textContent = '0';
-                        });
-                    }
+                            function uPrepend(itemHtml) {
+                                if (!uList) return;
+                                const li = document.createElement('li');
+                                li.className = 'list-group-item';
+                                li.innerHTML = itemHtml;
+                                uList.prepend(li);
+                            }
 
-                    // Socket
-                    const uSocket = io(); // same-origin
-                    uSocket.on('connect', () => {
-                        console.log('[SOCKET] user connected, USER_ID=', USER_ID);
-                        uSocket.emit('join-user-room', USER_ID);
-                    });
+                            const markBtn = document.getElementById('uMarkAllRead');
+                            if (markBtn && uBadge) {
+                                markBtn.addEventListener('click', () => {
+                                    uBadge.style.display = 'none';
+                                    uBadge.textContent = '0';
+                                });
+                            }
 
-                    // Admin xác nhận
-                    uSocket.on('order-confirmed', (data) => {
-                        console.log('[SOCKET] order-confirmed:', data);
-                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                        uUpdateBadge(1);
-                        const url = `/order/${data.orderId}`;
-                        const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
-                        uPrepend(
-                            '<div class="d-flex justify-content-between align-items-start">' +
-                            '<div>' +
-                            '<div class="fw-semibold">' + msg + '</div>' +
-                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                            '</div>' +
-                            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-                            '</div>'
-                        );
-                    });
+                            // Socket
+                            const uSocket = io(); // same-origin
+                            uSocket.on('connect', () => {
+                                console.log('[SOCKET] user connected, USER_ID=', USER_ID);
+                                uSocket.emit('join-user-room', USER_ID);
+                            });
 
-                    uSocket.on('order-canceled', (data) => {
-                        console.log('[SOCKET] order-canceled:', data);
-                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                        uUpdateBadge(1);
-                        const url = `/order/${data.orderId}`;
-                        const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
-                        uPrepend(
-                            '<div class="d-flex justify-content-between align-items-start">' +
-                            '<div>' +
-                            '<div class="fw-semibold">' + msg + '</div>' +
-                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                            '</div>' +
-                            '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
-                            '</div>'
-                        );
-                    });
+                            // Admin xác nhận
+                            uSocket.on('order-confirmed', (data) => {
+                                console.log('[SOCKET] order-confirmed:', data);
+                                try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                                uUpdateBadge(1);
+                                const url = `/order/${data.orderId}`;
+                                const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
+                                uPrepend(
+                                    '<div class="d-flex justify-content-between align-items-start">' +
+                                    '<div>' +
+                                    '<div class="fw-semibold">' + msg + '</div>' +
+                                    '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                                    '</div>' +
+                                    '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                                    '</div>'
+                                );
+                            });
 
-                    uSocket.on('order-updated', (data) => {
-                        console.log('[SOCKET] order-updated:', data);
-                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                        uUpdateBadge(1);
-                        const url = `/order/${data.orderId}`;
-                        const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
-                        uPrepend(
-                            '<div class="d-flex justify-content-between align-items-start">' +
-                            '<div>' +
-                            '<div class="fw-semibold">' + msg + '</div>' +
-                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                            '</div>' +
-                            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-                            '</div>'
-                        );
-                    });
-                })();
-            </script>
-            <!-- Navbar End -->
+                            uSocket.on('order-canceled', (data) => {
+                                console.log('[SOCKET] order-canceled:', data);
+                                try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                                uUpdateBadge(1);
+                                const url = `/order/${data.orderId}`;
+                                const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
+                                uPrepend(
+                                    '<div class="d-flex justify-content-between align-items-start">' +
+                                    '<div>' +
+                                    '<div class="fw-semibold">' + msg + '</div>' +
+                                    '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                                    '</div>' +
+                                    '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
+                                    '</div>'
+                                );
+                            });
+
+                            uSocket.on('order-updated', (data) => {
+                                console.log('[SOCKET] order-updated:', data);
+                                try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                                uUpdateBadge(1);
+                                const url = `/order/${data.orderId}`;
+                                const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
+                                uPrepend(
+                                    '<div class="d-flex justify-content-between align-items-start">' +
+                                    '<div>' +
+                                    '<div class="fw-semibold">' + msg + '</div>' +
+                                    '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                                    '</div>' +
+                                    '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                                    '</div>'
+                                );
+                            });
+                        })();
+                    </script>
+                    <!-- Navbar End -->
 
 
-            <!-- Single Product Start -->
-            <div class="container-fluid p-2" id="product-detail">
-                <div class="container py-2">
-                    <div class="mb-3">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                                <li class="breadcrumb-item active" aria-current="page"><span href="/">Chi tiết sản
-                                        phẩm</span>
-                                </li>
-                            </ol>
-                        </nav>
+                    <!-- Single Product Start -->
+                    <div class="container-fluid p-2" id="product-detail">
+                        <div class="container py-2">
+                            <div class="mb-3">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page"><span href="/">Chi tiết
+                                                sản
+                                                phẩm</span>
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                            <div class="row g-4 mb-5">
+                                <div class="col-lg-12 col-xl-12">
+                                    <div class="row g-4">
+
+                                        <div class="col-lg-5">
+                                            <div class="rounded">
+                                                <a href="#">
+                                                    <img src="/images/product/<%= product.image%>"
+                                                        class="img-fluid rounded" alt="Image">
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-5">
+                                            <!-- Tên sản phẩm -->
+                                            <h3 class="fw-bold mb-2">
+                                                <%= product.name %>
+                                            </h3>
+                                            <p class="text-muted mb-3">
+                                                <%= product.shortDesc %>
+                                            </p>
+
+
+
+                                            <h2 class="text-danger fw-bold">
+                                                <% if (product.discount> 0) { %>
+                                                    <p class="mb-1 text-decoration-line-through text-muted small">
+                                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                            currency: 'VND' }).format(product.price) %>
+                                                    </p>
+                                                    <p class="fw-bold text-danger fs-5 mb-3">
+                                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                            currency: 'VND' }) .format(product.price * (100 -
+                                                            product.discount) / 100) %>
+                                                    </p>
+                                                    <% } else { %>
+                                                        <p class="text-dark fs-5 fw-bold mb-3">
+                                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                                currency: 'VND' }).format(product.price) %>
+                                                        </p>
+                                                        <% } %>
+
+                                            </h2>
+                                            <!-- Rating động ở đầu trang -->
+                                            <span id="productRatingStars"></span>
+                                            <span id="productRatingCount" class="ms-2 small text-muted"></span>
+
+                                            <!-- Số lượng -->
+                                            <div class="d-flex align-items-center mb-4">
+                                                <span class="me-3 fw-bold">Số lượng:</span>
+                                                <div class="input-group quantity" style="width: 120px;">
+                                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                                        <i class="fa fa-minus"></i>
+                                                    </button>
+                                                    <input type="text"
+                                                        class="form-control form-control-sm text-center border-0"
+                                                        value="1">
+                                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Nút thêm giỏ -->
+                                            <form method="post"
+                                                action="/add-to-cart-from-detail-page/<%= product.id %>">
+                                                <input value="1" type="hidden" id="quantityDetail" name="quantity" />
+                                                <div class="cta-stack mt-2">
+                                                    <button type="submit" data-product-id="<%= product.id %>"
+                                                        class="btnAddToCartDetail btn btn-primary rounded-pill w-100 py-2">
+                                                        <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ hàng
+                                                    </button>
+
+                                                    <button id="btnBuyNow" type="button"
+                                                        class="btn btn-outline-success rounded-pill w-100 py-2">
+                                                        <i class="fa fa-bolt me-1"></i> Mua ngay
+                                                    </button>
+                                                </div>
+                                            </form>
+
+
+
+                                        </div>
+
+                                        <div class="col-lg-2">
+                                            <!-- Cột 3: Chính sách & Dịch vụ -->
+                                            <div class="">
+                                                <div class="card shadow-sm border-0 policy-card flex-fill">
+                                                    <div class="card-body">
+                                                        <!-- Thông tin công ty -->
+                                                        <div class="mb-3">
+                                                            <h5 class="fw-bold mb-1">LaptopShop VH</h5>
+                                                            <span class="badge bg-success">Đã xác minh</span>
+                                                        </div>
+
+                                                        <!-- Chính sách bán hàng -->
+                                                        <h6 class="fw-bold mb-2">Chính sách bán hàng</h6>
+                                                        <ul class="list-unstyled small mb-3">
+                                                            <li class="mb-2">
+                                                                <i class="fas fa-shipping-fast text-primary me-2"></i>
+                                                                Miễn phí giao hàng cho đơn hàng từ 5 triệu
+                                                            </li>
+                                                            <li class="mb-2">
+                                                                <i class="fas fa-shield-alt text-primary me-2"></i>
+                                                                Cam kết hàng chính hãng 100%
+                                                            </li>
+                                                            <li class="mb-2">
+                                                                <i class="fas fa-undo text-primary me-2"></i>
+                                                                Đổi trả trong vòng 10 ngày
+                                                            </li>
+                                                        </ul>
+
+                                                        <!-- Dịch vụ khác -->
+                                                        <h6 class="fw-bold mb-2">Dịch vụ khác</h6>
+                                                        <ul class="list-unstyled small">
+                                                            <li class="mb-2">
+                                                                <i class="fas fa-tools text-primary me-2"></i>
+                                                                Gói dịch vụ bảo hành / sửa chữa tận nơi
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- DROP-IN: Warranty & Commitment (keeps your logic intact) -->
+                                        <!-- Place this right under the buy-cta block in your product detail page -->
+                                        <div class="policy-grid my-3">
+                                            <!-- Warranty policy -->
+                                            <div class="policy-tile">
+                                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                                    <h6 class="m-0">Chính sách bảo hành</h6>
+                                                    <span class="warranty-badge"><i
+                                                            class="fa-solid fa-shield-halved"></i> Bảo
+                                                        hành chính
+                                                        hãng</span>
+                                                </div>
+                                                <div class="policy-line">
+                                                    <i class="fa-regular fa-calendar-check"></i>
+                                                    <div>
+                                                        <div>Thời hạn: <strong>12–24 tháng</strong> (tuỳ dòng máy)</div>
+                                                        <div class="policy-sub">Theo quy định nhà sản xuất hoặc gói bảo
+                                                            hành bạn chọn</div>
+                                                    </div>
+                                                </div>
+                                                <div class="policy-line">
+                                                    <i class="fa-solid fa-screwdriver-wrench"></i>
+                                                    <div>
+                                                        <div>Trung tâm tiếp nhận: <strong>TTBH chính hãng &
+                                                                LaptopShop</strong></div>
+                                                        <div class="policy-sub">Hỗ trợ nhận máy và gửi hãng nếu bạn bận
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="policy-line">
+                                                    <i class="fa-solid fa-list-check"></i>
+                                                    <div>
+                                                        <div>Điều kiện: Tem/serial còn nguyên, không cong vênh, vào nước
+                                                        </div>
+                                                        <div class="policy-sub">Xem chi tiết tại trang <a
+                                                                href="/warranty">Bảo
+                                                                hành</a></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Commitment policy -->
+                                            <div class="policy-tile">
+                                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                                    <h6 class="m-0">Cam kết sản phẩm</h6>
+                                                    <span class="commit-badge"><i class="fa-solid fa-badge-check"></i>
+                                                        Cam kết 100%</span>
+                                                </div>
+                                                <div class="policy-line">
+                                                    <i class="fa-solid fa-box"></i>
+                                                    <div>
+                                                        <div>Hàng <strong>mới, chính hãng</strong>, đầy đủ hoá đơn</div>
+                                                        <div class="policy-sub">Nguồn gốc rõ ràng, không hàng trôi nổi
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="policy-line">
+                                                    <i class="fa-solid fa-rotate-left"></i>
+                                                    <div>
+                                                        <div>Đổi mới <strong>10 ngày</strong> nếu lỗi nhà sản xuất</div>
+                                                        <div class="policy-sub">Áp dụng khi còn đầy đủ phụ kiện, hộp
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="policy-line">
+                                                    <i class="fa-solid fa-truck-fast"></i>
+                                                    <div>
+                                                        <div>Giao nhanh nội thành, miễn phí đơn từ <strong>5
+                                                                triệu</strong></div>
+                                                        <div class="policy-sub">Có hỗ trợ lắp đặt/khởi tạo theo yêu cầu
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- END DROP-IN -->
+
+                                        <!-- thông số đánh giá và Q&A  -->
+                                        <div class="col-lg-10">
+                                            <!-- Accordion: xổ dọc, mặc định mở hết -->
+                                            <div class="accordion" id="productAccordion">
+
+                                                <!-- THÔNG SỐ -->
+                                                <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                                    <h2 class="accordion-header">
+                                                        <button class="accordion-button fw-semibold" type="button"
+                                                            data-bs-toggle="collapse" data-bs-target="#accSpecs"
+                                                            aria-expanded="true" aria-controls="accSpecs">
+                                                            Thông số kỹ thuật
+                                                        </button>
+                                                    </h2>
+                                                    <div id="accSpecs" class="accordion-collapse collapse show">
+                                                        <div class="accordion-body">
+                                                            <table class="table table-sm mb-0">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th style="width:180px">Hãng</th>
+                                                                        <td>
+                                                                            <%= product.factory %>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Đối tượng</th>
+                                                                        <td>
+                                                                            <%= product.target %>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>Tồn kho</th>
+                                                                        <td>
+                                                                            <%= product.quantity %>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <!-- bổ sung các hàng thông số khác nếu cần -->
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <!-- MÔ TẢ -->
+                                                <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                                    <h2 class="accordion-header">
+                                                        <button class="accordion-button fw-semibold" type="button"
+                                                            data-bs-toggle="collapse" data-bs-target="#accDesc"
+                                                            aria-expanded="true" aria-controls="accDesc">
+                                                            Mô tả chi tiết
+                                                        </button>
+                                                    </h2>
+                                                    <div id="accDesc" class="accordion-collapse collapse show">
+                                                        <div class="accordion-body">
+                                                            <div id="desc-wrapper" class="desc-collapsed"><%-
+                                                                    product.detailDesc %></div>
+                                                            <div class="text-center mt-2">
+                                                                <button type="button" id="toggle-desc"
+                                                                    class="btn btn-outline-primary btn-sm">
+                                                                    Xem thêm
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- ĐÁNH GIÁ -->
+                                                <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
+                                                    id="reviewsSection">
+                                                    <h2 class="accordion-header">
+                                                        <button class="accordion-button fw-semibold" type="button"
+                                                            data-bs-toggle="collapse" data-bs-target="#accReviews"
+                                                            aria-expanded="true" aria-controls="accReviews">
+                                                            Đánh giá
+                                                        </button>
+                                                    </h2>
+                                                    <div id="accReviews" class="accordion-collapse collapse show">
+                                                        <div class="accordion-body">
+                                                            <!-- Tóm tắt rating -->
+                                                            <div class="d-flex align-items-center mb-2">
+                                                                <div id="avgStars" class="me-2"></div>
+                                                                <small id="ratingCount" class="text-muted"></small>
+                                                            </div>
+
+                                                            <% if (user) { %>
+                                                                <!-- Form đánh giá -->
+                                                                <form id="reviewForm" class="mb-3">
+                                                                    <div class="mb-2">Đánh giá của bạn:</div>
+                                                                    <div id="ratingStars" class="mb-2"></div>
+                                                                    <textarea class="form-control" name="comment"
+                                                                        rows="3"
+                                                                        placeholder="Cảm nhận của bạn..."></textarea>
+                                                                    <button class="btn btn-primary mt-2">Gửi đánh
+                                                                        giá</button>
+                                                                </form>
+                                                                <% } else { %>
+                                                                    <div class="alert alert-warning">
+                                                                        Bạn cần <a href="/login">đăng nhập</a> để đánh
+                                                                        giá.
+                                                                    </div>
+                                                                    <% } %>
+
+                                                                        <!-- Danh sách đánh giá -->
+                                                                        <div id="reviewList" class="small text-muted">
+                                                                            <!-- JS client sẽ render danh sách -->
+                                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Q&A -->
+                                                <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
+                                                    id="qaSection">
+                                                    <h2 class="accordion-header">
+                                                        <button class="accordion-button fw-semibold" type="button"
+                                                            data-bs-toggle="collapse" data-bs-target="#accQA"
+                                                            aria-expanded="true" aria-controls="accQA">
+                                                            Hỏi & Đáp (Q&A)
+                                                        </button>
+                                                    </h2>
+                                                    <div id="accQA" class="accordion-collapse collapse show">
+                                                        <div class="accordion-body">
+                                                            <% if (user) { %>
+                                                                <form id="qaForm" class="mb-3">
+                                                                    <textarea class="form-control" name="content"
+                                                                        rows="2"
+                                                                        placeholder="Đặt câu hỏi về sản phẩm..."></textarea>
+                                                                    <button class="btn btn-success mt-2">Gửi câu
+                                                                        hỏi</button>
+                                                                </form>
+                                                                <% } else { %>
+                                                                    <div class="alert alert-info">Đăng nhập để xem và
+                                                                        đặt câu
+                                                                        hỏi.</div>
+                                                                    <% } %>
+
+                                                                        <div id="qaList">
+                                                                            <!-- JS client sẽ render danh sách Q&A -->
+                                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
-                    <div class="row g-4 mb-5">
-                        <div class="col-lg-12 col-xl-12">
-                            <div class="row g-4">
+                    <!-- Single Product End -->
+                    <!-- Boot data -->
+                    <div id="boot" data-product-id="<%= product.id %>" data-is-auth="<%= user ? 1 : 0 %>"
+                        data-user-id="<%= user ? user.id : '' %>"></div>
 
-                                <div class="col-lg-5">
-                                    <div class="rounded">
-                                        <a href="#">
-                                            <img src="/images/product/<%= product.image%>" class="img-fluid rounded"
-                                                alt="Image">
-                                        </a>
+                    <!-- Chat widget (drop-in) -->
+                    <div id="chatWidget" class="chat-fab">
+                        <!-- Minimized button -->
+                        <button id="chatOpen" class="chat-fab__btn" aria-label="Mở chat">
+                            <i class="fas fa-comments"></i>
+                            <span id="chatMiniBadge" class="chat-fab__badge d-none">1</span>
+                        </button>
+
+                        <!-- Card -->
+                        <div id="chatCard" class="chat-card d-none" aria-live="polite">
+                            <div class="chat-card__header">
+                                <div class="chat-card__agent">
+                                    <span class="chat-card__avatar">
+                                        <i class="fas fa-headset"></i>
+                                        <span class="chat-card__dot"></span>
+                                    </span>
+                                    <div>
+                                        <div class="chat-card__title">Hỗ trợ tư vấn</div>
+                                        <div class="chat-card__sub">LaptopShop trực tuyến</div>
+                                    </div>
+                                </div>
+                                <button class="chat-card__close" id="chatClose" aria-label="Đóng chat">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            <!-- Pre-chat -->
+                            <div id="preChat" class="chat-card__body">
+                                <div class="mb-2 fw-semibold">Trước khi bắt đầu, vui lòng nhập:</div>
+                                <div class="mb-2">
+                                    <label class="form-label small">Tên của bạn</label>
+                                    <input id="preName" class="form-control form-control-sm"
+                                        placeholder="Ví dụ: An Nguyen">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small me-2">Giới tính</label>
+                                    <div class="d-flex gap-3 small">
+                                        <label class="mb-0"><input type="radio" name="preGender" value="MALE">
+                                            Nam</label>
+                                        <label class="mb-0"><input type="radio" name="preGender" value="FEMALE">
+                                            Nữ</label>
+                                        <label class="mb-0"><input type="radio" name="preGender" value="OTHER" checked>
+                                            Khác</label>
+                                    </div>
+                                </div>
+                                <button id="btnStartChat" class="btn btn-primary w-100">
+                                    <i class="fa-regular fa-paper-plane me-1"></i> Bắt đầu
+                                </button>
+                            </div>
+
+                            <!-- Main chat -->
+                            <div id="chatMain" class="chat-card__body d-none">
+                                <div id="chatBody" class="chat-card__scroll"></div>
+
+                                <div id="typingHint" class="chat-card__typing d-none">
+                                    Đang nhập
+                                    <span class="typing-dots"><span></span><span></span><span></span></span>
+                                </div>
+
+                                <div class="chat-card__footer">
+                                    <form id="chatForm" class="chat-input">
+                                        <input id="chatInput" class="form-control" placeholder="Nhập tin nhắn...">
+                                        <button class="btn btn-primary chat-input__send" aria-label="Gửi">
+                                            <i class="fa-regular fa-paper-plane"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Âm thanh -->
+                        <audio id="chatSound" src="/ring.wav" preload="auto"></audio>
+                    </div>
+
+
+                    <!-- Footer Start -->
+                    <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+                        <div class="container py-5">
+                            <div class="row g-5">
+                                <!-- Logo & Giới thiệu -->
+                                <div class="col-lg-3 col-md-6">
+                                    <a href="/" class="d-inline-block mb-3">
+                                        <h2 class="text-primary fw-bold">LaptopShop</h2>
+                                    </a>
+                                    <p class="small">
+                                        Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
+                                        dịch vụ tận tâm và giá cả cạnh tranh nhất.
+                                    </p>
+                                    <!-- Icon mạng xã hội -->
+                                    <div class="d-flex pt-2">
+                                        <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                                class="fab fa-facebook-f"></i></a>
+                                        <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                                class="fab fa-instagram"></i></a>
+                                        <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                                class="fab fa-youtube"></i></a>
+                                        <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
+                                                class="fab fa-tiktok"></i></a>
                                     </div>
                                 </div>
 
-                                <div class="col-lg-5">
-                                    <!-- Tên sản phẩm -->
-                                    <h3 class="fw-bold mb-2">
-                                        <%= product.name %>
-                                    </h3>
-                                    <p class="text-muted mb-3">
-                                        <%= product.shortDesc %>
+                                <!-- Thông tin cửa hàng -->
+                                <div class="col-lg-3 col-md-6">
+                                    <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
+                                    <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
+                                    <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
+                                    <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
+                                    <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
+                                </div>
+
+                                <!-- Tài khoản -->
+                                <div class="col-lg-3 col-md-6">
+                                    <h4 class="text-light mb-3">Tài khoản</h4>
+                                    <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
+                                    <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
+                                    <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
+                                    <a class="btn-link d-block" href="/blogs">Blogs</a>
+                                </div>
+
+                                <!-- Liên hệ -->
+                                <div class="col-lg-3 col-md-6">
+                                    <h4 class="text-light mb-3">Liên hệ</h4>
+                                    <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp
                                     </p>
-
-
-
-                                    <h2 class="text-danger fw-bold">
-                                        <% if (product.discount> 0) { %>
-                                            <p class="mb-1 text-decoration-line-through text-muted small">
-                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                                    }).format(product.price) %>
-                                            </p>
-                                            <p class="fw-bold text-danger fs-5 mb-3">
-                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
-                                                    }) .format(product.price * (100 - product.discount) / 100) %>
-                                            </p>
-                                            <% } else { %>
-                                                <p class="text-dark fs-5 fw-bold mb-3">
-                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                        currency: 'VND' }).format(product.price) %>
-                                                </p>
-                                                <% } %>
-
-                                    </h2>
-                                    <!-- Rating động ở đầu trang -->
-                                    <span id="productRatingStars"></span>
-                                    <span id="productRatingCount" class="ms-2 small text-muted"></span>
-
-                                    <!-- Số lượng -->
-                                    <div class="d-flex align-items-center mb-4">
-                                        <span class="me-3 fw-bold">Số lượng:</span>
-                                        <div class="input-group quantity" style="width: 120px;">
-                                            <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                                <i class="fa fa-minus"></i>
-                                            </button>
-                                            <input type="text" class="form-control form-control-sm text-center border-0"
-                                                value="1">
-                                            <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                                <i class="fa fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Nút thêm giỏ -->
-                                    <form method="post" action="/add-to-cart-from-detail-page/<%= product.id %>">
-                                        <input value="1" type="hidden" id="quantityDetail" name="quantity" />
-                                        <div class="cta-stack mt-2">
-                                            <button type="submit" data-product-id="<%= product.id %>"
-                                                class="btnAddToCartDetail btn btn-primary rounded-pill w-100 py-2">
-                                                <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ hàng
-                                            </button>
-
-                                            <button id="btnBuyNow" type="button"
-                                                class="btn btn-outline-success rounded-pill w-100 py-2">
-                                                <i class="fa fa-bolt me-1"></i> Mua ngay
-                                            </button>
+                                    <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
+                                    <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
+                                    <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
+                                    <!-- Form đăng ký nhận tin -->
+                                    <form class="mt-3">
+                                        <div class="input-group">
+                                            <input type="email" class="form-control border-0"
+                                                placeholder="Nhập email của bạn">
+                                            <button class="btn btn-primary">Đăng ký</button>
                                         </div>
                                     </form>
-
-
-
                                 </div>
-
-                                <div class="col-lg-2">
-                                    <!-- Cột 3: Chính sách & Dịch vụ -->
-                                    <div class="">
-                                        <div class="card shadow-sm border-0 policy-card flex-fill">
-                                            <div class="card-body">
-                                                <!-- Thông tin công ty -->
-                                                <div class="mb-3">
-                                                    <h5 class="fw-bold mb-1">LaptopShop VH</h5>
-                                                    <span class="badge bg-success">Đã xác minh</span>
-                                                </div>
-
-                                                <!-- Chính sách bán hàng -->
-                                                <h6 class="fw-bold mb-2">Chính sách bán hàng</h6>
-                                                <ul class="list-unstyled small mb-3">
-                                                    <li class="mb-2">
-                                                        <i class="fas fa-shipping-fast text-primary me-2"></i>
-                                                        Miễn phí giao hàng cho đơn hàng từ 5 triệu
-                                                    </li>
-                                                    <li class="mb-2">
-                                                        <i class="fas fa-shield-alt text-primary me-2"></i>
-                                                        Cam kết hàng chính hãng 100%
-                                                    </li>
-                                                    <li class="mb-2">
-                                                        <i class="fas fa-undo text-primary me-2"></i>
-                                                        Đổi trả trong vòng 10 ngày
-                                                    </li>
-                                                </ul>
-
-                                                <!-- Dịch vụ khác -->
-                                                <h6 class="fw-bold mb-2">Dịch vụ khác</h6>
-                                                <ul class="list-unstyled small">
-                                                    <li class="mb-2">
-                                                        <i class="fas fa-tools text-primary me-2"></i>
-                                                        Gói dịch vụ bảo hành / sửa chữa tận nơi
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- DROP-IN: Warranty & Commitment (keeps your logic intact) -->
-                                <!-- Place this right under the buy-cta block in your product detail page -->
-                                <div class="policy-grid my-3">
-                                    <!-- Warranty policy -->
-                                    <div class="policy-tile">
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <h6 class="m-0">Chính sách bảo hành</h6>
-                                            <span class="warranty-badge"><i class="fa-solid fa-shield-halved"></i> Bảo
-                                                hành chính
-                                                hãng</span>
-                                        </div>
-                                        <div class="policy-line">
-                                            <i class="fa-regular fa-calendar-check"></i>
-                                            <div>
-                                                <div>Thời hạn: <strong>12–24 tháng</strong> (tuỳ dòng máy)</div>
-                                                <div class="policy-sub">Theo quy định nhà sản xuất hoặc gói bảo
-                                                    hành bạn chọn</div>
-                                            </div>
-                                        </div>
-                                        <div class="policy-line">
-                                            <i class="fa-solid fa-screwdriver-wrench"></i>
-                                            <div>
-                                                <div>Trung tâm tiếp nhận: <strong>TTBH chính hãng &
-                                                        LaptopShop</strong></div>
-                                                <div class="policy-sub">Hỗ trợ nhận máy và gửi hãng nếu bạn bận
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="policy-line">
-                                            <i class="fa-solid fa-list-check"></i>
-                                            <div>
-                                                <div>Điều kiện: Tem/serial còn nguyên, không cong vênh, vào nước
-                                                </div>
-                                                <div class="policy-sub">Xem chi tiết tại trang <a href="/warranty">Bảo
-                                                        hành</a></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Commitment policy -->
-                                    <div class="policy-tile">
-                                        <div class="d-flex align-items-center justify-content-between mb-2">
-                                            <h6 class="m-0">Cam kết sản phẩm</h6>
-                                            <span class="commit-badge"><i class="fa-solid fa-badge-check"></i>
-                                                Cam kết 100%</span>
-                                        </div>
-                                        <div class="policy-line">
-                                            <i class="fa-solid fa-box"></i>
-                                            <div>
-                                                <div>Hàng <strong>mới, chính hãng</strong>, đầy đủ hoá đơn</div>
-                                                <div class="policy-sub">Nguồn gốc rõ ràng, không hàng trôi nổi
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="policy-line">
-                                            <i class="fa-solid fa-rotate-left"></i>
-                                            <div>
-                                                <div>Đổi mới <strong>10 ngày</strong> nếu lỗi nhà sản xuất</div>
-                                                <div class="policy-sub">Áp dụng khi còn đầy đủ phụ kiện, hộp
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="policy-line">
-                                            <i class="fa-solid fa-truck-fast"></i>
-                                            <div>
-                                                <div>Giao nhanh nội thành, miễn phí đơn từ <strong>5
-                                                        triệu</strong></div>
-                                                <div class="policy-sub">Có hỗ trợ lắp đặt/khởi tạo theo yêu cầu
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- END DROP-IN -->
-
-                                <!-- thông số đánh giá và Q&A  -->
-                                <div class="col-lg-10">
-                                    <!-- Accordion: xổ dọc, mặc định mở hết -->
-                                    <div class="accordion" id="productAccordion">
-
-                                        <!-- THÔNG SỐ -->
-                                        <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
-                                            <h2 class="accordion-header">
-                                                <button class="accordion-button fw-semibold" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#accSpecs"
-                                                    aria-expanded="true" aria-controls="accSpecs">
-                                                    Thông số kỹ thuật
-                                                </button>
-                                            </h2>
-                                            <div id="accSpecs" class="accordion-collapse collapse show">
-                                                <div class="accordion-body">
-                                                    <table class="table table-sm mb-0">
-                                                        <tbody>
-                                                            <tr>
-                                                                <th style="width:180px">Hãng</th>
-                                                                <td>
-                                                                    <%= product.factory %>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Đối tượng</th>
-                                                                <td>
-                                                                    <%= product.target %>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <th>Tồn kho</th>
-                                                                <td>
-                                                                    <%= product.quantity %>
-                                                                </td>
-                                                            </tr>
-                                                            <!-- bổ sung các hàng thông số khác nếu cần -->
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                        <!-- MÔ TẢ -->
-                                        <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
-                                            <h2 class="accordion-header">
-                                                <button class="accordion-button fw-semibold" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#accDesc"
-                                                    aria-expanded="true" aria-controls="accDesc">
-                                                    Mô tả chi tiết
-                                                </button>
-                                            </h2>
-                                            <div id="accDesc" class="accordion-collapse collapse show">
-                                                <div class="accordion-body">
-                                                    <div id="desc-wrapper" class="desc-collapsed"><%- product.detailDesc
-                                                            %></div>
-                                                    <div class="text-center mt-2">
-                                                        <button type="button" id="toggle-desc"
-                                                            class="btn btn-outline-primary btn-sm">
-                                                            Xem thêm
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- ĐÁNH GIÁ -->
-                                        <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
-                                            id="reviewsSection">
-                                            <h2 class="accordion-header">
-                                                <button class="accordion-button fw-semibold" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#accReviews"
-                                                    aria-expanded="true" aria-controls="accReviews">
-                                                    Đánh giá
-                                                </button>
-                                            </h2>
-                                            <div id="accReviews" class="accordion-collapse collapse show">
-                                                <div class="accordion-body">
-                                                    <!-- Tóm tắt rating -->
-                                                    <div class="d-flex align-items-center mb-2">
-                                                        <div id="avgStars" class="me-2"></div>
-                                                        <small id="ratingCount" class="text-muted"></small>
-                                                    </div>
-
-                                                    <% if (user) { %>
-                                                        <!-- Form đánh giá -->
-                                                        <form id="reviewForm" class="mb-3">
-                                                            <div class="mb-2">Đánh giá của bạn:</div>
-                                                            <div id="ratingStars" class="mb-2"></div>
-                                                            <textarea class="form-control" name="comment" rows="3"
-                                                                placeholder="Cảm nhận của bạn..."></textarea>
-                                                            <button class="btn btn-primary mt-2">Gửi đánh giá</button>
-                                                        </form>
-                                                        <% } else { %>
-                                                            <div class="alert alert-warning">
-                                                                Bạn cần <a href="/login">đăng nhập</a> để đánh giá.
-                                                            </div>
-                                                            <% } %>
-
-                                                                <!-- Danh sách đánh giá -->
-                                                                <div id="reviewList" class="small text-muted">
-                                                                    <!-- JS client sẽ render danh sách -->
-                                                                </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Q&A -->
-                                        <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
-                                            id="qaSection">
-                                            <h2 class="accordion-header">
-                                                <button class="accordion-button fw-semibold" type="button"
-                                                    data-bs-toggle="collapse" data-bs-target="#accQA"
-                                                    aria-expanded="true" aria-controls="accQA">
-                                                    Hỏi & Đáp (Q&A)
-                                                </button>
-                                            </h2>
-                                            <div id="accQA" class="accordion-collapse collapse show">
-                                                <div class="accordion-body">
-                                                    <% if (user) { %>
-                                                        <form id="qaForm" class="mb-3">
-                                                            <textarea class="form-control" name="content" rows="2"
-                                                                placeholder="Đặt câu hỏi về sản phẩm..."></textarea>
-                                                            <button class="btn btn-success mt-2">Gửi câu hỏi</button>
-                                                        </form>
-                                                        <% } else { %>
-                                                            <div class="alert alert-info">Đăng nhập để xem và đặt câu
-                                                                hỏi.</div>
-                                                            <% } %>
-
-                                                                <div id="qaList">
-                                                                    <!-- JS client sẽ render danh sách Q&A -->
-                                                                </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-
                             </div>
                         </div>
                     </div>
 
-                </div>
-            </div>
-            <!-- Single Product End -->
-            <!-- Boot data -->
-            <div id="boot" data-product-id="<%= product.id %>" data-is-auth="<%= user ? 1 : 0 %>"
-                data-user-id="<%= user ? user.id : '' %>"></div>
-
-            <!-- Chat widget (drop-in) -->
-            <div id="chatWidget" class="chat-fab">
-                <!-- Minimized button -->
-                <button id="chatOpen" class="chat-fab__btn" aria-label="Mở chat">
-                    <i class="fas fa-comments"></i>
-                    <span id="chatMiniBadge" class="chat-fab__badge d-none">1</span>
-                </button>
-
-                <!-- Card -->
-                <div id="chatCard" class="chat-card d-none" aria-live="polite">
-                    <div class="chat-card__header">
-                        <div class="chat-card__agent">
-                            <span class="chat-card__avatar">
-                                <i class="fas fa-headset"></i>
-                                <span class="chat-card__dot"></span>
+                    <!-- Copyright -->
+                    <div class="container-fluid bg-dark copyright bg-black py-3">
+                        <div
+                            class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
+                            <span class="text-light mb-2 mb-md-0">
+                                <i class="fas fa-copyright me-2"></i>2025
+                                <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
                             </span>
-                            <div>
-                                <div class="chat-card__title">Hỗ trợ tư vấn</div>
-                                <div class="chat-card__sub">LaptopShop trực tuyến</div>
-                            </div>
-                        </div>
-                        <button class="chat-card__close" id="chatClose" aria-label="Đóng chat">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-
-                    <!-- Pre-chat -->
-                    <div id="preChat" class="chat-card__body">
-                        <div class="mb-2 fw-semibold">Trước khi bắt đầu, vui lòng nhập:</div>
-                        <div class="mb-2">
-                            <label class="form-label small">Tên của bạn</label>
-                            <input id="preName" class="form-control form-control-sm" placeholder="Ví dụ: An Nguyen">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small me-2">Giới tính</label>
-                            <div class="d-flex gap-3 small">
-                                <label class="mb-0"><input type="radio" name="preGender" value="MALE"> Nam</label>
-                                <label class="mb-0"><input type="radio" name="preGender" value="FEMALE"> Nữ</label>
-                                <label class="mb-0"><input type="radio" name="preGender" value="OTHER" checked>
-                                    Khác</label>
-                            </div>
-                        </div>
-                        <button id="btnStartChat" class="btn btn-primary w-100">
-                            <i class="fa-regular fa-paper-plane me-1"></i> Bắt đầu
-                        </button>
-                    </div>
-
-                    <!-- Main chat -->
-                    <div id="chatMain" class="chat-card__body d-none">
-                        <div id="chatBody" class="chat-card__scroll"></div>
-
-                        <div id="typingHint" class="chat-card__typing d-none">
-                            Đang nhập
-                            <span class="typing-dots"><span></span><span></span><span></span></span>
-                        </div>
-
-                        <div class="chat-card__footer">
-                            <form id="chatForm" class="chat-input">
-                                <input id="chatInput" class="form-control" placeholder="Nhập tin nhắn...">
-                                <button class="btn btn-primary chat-input__send" aria-label="Gửi">
-                                    <i class="fa-regular fa-paper-plane"></i>
-                                </button>
-                            </form>
+                            <span class="text-white">
+                                Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML
+                                    Codex</a> |
+                                Distributed by <a class="text-primary border-bottom"
+                                    href="https://themewagon.com">ThemeWagon</a>
+                            </span>
                         </div>
                     </div>
-                </div>
+                    <!-- Footer End -->
 
-                <!-- Âm thanh -->
-                <audio id="chatSound" src="/ring.wav" preload="auto"></audio>
-            </div>
-
-
-            <!-- Footer Start -->
-            <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-                <div class="container py-5">
-                    <div class="row g-5">
-                        <!-- Logo & Giới thiệu -->
-                        <div class="col-lg-3 col-md-6">
-                            <a href="/" class="d-inline-block mb-3">
-                                <h2 class="text-primary fw-bold">LaptopShop</h2>
-                            </a>
-                            <p class="small">
-                                Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
-                                dịch vụ tận tâm và giá cả cạnh tranh nhất.
-                            </p>
-                            <!-- Icon mạng xã hội -->
-                            <div class="d-flex pt-2">
-                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                        class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                        class="fab fa-instagram"></i></a>
-                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                        class="fab fa-youtube"></i></a>
-                                <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
-                                        class="fab fa-tiktok"></i></a>
-                            </div>
-                        </div>
-
-                        <!-- Thông tin cửa hàng -->
-                        <div class="col-lg-3 col-md-6">
-                            <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
-                            <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
-                            <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
-                            <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
-                            <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
-                        </div>
-
-                        <!-- Tài khoản -->
-                        <div class="col-lg-3 col-md-6">
-                            <h4 class="text-light mb-3">Tài khoản</h4>
-                            <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
-                            <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
-                            <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
-                            <a class="btn-link d-block" href="/blogs">Blogs</a>
-                        </div>
-
-                        <!-- Liên hệ -->
-                        <div class="col-lg-3 col-md-6">
-                            <h4 class="text-light mb-3">Liên hệ</h4>
-                            <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
-                            <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
-                            <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
-                            <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
-                            <!-- Form đăng ký nhận tin -->
-                            <form class="mt-3">
-                                <div class="input-group">
-                                    <input type="email" class="form-control border-0" placeholder="Nhập email của bạn">
-                                    <button class="btn btn-primary">Đăng ký</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Copyright -->
-            <div class="container-fluid bg-dark copyright bg-black py-3">
-                <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
-                    <span class="text-light mb-2 mb-md-0">
-                        <i class="fas fa-copyright me-2"></i>2025
-                        <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
-                    </span>
-                    <span class="text-white">
-                        Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML Codex</a> |
-                        Distributed by <a class="text-primary border-bottom"
-                            href="https://themewagon.com">ThemeWagon</a>
-                    </span>
-                </div>
-            </div>
-            <!-- Footer End -->
-
-            <!-- Back to Top -->
-            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-                    class="fa fa-arrow-up"></i></a>
+                    <!-- Back to Top -->
+                    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                            class="fa fa-arrow-up"></i></a>
 
 
-            <!-- JavaScript Libraries -->
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="/client/lib/easing/easing.min.js"></script>
-            <script src="/client/lib/waypoints/waypoints.min.js"></script>
-            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+                    <!-- JavaScript Libraries -->
+                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+                    <script src="/client/lib/easing/easing.min.js"></script>
+                    <script src="/client/lib/waypoints/waypoints.min.js"></script>
+                    <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+                    <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
-            <!-- Template Javascript -->
-            <script src="/client/js/main.js"></script>
-            <!-- Font Awesome (icon sao) -->
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
-                integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
-                crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-            <!-- nút xem thêm -->
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    const desc = document.getElementById("desc-wrapper");
-                    const btn = document.getElementById("toggle-desc");
+                    <!-- Template Javascript -->
+                    <script src="/client/js/main.js"></script>
+                    <!-- Font Awesome (icon sao) -->
+                    <link rel="stylesheet"
+                        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
+                        integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
+                        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <!-- nút xem thêm -->
+                    <script>
 
-                    btn.addEventListener("click", function () {
-                        desc.classList.toggle("desc-collapsed");
 
-                        if (desc.classList.contains("desc-collapsed")) {
-                            btn.innerText = "Xem thêm";
-                        } else {
-                            btn.innerText = "Thu gọn";
-                        }
-                    });
-                });
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const desc = document.getElementById("desc-wrapper");
+                            const btn = document.getElementById("toggle-desc");
+
+                            btn.addEventListener("click", function () {
+                                desc.classList.toggle("desc-collapsed");
+
+                                if (desc.classList.contains("desc-collapsed")) {
+                                    btn.innerText = "Xem thêm";
+                                } else {
+                                    btn.innerText = "Thu gọn";
+                                }
+                            });
+                        });
 
 
 
-            </script>
+                    </script>
 
-            <script id="boot-json" type="application/json">
+                    <script id="boot-json" type="application/json">
   <%- JSON.stringify({ productId: product.id, isAuth: !!user }) %>
             </script>
-            <script>
-                const boot = JSON.parse(document.getElementById('boot-json').textContent);
-                window.__PRODUCT_ID__ = boot.productId;
-                window.__IS_AUTH__ = boot.isAuth;
-            </script>
-            <!-- chat widget -->
-            <script>
-                (function () {
-                    const $root = document.getElementById('chatWidget');
-                    const $card = document.getElementById('chatCard');
-                    const $open = document.getElementById('chatOpen');
-                    const $close = document.getElementById('chatClose');
+                    <script>
+                        const boot = JSON.parse(document.getElementById('boot-json').textContent);
+                        window.__PRODUCT_ID__ = boot.productId;
+                        window.__IS_AUTH__ = boot.isAuth;
+                    </script>
+                    <!-- chat widget -->
+                    <script>
+                        (function () {
+                            const $root = document.getElementById('chatWidget');
+                            const $card = document.getElementById('chatCard');
+                            const $open = document.getElementById('chatOpen');
+                            const $close = document.getElementById('chatClose');
 
-                    if (!$root || !$card || !$open || !$close) return;
+                            if (!$root || !$card || !$open || !$close) return;
 
-                    function openCard() {
-                        // nếu bạn có logic cũ: vẫn giữ, chỉ thêm lớp để animate
-                        $card.classList.remove('d-none');
-                        requestAnimationFrame(() => $card.classList.add('enter'));
-                        // ẩn badge nhỏ khi mở
-                        const b = document.getElementById('chatMiniBadge');
-                        if (b) b.classList.add('d-none');
-                    }
-                    function closeCard() {
-                        $card.classList.add('leaving');
-                        $card.addEventListener('transitionend', () => {
-                            $card.classList.remove('leaving', 'enter');
-                            $card.classList.add('d-none');
-                        }, { once: true });
-                    }
+                            function openCard() {
+                                // nếu bạn có logic cũ: vẫn giữ, chỉ thêm lớp để animate
+                                $card.classList.remove('d-none');
+                                requestAnimationFrame(() => $card.classList.add('enter'));
+                                // ẩn badge nhỏ khi mở
+                                const b = document.getElementById('chatMiniBadge');
+                                if (b) b.classList.add('d-none');
+                            }
+                            function closeCard() {
+                                $card.classList.add('leaving');
+                                $card.addEventListener('transitionend', () => {
+                                    $card.classList.remove('leaving', 'enter');
+                                    $card.classList.add('d-none');
+                                }, { once: true });
+                            }
 
-                    // Nếu bạn đã gán click open/close ở file JS cũ, có thể bỏ addEventListener dưới.
-                    // Hoặc giữ cũng được (không hại), vì chỉ chèn thêm hiệu ứng.
-                    $open.addEventListener('click', openCard);
-                    $close.addEventListener('click', closeCard);
+                            // Nếu bạn đã gán click open/close ở file JS cũ, có thể bỏ addEventListener dưới.
+                            // Hoặc giữ cũng được (không hại), vì chỉ chèn thêm hiệu ứng.
+                            $open.addEventListener('click', openCard);
+                            $close.addEventListener('click', closeCard);
 
-                    // Khi nhận sự kiện "chat:closed" từ server, khóa input (nếu bạn đã làm, bỏ qua)
-                    const input = document.getElementById('chatInput');
-                    const formBtn = document.querySelector('#chatForm button');
-                    window.setClosedUI = function () {
-                        if (input) input.disabled = true;
-                        if (formBtn) formBtn.disabled = true;
-                    };
-                })();
-            </script>
+                            // Khi nhận sự kiện "chat:closed" từ server, khóa input (nếu bạn đã làm, bỏ qua)
+                            const input = document.getElementById('chatInput');
+                            const formBtn = document.querySelector('#chatForm button');
+                            window.setClosedUI = function () {
+                                if (input) input.disabled = true;
+                                if (formBtn) formBtn.disabled = true;
+                            };
+                        })();
+                    </script>
 
-            <!-- render sao  -->
-            <script>
-                (() => {
-                    // ---- Boot ----
-                    const boot = document.getElementById('boot');
-                    const PRODUCT_ID = Number(boot?.dataset?.productId || 0);
-                    const CURRENT_USER_ID = boot?.dataset?.userId ? Number(boot.dataset.userId) : null;
+                    <!-- render sao  -->
+                    <script>
+                        (() => {
+                            // ---- Boot ----
+                            const boot = document.getElementById('boot');
+                            const PRODUCT_ID = Number(boot?.dataset?.productId || 0);
+                            const CURRENT_USER_ID = boot?.dataset?.userId ? Number(boot.dataset.userId) : null;
 
-                    // ---- DOM ----
-                    const $topStars = document.getElementById('productRatingStars');
-                    const $topCount = document.getElementById('productRatingCount');
-                    const $avgStars = document.getElementById('avgStars');
-                    const $ratingCount = document.getElementById('ratingCount');
-                    const $reviewList = document.getElementById('reviewList');
-                    const $reviewForm = document.getElementById('reviewForm');
-                    const $ratingStars = document.getElementById('ratingStars');
+                            // ---- DOM ----
+                            const $topStars = document.getElementById('productRatingStars');
+                            const $topCount = document.getElementById('productRatingCount');
+                            const $avgStars = document.getElementById('avgStars');
+                            const $ratingCount = document.getElementById('ratingCount');
+                            const $reviewList = document.getElementById('reviewList');
+                            const $reviewForm = document.getElementById('reviewForm');
+                            const $ratingStars = document.getElementById('ratingStars');
 
-                    // ---- helpers ----
-                    const escapeHtml = (s = '') =>
-                        s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-                    function starsHtml(val) {
-                        const v = Number(val || 0);
-                        let out = '';
-                        for (let i = 1; i <= 5; i++) {
-                            if (v >= i) out += '<i class="fas fa-star text-warning"></i>';
-                            else if (v >= i - 0.5) out += '<i class="fas fa-star-half-alt text-warning"></i>';
-                            else out += '<i class="far fa-star text-secondary"></i>';
-                        }
-                        return out;
-                    }
-                    function renderSummary(sum = { avg: 0, count: 0 }) {
-                        const avg = Number(sum.avg || 0), count = Number(sum.count || 0);
-                        if ($topStars) $topStars.innerHTML = starsHtml(avg);
-                        if ($topCount) $topCount.textContent = `(${count} đánh giá)`;
-                        if ($avgStars) $avgStars.innerHTML = `${starsHtml(avg)} <span class="ms-2">${avg.toFixed(1)}/5</span>`;
-                        if ($ratingCount) $ratingCount.textContent = `${count} lượt đánh giá`;
-                    }
-                    async function loadSummary() {
-                        let sum = null;
-                        try {
-                            const r = await fetch(`/api/products/${PRODUCT_ID}/reviews/summary`);
-                            if (r.ok) sum = await r.json();
-                        } catch { }
-                        if (!sum) {
-                            try {
-                                const r2 = await fetch(`/api/products/${PRODUCT_ID}/meta`);
-                                if (r2.ok) {
-                                    const d = await r2.json();
-                                    sum = { avg: d.ratingAvg || 0, count: d.ratingCount || 0 };
+                            // ---- helpers ----
+                            const escapeHtml = (s = '') =>
+                                s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+                            function starsHtml(val) {
+                                const v = Number(val || 0);
+                                let out = '';
+                                for (let i = 1; i <= 5; i++) {
+                                    if (v >= i) out += '<i class="fas fa-star text-warning"></i>';
+                                    else if (v >= i - 0.5) out += '<i class="fas fa-star-half-alt text-warning"></i>';
+                                    else out += '<i class="far fa-star text-secondary"></i>';
                                 }
-                            } catch { }
-                        }
-                        renderSummary(sum || { avg: 0, count: 0 });
-                    }
-                    function renderReviewList(list = []) {
-                        if (!$reviewList) return;
-                        $reviewList.innerHTML = list.map(r => `
+                                return out;
+                            }
+                            function renderSummary(sum = { avg: 0, count: 0 }) {
+                                const avg = Number(sum.avg || 0), count = Number(sum.count || 0);
+                                if ($topStars) $topStars.innerHTML = starsHtml(avg);
+                                if ($topCount) $topCount.textContent = `(${count} đánh giá)`;
+                                if ($avgStars) $avgStars.innerHTML = `${starsHtml(avg)} <span class="ms-2">${avg.toFixed(1)}/5</span>`;
+                                if ($ratingCount) $ratingCount.textContent = `${count} lượt đánh giá`;
+                            }
+                            async function loadSummary() {
+                                let sum = null;
+                                try {
+                                    const r = await fetch(`/api/products/${PRODUCT_ID}/reviews/summary`);
+                                    if (r.ok) sum = await r.json();
+                                } catch { }
+                                if (!sum) {
+                                    try {
+                                        const r2 = await fetch(`/api/products/${PRODUCT_ID}/meta`);
+                                        if (r2.ok) {
+                                            const d = await r2.json();
+                                            sum = { avg: d.ratingAvg || 0, count: d.ratingCount || 0 };
+                                        }
+                                    } catch { }
+                                }
+                                renderSummary(sum || { avg: 0, count: 0 });
+                            }
+                            function renderReviewList(list = []) {
+                                if (!$reviewList) return;
+                                $reviewList.innerHTML = list.map(r => `
       <div class="border rounded p-2 mb-2">
         <div class="d-flex align-items-center mb-1">
           <strong class="me-2">${escapeHtml(r.user?.fullName || r.user?.name || r.user?.username || 'Ẩn danh')}</strong>
@@ -1326,120 +1355,120 @@
         <div>${escapeHtml(r.comment || '')}</div>
       </div>
     `).join('');
-                    }
-                    async function loadReviews() {
-                        const r = await fetch(`/api/products/${PRODUCT_ID}/reviews`);
-                        const list = r.ok ? await r.json() : [];
-                        renderReviewList(list);
-                        // nếu đã có review của tôi -> khóa form + fill lại sao/comment
-                        if ($reviewForm && $ratingStars) {
-                            const mine = list.find(x => Number(x.user?.id) === Number(CURRENT_USER_ID));
-                            if (mine) {
-                                paintInteractive(mine.rating);
-                                const ta = $reviewForm.querySelector('textarea[name="comment"]');
-                                if (ta) ta.value = mine.comment || '';
-                                disableForm();
                             }
-                        }
-                    }
-
-                    // ---- sao tương tác ----
-                    let selectedRating = 5;
-                    function paintInteractive(r = selectedRating) {
-                        selectedRating = Number(r) || 5;
-                        if (!$ratingStars) return;
-                        $ratingStars.innerHTML = Array.from({ length: 5 }, (_, i) => {
-                            const n = i + 1;
-                            return `<i data-star="${n}" class="${n <= selectedRating ? 'fas' : 'far'} fa-star ${n <= selectedRating ? 'text-warning' : 'text-secondary'}" style="cursor:pointer"></i>`;
-                        }).join('');
-                    }
-                    if ($ratingStars) {
-                        paintInteractive(5);
-                        // event delegation: click ở icon hoặc svg con đều bắt được
-                        $ratingStars.addEventListener('click', (e) => {
-                            const el = e.target.closest?.('[data-star]');
-                            if (!el) return;
-                            paintInteractive(Number(el.getAttribute('data-star')));
-                        });
-                    }
-                    function disableForm() {
-                        if (!$reviewForm) return;
-                        $reviewForm.querySelector('button')?.setAttribute('disabled', 'true');
-                        $reviewForm.querySelectorAll('textarea, input').forEach(el => el.setAttribute('disabled', 'true'));
-                        if ($ratingStars) $ratingStars.style.pointerEvents = 'none';
-                    }
-
-                    // ---- submit (ONLY ONE handler) ----
-                    if ($reviewForm) {
-                        $reviewForm.addEventListener('submit', async (e) => {
-                            e.preventDefault();
-                            const comment = ($reviewForm.querySelector('textarea[name="comment"]')?.value || '').trim();
-
-                            const resp = await fetch(`/api/products/${PRODUCT_ID}/reviews`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ rating: selectedRating, comment }),
-                            });
-
-                            // đọc JSON nếu có
-                            let payload = null;
-                            const ct = resp.headers.get('content-type') || '';
-                            if (ct.includes('application/json')) {
-                                try { payload = await resp.json(); } catch { }
+                            async function loadReviews() {
+                                const r = await fetch(`/api/products/${PRODUCT_ID}/reviews`);
+                                const list = r.ok ? await r.json() : [];
+                                renderReviewList(list);
+                                // nếu đã có review của tôi -> khóa form + fill lại sao/comment
+                                if ($reviewForm && $ratingStars) {
+                                    const mine = list.find(x => Number(x.user?.id) === Number(CURRENT_USER_ID));
+                                    if (mine) {
+                                        paintInteractive(mine.rating);
+                                        const ta = $reviewForm.querySelector('textarea[name="comment"]');
+                                        if (ta) ta.value = mine.comment || '';
+                                        disableForm();
+                                    }
+                                }
                             }
 
-                            if (resp.status === 409) { // đã có review
-                                disableForm();
-                                await loadReviews();
-                                await loadSummary();
-                                return;
+                            // ---- sao tương tác ----
+                            let selectedRating = 5;
+                            function paintInteractive(r = selectedRating) {
+                                selectedRating = Number(r) || 5;
+                                if (!$ratingStars) return;
+                                $ratingStars.innerHTML = Array.from({ length: 5 }, (_, i) => {
+                                    const n = i + 1;
+                                    return `<i data-star="${n}" class="${n <= selectedRating ? 'fas' : 'far'} fa-star ${n <= selectedRating ? 'text-warning' : 'text-secondary'}" style="cursor:pointer"></i>`;
+                                }).join('');
                             }
-                            if (!resp.ok) {
-                                console.error('POST /reviews failed', resp.status, await resp.text().catch(() => ''));
-                                // Không alert nữa để tránh báo lỗi giả
-                                return;
+                            if ($ratingStars) {
+                                paintInteractive(5);
+                                // event delegation: click ở icon hoặc svg con đều bắt được
+                                $ratingStars.addEventListener('click', (e) => {
+                                    const el = e.target.closest?.('[data-star]');
+                                    if (!el) return;
+                                    paintInteractive(Number(el.getAttribute('data-star')));
+                                });
+                            }
+                            function disableForm() {
+                                if (!$reviewForm) return;
+                                $reviewForm.querySelector('button')?.setAttribute('disabled', 'true');
+                                $reviewForm.querySelectorAll('textarea, input').forEach(el => el.setAttribute('disabled', 'true'));
+                                if ($ratingStars) $ratingStars.style.pointerEvents = 'none';
                             }
 
-                            disableForm();
-                            await loadReviews();
-                            if (payload?.summary) renderSummary(payload.summary);
-                            else await loadSummary();
-                        }, { once: true }); // tránh bị bind trùng lần 2
-                    }
+                            // ---- submit (ONLY ONE handler) ----
+                            if ($reviewForm) {
+                                $reviewForm.addEventListener('submit', async (e) => {
+                                    e.preventDefault();
+                                    const comment = ($reviewForm.querySelector('textarea[name="comment"]')?.value || '').trim();
 
-                    // ---- init ----
-                    loadSummary();
-                    loadReviews();
-                })();
-            </script>
+                                    const resp = await fetch(`/api/products/${PRODUCT_ID}/reviews`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ rating: selectedRating, comment }),
+                                    });
 
-            <!-- admin có thể trả lời -->
-            <script>
-                (() => {
-                    const boot = document.getElementById('boot');
-                    const PRODUCT_ID = Number(boot?.dataset?.productId || 0);
-                    const USER_ID = boot?.dataset?.userId ? Number(boot.dataset.userId) : null;
-                    const IS_AUTH = (boot?.dataset?.isAuth || '0') === '1';
+                                    // đọc JSON nếu có
+                                    let payload = null;
+                                    const ct = resp.headers.get('content-type') || '';
+                                    if (ct.includes('application/json')) {
+                                        try { payload = await resp.json(); } catch { }
+                                    }
 
-                    const $qaList = document.getElementById('qaList');
-                    const $qaForm = document.getElementById('qaForm');
+                                    if (resp.status === 409) { // đã có review
+                                        disableForm();
+                                        await loadReviews();
+                                        await loadSummary();
+                                        return;
+                                    }
+                                    if (!resp.ok) {
+                                        console.error('POST /reviews failed', resp.status, await resp.text().catch(() => ''));
+                                        // Không alert nữa để tránh báo lỗi giả
+                                        return;
+                                    }
 
-                    const esc = (s = '') => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+                                    disableForm();
+                                    await loadReviews();
+                                    if (payload?.summary) renderSummary(payload.summary);
+                                    else await loadSummary();
+                                }, { once: true }); // tránh bị bind trùng lần 2
+                            }
 
-                    const tpl = (q) => {
-                        const name = esc(q.user?.name || `User #${q.user?.id || ''}`);
-                        const avatar = q.user?.avatar ? `/images/${q.user.avatar}` : '/images/default-avatar.png';
-                        const at = new Date(q.createdAt).toLocaleString('vi-VN');
-                        const hasRep = q.replies && q.replies.length > 0;
-                        const rep = hasRep ? q.replies[0] : null;
-                        const repHtml = hasRep
-                            ? `<div class="mt-2 ps-3 border-start">
+                            // ---- init ----
+                            loadSummary();
+                            loadReviews();
+                        })();
+                    </script>
+
+                    <!-- admin có thể trả lời -->
+                    <script>
+                        (() => {
+                            const boot = document.getElementById('boot');
+                            const PRODUCT_ID = Number(boot?.dataset?.productId || 0);
+                            const USER_ID = boot?.dataset?.userId ? Number(boot.dataset.userId) : null;
+                            const IS_AUTH = (boot?.dataset?.isAuth || '0') === '1';
+
+                            const $qaList = document.getElementById('qaList');
+                            const $qaForm = document.getElementById('qaForm');
+
+                            const esc = (s = '') => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+                            const tpl = (q) => {
+                                const name = esc(q.user?.name || `User #${q.user?.id || ''}`);
+                                const avatar = q.user?.avatar ? `/images/${q.user.avatar}` : '/images/default-avatar.png';
+                                const at = new Date(q.createdAt).toLocaleString('vi-VN');
+                                const hasRep = q.replies && q.replies.length > 0;
+                                const rep = hasRep ? q.replies[0] : null;
+                                const repHtml = hasRep
+                                    ? `<div class="mt-2 ps-3 border-start">
            <div class="small text-success fw-semibold"><i class="fas fa-user-shield me-1"></i>Admin</div>
            <div>${esc(rep.content)}</div>
            <div class="small text-muted">${new Date(rep.createdAt).toLocaleString('vi-VN')}</div>
          </div>`
-                            : `<div class="mt-2 small text-muted fst-italic">Đang chờ phản hồi từ Admin...</div>`;
-                        return `
+                                    : `<div class="mt-2 small text-muted fst-italic">Đang chờ phản hồi từ Admin...</div>`;
+                                return `
       <div class="border rounded p-2 mb-2" data-qid="${q.id}">
         <div class="d-flex align-items-center gap-2">
           <img src="${avatar}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
@@ -1449,62 +1478,62 @@
         <div class="mt-1">${esc(q.content)}</div>
         ${repHtml}
       </div>`;
-                    };
+                            };
 
-                    async function loadQA() {
-                        const r = await fetch(`/api/products/${PRODUCT_ID}/questions`);
-                        const data = r.ok ? await r.json() : [];
-                        $qaList.innerHTML = data.map(tpl).join('') || '<div class="text-muted">Chưa có câu hỏi nào.</div>';
-                    }
-
-                    // Submit (1 lần, có chặn double)
-                    if ($qaForm && !$qaForm.dataset.bound) {
-                        $qaForm.dataset.bound = '1';
-                        let busy = false;
-                        $qaForm.addEventListener('submit', async (e) => {
-                            e.preventDefault();
-                            if (busy) return; busy = true;
-                            const ta = $qaForm.querySelector('textarea[name="content"]');
-                            const btn = $qaForm.querySelector('button');
-                            const content = (ta?.value || '').trim();
-                            if (!content) { busy = false; return; }
-                            btn?.setAttribute('disabled', 'true');
-                            try {
-                                const r = await fetch(`/api/products/${PRODUCT_ID}/questions`, {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ content })
-                                });
-                                if (!r.ok) {
-                                    const j = await r.json().catch(() => ({ message: 'Gửi thất bại' }));
-                                    alert(j.message || 'Gửi thất bại');
-                                } else {
-                                    const q = await r.json();
-                                    $qaList.insertAdjacentHTML('afterbegin', tpl(q));
-                                    ta.value = '';
-                                }
-                            } finally {
-                                btn?.removeAttribute('disabled');
-                                busy = false;
+                            async function loadQA() {
+                                const r = await fetch(`/api/products/${PRODUCT_ID}/questions`);
+                                const data = r.ok ? await r.json() : [];
+                                $qaList.innerHTML = data.map(tpl).join('') || '<div class="text-muted">Chưa có câu hỏi nào.</div>';
                             }
-                        });
-                    }
 
-                    // Socket: join user room & nghe trả lời
-                    try {
-                        const s = (window.__CHAT_SOCKET__ ||= io());
-                        if (USER_ID) s.emit('join-user-room', USER_ID);
+                            // Submit (1 lần, có chặn double)
+                            if ($qaForm && !$qaForm.dataset.bound) {
+                                $qaForm.dataset.bound = '1';
+                                let busy = false;
+                                $qaForm.addEventListener('submit', async (e) => {
+                                    e.preventDefault();
+                                    if (busy) return; busy = true;
+                                    const ta = $qaForm.querySelector('textarea[name="content"]');
+                                    const btn = $qaForm.querySelector('button');
+                                    const content = (ta?.value || '').trim();
+                                    if (!content) { busy = false; return; }
+                                    btn?.setAttribute('disabled', 'true');
+                                    try {
+                                        const r = await fetch(`/api/products/${PRODUCT_ID}/questions`, {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ content })
+                                        });
+                                        if (!r.ok) {
+                                            const j = await r.json().catch(() => ({ message: 'Gửi thất bại' }));
+                                            alert(j.message || 'Gửi thất bại');
+                                        } else {
+                                            const q = await r.json();
+                                            $qaList.insertAdjacentHTML('afterbegin', tpl(q));
+                                            ta.value = '';
+                                        }
+                                    } finally {
+                                        btn?.removeAttribute('disabled');
+                                        busy = false;
+                                    }
+                                });
+                            }
 
-                        s.off('qa:answer_available');         // tránh đăng ký trùng
-                        s.on('qa:answer_available', (p) => {
-                            if (Number(p.productId) === PRODUCT_ID) loadQA();
-                        });
-                    } catch { }
+                            // Socket: join user room & nghe trả lời
+                            try {
+                                const s = (window.__CHAT_SOCKET__ ||= io());
+                                if (USER_ID) s.emit('join-user-room', USER_ID);
 
-                    // init
-                    loadQA();
-                })();
-            </script>
+                                s.off('qa:answer_available');         // tránh đăng ký trùng
+                                s.on('qa:answer_available', (p) => {
+                                    if (Number(p.productId) === PRODUCT_ID) loadQA();
+                                });
+                            } catch { }
+
+                            // init
+                            loadQA();
+                        })();
+                    </script>
 
 
 
