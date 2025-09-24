@@ -157,8 +157,7 @@
                                                         </td>
                                                         <td>
                                                             <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                                currency: 'VND' }).format(order.totalPrice -
-                                                                (order.discountAmount || 0)) %>
+                                                                currency: 'VND' }) .format(order.totalPrice) %>
                                                         </td>
                                                         <td>
                                                             <% if (order.status==='PENDING' ) { %>

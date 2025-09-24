@@ -134,66 +134,70 @@
                                     <div class="card glass shadow-sm">
                                         <div class="card-header">Thông tin đơn hàng</div>
                                         <div class="card-body">
-                                            <p><strong>Mã đơn:</strong>
-                                                <%= order.id %>
-                                            </p>
-                                            <p><strong>Ngày đặt:</strong>
-                                                <%= formattedCreatedAtVN %>
-                                            </p>
-                                            <p><strong>Trạng thái:</strong>
-                                                <% if (order.status==='PENDING' ) { %>
-                                                    <span class="badge bg-warning text-dark">Chờ xử lý</span>
-                                                    <% } else if (order.status==='CONFIRMED' ) { %>
-                                                        <span class="badge bg-info text-dark">Đã xác nhận đơn</span>
-                                                        <% } else if (order.status==='SHIPPING' ) { %>
-                                                            <span class="badge bg-primary">Đang vận chuyển</span>
-                                                            <% } else if (order.status==='OUT_FOR_DELIVERY' ) { %>
-                                                                <span class="badge bg-secondary">Đang giao hàng</span>
-                                                                <% } else if (order.status==='DELIVERED' ) { %>
-                                                                    <span class="badge bg-success">Đã giao hàng</span>
-                                                                    <% } else if (order.status==='CANCELED' ) { %>
-                                                                        <span class="badge bg-danger">Đã hủy</span>
-                                                                        <% if (order.cancelReason){ %>
-                                                                            <br><small class="text-muted">Lý do: <%=
-                                                                                    order.cancelReason %></small>
-                                                                            <% } %>
-                                                                                <% } else { %>
-                                                                                    <span
-                                                                                        class="badge bg-light text-dark">
-                                                                                        <%= order.status %>
-                                                                                    </span>
-                                                                                    <% } %>
-                                            </p>
+                                            <% const discount=Number(order.discountAmount || 0); const
+                                                grandTotal=Number(order.totalPrice || 0); // Tổng phải thu const
+                                                subTotal=grandTotal + discount; // Tạm tính trước coupon %>
+                                                <p><strong>Mã đơn:</strong>
+                                                    <%= order.id %>
+                                                </p>
+                                                <p><strong>Ngày đặt:</strong>
+                                                    <%= formattedCreatedAtVN %>
+                                                </p>
+                                                <p><strong>Trạng thái:</strong>
+                                                    <% if (order.status==='PENDING' ) { %>
+                                                        <span class="badge bg-warning text-dark">Chờ xử lý</span>
+                                                        <% } else if (order.status==='CONFIRMED' ) { %>
+                                                            <span class="badge bg-info text-dark">Đã xác nhận đơn</span>
+                                                            <% } else if (order.status==='SHIPPING' ) { %>
+                                                                <span class="badge bg-primary">Đang vận chuyển</span>
+                                                                <% } else if (order.status==='OUT_FOR_DELIVERY' ) { %>
+                                                                    <span class="badge bg-secondary">Đang giao
+                                                                        hàng</span>
+                                                                    <% } else if (order.status==='DELIVERED' ) { %>
+                                                                        <span class="badge bg-success">Đã giao
+                                                                            hàng</span>
+                                                                        <% } else if (order.status==='CANCELED' ) { %>
+                                                                            <span class="badge bg-danger">Đã hủy</span>
+                                                                            <% if (order.cancelReason){ %>
+                                                                                <br><small class="text-muted">Lý do: <%=
+                                                                                        order.cancelReason %></small>
+                                                                                <% } %>
+                                                                                    <% } else { %>
+                                                                                        <span
+                                                                                            class="badge bg-light text-dark">
+                                                                                            <%= order.status %>
+                                                                                        </span>
+                                                                                        <% } %>
+                                                </p>
 
-                                            <p><strong>Phương thức thanh toán:</strong>
-                                                <%= order.paymentMethod %>
-                                            </p>
-                                            <p><strong>Trạng thái thanh toán:</strong>
-                                                <%= order.paymentStatus %>
-                                            </p>
-                                            <p><strong>Mã giảm giá:</strong>
-                                                <%= order.couponCode || "-" %>
-                                            </p>
-                                            <p><strong>Tổng tiền:</strong>
-                                                <%= new
-                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(order.totalPrice)
-                                                    %>
-                                            </p>
-                                            <p><strong>Giảm giá:</strong>
-                                                <%= order.discountAmount>0
-                                                    ? "-" + new
-                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(order.discountAmount)
-                                                    : "0 đ" %>
-                                            </p>
-                                            <p><strong>Tổng tiền sau giảm:</strong>
-                                                <%= new
-                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(order.totalPrice
-                                                    - order.discountAmount) %>
-                                            </p>
+                                                <p><strong>Phương thức thanh toán:</strong>
+                                                    <%= order.paymentMethod %>
+                                                </p>
+                                                <p><strong>Trạng thái thanh toán:</strong>
+                                                    <%= order.paymentStatus %>
+                                                </p>
+                                                <p><strong>Mã giảm giá:</strong>
+                                                    <%= order.couponCode || "-" %>
+                                                </p>
+                                                <p><strong>Tổng tiền:</strong>
+                                                    <%= new Intl.NumberFormat('vi-VN', {style:'currency',
+                                                        currency:'VND'}).format(subTotal) %>
+                                                </p>
+                                                <p><strong>Giảm giá:</strong>
+                                                    <%= discount> 0
+                                                        ? '-' + new Intl.NumberFormat('vi-VN', {style:'currency',
+                                                        currency:'VND'}).format(discount)
+                                                        : '0 đ' %>
+                                                </p>
+                                                <p><strong>Tổng tiền sau giảm:</strong>
+                                                    <%= new Intl.NumberFormat('vi-VN', {style:'currency',
+                                                        currency:'VND'}).format(grandTotal) %>
+                                                </p>
 
-                                            <p><strong>Ghi chú khách:</strong>
-                                                <%= order.receiverNote || "-" %>
-                                            </p>
+
+                                                <p><strong>Ghi chú khách:</strong>
+                                                    <%= order.receiverNote || "-" %>
+                                                </p>
                                         </div>
                                     </div>
                                 </div>
