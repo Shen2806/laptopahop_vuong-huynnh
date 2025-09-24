@@ -16,6 +16,7 @@ import { initSocket } from "./socket";
 import "./middleware/passport.google";
 import "./middleware/passport.jwt";
 import path from "path";
+import paymentRoutes from './routes/payment';
 const app = express();
 app.use(cookieParser());
 
@@ -67,6 +68,9 @@ webRoutes(app);
 
 // api routes
 apiRoutes(app);
+
+// payment routes (VNPAY return/IPN)
+app.use('/payment', paymentRoutes);
 // seeding data
 initDatabase()
 

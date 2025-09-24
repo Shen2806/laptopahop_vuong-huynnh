@@ -749,18 +749,7 @@
                                                     <% const _avg=Number(product?.ratingAvg ?? 0); const
                                                         _count=Number(product?.ratingCount ?? 0); const _pct=Math.max(0,
                                                         Math.min(100, (_avg / 5) * 100)).toFixed(2) + '%' ; %>
-                                                        <div class="mb-2 text-center">
-                                                            <span class="ls-rating d-inline-flex align-items-center"
-                                                                style="--w:<%- _pct %>"
-                                                                title="<%= _avg.toFixed(1) %>/5">
-                                                                <span class="stars">
-                                                                    <span class="stars-back">★★★★★</span>
-                                                                    <span class="stars-front">★★★★★</span>
-                                                                </span>
-                                                                <span class="ms-1 small text-muted">(<%= _count %>
-                                                                        )</span>
-                                                            </span>
-                                                        </div>
+
 
                                                         <% if(product.discount> 0) { %>
                                                             <div

@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { addProductToCart, DeleteProductInCart, getOrderHistory, getProductById, getProductInCart, handlePlaceOrder, updateCartDetailBeforeCheckOut } from "services/client/item.service";
 import { getIO } from "src/socket";
 import { $Enums } from "@prisma/client"; // thêm nếu chưa có
+import { paymentGateway } from "services/paymentGateway";
 // Nhãn tiếng Việt cho trạng thái
 const STATUS_LABEL_VI: Record<string, string> = {
     PENDING: "Chờ xử lý",
@@ -385,7 +386,128 @@ const toInt = (v: any) => {
     const n = Number(v);
     return Number.isFinite(n) ? Math.floor(n) : 0;
 };
+// bản chính
+// const postPlaceOrder = async (req: Request, res: Response) => {
+//     const user: any = (req as any).user;
+//     if (!user) return res.redirect("/login");
 
+//     const {
+//         receiverName,
+//         receiverAddress,
+//         receiverPhone,
+//         receiverNote,
+//         couponCode,
+//         mode: modeRaw, // 'buy' | 'cart'
+//     } = req.body;
+
+//     // sanitize
+//     const coupon = (couponCode || "").trim() || null;
+//     const mode: "buy" | "cart" = modeRaw === "buy" ? "buy" : "cart";
+
+//     // helper push message
+//     const pushMsg = (type: "danger" | "warning" | "success", text: string) => {
+//         const sess: any = (req as any).session || ((req as any).session = {});
+//         if (!Array.isArray(sess.messages)) sess.messages = [];
+//         sess.messages.push({ type, text });
+//     };
+
+//     try {
+//         // =========================
+//         // ======== BUY MODE =======
+//         // =========================
+//         if (mode === "buy") {
+//             const ticket: any = (req as any).session?.buyNow;
+//             if (!ticket) {
+//                 pushMsg("warning", "Phiên 'Mua ngay' đã hết hạn. Vui lòng thao tác lại.");
+//                 return res.redirect("/checkout?mode=buy");
+//             }
+
+//             const pid = toInt(ticket.productId);
+//             const qty = Math.max(1, toInt(ticket.quantity));
+//             if (!pid || !qty) {
+//                 pushMsg("warning", "Dữ liệu 'Mua ngay' không hợp lệ. Vui lòng thao tác lại.");
+//                 return res.redirect("/checkout?mode=buy");
+//             }
+
+//             const result = await handlePlaceOrder({
+//                 userId: Number(user.id),
+//                 receiverName,
+//                 receiverAddress,
+//                 receiverPhone,
+//                 receiverNote,
+//                 couponCode: coupon,
+//                 mode: "buy",
+//                 items: [{ productId: pid, quantity: qty }],
+//             });
+
+//             if (!result?.success) {
+//                 pushMsg("danger", result?.error || "Đặt hàng thất bại. Vui lòng thử lại!");
+//                 return res.redirect("/checkout?mode=buy");
+//             }
+
+//             // Clear vé buyNow để tránh reuse
+//             (req as any).session.buyNow = undefined;
+
+//             // Emit cho admin
+//             try {
+//                 const io = getIO();
+//                 io.to("admins").emit("new-order", {
+//                     orderId: result.orderId,
+//                     userId: Number(user.id),
+//                     customerName: user.fullName || user.username || `User #${user.id}`,
+//                     totalPrice: result.totalPrice ?? null,
+//                     mode: "buy",
+//                     createdAt: new Date().toISOString(),
+//                 });
+//             } catch (e) {
+//                 console.error("emit new-order error:", e);
+//             }
+
+//             return res.redirect("/thanks");
+//         }
+
+//         // =========================
+//         // ======= CART MODE =======
+//         // =========================
+//         const result = await handlePlaceOrder({
+//             userId: Number(user.id),
+//             receiverName,
+//             receiverAddress,
+//             receiverPhone,
+//             receiverNote,
+//             couponCode: coupon,
+//             mode: "cart",
+//         });
+
+//         if (!result?.success) {
+//             pushMsg("danger", result?.error || "Đặt hàng thất bại. Vui lòng thử lại!");
+//             return res.redirect("/checkout");
+//         }
+
+//         // Emit cho admin
+//         try {
+//             const io = getIO();
+//             io.to("admins").emit("new-order", {
+//                 orderId: result.orderId,
+//                 userId: Number(user.id),
+//                 customerName: user.fullName || user.username || `User #${user.id}`,
+//                 totalPrice: result.totalPrice ?? null,
+//                 mode: "cart",
+//                 createdAt: new Date().toISOString(),
+//             });
+//         } catch (e) {
+//             console.error("emit new-order error:", e);
+//         }
+
+//         return res.redirect("/thanks");
+//     } catch (e) {
+//         console.error("postPlaceOrder error:", e);
+//         const back = mode === "buy" ? "/checkout?mode=buy" : "/checkout";
+//         const sess: any = (req as any).session || ((req as any).session = {});
+//         sess.messages = [{ type: "danger", text: "Có lỗi hệ thống. Thử lại sau." }];
+//         return res.redirect(back);
+//     }
+// };
 const postPlaceOrder = async (req: Request, res: Response) => {
     const user: any = (req as any).user;
     if (!user) return res.redirect("/login");
@@ -396,19 +518,28 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         receiverPhone,
         receiverNote,
         couponCode,
-        mode: modeRaw, // 'buy' | 'cart'
+        mode: modeRaw,            // 'buy' | 'cart'
+        paymentMethod: pmRaw,     // 'ONLINE' | 'COD' (từ form)
     } = req.body;
 
-    // sanitize
     const coupon = (couponCode || "").trim() || null;
     const mode: "buy" | "cart" = modeRaw === "buy" ? "buy" : "cart";
+    const paymentMethod = String(pmRaw || "").toUpperCase();
 
-    // helper push message
     const pushMsg = (type: "danger" | "warning" | "success", text: string) => {
         const sess: any = (req as any).session || ((req as any).session = {});
         if (!Array.isArray(sess.messages)) sess.messages = [];
         sess.messages.push({ type, text });
     };
+
+    // Helper build absolute return URL + IP
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const returnUrl = `${baseUrl}/payment/return`;
+    const ipAddr =
+        (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+        (req.socket as any)?.remoteAddress ||
+        req.ip ||
+        "127.0.0.1";
 
     try {
         // =========================
@@ -462,7 +593,30 @@ const postPlaceOrder = async (req: Request, res: Response) => {
                 console.error("emit new-order error:", e);
             }
 
-            return res.redirect("/thanks");
+            // Nếu người dùng chọn ONLINE → redirect VNPAY
+            if (paymentMethod === "ONLINE") {
+                try {
+                    const gw = paymentGateway();
+                    const amount = Number(result.totalPrice || 0);
+                    await prisma.order.update({
+                        where: { id: result.orderId! },
+                        data: { paymentMethod: "ONLINE", paymentStatus: "PENDING" },
+                    });
+                    const { url } = await gw.createPaymentSession({
+                        orderId: result.orderId!,
+                        amount,
+                        returnUrl,
+                        ipAddr: String(ipAddr),
+                    });
+                    return res.redirect(url);
+                } catch (err) {
+                    console.error("start payment (buy) error:", err);
+                    return res.redirect(`/thanks?orderId=${result.orderId}`);
+                }
+            }
+
+            // COD → thanks
+            return res.redirect(`/thanks?orderId=${result.orderId}`);
         }
 
         // =========================
@@ -498,7 +652,29 @@ const postPlaceOrder = async (req: Request, res: Response) => {
             console.error("emit new-order error:", e);
         }
 
-        return res.redirect("/thanks");
+        // ONLINE → redirect VNPAY
+        if (paymentMethod === "ONLINE") {
+            try {
+                const gw = paymentGateway();
+                const amount = Number(result.totalPrice || 0);
+                await prisma.order.update({
+                    where: { id: result.orderId! },
+                    data: { paymentMethod: "ONLINE", paymentStatus: "PENDING" },
+                });
+                const { url } = await gw.createPaymentSession({
+                    orderId: result.orderId!,
+                    amount,
+                    returnUrl,
+                    ipAddr: String(ipAddr),
+                });
+                return res.redirect(url);
+            } catch (err) {
+                console.error("start payment (cart) error:", err);
+                return res.redirect(`/thanks?orderId=${result.orderId}`);
+            }
+        }
+
+        return res.redirect(`/thanks?orderId=${result.orderId}`);
     } catch (e) {
         console.error("postPlaceOrder error:", e);
         const back = mode === "buy" ? "/checkout?mode=buy" : "/checkout";
@@ -507,6 +683,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         return res.redirect(back);
     }
 };
+
 
 
 const getThanksPage = async (req: Request, res: Response) => {
