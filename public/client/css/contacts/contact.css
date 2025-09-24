@@ -179,7 +179,7 @@
         /* Khi focus trong form hoặc có class .open (JS đã thêm) -> mở rộng */
         #headerSearchForm:focus-within,
         #headerSearchForm.open {
-            width: clamp(200px, 35vw, 200px);
+            width: clamp(300px, 35vw, 200px);
             border-color: #4CAF50 !important;
             box-shadow: 0 0 0 3px rgba(76, 175, 80, .18);
         }
