@@ -43,6 +43,39 @@
     <!-- Bootstrap Icons (bi-*) nếu bạn dùng thêm -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
 
+    <style>
+        .ldesc {
+            position: relative;
+        }
+
+        .ldesc--collapsed {
+            max-height: 270px;
+            /* chỉnh theo ý */
+            overflow: hidden;
+            transition: max-height .25s ease;
+        }
+
+        .ldesc--collapsed::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 64px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--bs-body-bg, #fff) 70%);
+            pointer-events: none;
+        }
+
+        .ldesc img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .ldesc table {
+            width: 100%;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -884,7 +917,7 @@
                                             <!-- Accordion: xổ dọc, mặc định mở hết -->
                                             <div class="accordion" id="productAccordion">
 
-                                                <!-- THÔNG SỐ -->
+                                                <!-- THÔNG SỐ KỸ THUẬT -->
                                                 <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
                                                     <h2 class="accordion-header">
                                                         <button class="accordion-button fw-semibold" type="button"
@@ -893,135 +926,269 @@
                                                             Thông số kỹ thuật
                                                         </button>
                                                     </h2>
+
                                                     <div id="accSpecs" class="accordion-collapse collapse show">
                                                         <div class="accordion-body">
-                                                            <table class="table table-sm mb-0">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <th style="width:180px">Hãng</th>
-                                                                        <td>
-                                                                            <%= product.factory %>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th>Đối tượng</th>
-                                                                        <td>
-                                                                            <%= product.target %>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th>Tồn kho</th>
-                                                                        <td>
-                                                                            <%= product.quantity %>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <!-- bổ sung các hàng thông số khác nếu cần -->
-                                                                </tbody>
-                                                            </table>
+
+                                                            <% var p=(typeof product !=='undefined' && product) ?
+                                                                product : {}; var factoryLabel=(p && p.factory) ?
+                                                                p.factory : '-' ; if (factoryLabel==='APPLE' )
+                                                                factoryLabel='Apple (MacBook)' ; else if
+                                                                (factoryLabel==='ASUS' ) factoryLabel='Asus' ; else if
+                                                                (factoryLabel==='LENOVO' ) factoryLabel='Lenovo' ; else
+                                                                if (factoryLabel==='DELL' ) factoryLabel='Dell' ; else
+                                                                if (factoryLabel==='LG' ) factoryLabel='LG' ; else if
+                                                                (factoryLabel==='ACER' ) factoryLabel='Acer' ; else if
+                                                                (factoryLabel==='HP' ) factoryLabel='HP' ; else if
+                                                                (factoryLabel==='MSI' ) factoryLabel='MSI' ; else if
+                                                                (factoryLabel==='GIGABYTE' ) factoryLabel='Gigabyte' ;
+                                                                else if (factoryLabel==='ALIENWARE' )
+                                                                factoryLabel='Alienware' ; var targetLabel=(p &&
+                                                                p.target) ? p.target : '-' ; if (targetLabel==='GAMING'
+                                                                ) targetLabel='Gaming' ; else if
+                                                                (targetLabel==='SINHVIEN-VANPHONG' )
+                                                                targetLabel='Sinh viên - Văn phòng' ; else if
+                                                                (targetLabel==='THIET-KE-DO-HOA' )
+                                                                targetLabel='Thiết kế đồ họa' ; else if
+                                                                (targetLabel==='MONG-NHE' ) targetLabel='Mỏng nhẹ' ;
+                                                                else if (targetLabel==='DOANH-NHAN' )
+                                                                targetLabel='Doanh nhân' ; var cpu=(p && p.cpu) ? p.cpu
+                                                                : '-' ; var ram='-' ; if (p && typeof p.ramGB==='number'
+                                                                ) { ram=String(p.ramGB) + ' GB' ; } var storage='-' ; if
+                                                                (p && typeof p.storageGB==='number' ) { var
+                                                                stype=(p.storageType) ? p.storageType : 'SSD' ; var
+                                                                storageNum=String(p.storageGB); try { storageNum=new
+                                                                Intl.NumberFormat('vi-VN').format(p.storageGB); }
+                                                                catch(e) {} storage=storageNum + ' GB ' + stype; } var
+                                                                resText=(p && p.screenResolution) ? p.screenResolution
+                                                                : '' ; if (resText==='FHD' ) resText='FHD (1920×1080)' ;
+                                                                else if (resText==='QHD' ) resText='QHD / 2K' ; else if
+                                                                (resText==='4K' ) resText='4K UHD' ; var screen='-' ; if
+                                                                (p && typeof p.screenSizeInches==='number' ) { var
+                                                                sizeText=String(p.screenSizeInches); if
+                                                                (sizeText.indexOf('.0') !==-1) {
+                                                                sizeText=sizeText.replace('.0',''); } sizeText=sizeText
+                                                                + '"' ; if (resText && resText.length> 0) screen =
+                                                                sizeText + ' ' + resText;
+                                                                else screen = sizeText;
+                                                                } else {
+                                                                if (resText && resText.length > 0) screen = resText;
+                                                                }
+
+                                                                var qty = 0;
+                                                                if (p && typeof p.quantity === 'number') {
+                                                                qty = p.quantity;
+                                                                }
+
+                                                                var features = [];
+                                                                if (p && p.featureTags && typeof p.featureTags ===
+                                                                'string') {
+                                                                var norm = p.featureTags;
+                                                                if (norm.indexOf('|') !== -1) {
+                                                                norm = norm.split('|').join(';');
+                                                                }
+                                                                var arr = norm.split(';');
+                                                                var i = 0;
+                                                                for (i = 0; i < arr.length; i++) { var t=arr[i]; if (t)
+                                                                    { t=t.trim(); if (t.length> 0) {
+                                                                    features.push(t);
+                                                                    }
+                                                                    }
+                                                                    }
+                                                                    }
+                                                                    %>
+
+                                                                    <table class="table table-sm mb-0">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <th style="width:180px">Hãng</th>
+                                                                                <td>
+                                                                                    <%= factoryLabel %>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th>Mục đích</th>
+                                                                                <td>
+                                                                                    <%= targetLabel %>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th>Tồn kho</th>
+                                                                                <td>
+                                                                                    <%= qty %>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th>CPU</th>
+                                                                                <td>
+                                                                                    <%= cpu %>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th>RAM</th>
+                                                                                <td>
+                                                                                    <%= ram %>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th>Ổ cứng</th>
+                                                                                <td>
+                                                                                    <%= storage %>
+                                                                                </td>
+                                                                            </tr>
+                                                                            <tr>
+                                                                                <th>Màn hình</th>
+                                                                                <td>
+                                                                                    <%= screen %>
+                                                                                </td>
+                                                                            </tr>
+
+                                                                            <% if (features && features.length> 0) { %>
+                                                                                <tr>
+                                                                                    <th>Tính năng</th>
+                                                                                    <td>
+                                                                                        <div
+                                                                                            style="display:flex;flex-wrap:wrap;gap:.25rem;">
+                                                                                            <% for (var j=0; j <
+                                                                                                features.length; j++) {
+                                                                                                %>
+                                                                                                <span
+                                                                                                    class="badge bg-light text-dark border">
+                                                                                                    <%= features[j] %>
+                                                                                                </span>
+                                                                                                <% } %>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <% } %>
+                                                                        </tbody>
+                                                                    </table>
+
                                                         </div>
                                                     </div>
                                                 </div>
-
 
                                                 <!-- MÔ TẢ -->
-                                                <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
-                                                    <h2 class="accordion-header">
-                                                        <button class="accordion-button fw-semibold" type="button"
-                                                            data-bs-toggle="collapse" data-bs-target="#accDesc"
-                                                            aria-expanded="true" aria-controls="accDesc">
-                                                            Mô tả chi tiết
-                                                        </button>
-                                                    </h2>
-                                                    <div id="accDesc" class="accordion-collapse collapse show">
-                                                        <div class="accordion-body">
-                                                            <div id="desc-wrapper" class="desc-collapsed"><%-
-                                                                    product.detailDesc %></div>
-                                                            <div class="text-center mt-2">
-                                                                <button type="button" id="toggle-desc"
-                                                                    class="btn btn-outline-primary btn-sm">
-                                                                    Xem thêm
-                                                                </button>
+                                                <% var _UID=(product && product.id) ? String(product.id) : 'x' ; %>
+
+                                                    <!-- MÔ TẢ CHI TIẾT -->
+                                                    <div
+                                                        class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button fw-semibold" type="button"
+                                                                data-bs-toggle="collapse"
+                                                                data-bs-target="#accDesc-<%= _UID %>"
+                                                                aria-expanded="true"
+                                                                aria-controls="accDesc-<%= _UID %>">
+                                                                Mô tả chi tiết
+                                                            </button>
+                                                        </h2>
+
+                                                        <div id="accDesc-<%= _UID %>"
+                                                            class="accordion-collapse collapse show">
+                                                            <div class="accordion-body">
+
+                                                                <!-- Wrapper mô tả (mặc định thu gọn) -->
+                                                                <div id="desc-wrapper-<%= _UID %>"
+                                                                    class="ldesc ldesc--collapsed">
+                                                                    <%- (product && product.detailDesc) ?
+                                                                        product.detailDesc : '' %>
+                                                                </div>
+
+                                                                <!-- Nút toggle (ẩn nếu nội dung ngắn) -->
+                                                                <div class="text-center mt-2">
+                                                                    <button type="button" id="toggle-desc-<%= _UID %>"
+                                                                        class="btn btn-outline-primary btn-sm"
+                                                                        data-collapsed-text="Xem thêm"
+                                                                        data-expanded-text="Thu gọn"
+                                                                        style="display:none">
+                                                                        Xem thêm
+                                                                    </button>
+                                                                </div>
+
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <!-- ĐÁNH GIÁ -->
-                                                <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
-                                                    id="reviewsSection">
-                                                    <h2 class="accordion-header">
-                                                        <button class="accordion-button fw-semibold" type="button"
-                                                            data-bs-toggle="collapse" data-bs-target="#accReviews"
-                                                            aria-expanded="true" aria-controls="accReviews">
-                                                            Đánh giá
-                                                        </button>
-                                                    </h2>
-                                                    <div id="accReviews" class="accordion-collapse collapse show">
-                                                        <div class="accordion-body">
-                                                            <!-- Tóm tắt rating -->
-                                                            <div class="d-flex align-items-center mb-2">
-                                                                <div id="avgStars" class="me-2"></div>
-                                                                <small id="ratingCount" class="text-muted"></small>
+                                                    <!-- ĐÁNH GIÁ -->
+                                                    <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
+                                                        id="reviewsSection">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button fw-semibold" type="button"
+                                                                data-bs-toggle="collapse" data-bs-target="#accReviews"
+                                                                aria-expanded="true" aria-controls="accReviews">
+                                                                Đánh giá
+                                                            </button>
+                                                        </h2>
+                                                        <div id="accReviews" class="accordion-collapse collapse show">
+                                                            <div class="accordion-body">
+                                                                <!-- Tóm tắt rating -->
+                                                                <div class="d-flex align-items-center mb-2">
+                                                                    <div id="avgStars" class="me-2"></div>
+                                                                    <small id="ratingCount" class="text-muted"></small>
+                                                                </div>
+
+                                                                <% if (user) { %>
+                                                                    <!-- Form đánh giá -->
+                                                                    <form id="reviewForm" class="mb-3">
+                                                                        <div class="mb-2">Đánh giá của bạn:</div>
+                                                                        <div id="ratingStars" class="mb-2"></div>
+                                                                        <textarea class="form-control" name="comment"
+                                                                            rows="3"
+                                                                            placeholder="Cảm nhận của bạn..."></textarea>
+                                                                        <button class="btn btn-primary mt-2">Gửi đánh
+                                                                            giá</button>
+                                                                    </form>
+                                                                    <% } else { %>
+                                                                        <div class="alert alert-warning">
+                                                                            Bạn cần <a href="/login">đăng nhập</a> để
+                                                                            đánh
+                                                                            giá.
+                                                                        </div>
+                                                                        <% } %>
+
+                                                                            <!-- Danh sách đánh giá -->
+                                                                            <div id="reviewList"
+                                                                                class="small text-muted">
+                                                                                <!-- JS client sẽ render danh sách -->
+                                                                            </div>
                                                             </div>
-
-                                                            <% if (user) { %>
-                                                                <!-- Form đánh giá -->
-                                                                <form id="reviewForm" class="mb-3">
-                                                                    <div class="mb-2">Đánh giá của bạn:</div>
-                                                                    <div id="ratingStars" class="mb-2"></div>
-                                                                    <textarea class="form-control" name="comment"
-                                                                        rows="3"
-                                                                        placeholder="Cảm nhận của bạn..."></textarea>
-                                                                    <button class="btn btn-primary mt-2">Gửi đánh
-                                                                        giá</button>
-                                                                </form>
-                                                                <% } else { %>
-                                                                    <div class="alert alert-warning">
-                                                                        Bạn cần <a href="/login">đăng nhập</a> để đánh
-                                                                        giá.
-                                                                    </div>
-                                                                    <% } %>
-
-                                                                        <!-- Danh sách đánh giá -->
-                                                                        <div id="reviewList" class="small text-muted">
-                                                                            <!-- JS client sẽ render danh sách -->
-                                                                        </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <!-- Q&A -->
-                                                <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
-                                                    id="qaSection">
-                                                    <h2 class="accordion-header">
-                                                        <button class="accordion-button fw-semibold" type="button"
-                                                            data-bs-toggle="collapse" data-bs-target="#accQA"
-                                                            aria-expanded="true" aria-controls="accQA">
-                                                            Hỏi & Đáp (Q&A)
-                                                        </button>
-                                                    </h2>
-                                                    <div id="accQA" class="accordion-collapse collapse show">
-                                                        <div class="accordion-body">
-                                                            <% if (user) { %>
-                                                                <form id="qaForm" class="mb-3">
-                                                                    <textarea class="form-control" name="content"
-                                                                        rows="2"
-                                                                        placeholder="Đặt câu hỏi về sản phẩm..."></textarea>
-                                                                    <button class="btn btn-success mt-2">Gửi câu
-                                                                        hỏi</button>
-                                                                </form>
-                                                                <% } else { %>
-                                                                    <div class="alert alert-info">Đăng nhập để xem và
-                                                                        đặt câu
-                                                                        hỏi.</div>
-                                                                    <% } %>
+                                                    <!-- Q&A -->
+                                                    <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
+                                                        id="qaSection">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button fw-semibold" type="button"
+                                                                data-bs-toggle="collapse" data-bs-target="#accQA"
+                                                                aria-expanded="true" aria-controls="accQA">
+                                                                Hỏi & Đáp (Q&A)
+                                                            </button>
+                                                        </h2>
+                                                        <div id="accQA" class="accordion-collapse collapse show">
+                                                            <div class="accordion-body">
+                                                                <% if (user) { %>
+                                                                    <form id="qaForm" class="mb-3">
+                                                                        <textarea class="form-control" name="content"
+                                                                            rows="2"
+                                                                            placeholder="Đặt câu hỏi về sản phẩm..."></textarea>
+                                                                        <button class="btn btn-success mt-2">Gửi câu
+                                                                            hỏi</button>
+                                                                    </form>
+                                                                    <% } else { %>
+                                                                        <div class="alert alert-info">Đăng nhập để xem
+                                                                            và
+                                                                            đặt câu
+                                                                            hỏi.</div>
+                                                                        <% } %>
 
-                                                                        <div id="qaList">
-                                                                            <!-- JS client sẽ render danh sách Q&A -->
-                                                                        </div>
+                                                                            <div id="qaList">
+                                                                                <!-- JS client sẽ render danh sách Q&A -->
+                                                                            </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
                                             </div>
                                         </div>
@@ -1218,31 +1385,53 @@
                         integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
                         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
                     <!-- nút xem thêm -->
+                    <!-- JS: tự hiện/ẩn nút, toggle mở/thu, đo lại sau khi ảnh tải xong -->
                     <script>
+                        (function () {
+                            var uid = '<%= _UID %>';
+                            var wrap = document.getElementById('desc-wrapper-' + uid);
+                            var btn = document.getElementById('toggle-desc-' + uid);
+                            if (!wrap || !btn) return;
 
+                            var MAX = 320; // phải khớp CSS .ldesc--collapsed
 
-                        document.addEventListener("DOMContentLoaded", function () {
-                            const desc = document.getElementById("desc-wrapper");
-                            const btn = document.getElementById("toggle-desc");
+                            function updateButtonVisibility() {
+                                // Nếu nội dung dài hơn MAX -> hiện nút; ngắn -> ẩn
+                                // +4 đề phòng sai số layout
+                                var needMore = wrap.scrollHeight > (MAX + 4);
+                                btn.style.display = needMore ? 'inline-block' : 'none';
+                                // Đặt lại text đúng theo trạng thái hiện tại
+                                btn.textContent = wrap.classList.contains('ldesc--collapsed')
+                                    ? (btn.getAttribute('data-collapsed-text') || 'Xem thêm')
+                                    : (btn.getAttribute('data-expanded-text') || 'Thu gọn');
+                            }
 
-                            btn.addEventListener("click", function () {
-                                desc.classList.toggle("desc-collapsed");
-
-                                if (desc.classList.contains("desc-collapsed")) {
-                                    btn.innerText = "Xem thêm";
+                            btn.onclick = function () {
+                                if (wrap.classList.contains('ldesc--collapsed')) {
+                                    wrap.classList.remove('ldesc--collapsed');
+                                    btn.textContent = btn.getAttribute('data-expanded-text') || 'Thu gọn';
                                 } else {
-                                    btn.innerText = "Thu gọn";
+                                    wrap.classList.add('ldesc--collapsed');
+                                    btn.textContent = btn.getAttribute('data-collapsed-text') || 'Xem thêm';
+                                    try { wrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { }
                                 }
-                            });
-                        });
+                            };
 
-
-
+                            // Khởi tạo
+                            wrap.classList.add('ldesc--collapsed');
+                            updateButtonVisibility();                   // 1) lúc DOM sẵn
+                            window.addEventListener('load', updateButtonVisibility); // 2) sau khi ảnh/load xong
+                            if ('ResizeObserver' in window) {            // 3) nếu nội dung thay đổi kích thước
+                                var ro = new ResizeObserver(updateButtonVisibility);
+                                ro.observe(wrap);
+                            }
+                        })();
                     </script>
 
                     <script id="boot-json" type="application/json">
   <%- JSON.stringify({ productId: product.id, isAuth: !!user }) %>
             </script>
+
                     <script>
                         const boot = JSON.parse(document.getElementById('boot-json').textContent);
                         window.__PRODUCT_ID__ = boot.productId;

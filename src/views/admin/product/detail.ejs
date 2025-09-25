@@ -147,11 +147,21 @@
                                                 <input type="text" name="name" class="form-control"
                                                     value="<%= product.name %>" placeholder="Tên sản phẩm" required>
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label">Giá (VND)</label>
-                                                <input type="number" name="price" class="form-control"
-                                                    value="<%= product.price %>" placeholder="Giá sản phẩm" required>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Giá (VND)</label>
+                                                    <input type="number" name="price" class="form-control"
+                                                        value="<%= product.price %>" placeholder="Giá sản phẩm"
+                                                        required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Giảm giá (%)</label>
+                                                    <input type="number" name="discount" min="0" max="100" step="1"
+                                                        class="form-control" value="<%= (product.discount ?? 0) %>">
+                                                </div>
                                             </div>
+
+
                                         </div>
 
                                         <div class="mb-3">
@@ -195,6 +205,72 @@
                                                         </option>
                                                         <% }) %>
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <!-- ===== Thông số kỹ thuật (DETAIL) ===== -->
+                                        <div class="card glass shadow-sm mb-4">
+                                            <div class="card-header">Thông số kỹ thuật</div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="mb-3 col-md-6">
+                                                        <label class="form-label">CPU</label>
+                                                        <input type="text" name="cpu" class="form-control"
+                                                            value="<%= product.cpu || '' %>">
+                                                    </div>
+                                                    <div class="mb-3 col-md-3">
+                                                        <label class="form-label">RAM (GB)</label>
+                                                        <input type="number" name="ramGB" class="form-control"
+                                                            value="<%= product.ramGB || '' %>">
+                                                    </div>
+                                                    <div class="mb-3 col-md-3">
+                                                        <label class="form-label">Ổ cứng (GB)</label>
+                                                        <input type="number" name="storageGB" class="form-control"
+                                                            value="<%= product.storageGB || '' %>">
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="mb-3 col-md-4">
+                                                        <label class="form-label">Loại ổ</label>
+                                                        <select name="storageType" class="form-select">
+                                                            <option value="">-- Chọn --</option>
+                                                            <option value="HDD" <%=product.storageType==='HDD'
+                                                                ? 'selected' : '' %>>HDD</option>
+                                                            <option value="SSD" <%=product.storageType==='SSD'
+                                                                ? 'selected' : '' %>>SSD</option>
+                                                            <option value="NVME" <%=product.storageType==='NVME'
+                                                                ? 'selected' : '' %>>NVMe</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3 col-md-4">
+                                                        <label class="form-label">Độ phân giải</label>
+                                                        <select name="screenResolution" class="form-select">
+                                                            <option value="">-- Chọn --</option>
+                                                            <option value="FHD" <%=product.screenResolution==='FHD'
+                                                                ? 'selected' : '' %>>FHD</option>
+                                                            <option value="QHD" <%=product.screenResolution==='QHD'
+                                                                ? 'selected' : '' %>>QHD</option>
+                                                            <option value="4K" <%=product.screenResolution==='4K'
+                                                                ? 'selected' : '' %>>4K</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3 col-md-4">
+                                                        <label class="form-label">Màn hình (inch)</label>
+                                                        <input type="number" step="0.1" name="screenSizeInch"
+                                                            class="form-control"
+                                                            value="<%= product.screenSizeInch || '' %>">
+                                                    </div>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">Tính năng đặc biệt</label>
+                                                    <% const ft=(product.featureTags || '' ) .replaceAll('|', ',' )
+                                                        .replace(/^,|,$/g, '' ); %>
+                                                        <input type="text" name="featureTagsRaw" class="form-control"
+                                                            value="<%= ft %>" placeholder="VD: TOUCH,2IN1,TB4,FP">
+                                                        <small class="text-muted">Hệ thống lưu
+                                                            “|TOUCH|2IN1|TB4|FP|”.</small>
+                                                </div>
                                             </div>
                                         </div>
 

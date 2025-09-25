@@ -1,44 +1,115 @@
+// import { prisma } from "config/client";
+// import { TOTAL_ITEM_PER_PAGE } from "config/constant";
+
+// // Định nghĩa input cho hàm createProduct
+// interface CreateProductInput {
+//     name: string;
+//     price: number;
+//     detailDesc: string;
+//     shortDesc: string;
+//     quantity: number;
+//     factory: string;
+//     target: string;
+//     imageUpload?: string | null;
+// }
+
+// const createProduct = async (data: CreateProductInput) => {
+//     const {
+//         name,
+//         price,
+//         detailDesc,
+//         shortDesc,
+//         quantity,
+//         factory,
+//         target,
+//         imageUpload,
+//     } = data;
+
+//     return await prisma.product.create({
+//         data: {
+//             name: String(name),
+//             price: Number(price),
+//             detailDesc: String(detailDesc),
+//             shortDesc: String(shortDesc),
+//             quantity: Number(quantity),
+//             factory: String(factory),
+//             target: String(target),
+//             image: imageUpload ?? null, // Prisma cho phép null
+//         },
+//     });
+// };
+
+
+import { Prisma } from "@prisma/client";
+// const deleteProductById = async (id: number) => {
+//     await prisma.product.delete({
+//         where: { id }
+//     });
+// }
+
+// const getProductById = async (id: number) => {
+//     return await prisma.product.findUnique({
+//         where: { id }
+//     });
+// }
+
+// const updateProductById = async (data: {
+//     id: number;
+//     name?: string;
+//     price?: number;
+//     detailDesc?: string;
+//     shortDesc?: string;
+//     quantity?: number;
+//     factory?: string;
+//     target?: string;
+//     imageUpload?: string | null;
+// }) => {
+//     await prisma.product.update({
+//         where: { id: data.id },
+//         data: {
+//             ...(data.name && { name: String(data.name) }),
+//             ...(data.price && { price: Number(data.price) }),
+//             ...(data.detailDesc && { detailDesc: String(data.detailDesc) }),
+//             ...(data.shortDesc && { shortDesc: String(data.shortDesc) }),
+//             ...(data.quantity && { quantity: Number(data.quantity) }),
+//             ...(data.factory && { factory: String(data.factory) }),
+//             ...(data.target && { target: String(data.target) }),
+//             ...(data.imageUpload !== undefined && { image: data.imageUpload }),
+//         }
+//     });
+// };
+
+// export { createProduct, type CreateProductInput, getProductList, deleteProductById, getProductById, updateProductById };
+// services/admin/product.service.ts
 import { prisma } from "config/client";
 import { TOTAL_ITEM_PER_PAGE } from "config/constant";
 
-// Định nghĩa input cho hàm createProduct
-interface CreateProductInput {
+type CreateProductInput = {
     name: string;
     price: number;
-    detailDesc: string;
-    shortDesc: string;
+    discount?: number;
+    detailDesc?: string;
+    shortDesc?: string;
     quantity: number;
     factory: string;
     target: string;
     imageUpload?: string | null;
-}
 
-const createProduct = async (data: CreateProductInput) => {
-    const {
-        name,
-        price,
-        detailDesc,
-        shortDesc,
-        quantity,
-        factory,
-        target,
-        imageUpload,
-    } = data;
-
-    return await prisma.product.create({
-        data: {
-            name: String(name),
-            price: Number(price),
-            detailDesc: String(detailDesc),
-            shortDesc: String(shortDesc),
-            quantity: Number(quantity),
-            factory: String(factory),
-            target: String(target),
-            image: imageUpload ?? null, // Prisma cho phép null
-        },
-    });
+    // specs
+    cpu?: string | null;
+    ramGB?: number | null;
+    storageGB?: number | null;
+    storageType?: "HDD" | "SSD" | "NVME" | null;
+    screenResolution?: "FHD" | "QHD" | "4K" | null;
+    screenSizeInch?: number | null;
+    featureTags?: string | null;
 };
-const getProductList = async (page: number) => {
+
+type UpdateProductInput = CreateProductInput & {
+    id: number;
+    image?: string | null;
+};
+export const getProductList = async (page: number) => {
     const pageSize = TOTAL_ITEM_PER_PAGE;
     const skip = (page - 1) * pageSize;
     const products = await prisma.product.findMany({
@@ -47,43 +118,62 @@ const getProductList = async (page: number) => {
     })
     return products;
 }
+export async function createProduct(data: {
+    name: string; price: number; quantity: number; factory: string; target: string;
+    discount?: number; detailDesc?: string; shortDesc?: string; imageUpload?: string | null;
+    cpu?: string | null; ramGB?: number | null; storageGB?: number | null;
+    storageType?: "HDD" | "SSD" | "NVME" | null;
+    screenResolution?: "FHD" | "QHD" | "4K" | null;    // chú ý nếu enum Prisma là _4K thì cần map
+    screenSizeInch?: number | null;
+    featureTags?: string | null;
+}) {
+    // Nếu enum Prisma đặt là _4K:
+    // If your Prisma schema uses string enums for screenResolution, just return the string value.
+    const mapResolution = (v?: string | null): string | null => {
+        if (!v) return null;
+        if (v === "4K") return "_4K"; // map to your actual enum value if needed
+        return v; // FHD / QHD
+    };
 
-const deleteProductById = async (id: number) => {
-    await prisma.product.delete({
-        where: { id }
-    });
+    const payload: Prisma.ProductCreateInput = {
+        name: data.name,
+        price: data.price,
+        discount: data.discount ?? 0,
+        detailDesc: data.detailDesc ?? "",
+        shortDesc: data.shortDesc ?? "",
+        quantity: data.quantity,
+        factory: data.factory,
+        target: data.target,
+        ...(data.imageUpload ? { image: data.imageUpload } : {}),
+
+        // Specs (chỉ gán nếu model có các field tương ứng)
+        cpu: data.cpu ?? null,
+        ramGB: data.ramGB ?? null,
+        storageGB: data.storageGB ?? null,
+        storageType: data.storageType ?? null,
+        screenResolution: mapResolution(data.screenResolution ?? null),
+        screenSizeInch: data.screenSizeInch ?? null,
+        featureTags: data.featureTags ?? null,
+    };
+
+    return prisma.product.create({ data: payload });
 }
 
-const getProductById = async (id: number) => {
-    return await prisma.product.findUnique({
-        where: { id }
-    });
-}
-
-const updateProductById = async (data: {
-    id: number;
-    name?: string;
-    price?: number;
-    detailDesc?: string;
-    shortDesc?: string;
-    quantity?: number;
-    factory?: string;
-    target?: string;
-    imageUpload?: string | null;
-}) => {
-    await prisma.product.update({
-        where: { id: data.id },
+export async function updateProductById(data: UpdateProductInput) {
+    const { id, image, ...rest } = data;
+    return prisma.product.update({
+        where: { id },
         data: {
-            ...(data.name && { name: String(data.name) }),
-            ...(data.price && { price: Number(data.price) }),
-            ...(data.detailDesc && { detailDesc: String(data.detailDesc) }),
-            ...(data.shortDesc && { shortDesc: String(data.shortDesc) }),
-            ...(data.quantity && { quantity: Number(data.quantity) }),
-            ...(data.factory && { factory: String(data.factory) }),
-            ...(data.target && { target: String(data.target) }),
-            ...(data.imageUpload !== undefined && { image: data.imageUpload }),
-        }
+            ...rest,
+            ...(image !== undefined ? { image } : {}),
+        },
     });
-};
+}
 
-export { createProduct, type CreateProductInput, getProductList, deleteProductById, getProductById, updateProductById };
+export async function deleteProductById(id: number) {
+    return prisma.product.delete({ where: { id } });
+}
+
+export async function getProductById(id: number) {
+    return prisma.product.findUnique({ where: { id } });
+}

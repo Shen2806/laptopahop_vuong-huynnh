@@ -92,6 +92,22 @@ model Product {
   reorderLevel     Int               @default(0)
   stockMovements   StockMovement[]
 
+  // --- Các cột mới ---
+  cpu              String? @db.VarChar(255)
+  ramGB            Int?
+  storageGB        Int?
+  storageType      String? @db.VarChar(50) // HDD | SSD | NVME
+  screenResolution String? @db.VarChar(50) // FHD | QHD | 4K (hoặc "1920x1080")
+  screenSizeInch   Float? // ví dụ 13.3, 14.0, 15.6
+  featureTags      String? @db.VarChar(255) // ví dụ: |TOUCH|2IN1|TB4|FP|
+
+  // Index khuyến nghị để lọc nhanh hơn:
+  @@index([factory])
+  @@index([cpu])
+  @@index([ramGB])
+  @@index([storageType, storageGB])
+  @@index([screenResolution])
+  @@index([screenSizeInch])
   @@map("products")
 }
 

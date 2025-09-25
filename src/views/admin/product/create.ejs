@@ -250,6 +250,86 @@
                                                                     value="<%= (oldData && oldData.discount) || '' %>">
                                                             </div>
                                                         </div>
+                                                        <!-- ===== Thông số kỹ thuật (CREATE) ===== -->
+                                                        <div class="card glass shadow-sm mb-4 rounded-3">
+                                                            <div class="card-header">Thông số kỹ thuật</div>
+                                                            <div class="card-body">
+                                                                <div class="row">
+                                                                    <div class="mb-3 col-md-6">
+                                                                        <label class="form-label">CPU</label>
+                                                                        <input name="cpu" type="text"
+                                                                            class="form-control"
+                                                                            placeholder="VD: Intel Core i5-1240P / Ryzen 7 7840HS / Apple M2"
+                                                                            value="<%= (oldData && oldData.cpu) || '' %>">
+                                                                    </div>
+                                                                    <div class="mb-3 col-md-3">
+                                                                        <label class="form-label">RAM (GB)</label>
+                                                                        <input name="ramGB" type="number" min="1"
+                                                                            step="1" class="form-control"
+                                                                            value="<%= (oldData && oldData.ramGB) || '' %>">
+                                                                    </div>
+                                                                    <div class="mb-3 col-md-3">
+                                                                        <label class="form-label">Ổ cứng (GB)</label>
+                                                                        <input name="storageGB" type="number" min="1"
+                                                                            step="1" class="form-control"
+                                                                            value="<%= (oldData && oldData.storageGB) || '' %>">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="row">
+                                                                    <div class="mb-3 col-md-4">
+                                                                        <label class="form-label">Loại ổ</label>
+                                                                        <select name="storageType" class="form-select">
+                                                                            <option value="">-- Chọn --</option>
+                                                                            <option value="HDD"
+                                                                                <%=oldData?.storageType==='HDD'
+                                                                                ? 'selected' : '' %>>HDD</option>
+                                                                            <option value="SSD"
+                                                                                <%=oldData?.storageType==='SSD'
+                                                                                ? 'selected' : '' %>>SSD</option>
+                                                                            <option value="NVME"
+                                                                                <%=oldData?.storageType==='NVME'
+                                                                                ? 'selected' : '' %>>NVMe</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="mb-3 col-md-4">
+                                                                        <label class="form-label">Độ phân giải</label>
+                                                                        <select name="screenResolution"
+                                                                            class="form-select">
+                                                                            <option value="">-- Chọn --</option>
+                                                                            <option value="FHD"
+                                                                                <%=oldData?.screenResolution==='FHD'
+                                                                                ? 'selected' : '' %>>FHD (1920×1080)
+                                                                            </option>
+                                                                            <option value="QHD"
+                                                                                <%=oldData?.screenResolution==='QHD'
+                                                                                ? 'selected' : '' %>>QHD / 2K</option>
+                                                                            <option value="4K"
+                                                                                <%=oldData?.screenResolution==='4K'
+                                                                                ? 'selected' : '' %>>4K</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="mb-3 col-md-4">
+                                                                        <label class="form-label">Màn hình
+                                                                            (inch)</label>
+                                                                        <input name="screenSizeInch" type="number"
+                                                                            min="10" step="0.1" class="form-control"
+                                                                            placeholder="VD: 13.3, 14.0, 15.6"
+                                                                            value="<%= (oldData && oldData.screenSizeInch) || '' %>">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">Tính năng đặc biệt</label>
+                                                                    <input name="featureTagsRaw" type="text"
+                                                                        class="form-control"
+                                                                        placeholder="Nhập dạng: TOUCH,2IN1,TB4,FP"
+                                                                        value="<%= (oldData && oldData.featureTagsRaw) || '' %>">
+                                                                    <small class="text-muted">Hệ thống sẽ lưu thành dạng
+                                                                        “|TOUCH|2IN1|TB4|FP|”.</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
                                                         <div class="mb-3">
                                                             <label class="form-label">Ảnh đại diện</label>

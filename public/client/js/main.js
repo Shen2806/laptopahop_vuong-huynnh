@@ -321,7 +321,57 @@ $(document).on('click', '#btnFilter', function (event) {
   // Điều hướng
   window.location.href = currentUrl.toString();
 });
+    // Thu thập filter
+const factoryArr = $("#factoryFilter .form-check-input:checked").map(function(){ return this.value; }).get();
+const targetArr  = $("#targetFilter .form-check-input:checked").map(function(){ return this.value; }).get();
+const priceArr   = $("#priceFilter  .form-check-input:checked").map(function(){ return this.value; }).get();
+const sortValue  = $('input[name="radio-sort"]:checked').val();
 
+// === NEW ===
+const cpuArr     = $("#cpuFilter .form-check-input:checked").map(function(){ return this.value; }).get();
+const ramArr     = $("#ramFilter .form-check-input:checked").map(function(){ return this.value; }).get();
+const storageArr = $("#storageFilter .form-check-input:checked").map(function(){ return this.value; }).get();
+const resArr     = $("#resFilter .form-check-input:checked").map(function(){ return this.value; }).get();
+const screenArr  = $("#screenFilter .form-check-input:checked").map(function(){ return this.value; }).get();
+const featureArr = $("#featureFilter .form-check-input:checked").map(function(){ return this.value; }).get();
+
+// Reset param cũ
+searchParams.delete('factory');
+searchParams.delete('target');
+searchParams.delete('price');
+searchParams.delete('sort');
+// === NEW ===
+searchParams.delete('cpu');
+searchParams.delete('ram');
+searchParams.delete('storage');
+searchParams.delete('res');
+searchParams.delete('screen');
+searchParams.delete('feature');
+
+// về trang 1
+searchParams.set('page', '1');
+
+// Set param
+if (factoryArr.length) searchParams.set('factory', factoryArr.join(','));
+if (targetArr.length)  searchParams.set('target',  targetArr.join(','));
+
+// Giá: hỗ trợ CSV nhiều khoảng
+if (priceArr.length)   searchParams.set('price',   priceArr.join(','));
+
+if (sortValue && sortValue !== 'gia-khong-sap-xep') {
+  searchParams.set('sort', sortValue);
+}
+
+// === NEW ===
+if (cpuArr.length)     searchParams.set('cpu',     cpuArr.join(','));
+if (ramArr.length)     searchParams.set('ram',     ramArr.join(','));
+if (storageArr.length) searchParams.set('storage', storageArr.join(','));
+if (resArr.length)     searchParams.set('res',     resArr.join(','));
+if (screenArr.length)  searchParams.set('screen',  screenArr.join(','));
+if (featureArr.length) searchParams.set('feature', featureArr.join(','));
+
+// Điều hướng
+window.location.href = currentUrl.toString();
 
     //handle auto checkbox after page loading
     // Parse the URL parameters
@@ -357,6 +407,47 @@ $(document).on('click', '#btnFilter', function (event) {
         $(`input[type="radio"][name="radio-sort"][value="${sort}"]`).prop('checked', true);
     }
 
+    // CPU
+if (params.has('cpu')) {
+  params.get('cpu').split(',').forEach(v => {
+    $(`#cpuFilter .form-check-input[value="${v}"]`).prop('checked', true);
+  });
+}
+
+// RAM
+if (params.has('ram')) {
+  params.get('ram').split(',').forEach(v => {
+    $(`#ramFilter .form-check-input[value="${v}"]`).prop('checked', true);
+  });
+}
+
+// STORAGE
+if (params.has('storage')) {
+  params.get('storage').split(',').forEach(v => {
+    $(`#storageFilter .form-check-input[value="${v}"]`).prop('checked', true);
+  });
+}
+
+// RESOLUTION
+if (params.has('res')) {
+  params.get('res').split(',').forEach(v => {
+    $(`#resFilter .form-check-input[value="${v}"]`).prop('checked', true);
+  });
+}
+
+// SCREEN SIZE
+if (params.has('screen')) {
+  params.get('screen').split(',').forEach(v => {
+    $(`#screenFilter .form-check-input[value="${v}"]`).prop('checked', true);
+  });
+}
+
+// FEATURES
+if (params.has('feature')) {
+  params.get('feature').split(',').forEach(v => {
+    $(`#featureFilter .form-check-input[value="${v}"]`).prop('checked', true);
+  });
+}
 
     // handle add to cart wit ajax
     $(".btnAddToCartHomePage").click(function(event){

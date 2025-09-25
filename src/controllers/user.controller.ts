@@ -282,42 +282,44 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         price = "",
         sort = "",
         q = "",
-    } = req.query as {
-        page?: string;
-        factory: string;
-        target: string;
-        price: string;
-        sort: string;
-        q?: string;
-    };
+        // --- mới ---
+        cpu = "",
+        ram = "",
+        storage = "",
+        res: reso = "",
+        screen = "",
+        feature = "",
+    } = req.query as any;
 
     // Pagination
     let currentPage = page ? parseInt(String(page), 10) : 1;
     if (!Number.isFinite(currentPage) || currentPage <= 0) currentPage = 1;
     const pageSize = 6;
 
-    // Các hãng đã tick sẵn (để render lại checkbox)
-    const precheckedFactories = (req.query.factory?.toString() || "")
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean);
+    // helpers
+    const parseCsv = (v: any) =>
+        String(v || "")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
 
-    // ===== Build điều kiện where =====
+    const precheckedFactories = parseCsv(factory);
+
+    // ===== Build where =====
     const where: any = {};
+    const AND: any[] = [];
 
-    // Lọc theo hãng (CSV)
+    // Hãng
     if (precheckedFactories.length) {
         where.factory = { in: precheckedFactories };
     }
 
-    // Lọc theo target (ví dụ: "gaming", "office" ...)
+    // Target
     if (target) {
-        // MySQL thường dùng collation _ci ⇒ mặc định không phân biệt hoa/thường
-        // Không dùng mode: "insensitive" để tránh lỗi Prisma trên MySQL
-        where.target = { contains: String(target) };
+        AND.push({ target: { contains: String(target) } });
     }
 
-    // Lọc theo từ khóa q (name/factory/shortDesc/detailDesc)
+    // Tìm kiếm q
     if (q) {
         const kw = String(q).trim();
         if (kw) {
@@ -330,52 +332,118 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         }
     }
 
-    // Lọc theo khoảng giá (hỗ trợ: "min-max", "min+", "<=max", ">=min")
-    const addPriceFilter = (priceStr: string) => {
-        const s = String(priceStr || "").trim();
-        if (!s) return;
+    // ===== Giá: hỗ trợ nhiều khoảng (CSV) theo format controller đang dùng: "min-max", "min+", "<=max", ">=min"
+    const priceTokens = parseCsv(price);
+    if (priceTokens.length) {
+        const OR: any[] = [];
+        for (const token of priceTokens) {
+            const s = token.trim();
 
-        // "min-max" (vd: "10000000-20000000")
-        const range = s.match(/^(\d+)?\s*-\s*(\d+)?$/);
-        if (range) {
-            const min = range[1] ? parseInt(range[1], 10) : null;
-            const max = range[2] ? parseInt(range[2], 10) : null;
-            where.price = {};
-            if (min !== null) where.price.gte = min;
-            if (max !== null) where.price.lte = max;
-            return;
+            // "min-max"
+            const range = s.match(/^(\d+)?\s*-\s*(\d+)?$/);
+            if (range) {
+                const min = range[1] ? parseInt(range[1], 10) : null;
+                const max = range[2] ? parseInt(range[2], 10) : null;
+                const cond: any = {};
+                if (min !== null) cond.gte = min;
+                if (max !== null) cond.lte = max;
+                OR.push({ price: cond });
+                continue;
+            }
+            // "min+"
+            const minPlus = s.match(/^(\d+)\+$/);
+            if (minPlus) {
+                OR.push({ price: { gte: parseInt(minPlus[1], 10) } });
+                continue;
+            }
+            // "<=max"
+            const lte = s.match(/^<=?\s*(\d+)$/);
+            if (lte) {
+                OR.push({ price: { lte: parseInt(lte[1], 10) } });
+                continue;
+            }
+            // ">=min"
+            const gte = s.match(/^>=?\s*(\d+)$/);
+            if (gte) {
+                OR.push({ price: { gte: parseInt(gte[1], 10) } });
+                continue;
+            }
         }
+        if (OR.length) AND.push({ OR });
+    }
 
-        // "min+" (vd: "30000000+")
-        const minPlus = s.match(/^(\d+)\+$/);
-        if (minPlus) {
-            where.price = { gte: parseInt(minPlus[1], 10) };
-            return;
+    // ======== Các filter mới ========
+
+    // CPU (CSV token, ví dụ: I3,I5,I7,RYZEN5,M1,M2,M3...)
+    const cpus = parseCsv(cpu);
+    if (cpus.length) {
+        AND.push({
+            OR: cpus.map((c: string) => ({
+                cpu: { contains: c }, // ví dụ "i5", "ryzen 7", "m2"
+            })),
+        });
+    }
+
+    // RAM (CSV số GB: 8,16,32...)
+    const rams = parseCsv(ram)
+        .map((n: string) => parseInt(n, 10))
+        .filter((n: number) => Number.isFinite(n));
+    if (rams.length) {
+        AND.push({ ramGB: { in: rams } });
+    }
+
+    // STORAGE (CSV GB: 256,512,1024...) — tuỳ chọn: nếu bạn muốn filter theo loại, thêm param storageType
+    const storages = parseCsv(storage)
+        .map((n: string) => parseInt(n, 10))
+        .filter((n: number) => Number.isFinite(n));
+    if (storages.length) {
+        AND.push({ storageGB: { in: storages } });
+    }
+
+    // RESOLUTION (CSV: FHD,QHD,4K)
+    const resos = parseCsv(reso);
+    if (resos.length) {
+        AND.push({ screenResolution: { in: resos } });
+    }
+
+    // SCREEN SIZE bucket (CSV: "13-14","15-16","17-18")
+    const screens = parseCsv(screen);
+    if (screens.length) {
+        const OR: any[] = [];
+        for (const tk of screens) {
+            const m = tk.match(/^(\d+(\.\d+)?)\s*-\s*(\d+(\.\d+)?)$/);
+            if (m) {
+                const min = parseFloat(m[1]);
+                const max = parseFloat(m[3]);
+                if (Number.isFinite(min) && Number.isFinite(max)) {
+                    OR.push({ screenSizeInch: { gte: min, lte: max } });
+                }
+            }
         }
+        if (OR.length) AND.push({ OR });
+    }
 
-        // "<=max"
-        const lte = s.match(/^<=?\s*(\d+)$/);
-        if (lte) {
-            where.price = { lte: parseInt(lte[1], 10) };
-            return;
-        }
+    // FEATURES (CSV tokens: TOUCH,2IN1,TB4,FP,WEBCAM1080...)
+    const features = parseCsv(feature).map((s) => s.toUpperCase());
+    if (features.length) {
+        AND.push({
+            OR: features.map((f) => ({
+                featureTags: { contains: `|${f}|` }, // an toàn do có delimiter
+            })),
+        });
+    }
 
-        // ">=min"
-        const gte = s.match(/^>=?\s*(\d+)$/);
-        if (gte) {
-            where.price = { gte: parseInt(gte[1], 10) };
-            return;
-        }
-    };
-    addPriceFilter(price);
+    if (AND.length) where.AND = AND;
 
-    // Sắp xếp
+    // ===== Sắp xếp: hỗ trợ cả "gia-tang-dan/gia-giam-dan" và "price_asc/price_desc"
     let orderBy: any = { id: "desc" as const };
     switch (String(sort).toLowerCase()) {
         case "price_asc":
+        case "gia-tang-dan":
             orderBy = { price: "asc" };
             break;
         case "price_desc":
+        case "gia-giam-dan":
             orderBy = { price: "desc" };
             break;
         case "best_seller":
@@ -384,10 +452,9 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         case "newest":
             orderBy = { id: "desc" };
             break;
-        // có thể bổ sung case khác nếu bạn đang dùng
     }
 
-    // ===== Query sản phẩm + tổng count =====
+    // ===== Query
     const skip = (currentPage - 1) * pageSize;
     const [products, totalCount] = await prisma.$transaction([
         prisma.product.findMany({
@@ -401,9 +468,8 @@ const getProductFilterPage = async (req: Request, res: Response) => {
 
     const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
-    // ===== Lấy review aggregate theo danh sách sản phẩm hiện trang =====
+    // ===== Ratings (giữ nguyên logic của bạn)
     const ids = products.map((p) => Number(p.id)).filter(Number.isFinite);
-
     type ReviewRow = { productId: number; rating: number };
     const reviews: ReviewRow[] = ids.length
         ? await prisma.review.findMany({
@@ -412,7 +478,6 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         })
         : [];
 
-    // Gom review -> sum & count
     const agg: Record<number, { sum: number; count: number }> = {};
     for (const r of reviews) {
         const k = r.productId;
@@ -420,10 +485,8 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         agg[k].sum += Number(r.rating) || 0;
         agg[k].count += 1;
     }
-
-    // Helper mảng sao
     const makeStars = (avg: number) => {
-        const rounded = Math.round(avg * 2) / 2; // làm tròn .5
+        const rounded = Math.round(avg * 2) / 2;
         const full = Math.floor(rounded);
         const half = rounded - full === 0.5 ? 1 : 0;
         const empty = 5 - full - half;
@@ -446,7 +509,6 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         };
     });
 
-    // ===== Render =====
     return res.render("product/filter.ejs", {
         products: productsWithRating,
         totalPages,
@@ -464,9 +526,10 @@ const getProductFilterPage = async (req: Request, res: Response) => {
             { value: "ALIENWARE", name: "Alienware" },
         ],
         precheckedFactories,
-        q, // để đổ lại keyword ra view nếu cần
+        q,
     });
 };
+
 
 const getRegisterPage = async (req: Request, res: Response) => {
     return res.render("client/auth/register.ejs",
