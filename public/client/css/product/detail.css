@@ -176,7 +176,7 @@
 /* Khi focus trong form hoặc có class .open (JS đã thêm) -> mở rộng */
 #headerSearchForm:focus-within,
 #headerSearchForm.open {
-  width: clamp(200px, 35vw, 200px);
+  width: clamp(300px, 35vw, 200px);
   border-color: #4CAF50 !important;
   box-shadow: 0 0 0 3px rgba(76, 175, 80, .18);
 }
@@ -1351,4 +1351,28 @@
 #reviewList a:hover,
 #qaList a:hover {
   text-decoration: underline;
+}
+
+/*xem thêm */
+#desc-wrapper.desc-collapsed {
+  max-height: 150px;
+  /* chỉnh chiều cao mong muốn */
+  overflow: hidden;
+  position: relative;
+}
+
+#desc-wrapper.desc-collapsed::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background: linear-gradient(to top, white, transparent);
+}
+
+#toggle-desc {
+  display: inline-block !important;
+  margin-top: 10px;
+  z-index: 10;
 }

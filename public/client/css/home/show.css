@@ -518,3 +518,121 @@
       transition: none !important;
     }
   }
+
+  /* biến dễ chỉnh */
+:root{
+  --sw-btn-size: 44px;
+  --sw-btn-bg: rgba(0,0,0,0.55);
+  --sw-btn-color: #fff;
+  --sw-btn-hover-bg: rgba(0,0,0,0.75);
+  --sw-bullet-size: 10px;
+  --sw-bullet-active: #1a73e8;
+  --sw-bullet-bg: rgba(255,255,255,0.45);
+  --sw-z: 50;
+}
+
+/* Container đảm bảo vị trí tương đối để nút có thể absolute */
+.swiper {
+  position: relative;
+}
+
+/* Nút next / prev chung */
+.swiper-button-next,
+.swiper-button-prev {
+  width: var(--sw-btn-size);
+  height: var(--sw-btn-size);
+  border-radius: 50%;
+  background: var(--sw-btn-bg);
+  color: var(--sw-btn-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  transition: transform .16s ease, background .12s ease, opacity .12s ease;
+  z-index: var(--sw-z);
+  cursor: pointer;
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  opacity: 0.98;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  border: none; /* nếu swiper chèn button element */
+}
+
+/* vị trí trái/phải */
+.swiper-button-prev { left: 10px; }
+.swiper-button-next { right: 10px; }
+
+/* icon mặc định ẩn nếu bạn dùng custom icon; Swiper có sẵn pseudo-element, giữ nó */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--sw-btn-color);
+  opacity: 0.95;
+}
+
+/* hover / fokus */
+.swiper-button-next:hover,
+.swiper-button-prev:hover,
+.swiper-button-next:focus,
+.swiper-button-prev:focus {
+  background: var(--sw-btn-hover-bg);
+  transform: translateY(-50%) scale(1.06);
+  outline: none;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.32);
+}
+
+/* disabled state */
+.swiper-button-disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  transform: translateY(-50%) scale(1);
+}
+
+/* Pagination bullets */
+.swiper-pagination {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 12px;
+  z-index: var(--sw-z);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* bullet mặc định */
+.swiper-pagination-bullet {
+  width: var(--sw-bullet-size);
+  height: var(--sw-bullet-size);
+  border-radius: 50%;
+  background: var(--sw-bullet-bg);
+  opacity: 0.9;
+  transition: transform .14s ease, background .14s ease, width .14s ease;
+  cursor: pointer;
+  border: 0;
+}
+
+/* active bullet */
+.swiper-pagination-bullet-active {
+  background: var(--sw-bullet-active);
+  transform: scale(1.25);
+  width: calc(var(--sw-bullet-size) * 1.6);
+  height: var(--sw-bullet-size);
+  border-radius: 999px; /* pill shape */
+}
+
+/* responsive: ẩn nút trên màn nhỏ, show pagination */
+@media (max-width: 640px) {
+  .swiper-button-next,
+  .swiper-button-prev {
+    display: none;
+  }
+  .swiper-pagination {
+    bottom: 8px;
+  }
+}
+

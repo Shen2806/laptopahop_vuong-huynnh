@@ -195,10 +195,17 @@
 
 /* Khi focus trong form hoặc có class .open (JS đã thêm) -> mở rộng */
 #headerSearchForm:focus-within,
+<<<<<<< HEAD
 #headerSearchForm.open {
   width: clamp(200px, 35vw, 200px);
   border-color: #4CAF50 !important;
   box-shadow: 0 0 0 3px rgba(76, 175, 80, .18);
+=======
+#headerSearchForm.open{
+  width: clamp(300px, 35vw, 200px);
+  border-color:#4CAF50 !important;
+  box-shadow:0 0 0 3px rgba(76,175,80,.18);
+>>>>>>> cf22fe488fee3733689100ce4d6032b5af101ee0
 }
 
 #headerSearchForm:focus-within .form-control,
