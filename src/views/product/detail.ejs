@@ -946,6 +946,8 @@
                                                     </div>
                                                 </div>
 
+                                                
+
                                                 <!-- ĐÁNH GIÁ -->
                                                 <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
                                                     id="reviewsSection">
@@ -1217,28 +1219,7 @@
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
                         integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
                         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-                    <!-- nút xem thêm -->
-                    <script>
-
-
-                        document.addEventListener("DOMContentLoaded", function () {
-                            const desc = document.getElementById("desc-wrapper");
-                            const btn = document.getElementById("toggle-desc");
-
-                            btn.addEventListener("click", function () {
-                                desc.classList.toggle("desc-collapsed");
-
-                                if (desc.classList.contains("desc-collapsed")) {
-                                    btn.innerText = "Xem thêm";
-                                } else {
-                                    btn.innerText = "Thu gọn";
-                                }
-                            });
-                        });
-
-
-
-                    </script>
+                    
 
                     <script id="boot-json" type="application/json">
   <%- JSON.stringify({ productId: product.id, isAuth: !!user }) %>
@@ -1441,6 +1422,23 @@
                             loadReviews();
                         })();
                     </script>
+
+                    <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const descWrapper = document.getElementById("desc-wrapper");
+  const toggleBtn = document.getElementById("toggle-desc");
+
+  if (!descWrapper || !toggleBtn) return;
+
+  toggleBtn.addEventListener("click", function () {
+    descWrapper.classList.toggle("desc-collapsed");
+    toggleBtn.textContent = descWrapper.classList.contains("desc-collapsed")
+      ? "Xem thêm"
+      : "Thu gọn";
+  });
+});
+</script>
+
 
                     <!-- admin có thể trả lời -->
                     <script>
