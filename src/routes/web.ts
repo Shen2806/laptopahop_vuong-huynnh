@@ -1,5 +1,5 @@
 import express, { CookieOptions, Express } from 'express';
-import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser, getUserOrders } from 'controllers/user.controller';
+import { getCreateUserPage, getHomePage, getProductFilterPage, getViewUser, postCreateUser, postDeleteUser, postUpdateUser, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser, getUserOrders, postChangePassword } from 'controllers/user.controller';
 import 'dotenv/config';
 import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashboardPage, getPromoPage, postAddPromo, postCancelOrderByAdmin, postConfirmOrder, postDeletePromo, postRestockProduct, postUpdateOrderStatus, postUpdatePromo } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
@@ -19,6 +19,7 @@ import { getProductReviews, getProductReviewSummary, postCreateReview } from 'co
 import { adminAnswerQuestionAPI, adminListQuestionsAPI, getAdminQAPage } from 'controllers/admin/qa.controller';
 import { getUserWithRoleById } from 'services/client/auth.service';
 import { adminInventoryAdjustAPI, adminInventoryListAPI, adminInventoryPage, adminInventorySetReorderAPI } from 'controllers/admin/inventory.controller';
+import { getComparePage } from 'controllers/client/compare.controller';
 
 const router = express.Router();
 
@@ -132,6 +133,8 @@ const webRoutes = (app: Express) => {
 
     // POST update profile
     router.post("/profile/update", upload.single("avatar"), handleUpdateProfile);
+    // NEW: đổi mật khẩu (cần đăng nhập)
+    router.post("/profile/change-password", ensureAuthenticated, postChangePassword);
     // GET /order-user
     router.get("/order-user", ensureAuthenticated, getUserOrders);
     // Chính sách sử dụng
@@ -269,22 +272,6 @@ const webRoutes = (app: Express) => {
         res.json(messages);
     });
 
-    // Trang & API admin chat
-    router.get("/admin/chat", isAdmin, (req, res) => res.render("admin/chat/index.ejs"));
-    router.get("/admin/api/chat/sessions", isAdmin, async (req, res) => {
-        const sessions = await prisma.chatSession.findMany({
-            where: { status: "OPEN" },
-            orderBy: { createdAt: "desc" },
-        });
-        // tính unread theo góc nhìn ADMIN (tin từ USER, isRead=false)
-        const result = await Promise.all(sessions.map(async s => {
-            const unread = await prisma.chatMessage.count({
-                where: { sessionId: s.id, sender: "USER", isRead: false },
-            });
-            return { ...s, unread };
-        }));
-        res.json(result);
-    });
 
     // Lấy danh sách review (ai đăng nhập cũng thấy)
     router.get("/api/products/:productId/reviews", async (req, res) => {
@@ -342,13 +329,32 @@ const webRoutes = (app: Express) => {
     router.get("/api/products/:id/reviews/summary", getProductReviewSummary);
     router.post("/api/products/:id/reviews", ensureAuthenticated, postCreateReview);
 
+    // So sánh sản phẩm
+    router.get("/compare", getComparePage);
+
     // ====== ADMIN GUARD CHO TOÀN NHÁNH /admin ======
     router.use('/admin', isAdmin);
     // admin routes
     router.get("/admin", getDashboardPage);
+    // Trang & API admin chat
+    router.get("/admin/chat", isAdmin, (req, res) => res.render("admin/chat/index.ejs"));
+    router.get("/admin/api/chat/sessions", isAdmin, async (req, res) => {
+        const sessions = await prisma.chatSession.findMany({
+            where: { status: "OPEN" },
+            orderBy: { createdAt: "desc" },
+        });
+        // tính unread theo góc nhìn ADMIN (tin từ USER, isRead=false)
+        const result = await Promise.all(sessions.map(async s => {
+            const unread = await prisma.chatMessage.count({
+                where: { sessionId: s.id, sender: "USER", isRead: false },
+            });
+            return { ...s, unread };
+        }));
+        res.json(result);
+    });
+
     // cập nhật số lượng sắp hết hàng
     router.post("/admin/product/restock", postRestockProduct);
-
     router.get("/admin/user", getAdminUserPage);
     router.post("/admin/handle-create-user", fileUploadMiddleware("avatar"), postCreateUser);
     router.get("/admin/create-user", getCreateUserPage);
@@ -369,6 +375,7 @@ const webRoutes = (app: Express) => {
     router.get("/admin/edit-blog/:id", getAdminEditBlogPage);
     router.post("/admin/update-blog", fileUploadMiddleware("thumbnail", "images/blog"), postAdminUpdateBlog);
     router.post("/admin/delete-blog/:id", postDeleteBlog);
+
     // Promo routes - Admin
     router.get("/admin/promo", getPromoPage);
     router.post("/admin/promo/add", postAddPromo);

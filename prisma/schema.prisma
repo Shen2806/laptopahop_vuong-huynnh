@@ -34,11 +34,77 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AiRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
 model Session {
   id        String   @id
   sid       String   @unique
   data      String   @db.MediumText
   expiresAt DateTime
+}
+
+model AiChatSession {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  topic      String?  @db.VarChar(255)
+  summary    String?  @db.Text // tóm tắt cuộn (rolling)
+  status     String   @default("OPEN") // OPEN | CLOSED
+  lastUsedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  messages AiChatMessage[]
+  memories AiMemory[]
+
+  @@index([userId, lastUsedAt])
+}
+
+model AiChatMessage {
+  id        Int      @id @default(autoincrement())
+  sessionId Int
+  role      AiRole
+  content   String   @db.Text
+  tokens    Int? // optional
+  createdAt DateTime @default(now())
+
+  session   AiChatSession @relation(fields: [sessionId], references: [id])
+  embedding AiEmbedding?
+}
+
+model AiMemory {
+  id        Int       @id @default(autoincrement())
+  userId    Int?
+  sessionId Int?
+  type      String    @db.VarChar(32) // PREFERENCE | FACT | EPHEMERAL
+  key       String    @db.VarChar(255)
+  value     String    @db.Text
+  score     Float // độ “đáng nhớ”
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+
+  session     AiChatSession? @relation(fields: [sessionId], references: [id])
+  AiEmbedding AiEmbedding[]
+
+  @@index([userId, sessionId, type])
+}
+
+model AiEmbedding {
+  id        Int  @id @default(autoincrement())
+  messageId Int? @unique
+  memoryId  Int?
+  dim       Int
+  // MySQL không có vector-native -> lưu JSON float[]
+  vector    Json
+
+  message AiChatMessage? @relation(fields: [messageId], references: [id])
+  memory  AiMemory?      @relation(fields: [memoryId], references: [id])
+
+  @@index([messageId])
+  @@index([memoryId])
 }
 
 model User {

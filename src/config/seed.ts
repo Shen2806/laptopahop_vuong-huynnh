@@ -50,198 +50,282 @@ const initDatabase = async () => {
 
     }
 
-    if (countProduct === 0) {
-        const products = [
-            {
-                name: "Laptop Asus TUF Gaming",
-                price: 17490000,
-                detailDesc:
-                    "ASUS TUF Gaming F15 FX506HF-HN017W: i5-11400H + RTX 2050, sẵn 16GB RAM, SSD NVMe 512GB, màn 15.6\" FHD 144Hz, khung máy chuẩn bền MIL-STD-810H.",
-                shortDesc: "i5-11400H • RTX 2050 • 16GB • 512GB • 15.6\" FHD 144Hz",
-                quantity: 100,
-                factory: "ASUS",
-                target: "GAMING",
-                image: "1711078092373-asus-01.png",
-                // specs mới
-                cpu: "Intel Core i5-11400H",
-                ramGB: 16,
-                storageGB: 512,
-                storageType: "NVME",
-                screenSizeInch: 15.6,
-                screenResolution: "FHD",
-                featureTags: "RTX 2050 4GB;144Hz;Wi-Fi 6;RGB keyboard;MIL-STD-810H"
+    if (countProduct < 150) {
+        // ===== CẤU HÌNH =====
+        const factoryOptions = [
+            { value: "APPLE", name: "Apple (MacBook)" },
+            { value: "ASUS", name: "Asus" },
+            { value: "LENOVO", name: "Lenovo" },
+            { value: "DELL", name: "Dell" },
+            { value: "LG", name: "LG" },
+            { value: "ACER", name: "Acer" },
+            { value: "HP", name: "HP" },
+            { value: "MSI", name: "MSI" },
+            { value: "GIGABYTE", name: "Gigabyte" },
+            { value: "ALIENWARE", name: "Alienware" },
+        ] as const;
+
+        const PER_BRAND = 12; // 👉 Đổi thành 10..15 nếu muốn
+
+        // ===== Helpers =====
+        const rand = (min: number, max: number) => Math.round(min + Math.random() * (max - min));
+        const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+        const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+
+        const targets = {
+            GAMING: "GAMING",
+            SVVP: "SINHVIEN-VANPHONG",
+            TKDH: "THIET-KE-DO-HOA",
+            MONG: "MONG-NHE",
+            DN: "DOANH-NHAN",
+        } as const;
+
+        const resos = ["FHD", "QHD", "4K"] as const;
+        const sizesCommon = [13.3, 14.0, 15.6, 16.0, 17.3];
+
+        // Series/CPU theo hãng (đều là dòng có thật)
+        const catalogs: Record<string, { series: string[]; cpus: string[]; extras?: string[]; sizes?: number[] }> = {
+            APPLE: {
+                series: ["MacBook Air", "MacBook Pro"],
+                cpus: ["Apple M1 8‑core", "Apple M2 8‑core", "Apple M3 8‑core"],
+                extras: ["Retina", "Liquid Retina", "MagSafe 3", "Wi‑Fi 6", "Touch ID"],
+                sizes: [13.3, 13.6, 14.2, 16.2],
             },
-            {
-                name: "Laptop Dell Inspiron 15",
-                price: 15490000,
-                detailDesc:
-                    "Dell Inspiron 15 3520: i5-1235U, RAM 16GB, SSD NVMe 512GB, màn 15.6\" FHD 120Hz — tối ưu cho công việc hằng ngày.",
-                shortDesc: "i5-1235U • 16GB • 512GB • 15.6\" FHD 120Hz",
-                quantity: 200,
-                factory: "DELL",
-                target: "SINHVIEN-VANPHONG",
-                image: "1711078452562-dell-01.png",
-                cpu: "Intel Core i5-1235U",
-                ramGB: 16,
-                storageGB: 512,
-                storageType: "NVME",
-                screenSizeInch: 15.6,
-                screenResolution: "FHD",
-                featureTags: "120Hz;Wi-Fi 6;Backlit keyboard"
+            ASUS: {
+                series: ["TUF Gaming", "ROG Strix", "ROG Zephyrus", "Vivobook", "Zenbook"],
+                cpus: ["Intel Core i5‑12450H", "Intel Core i7‑12700H", "AMD Ryzen 7 7840HS"],
+                extras: ["144Hz", "RGB keyboard", "Wi‑Fi 6", "MIL‑STD‑810H"],
             },
-            {
-                name: "Lenovo IdeaPad Gaming 3",
-                price: 19500000,
-                detailDesc:
-                    "IdeaPad Gaming 3 (15”) i5-10300H + GTX 1650, RAM 8GB, SSD 512GB, màn 15.6\" FHD 120Hz — thiết kế tối giản, mát mẻ.",
-                shortDesc: "i5-10300H • GTX 1650 • 8GB • 512GB • 15.6\" FHD 120Hz",
-                quantity: 150,
-                factory: "LENOVO",
-                target: "GAMING",
-                image: "1711079073759-lenovo-01.png",
-                cpu: "Intel Core i5-10300H",
-                ramGB: 8,
-                storageGB: 512,
-                storageType: "NVME",
-                screenSizeInch: 15.6,
-                screenResolution: "FHD",
-                featureTags: "GTX 1650 4GB;120Hz;Wi-Fi 6"
+            LENOVO: {
+                series: ["IdeaPad", "IdeaPad Gaming", "Legion", "ThinkPad E14", "Yoga"],
+                cpus: ["Intel Core i5‑1240P", "Intel Core i7‑1260P", "AMD Ryzen 5 7530U"],
+                extras: ["Backlit keyboard", "Wi‑Fi 6", "120Hz"],
             },
-            {
-                name: "Asus K501UX",
-                price: 11900000,
-                detailDesc:
-                    "ASUS K501UX vỏ kim loại mỏng nhẹ: i5-6200U, RAM 8GB, SSD 256GB, GPU GeForce GTX 950M, màn 15.6\" FHD.",
-                shortDesc: "i5-6200U • GTX 950M • 8GB • 256GB • 15.6\" FHD",
-                quantity: 99,
-                factory: "ASUS",
-                target: "THIET-KE-DO-HOA",
-                image: "1711079496409-asus-02.png",
-                cpu: "Intel Core i5-6200U",
-                ramGB: 8,
-                storageGB: 256,
-                storageType: "SSD",
-                screenSizeInch: 15.6,
-                screenResolution: "FHD",
-                featureTags: "GTX 950M 4GB;Aluminum body;Backlit keyboard"
+            DELL: {
+                series: ["Inspiron", "Vostro", "Latitude", "G15"],
+                cpus: ["Intel Core i5‑1235U", "Intel Core i7‑12650H", "Intel Core i5‑1135G7"],
+                extras: ["Wi‑Fi 6", "120Hz", "Backlit keyboard"],
             },
-            {
-                name: "MacBook Air 13",
-                price: 17690000,
-                detailDesc:
-                    "MacBook Air 13 (2020) chip Apple M1, RAM 8GB, SSD 256GB, màn Retina 13.3\" 2560×1600, Touch ID, Wi-Fi 6.",
-                shortDesc: "Apple M1 • 8GB • 256GB • 13.3\" 2560×1600",
-                quantity: 99,
-                factory: "APPLE",
-                target: "GAMING", // giữ nguyên target cũ của bạn
-                image: "1711079954090-apple-01.png",
-                cpu: "Apple M1 8-core",
-                ramGB: 8,
-                storageGB: 256,
-                storageType: "NVME",
-                screenSizeInch: 13.3,
-                screenResolution: "QHD", // 2560×1600 ~ “2.5K” (map tạm sang QHD enum)
-                featureTags: "Retina;Touch ID;Wi-Fi 6;Fanless"
+            LG: {
+                series: ["gram 14", "gram Style 14", "gram 16"],
+                cpus: ["Intel Core i7‑1360P", "Intel Core i5‑1340P"],
+                extras: ["OLED 90Hz", "~1.0kg", "Wi‑Fi 6E"],
             },
-            {
-                name: "Laptop LG Gram Style",
-                price: 31490000,
-                detailDesc:
-                    "LG gram Style 14 (14Z90RS): Core i7-1360P, RAM 16GB, SSD 512GB, màn OLED 14\" 2880×1800 90Hz, siêu nhẹ ~1kg.",
-                shortDesc: "i7-1360P • 16GB • 512GB • 14\" 2880×1800 90Hz OLED",
-                quantity: 99,
-                factory: "LG",
-                target: "DOANH-NHAN",
-                image: "1711080386941-lg-01.png",
-                cpu: "Intel Core i7-1360P",
-                ramGB: 16,
-                storageGB: 512,
-                storageType: "NVME",
-                screenSizeInch: 14.0,
-                screenResolution: "QHD", // 2880×1800 ≈ “2.8K” (map sang QHD enum)
-                featureTags: "OLED 90Hz;~1.0kg;Wi-Fi 6E"
+            ACER: {
+                series: ["Nitro 5", "Nitro V 15", "Aspire 7", "Swift"],
+                cpus: ["Intel Core i5‑13420H", "Intel Core i7‑12700H", "AMD Ryzen 5 7535HS"],
+                extras: ["144Hz", "Wi‑Fi 6"],
             },
-            {
-                name: "MacBook Air 13",
-                price: 24990000,
-                detailDesc:
-                    "MacBook Air 13 (2022) chip Apple M2, RAM 8GB, SSD 256GB, màn 13.6\" 2560×1664 (Liquid Retina), MagSafe 3, Wi-Fi 6.",
-                shortDesc: "Apple M2 • 8GB • 256GB • 13.6\" 2560×1664",
-                quantity: 99,
-                factory: "APPLE",
-                target: "MONG-NHE",
-                image: "1711080787179-apple-02.png",
-                cpu: "Apple M2 8-core",
-                ramGB: 8,
-                storageGB: 256,
-                storageType: "NVME",
-                screenSizeInch: 13.6,
-                screenResolution: "QHD", // 2560×1664 ~ 2.5K (map sang QHD enum)
-                featureTags: "Liquid Retina;MagSafe 3;Wi-Fi 6;1080p camera"
+            HP: {
+                series: ["Pavilion 15", "Victus 16", "Envy x360", "ProBook"],
+                cpus: ["Intel Core i5‑1240P", "Intel Core i7‑13700H", "AMD Ryzen 7 7730U"],
+                extras: ["Backlit keyboard", "Wi‑Fi 6"],
             },
-            {
-                name: "Laptop Acer Nitro",
-                price: 23490000,
-                detailDesc:
-                    "Acer Nitro 5 AN515-58-769J: i7-12700H, RAM 16GB, SSD 512GB, RTX 3050, màn 15.6\" FHD 144Hz.",
-                shortDesc: "i7-12700H • RTX 3050 • 16GB • 512GB • 15.6\" FHD 144Hz",
-                quantity: 99,
-                factory: "ACER",
-                target: "SINHVIEN-VANPHONG",
-                image: "1711080948771-acer-01.png",
-                cpu: "Intel Core i7-12700H",
-                ramGB: 16,
-                storageGB: 512,
-                storageType: "NVME",
-                screenSizeInch: 15.6,
-                screenResolution: "FHD",
-                featureTags: "RTX 3050 4GB;144Hz;Wi-Fi 6"
+            MSI: {
+                series: ["Katana", "GF63", "Modern 14", "Prestige"],
+                cpus: ["Intel Core i5‑12500H", "Intel Core i7‑12650H", "AMD Ryzen 7 7735HS"],
+                extras: ["144Hz", "CoolerBoost", "Wi‑Fi 6"],
             },
-            {
-                name: "Laptop Acer Nitro V",
-                price: 26999000,
-                detailDesc:
-                    "Acer Nitro V 15 (ANV15-51): i5-13420H, RAM 16GB, SSD 512GB, RTX 4050, màn 15.6\" FHD 144Hz.",
-                shortDesc: "i5-13420H • RTX 4050 • 16GB • 512GB • 15.6\" FHD 144Hz",
-                quantity: 99,
-                factory: "ACER", // sửa lại cho đúng (trước đây bạn set nhầm ASUS)
-                target: "MONG-NHE",
-                image: "1711081080930-asus-03.png",
-                cpu: "Intel Core i5-13420H",
-                ramGB: 16,
-                storageGB: 512,
-                storageType: "NVME",
-                screenSizeInch: 15.6,
-                screenResolution: "FHD",
-                featureTags: "RTX 4050 6GB;144Hz;Wi-Fi 6"
+            GIGABYTE: {
+                series: ["Aero 14", "G5", "Aorus 15"],
+                cpus: ["Intel Core i7‑13700H", "Intel Core i5‑12500H"],
+                extras: ["144Hz", "Wi‑Fi 6", "RGB keyboard"],
             },
-            {
-                name: "Laptop Dell Latitude 3420",
-                price: 21399000,
-                detailDesc:
-                    "Dell Latitude 3420: i5-1135G7, RAM 16GB, SSD 256GB, màn 14\" FHD 60Hz — gọn nhẹ cho doanh nghiệp.",
-                shortDesc: "i5-1135G7 • 16GB • 256GB • 14\" FHD",
-                quantity: 99,
-                factory: "DELL",
-                target: "MONG-NHE",
-                image: "1711081278418-dell-02.png",
-                cpu: "Intel Core i5-1135G7",
-                ramGB: 16,
-                storageGB: 256,
-                storageType: "NVME",
-                screenSizeInch: 14.0,
-                screenResolution: "FHD",
-                featureTags: "Iris Xe;Wi-Fi 5;54Wh"
-            }
+            ALIENWARE: {
+                series: ["m15 R7", "x16", "m16"],
+                cpus: ["Intel Core i7‑13700HX", "Intel Core i9‑13900HX"],
+                extras: ["165Hz", "RGB keyboard", "Wi‑Fi 6E"],
+            },
+        };
+
+        // GPU theo tier (đều là mẫu có thật)
+        const gpuByTier = [
+            "Iris Xe",
+            "RTX 2050 4GB",
+            "RTX 3050 6GB",
+            "RTX 4050 6GB",
+            "RTX 4060 8GB",
+            "RTX 4070 8GB",
         ];
 
+        // map series -> target
+        const guessTarget = (brand: string, series: string): string => {
+            const s = `${brand} ${series}`.toLowerCase();
+            if (/(tuf|rog|legion|nitro|victus|katana|aorus|alienware|g15)/.test(s)) return targets.GAMING;
+            if (/(zenbook|gram|air|swift|prestige|modern|envy|xps|probook)/.test(s)) return targets.MONG;
+            if (/(thinkpad|latitude|vostro|probook|gram)/.test(s)) return targets.DN;
+            if (/(ideapad|inspiron|vivobook|pavilion|aspire|modern)/.test(s)) return targets.SVVP;
+            return targets.TKDH;
+        };
+
+        const basePrice = (brand: string, isGaming: boolean) => {
+            if (brand === "ALIENWARE") return 38000000;
+            if (brand === "APPLE") return 22000000;
+            if (isGaming) return 19000000;
+            return 15000000;
+        };
+
+        const buildShort = (
+            cpu: string, gpu: string | null, ram: number, ssd: number,
+            size: number, hz: number, res: "FHD" | "QHD" | "4K"
+        ) => {
+            const cpuTag = cpu.replace(/^Intel |^AMD |^Apple /, "");
+            return `${cpuTag} • ${gpu || "iGPU"} • ${ram}GB • ${ssd}GB • ${size.toFixed(1)}" ${res} ${hz}Hz`;
+        };
+
+        // 👉 MÔ TẢ CHI TIẾT: HTML TinyMCE-friendly, chèn ảnh gallery (picsum) — luôn hiển thị
+        const buildDetailDesc = (p: {
+            name: string; factory: string; shortDesc: string; cpu: string; ramGB: number; storageGB: number;
+            storageType: string; screenSizeInch: number; screenResolution: "FHD" | "QHD" | "4K"; featureTags: string; gpu?: string | null;
+        }) => {
+            const gpuText = p.gpu ? p.gpu : "Đồ họa tích hợp (iGPU)";
+            const brand = p.factory;
+            const s1 = `https://picsum.photos/seed/${encodeURIComponent(slug(p.name))}-1/900/560`;
+            const s2 = `https://picsum.photos/seed/${encodeURIComponent(slug(p.name))}-2/900/560`;
+            const s3 = `https://picsum.photos/seed/${encodeURIComponent(slug(p.name))}-3/900/560`;
+            const feats = (p.featureTags || "").split(/[;|]/).map(s => s.trim()).filter(Boolean);
+
+            return `
+      <h2>${p.name} — Tổng quan</h2>
+      <p>${brand} ${p.name.split(" ").slice(1).join(" ")} trang bị cấu hình <strong>${p.shortDesc}</strong>,
+      phù hợp nhu cầu ${gpuText.includes("RTX") ? "chơi game/đồ họa" : "văn phòng - học tập"} với hiệu năng ổn định,
+      thời lượng pin tốt và độ bền cao.</p>
+
+      <h3>Điểm nổi bật</h3>
+      <ul>
+        <li>CPU: <strong>${p.cpu}</strong>, RAM <strong>${p.ramGB}GB</strong>, SSD <strong>${p.storageGB}GB ${p.storageType}</strong>.</li>
+        <li>GPU: <strong>${gpuText}</strong>${gpuText.includes("RTX") ? " hỗ trợ DLSS/RTX cho game & đồ họa." : " cho công việc văn phòng mượt mà."}</li>
+        <li>Màn hình: <strong>${p.screenSizeInch.toFixed(1)}"</strong> ${p.screenResolution}, độ mượt cao.</li>
+        ${feats.length ? `<li>Tính năng: ${feats.map(x => `<span class="badge bg-light text-dark border me-1">${x}</span>`).join(" ")}</li>` : ""}
+      </ul>
+
+      <h3>Bảng thông số chính</h3>
+      <table class="table table-bordered">
+        <tbody>
+          <tr><th>CPU</th><td>${p.cpu}</td></tr>
+          <tr><th>GPU</th><td>${gpuText}</td></tr>
+          <tr><th>RAM</th><td>${p.ramGB} GB</td></tr>
+          <tr><th>Lưu trữ</th><td>${p.storageGB} GB ${p.storageType}</td></tr>
+          <tr><th>Màn hình</th><td>${p.screenSizeInch.toFixed(1)}" ${p.screenResolution}</td></tr>
+          <tr><th>Kết nối</th><td>Wi‑Fi 6 / Bluetooth 5.x / USB‑A, USB‑C, HDMI (tuỳ dòng)</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Thư viện ảnh</h3>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+        <figure><img src="${s1}" alt="${p.name} photo 1" style="width:100%;border-radius:8px"><figcaption style="font-size:12px;color:#777">Hình minh hoạ 1</figcaption></figure>
+        <figure><img src="${s2}" alt="${p.name} photo 2" style="width:100%;border-radius:8px"><figcaption style="font-size:12px;color:#777">Hình minh hoạ 2</figcaption></figure>
+        <figure><img src="${s3}" alt="${p.name} photo 3" style="width:100%;border-radius:8px"><figcaption style="font-size:12px;color:#777">Hình minh hoạ 3</figcaption></figure>
+      </div>
+
+      <h3>Ai nên mua?</h3>
+      <p>${gpuText.includes("RTX")
+                    ? "Game thủ, sinh viên đồ hoạ, dựng clip cơ bản cần máy mát và ổn định."
+                    : "Học sinh/sinh viên, nhân viên văn phòng, doanh nhân cần máy gọn nhẹ, pin tốt."}
+      </p>
+
+      <h3>Bảo hành & Dịch vụ</h3>
+      <ul>
+        <li>Bảo hành chính hãng 12–24 tháng (tuỳ dòng), hỗ trợ tại TTBH nhà sản xuất.</li>
+        <li>Đổi mới 10 ngày nếu lỗi nhà sản xuất, đủ hộp & phụ kiện.</li>
+      </ul>
+    `;
+        };
+
+        const products: any[] = [];
+
+        for (const f of factoryOptions) {
+            const cat = catalogs[f.value];
+            const sizes = cat?.sizes || sizesCommon;
+            const isGamingBrand = ["ASUS", "MSI", "ACER", "GIGABYTE", "ALIENWARE", "LENOVO"].includes(f.value);
+
+            for (let i = 0; i < PER_BRAND; i++) {
+                const series = pick(cat.series);
+                const cpu = pick(cat.cpus);
+                const size = pick(sizes);
+                const res: "FHD" | "QHD" | "4K" = (f.value === "APPLE" ? pick(["QHD", "4K"]) : pick([...resos])) as any;
+                const hz = f.value === "APPLE" ? pick([60, 90, 120]) : pick([60, 120, 144, 165]);
+
+                const ramGB = pick([8, 16, 16, 32]);              // bias 16GB
+                const storageGB = pick([256, 512, 512, 1024]);    // bias 512
+                const storageType = storageGB >= 512 ? "NVME" : "SSD";
+
+                const gpu = f.value === "APPLE"
+                    ? null
+                    : (isGamingBrand ? pick(gpuByTier.slice(1)) : pick([null, "RTX 2050 4GB", "RTX 3050 6GB", "Iris Xe"]));
+
+                // Giá theo cấu hình (hợp lý)
+                let price =
+                    basePrice(f.value, isGamingBrand)
+                    + (ramGB > 16 ? 1500000 : 0)
+                    + (storageGB >= 1024 ? 2500000 : storageGB >= 512 ? 800000 : 0)
+                    + (res === "4K" ? 2500000 : res === "QHD" ? 1200000 : 0)
+                    + (hz >= 144 ? 800000 : hz >= 120 ? 400000 : 0)
+                    + (gpu
+                        ? (gpu.includes("4070") ? 7000000
+                            : gpu.includes("4060") ? 5000000
+                                : gpu.includes("4050") ? 3500000
+                                    : 1800000)
+                        : 0);
+
+                const target = guessTarget(f.value, series);
+
+                const pool = Array.from(new Set([
+                    ...(cat.extras || []),
+                    gpu || "Iris Xe",
+                    `${hz}Hz`,
+                    "Backlit keyboard",
+                    "Wi‑Fi 6",
+                    res === "4K" ? "UHD" : (res === "QHD" ? "2K" : "FHD"),
+                ]));
+                const featureTags = Array.from(new Set([pick(pool), pick(pool), pick(pool)])).join(";");
+
+                const name = `${f.name} ${series} ${size.toFixed(1)}`;
+                const shortDesc = buildShort(cpu, gpu, ramGB, storageGB, size, hz, res);
+
+                // Thumbnail an toàn: no-image.png (bạn đặt file này vào /public/images/product/no-image.png)
+                const image = "no-image.png";
+
+                const pObj = {
+                    name,
+                    price,
+                    detailDesc: "", // set sau bằng buildDetailDesc
+                    shortDesc,
+                    quantity: rand(25, 200),
+                    factory: f.value,
+                    target,
+                    image,
+                    cpu,
+                    ramGB,
+                    storageGB,
+                    storageType,
+                    screenSizeInch: size,        // 🔺 field trong DB là "screenSizeInch"
+                    screenResolution: res,
+                    featureTags,
+                    // (optional) discount: 0,
+                };
+
+                // Mô tả chi tiết TinyMCE-friendly (khớp 100% với cấu hình)
+                (pObj as any).detailDesc = buildDetailDesc({
+                    name, factory: f.value, shortDesc, cpu, ramGB, storageGB,
+                    storageType, screenSizeInch: size, screenResolution: res, featureTags, gpu: gpu || null
+                });
+
+                products.push(pObj);
+            }
+        }
+
         await prisma.product.createMany({ data: products });
+        console.log(`[seed] Inserted ${products.length} products with detailed HTML descriptions`);
     }
+
+
 
     if (countRole !== 0 && countUser !== 0 && countProduct !== 0) {
         console.log(">>> ALREADY INIT DATA...");
     }
-
 }
+
+
 
 export default initDatabase;

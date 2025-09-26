@@ -60,3 +60,10 @@ Quốc Huỳnh:
 </div> -->
 
 . có thể chỉnh lại các trang như liên hệ , hỗ trợ... ( ổn 4 việc trên rồi làm cái này )
+
+==========================================================================
+Huỳnh chỉnh sửa;
+1. giao diện trang so sánh ( compare.ejs )
+2. gom gọn css các file tui làm ( detail.ejs) ==> nhớ kiểm tra lại toàn bộ coi sót file nào không
+3. làm cho tin nhắn trong trang detail.ejs có hiệu ứng động 
+4.

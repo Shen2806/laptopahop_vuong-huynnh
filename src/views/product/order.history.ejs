@@ -351,147 +351,174 @@
                         </ol>
                     </nav>
 
-<div class="orders-pro">
+                    <div class="orders-pro">
 
-  <% if (!orders || orders.length===0) { %>
-    <div class="empty-state fw-bold">Không có đơn hàng nào được tạo!</div>
-  <% } else { %>
+                        <% if (!orders || orders.length===0) { %>
+                            <div class="empty-state fw-bold">Không có đơn hàng nào được tạo!</div>
+                            <% } else { %>
 
-    <% orders.forEach(function(order){ %>
-      <% 
-        const statusMap = {
-          PENDING: { dot:'dot-pending', cls:'is-pending', label:'Chờ xử lý' },
-          CONFIRMED: { dot:'dot-confirmed', cls:'is-confirmed', label:'Đã xác nhận đơn' },
-          SHIPPING: { dot:'dot-shipping', cls:'is-shipping', label:'Đang vận chuyển' },
-          OUT_FOR_DELIVERY: { dot:'dot-out', cls:'is-out', label:'Đang giao hàng' },
-          DELIVERED: { dot:'dot-delivered', cls:'is-delivered', label:'Đã giao hàng' },
-          CANCELED: { dot:'dot-canceled', cls:'is-canceled', label:'Đã hủy' }
-        };
-        const st = statusMap[order.status] || { dot:'dot-default', cls:'is-default', label:order.status };
-        const firstName = order.orderDetails[0]?.product?.name || '—';
-        const collapseId = 'o' + order.id;
-      %>
+                                <% orders.forEach(function(order){ %>
+                                    <% const statusMap={ PENDING: { dot: 'dot-pending' , cls: 'is-pending' ,
+                                        label: 'Chờ xử lý' }, CONFIRMED: { dot: 'dot-confirmed' , cls: 'is-confirmed' ,
+                                        label: 'Đã xác nhận đơn' }, SHIPPING: { dot: 'dot-shipping' , cls: 'is-shipping'
+                                        , label: 'Đang vận chuyển' }, OUT_FOR_DELIVERY: { dot: 'dot-out' , cls: 'is-out'
+                                        , label: 'Đang giao hàng' }, DELIVERED: { dot: 'dot-delivered' ,
+                                        cls: 'is-delivered' , label: 'Đã giao hàng' }, CANCELED: { dot: 'dot-canceled' ,
+                                        cls: 'is-canceled' , label: 'Đã hủy' } }; const st=statusMap[order.status] || {
+                                        dot: 'dot-default' , cls: 'is-default' , label: String(order.status) }; const
+                                        firstName=(order.orderDetails[0] && order.orderDetails[0].product &&
+                                        order.orderDetails[0].product.name) || '—' ; const collapseId='o' + order.id; %>
 
-      <article class="order-card">
-        <!-- HEAD: nút toggle -->
-        <button class="order-head-btn" type="button"
-                data-bs-toggle="collapse" data-bs-target="#<%= collapseId %>"
-                aria-expanded="false" aria-controls="<%= collapseId %>">
 
-          <!-- status dot -->
-          <div class="head-left">
-            <span class="status-dot <%= st.dot %>"></span>
-          </div>
+                                        <article class="order-card">
+                                            <!-- HEAD: nút toggle -->
+                                            <button class="order-head-btn" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#<%= collapseId %>" aria-expanded="false"
+                                                aria-controls="<%= collapseId %>">
 
-          <!-- info giữa -->
-          <div class="head-mid">
-            <div class="h-row1">
-              <div class="h-orderid">Order #<%= order.id %></div>
-              <div class="h-date">• <%= new Date(order.createdAt).toLocaleDateString('vi-VN') %></div>
-            </div>
+                                                <!-- status dot -->
+                                                <div class="head-left">
+                                                    <span class="status-dot <%= st.dot %>"></span>
+                                                </div>
 
-            <div class="h-name" title="<%= firstName %>"><%= firstName %></div>
+                                                <!-- info giữa -->
+                                                <div class="head-mid">
+                                                    <div class="h-row1">
+                                                        <div class="h-orderid">Order #<%= order.id %>
+                                                        </div>
+                                                        <div class="h-date">• <%= new
+                                                                Date(order.createdAt).toLocaleDateString('vi-VN') %>
+                                                        </div>
+                                                    </div>
 
-            <div class="h-thumbs mt-1">
-              <% const showN = Math.min(6, order.orderDetails.length); %>
-              <% for (let i=0; i<showN; i++){ const d = order.orderDetails[i]; %>
-                <img src="/images/product/<%= d.product.image %>" alt="">
-              <% } %>
-              <% if (order.orderDetails.length > showN) { %>
-                <span class="more">+<%= order.orderDetails.length - showN %></span>
-              <% } %>
-            </div>
-          </div>
+                                                    <div class="h-name" title="<%= firstName %>">
+                                                        <%= firstName %>
+                                                    </div>
 
-          <!-- phải -->
-          <div class="head-right">
-            <div class="h-total text-primary">
-              <%= new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(order.totalPrice) %>
-            </div>
-            <span class="status-chip <%= st.cls %>"><%= st.label %></span>
-            <i class="fas fa-chevron-down chev ms-1"></i>
-          </div>
-        </button>
+                                                    <div class="h-thumbs mt-1">
+                                                        <% const showN=Math.min(6, order.orderDetails.length); %>
+                                                            <% for (let i=0; i<showN; i++){ const
+                                                                d=order.orderDetails[i]; %>
+                                                                <img src="/images/product/<%= d.product.image %>"
+                                                                    alt="">
+                                                                <% } %>
+                                                                    <% if (order.orderDetails.length> showN) { %>
+                                                                        <span class="more">+<%=
+                                                                                order.orderDetails.length - showN %>
+                                                                        </span>
+                                                                        <% } %>
+                                                    </div>
+                                                </div>
 
-        <!-- BODY: chi tiết -->
-        <div id="<%= collapseId %>" class="collapse order-body">
-          <div class="table-responsive px-3 pt-3">
-            <table class="table align-middle">
-              <thead class="table-light text-center">
-                <tr>
-                  <th>Sản phẩm</th>
-                  <th>Tên</th>
-                  <th>Giá</th>
-                  <th>Số lượng</th>
-                  <th>Tổng tiền</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% order.orderDetails.forEach(function(detail){ 
-                   const discountedPrice = detail.product.discount>0
-                     ? Math.round(detail.product.price * (100 - detail.product.discount) / 100)
-                     : detail.product.price;
-                %>
-                  <tr>
-                    <td class="text-center">
-                      <img src="/images/product/<%= detail.product.image %>"
-                           class="rounded-circle shadow-sm border"
-                           style="width:50px; height:50px; object-fit:cover;">
-                    </td>
-                    <td class="text-center">
-                      <a href="/product/<%= detail.product.id %>" target="_blank"
-                         class="text-decoration-none fw-semibold text-dark">
-                        <%= detail.product.name %>
-                      </a>
-                    </td>
-                    <td class="text-center">
-                      <% if(detail.product.discount>0){ %>
-                        <div class="text-muted text-decoration-line-through small">
-                          <%= new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(detail.product.price) %>
-                        </div>
-                        <span class="fw-bold text-danger">
-                          <%= new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountedPrice) %>
-                        </span>
-                      <% } else { %>
-                        <span class="fw-bold text-dark">
-                          <%= new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(detail.product.price) %>
-                        </span>
-                      <% } %>
-                    </td>
-                    <td class="text-center"><%= detail.quantity %></td>
-                    <td class="text-center fw-bold text-danger">
-                      <%= new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountedPrice * detail.quantity) %>
-                    </td>
-                  </tr>
-                <% }) %>
-              </tbody>
-            </table>
-          </div>
+                                                <!-- phải -->
+                                                <div class="head-right">
+                                                    <div class="h-total text-primary">
+                                                        <%= new
+                                                            Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(order.totalPrice)
+                                                            %>
+                                                    </div>
+                                                    <span class="status-chip <%= st.cls %>">
+                                                        <%= st.label %>
+                                                    </span>
+                                                    <i class="fas fa-chevron-down chev ms-1"></i>
+                                                </div>
+                                            </button>
 
-          <!-- FOOT: thêm thông tin & hành động -->
-          <div class="order-foot px-3 py-3 border-top d-flex flex-wrap justify-content-between align-items-center">
-            <div>Ngày đặt: <strong><%= new Date(order.createdAt).toLocaleDateString('vi-VN') %></strong></div>
+                                            <!-- BODY: chi tiết -->
+                                            <div id="<%= collapseId %>" class="collapse order-body">
+                                                <div class="table-responsive px-3 pt-3">
+                                                    <table class="table align-middle">
+                                                        <thead class="table-light text-center">
+                                                            <tr>
+                                                                <th>Sản phẩm</th>
+                                                                <th>Tên</th>
+                                                                <th>Giá</th>
+                                                                <th>Số lượng</th>
+                                                                <th>Tổng tiền</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <% order.orderDetails.forEach(function(detail){ const
+                                                                discountedPrice=detail.product.discount>0
+                                                                ? Math.round(detail.product.price * (100 -
+                                                                detail.product.discount) / 100)
+                                                                : detail.product.price;
+                                                                %>
+                                                                <tr>
+                                                                    <td class="text-center">
+                                                                        <img src="/images/product/<%= detail.product.image %>"
+                                                                            class="rounded-circle shadow-sm border"
+                                                                            style="width:50px; height:50px; object-fit:cover;">
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <a href="/product/<%= detail.product.id %>"
+                                                                            target="_blank"
+                                                                            class="text-decoration-none fw-semibold text-dark">
+                                                                            <%= detail.product.name %>
+                                                                        </a>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <% if(detail.product.discount>0){ %>
+                                                                            <div
+                                                                                class="text-muted text-decoration-line-through small">
+                                                                                <%= new
+                                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(detail.product.price)
+                                                                                    %>
+                                                                            </div>
+                                                                            <span class="fw-bold text-danger">
+                                                                                <%= new
+                                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountedPrice)
+                                                                                    %>
+                                                                            </span>
+                                                                            <% } else { %>
+                                                                                <span class="fw-bold text-dark">
+                                                                                    <%= new
+                                                                                        Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(detail.product.price)
+                                                                                        %>
+                                                                                </span>
+                                                                                <% } %>
+                                                                    </td>
+                                                                    <td class="text-center">
+                                                                        <%= detail.quantity %>
+                                                                    </td>
+                                                                    <td class="text-center fw-bold text-danger">
+                                                                        <%= new
+                                                                            Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountedPrice
+                                                                            * detail.quantity) %>
+                                                                    </td>
+                                                                </tr>
+                                                                <% }) %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
 
-            <% if(order.status==='PENDING' || order.status==='CONFIRMED'){ %>
-              <button type="button" class="btn btn-danger btn-sm btn-cancel"
-                      data-order-id="<%= order.id %>" data-bs-toggle="modal"
-                      data-bs-target="#cancelOrderModal">
-                Hủy đơn
-              </button>
-            <% } %>
-          </div>
+                                                <!-- FOOT: thêm thông tin & hành động -->
+                                                <div
+                                                    class="order-foot px-3 py-3 border-top d-flex flex-wrap justify-content-between align-items-center">
+                                                    <div>Ngày đặt: <strong>
+                                                            <%= new Date(order.createdAt).toLocaleDateString('vi-VN') %>
+                                                        </strong></div>
 
-          <% if(order.status==='CANCELED'){ %>
-            <div class="px-3 py-3 bg-light border-top text-danger fw-semibold">
-              Lý do hủy: <%= order.cancelReason || 'Không có lý do' %>
-            </div>
-          <% } %>
-        </div>
-      </article>
-    <% }) %>
+                                                    <% if(order.status==='PENDING' || order.status==='CONFIRMED' ){ %>
+                                                        <button type="button" class="btn btn-danger btn-sm btn-cancel"
+                                                            data-order-id="<%= order.id %>" data-bs-toggle="modal"
+                                                            data-bs-target="#cancelOrderModal">
+                                                            Hủy đơn
+                                                        </button>
+                                                        <% } %>
+                                                </div>
 
-  <% } %>
-</div>
+                                                <% if(order.status==='CANCELED' ){ %>
+                                                    <div class="px-3 py-3 bg-light border-top text-danger fw-semibold">
+                                                        Lý do hủy: <%= order.cancelReason || 'Không có lý do' %>
+                                                    </div>
+                                                    <% } %>
+                                            </div>
+                                        </article>
+                                        <% }) %>
+
+                                            <% } %>
+                    </div>
 
 
                     <div class="mt-4 text-end">

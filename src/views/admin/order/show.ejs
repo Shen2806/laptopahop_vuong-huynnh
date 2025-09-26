@@ -213,31 +213,103 @@
                                         </table>
                                     </div>
 
-                                    <!-- Pagination -->
-                                    <nav aria-label="Order pagination">
-                                        <ul class="pagination justify-content-center mt-3">
-                                            <li class="page-item">
-                                                <a class="<%= page === 1 ? 'disabled page-link' : 'page-link' %>"
-                                                    href="/admin/order?page=<%= page - 1 %>" aria-label="Previous">
-                                                    <span aria-hidden="true">&laquo;</span>
-                                                </a>
-                                            </li>
-                                            <% for(var i=1; i<=totalPages; i++) { %>
-                                                <li class="page-item <%= page === i ? 'active' : '' %>">
-                                                    <a class="page-link <%= page === i ? 'active' : '' %>"
-                                                        href="/admin/order?page=<%= i %>">
-                                                        <%= i %>
+                                    <!-- Pagination (block ranges 1–10, 11–20, ...) -->
+                                    <% const totalPagesNum=Number(totalPages) || 1; const currentPage=Number(page) || 1;
+                                        const BLOCK=10; const totalBlocks=Math.ceil(totalPagesNum / BLOCK); const
+                                        currentBlock=Math.floor((currentPage - 1) / BLOCK); const blockStart=(b)=> b *
+                                        BLOCK + 1;
+                                        const blockEnd = (b) => Math.min(blockStart(b) + BLOCK - 1, totalPagesNum);
+
+                                        // chỉ hiển thị gọn quanh khối hiện tại (±2 khối)
+                                        const winStart = Math.max(0, currentBlock - 2);
+                                        const winEnd = Math.min(totalBlocks - 1, currentBlock + 2);
+                                        %>
+
+                                        <nav aria-label="Order pagination">
+                                            <ul class="pagination justify-content-center mt-3">
+
+                                                <!-- Prev page -->
+                                                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                                    <a class="page-link"
+                                                        href="/admin/order?page=<%= Math.max(1, currentPage - 1) %>"
+                                                        aria-label="Previous">
+                                                        <span aria-hidden="true">&laquo;</span>
                                                     </a>
                                                 </li>
-                                                <% } %>
-                                                    <li class="page-item">
-                                                        <a class="<%= page === totalPages ? 'disabled page-link' : 'page-link' %>"
-                                                            href="/admin/order?page=<%= page + 1 %>" aria-label="Next">
-                                                            <span aria-hidden="true">&raquo;</span>
+
+                                                <!-- Prev block (lùi 10 trang) -->
+                                                <li class="page-item <%= currentBlock === 0 ? 'disabled' : '' %>">
+                                                    <a class="page-link"
+                                                        href="/admin/order?page=<%= Math.max(1, blockStart(currentBlock) - BLOCK) %>"
+                                                        aria-label="Prev 10">‹ 10</a>
+                                                </li>
+
+                                                <!-- First block -->
+                                                <% if (winStart> 0) { %>
+                                                    <li class="page-item <%= currentBlock === 0 ? 'active' : '' %>">
+                                                        <a class="page-link"
+                                                            href="/admin/order?page=<%= blockStart(0) %>">
+                                                            <%= blockStart(0) %>-<%= blockEnd(0) %>
                                                         </a>
                                                     </li>
-                                        </ul>
-                                    </nav>
+                                                    <% if (winStart> 1) { %>
+                                                        <li class="page-item disabled"><span class="page-link">…</span>
+                                                        </li>
+                                                        <% } %>
+                                                            <% } %>
+
+                                                                <!-- Window around current block -->
+                                                                <% for (let b=winStart; b <=winEnd; b++) { %>
+                                                                    <li
+                                                                        class="page-item <%= b === currentBlock ? 'active' : '' %>">
+                                                                        <a class="page-link"
+                                                                            href="/admin/order?page=<%= blockStart(b) %>">
+                                                                            <%= blockStart(b) %>-<%= blockEnd(b) %>
+                                                                        </a>
+                                                                    </li>
+                                                                    <% } %>
+
+                                                                        <!-- Last block -->
+                                                                        <% if (winEnd < totalBlocks - 1) { %>
+                                                                            <% if (winEnd < totalBlocks - 2) { %>
+                                                                                <li class="page-item disabled"><span
+                                                                                        class="page-link">…</span></li>
+                                                                                <% } %>
+                                                                                    <li
+                                                                                        class="page-item <%= currentBlock === totalBlocks - 1 ? 'active' : '' %>">
+                                                                                        <a class="page-link"
+                                                                                            href="/admin/order?page=<%= blockStart(totalBlocks - 1) %>">
+                                                                                            <%= blockStart(totalBlocks -
+                                                                                                1) %>-<%=
+                                                                                                    blockEnd(totalBlocks
+                                                                                                    - 1) %>
+                                                                                        </a>
+                                                                                    </li>
+                                                                                    <% } %>
+
+                                                                                        <!-- Next block (tiến 10 trang) -->
+                                                                                        <li
+                                                                                            class="page-item <%= currentBlock >= totalBlocks - 1 ? 'disabled' : '' %>">
+                                                                                            <a class="page-link"
+                                                                                                href="/admin/order?page=<%= Math.min(totalPagesNum, blockEnd(currentBlock) + 1) %>"
+                                                                                                aria-label="Next 10">10
+                                                                                                ›</a>
+                                                                                        </li>
+
+                                                                                        <!-- Next page -->
+                                                                                        <li
+                                                                                            class="page-item <%= currentPage === totalPagesNum ? 'disabled' : '' %>">
+                                                                                            <a class="page-link"
+                                                                                                href="/admin/order?page=<%= Math.min(totalPagesNum, currentPage + 1) %>"
+                                                                                                aria-label="Next">
+                                                                                                <span
+                                                                                                    aria-hidden="true">&raquo;</span>
+                                                                                            </a>
+                                                                                        </li>
+
+                                            </ul>
+                                        </nav>
+
 
                                 </div>
                             </div>

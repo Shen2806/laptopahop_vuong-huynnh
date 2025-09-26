@@ -1,220 +1,213 @@
-(async function(){
-  const socket = io();
-  const $sessions = document.getElementById("sessions");
-  const $panel = document.getElementById("panel");
-  const $roomMsgs = document.getElementById("roomMsgs");
-  const $adminForm = document.getElementById("adminForm");
-  const $adminInput = document.getElementById("adminInput");
-  const $typing = document.getElementById("typingHintAdmin");
-  const $badge = document.getElementById("adminChatBadge");
+// /admin/js/chat.js
+(function () {
+  // Dùng lại 1 socket duy nhất cho toàn trang admin
+  const socket     = window.__adminSocket || (window.__adminSocket = io());
 
+  // ===== DOM =====
+  const $sessions  = document.getElementById("sessions");
+  const $panel     = document.getElementById("panel");
+  const $roomMsgs  = document.getElementById("roomMsgs");
+  const $form      = document.getElementById("adminForm");
+  const $input     = document.getElementById("adminInput");
+  const $typing    = document.getElementById("typingHintAdmin");
+  const $btnClose  = document.getElementById("closeSession");
+
+  // Badge (có thể là #adminChatBadgeHeader hoặc phần tử mang data-admin-badge="chat")
+  const $badges = Array.from(
+    document.querySelectorAll('[data-admin-badge="chat"], #adminChatBadge, #adminChatBadgeHeader')
+  );
+
+  // ===== STATE =====
   let currentSessionId = null;
-  let closed = false;
+  let sessionClosed    = false;
+  let typingTimer      = null;
 
-  function renderMsg(who, text, isRead=false) {
-    const div = document.createElement("div");
-    div.className = `d-flex ${who==="ADMIN"?"justify-content-end":"justify-content-start"} mb-2`;
-    const status = who==="ADMIN" ? `<span class="ms-2 small ${isRead?"text-primary":"text-muted"}">${isRead?"✓✓":"✓"}</span>` : "";
-    div.innerHTML = `<div class="p-2 rounded ${who==="ADMIN"?"bg-primary text-white":"bg-light"}" style="max-width:80%">${text}${status}</div>`;
-    $roomMsgs.appendChild(div);
+  // ===== Utils =====
+  function moneyBadgeInc() {
+    $badges.forEach(b => {
+      const cur = Math.max(0, parseInt(b.textContent || "0", 10)) + 1;
+      b.textContent = String(cur);
+      b.classList.remove("d-none");
+    });
+  }
+  function moneyBadgeZero() {
+    $badges.forEach(b => { b.textContent = "0"; b.classList.add("d-none"); });
+  }
+
+  function renderMsg(who, text, isRead = false) {
+    const wrap = document.createElement("div");
+    wrap.className = `d-flex ${who === "ADMIN" ? "justify-content-end" : "justify-content-start"} mb-2`;
+
+    const status = who === "ADMIN"
+      ? `<span class="ms-2 small ${isRead ? "text-primary" : "text-muted"}">${isRead ? "✓✓" : "✓"}</span>`
+      : "";
+
+    wrap.innerHTML =
+      `<div class="p-2 rounded ${who === "ADMIN" ? "bg-primary text-white" : "bg-light"}" style="max-width:80%">
+         ${text}${status}
+       </div>`;
+
+    $roomMsgs.appendChild(wrap);
     $roomMsgs.scrollTop = $roomMsgs.scrollHeight;
   }
 
-  function decBadge() {
-    if (!$badge) return;
-    const cur = Math.max(0, Number($badge.textContent||"0")-1);
-    if (cur===0){ $badge.classList.add("d-none"); $badge.textContent="0"; }
-    else { $badge.textContent = String(cur); }
+  function setClosedUI(closed) {
+    sessionClosed = !!closed;
+    if ($input)  $input.disabled = sessionClosed;
+    const btn = $form?.querySelector('button[type="submit"]');
+    if (btn) {
+      btn.disabled = sessionClosed;
+      btn.classList.toggle('btn-primary', !closed);
+      btn.classList.toggle('btn-secondary', closed);
+    }
+    if ($typing) {
+      $typing.classList.remove('d-none');
+      $typing.textContent = closed
+        ? 'Phiên đã kết thúc — không thể gửi tin.'
+        : 'Khách đang nhập…';
+      if (!closed) $typing.classList.add('d-none'); // ẩn mặc định khi OPEN
+    }
   }
-
-  function setClosedUI() {
-    if (closed) return;
-    closed = true;
-    $adminInput.disabled = true;
-    $adminForm.querySelector('button').disabled = true;
-    renderMsg("USER", "Phiên chat đã kết thúc.", true);
-  }
-
-  socket.on("connect", ()=>{
-    console.log("[admin] connected:", socket.id);
-    socket.emit("join-admin-room");
-  });
 
   async function loadSessions() {
     const res = await fetch("/admin/api/chat/sessions");
     const sessions = await res.json();
+    // Nút mỗi phiên: data-id giữ sessionId, hiện badge unread
     $sessions.innerHTML = sessions.map(s =>
       `<button data-id="${s.id}" class="btn btn-outline-secondary me-2 mb-2">
-        #${s.id} - ${s.name}
-        ${s.unread>0?`<span class="badge bg-danger ms-2">${s.unread}</span>`:""}
-      </button>`).join("");
+         #${s.id} - ${s.name}
+         ${s.unread > 0 ? `<span class="badge bg-danger ms-2">${s.unread}</span>` : ""}
+       </button>`
+    ).join("");
   }
-  await loadSessions();
 
-  // Chọn session
-  $sessions.addEventListener("click", async (e) => {
-    const btn = e.target.closest('button[data-id]');
-    if (!btn) return;
-
-    currentSessionId = Number(btn.dataset.id);
-    closed = false; // reset
-    $adminInput.disabled = false;
-    $adminForm.querySelector('button').disabled = false;
+  async function openSession(sessionId) {
+    currentSessionId = Number(sessionId);
+    if (!Number.isFinite(currentSessionId)) return;
 
     $panel.classList.remove("d-none");
     $roomMsgs.innerHTML = "";
+    setClosedUI(false); // tạm mở, chờ server báo trạng thái thật
 
-    console.log("[admin] join session", currentSessionId);
+    // Join phòng + nhận status (OPEN/CLOSED)
     socket.emit("admin:join", { sessionId: currentSessionId });
 
+    // Tải lịch sử
     const res = await fetch(`/api/chat/sessions/${currentSessionId}/messages`);
     const list = await res.json();
     list.forEach(m => renderMsg(m.sender, m.content, !!m.isRead));
 
+    // Đọc tất cả tin nhắn user chưa đọc
     socket.emit("chat:read", { sessionId: currentSessionId, readerRole: "ADMIN" });
-    decBadge();
+
+    // Đã mở 1 phiên => có thể coi là đã xử lý các badge tổng
+    moneyBadgeZero();
+  }
+
+  // ===== Socket bindings =====
+  socket.on("connect", () => {
+    console.log("[admin] connected:", socket.id);
+    socket.emit("join-admin-room");
   });
 
-  // Gửi tin
-  $adminForm.addEventListener("submit", (e)=>{
-    e.preventDefault();
-    if (closed) return;
-    const content = $adminInput.value.trim(); if (!content) return;
-    console.log("[admin] send", { sessionId: currentSessionId, content });
-    socket.emit("chat:message", { sessionId: currentSessionId, sender: "ADMIN", content });
-    renderMsg("ADMIN", content, false);
-    $adminInput.value = "";
+  // Server trả trạng thái phòng sau khi join / hoặc khi có thay đổi
+  socket.on("chat:status", ({ sessionId, status }) => {
+    if (Number(sessionId) !== Number(currentSessionId)) return;
+    setClosedUI(status === "CLOSED");
   });
 
-  // Typing
-  let t;
-  $adminInput.addEventListener("input", ()=>{
-    if (!currentSessionId || closed) return;
-    socket.emit("chat:typing", { sessionId: currentSessionId, who: "ADMIN", isTyping: true });
-    clearTimeout(t);
-    t = setTimeout(()=> socket.emit("chat:typing", { sessionId: currentSessionId, who: "ADMIN", isTyping: false }), 800);
-  });
-
-  // Nhận tin trong phòng hiện tại
-  socket.on("chat:message", (msg)=>{
-    console.log("[admin] chat:message in", msg);
+  // Nhận tin nhắn trong phòng hiện tại
+  socket.on("chat:message", (msg) => {
+    // msg: { id, sessionId, sender, content, isRead, createdAt }
     if (Number(msg.sessionId) !== Number(currentSessionId)) return;
     if (msg.sender === "USER") {
       renderMsg("USER", msg.content);
+      // admin đã thấy => mark read
       socket.emit("chat:read", { sessionId: currentSessionId, readerRole: "ADMIN" });
     }
   });
 
-  // Fallback: có notify từ user → nếu đúng phòng thì tải lại lịch sử
+  // Khi user đang gõ
+  socket.on("chat:typing", ({ who, isTyping }) => {
+    if (who !== "USER") return;
+    if (!$typing) return;
+    $typing.textContent = 'Khách đang nhập…';
+    $typing.classList.toggle("d-none", !isTyping || sessionClosed);
+  });
+
+  // Khi server đóng phiên
+  socket.on("chat:closed", ({ sessionId }) => {
+    if (Number(sessionId) !== Number(currentSessionId)) return;
+    setClosedUI(true);
+    renderMsg("USER", "Phiên chat đã kết thúc.", true);
+  });
+
+  // Có session mới
+  socket.on("admin:new_session", () => loadSessions());
+
+  // Có tin mới từ user (notify trên danh sách phiên)
   socket.on("notify:chat_message", async ({ sessionId }) => {
-    console.log("[admin] notify:chat_message", sessionId, "current=", currentSessionId);
     if (currentSessionId && Number(sessionId) === Number(currentSessionId)) {
+      // Đang mở đúng phiên -> refresh nhẹ + mark read
       const res = await fetch(`/api/chat/sessions/${currentSessionId}/messages`);
       const list = await res.json();
       $roomMsgs.innerHTML = "";
       list.forEach(m => renderMsg(m.sender, m.content, !!m.isRead));
       socket.emit("chat:read", { sessionId: currentSessionId, readerRole: "ADMIN" });
     } else {
+      // Tin cho phiên khác
+      moneyBadgeInc();
       await loadSessions();
     }
   });
 
-  // Typing hiển thị
-  socket.on("chat:typing", ({ who, isTyping }) => {
-    if (who === "USER") $typing.classList.toggle("d-none", !isTyping);
-  });
-
-  // Trạng thái phiên
-  socket.on("chat:status", ({ sessionId: sid, status }) => {
-    console.log("[admin] chat:status", sid, status);
-    if (Number(sid)!==Number(currentSessionId)) return;
-    if (status === "CLOSED") setClosedUI();
-  });
-
-  socket.on("chat:closed", () => {
-    console.log("[admin] chat:closed");
-    setClosedUI();
-  });
-
-  socket.on("admin:new_session", () => loadSessions());
-
-})();
-
-
-(function(){
-  const socket   = window.__adminSocket || (window.__adminSocket = io());
-  const $badge   = document.getElementById('adminChatBadgeHeader');
-  const $panel   = document.getElementById('panel');
-  const $sessions= document.getElementById('sessions');
-  const $form    = document.getElementById('adminForm');
-  const $input   = document.getElementById('adminInput');
-  const $hint    = document.getElementById('typingHintAdmin');
-  const $close   = document.getElementById('closeSession');
-
-  let currentSessionId = null;
-  let clearBadgeOnNextOpen = false;
-  let sessionClosed = false;
-
-  function clearAllBadges(){
-    document.querySelectorAll('[data-admin-badge="chat"]').forEach(el=>{
-      el.textContent = '0';
-      el.classList.add('d-none');
-    });
-  }
-  function setClosedUI(closed){
-    sessionClosed = !!closed;
-    if ($input) $input.disabled = sessionClosed;
-    const btn = $form?.querySelector('button[type="submit"]');
-    if (btn) { btn.disabled = sessionClosed; btn.classList.toggle('btn-primary', !closed); btn.classList.toggle('btn-secondary', closed); }
-    if ($hint) { $hint.classList.remove('d-none'); $hint.textContent = closed ? 'Phiên đã kết thúc — không thể gửi tin.' : 'Khách đang nhập…'; }
-  }
-
-  // Click badge => bật panel, chờ clear khi chọn 1 phiên
-  $badge?.addEventListener('click', ()=>{
-    clearBadgeOnNextOpen = true;
-    $panel?.classList.remove('d-none');
-    document.getElementById('sessions')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-
-  // Chọn 1 phiên (item phải có data-conv-id = sessionId)
-  $sessions?.addEventListener('click', (e)=>{
-    const btn = e.target.closest('[data-conv-id]');
+  // ===== UI events =====
+  // Click 1 phiên ở danh sách
+  $sessions.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-id]");
     if (!btn) return;
-    const sessionId = Number(btn.dataset.convId);
-    if (!Number.isFinite(sessionId)) return;
-
-    currentSessionId = sessionId;
-    socket.emit('session:join', { sessionId }, ()=>{});
-    socket.emit('message:read', { sessionId }, ()=>{});
-    if (clearBadgeOnNextOpen) { clearAllBadges(); clearBadgeOnNextOpen = false; }
-    setClosedUI(false);
+    openSession(btn.dataset.id);
   });
 
-  // Đóng phiên
-  $close?.addEventListener('click', (e)=>{
+  // Gửi tin
+  $form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!currentSessionId || sessionClosed) return;
+    const content = ($input.value || "").trim();
+    if (!content) return;
+
+    socket.emit("chat:message", {
+      sessionId: currentSessionId,
+      sender: "ADMIN",
+      content
+    });
+
+    renderMsg("ADMIN", content, false);
+    $input.value = "";
+  });
+
+  // Typing indicator cho admin
+  $input.addEventListener("input", () => {
+    if (!currentSessionId || sessionClosed) return;
+    socket.emit("chat:typing", { sessionId: currentSessionId, who: "ADMIN", isTyping: true });
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+      socket.emit("chat:typing", { sessionId: currentSessionId, who: "ADMIN", isTyping: false });
+    }, 800);
+  });
+
+  // Kết thúc phiên (ĐÚNG event server: "chat:close")
+  $btnClose?.addEventListener("click", (e) => {
     e.preventDefault();
     if (!currentSessionId) return;
-    socket.emit('session:close', { sessionId: currentSessionId }, (res)=>{
-      if (res?.ok) setClosedUI(true);
-    });
+    socket.emit("chat:close", { sessionId: currentSessionId });
+    // UI sẽ khóa khi nhận 'chat:closed'
   });
 
-  // Cấm gửi khi đóng
-  $form?.addEventListener('submit', (e)=>{
-    if (sessionClosed) { e.preventDefault(); return false; }
-  });
-
-  // Server báo phiên đã đóng
-  socket.off('session:closed');
-  socket.on('session:closed', ({ sessionId })=>{
-    if (currentSessionId && sessionId === currentSessionId) setClosedUI(true);
-  });
-
-  // Nếu đang mở phiên và có tin mới trong chính phiên đó -> mark read luôn
-  socket.off('message:new');
-  socket.on('message:new', (msg)=>{
-    if (currentSessionId && msg.sessionId === currentSessionId) {
-      socket.emit('message:read', { sessionId: currentSessionId }, ()=>{});
-    }
-  });
+  // ===== init =====
+  (async function init() {
+    await loadSessions();
+    // Panel ẩn cho tới khi chọn 1 phiên
+    $panel.classList.add("d-none");
+  })();
 })();

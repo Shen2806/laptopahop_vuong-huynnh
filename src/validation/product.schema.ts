@@ -21,34 +21,6 @@ const toPositiveNumber = (msg: string) =>
         return 0;
     }, z.number().gt(0, { message: msg }));
 
-// export const ProductSchema = z.object({
-//     id: z.string().optional(), // thêm id để phục vụ update
-//     name: toTrimmedString("Tên không được để trống !"),
-
-//     price: toPositiveNumber("Số tiền tối thiểu là 1"),
-
-//     detailDesc: toTrimmedString("Mô tả chi tiết không được để trống !"),
-
-//     shortDesc: toTrimmedString("Mô tả ngắn không được để trống !"), // <= hết "Invalid input"
-
-//     quantity: toPositiveNumber("Số lượng tối thiểu là 1"),
-
-//     factory: toTrimmedString("Hãng sản xuất không được để trống !"),
-//     target: toTrimmedString("Đối tượng sử dụng không được để trống !"),
-
-//     // mới
-//     cpu: z.string().optional().nullable(),
-//     ramGB: z.coerce.number().int().positive().optional().nullable(),
-//     storageGB: z.coerce.number().int().positive().optional().nullable(),
-//     storageType: z.enum(["HDD", "SSD", "NVME"]).optional().nullable(),
-//     screenResolution: z.enum(["FHD", "QHD", "4K"]).optional().nullable(),
-//     screenSizeInch: z.coerce.number().positive().optional().nullable(),
-
-//     // người dùng nhập dạng "TOUCH,2IN1,TB4" → mình convert sang "|TOUCH|2IN1|TB4|"
-//     featureTagsRaw: z.string().optional().nullable(),
-// });
-// src/validation/product.schema.ts
-
 export const ProductSchema = z.object({
     // Base
     id: z.union([z.string(), z.number()]).optional(),

@@ -1,90 +1,9 @@
 import { prisma } from 'config/client';
 import { Request, Response } from 'express';
 import { countTotalProductClientPages, getProducts } from 'services/client/item.service';
-import { getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById } from 'services/user.service';
+import { changeUserPassword, getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById, verifyPasswordByUserId } from 'services/user.service';
+import bcrypt from 'bcrypt';
 
-// const getHomePage = async (req: Request, res: Response) => {
-//     const { page } = req.query;
-
-//     let currentPage = page ? +page : 1;
-//     if (currentPage <= 0) currentPage = 1;
-
-//     // Phân trang sản phẩm
-//     const pageSize = 8;
-//     const totalPages = await countTotalProductClientPages(pageSize);
-//     const products = await getProducts(currentPage, pageSize);
-
-//     // Sản phẩm khuyến mãi (giữ field view đang dùng)
-//     const promoProducts = await prisma.product.findMany({
-//         where: { discount: { gt: 0 } },
-//         take: 6,
-//         select: { id: true, name: true, price: true, discount: true, image: true, shortDesc: true, quantity: true },
-//     });
-
-//     // Blog
-//     const latestBlogs = await prisma.blog.findMany({
-//         where: { published: true },
-//         orderBy: { createdAt: "desc" },
-//         take: 8,
-//         select: { id: true, title: true, slug: true, thumbnail: true, author: true, createdAt: true, content: true },
-//     });
-
-//     // ====== LẤY RATING ĐỘNG CHO TẤT CẢ SẢN PHẨM 1 LẦN ======
-//     const ids = Array.from(new Set([
-//         ...products.map(p => Number(p.id)),
-//         ...promoProducts.map(p => Number(p.id)),
-//     ])).filter(Number.isFinite);
-
-//     type ReviewRow = { productId: number; rating: number };
-//     const reviews: ReviewRow[] = ids.length
-//         ? await prisma.review.findMany({
-//             where: { productId: { in: ids } },
-//             select: { productId: true, rating: true },
-//         })
-//         : [];
-
-//     // Gom nhóm -> sum & count -> avg
-//     const agg: Record<number, { sum: number; count: number }> = {};
-//     for (const r of reviews) {
-//         const k = r.productId;
-//         if (!agg[k]) agg[k] = { sum: 0, count: 0 };
-//         agg[k].sum += Number(r.rating) || 0;
-//         agg[k].count += 1;
-//     }
-//     const attach = <T extends { id: number }>(arr: T[]) =>
-//         arr.map(p => {
-//             const a = agg[p.id];
-//             const count = a?.count ?? 0;
-//             const avg = count ? a!.sum / count : 0;
-//             return { ...p, ratingAvg: avg, ratingCount: count };
-//         });
-
-//     const productsWithRating = attach(products);
-//     const promoWithRating = attach(promoProducts);
-//     // lấy lịch sử sản phẩm đã xem
-//     const KEY = "recent_products";
-//     let recentIds: number[] = [];
-//     try { recentIds = JSON.parse((req as any).cookies?.[KEY] || "[]"); } catch { }
-//     recentIds = recentIds.slice(0, 5);
-
-//     let recentProducts: any[] = [];
-//     if (recentIds.length) {
-//         const rows = await prisma.product.findMany({
-//             where: { id: { in: recentIds } },
-//             select: { id: true, name: true, price: true, discount: true, image: true }
-//         });
-//         const map = new Map(rows.map(r => [r.id, r]));
-//         recentProducts = recentIds.map(id => map.get(id)).filter(Boolean);
-//     }
-//     return res.render("client/home/show.ejs", {
-//         products: productsWithRating,   // ⬅️ đã có ratingAvg & ratingCount
-//         totalPages,
-//         page: currentPage,
-//         promoProducts: promoWithRating, // nếu view dùng tới
-//         latestBlogs,
-//         recentProducts
-//     });
-// };
 const getHomePage = async (req: Request, res: Response) => {
     const { page } = req.query;
 
@@ -541,18 +460,22 @@ const getRegisterPage = async (req: Request, res: Response) => {
 }
 // Hiển thị trang profile
 const updateProfilePage = async (req: Request, res: Response) => {
-    const userId = req.user?.id;
+    const userId = (req as any).user?.id;
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
-    // Lấy ra và xoá liền
-    const successMessage = req.session.successMessage || null;
-    req.session.successMessage = null; // ✅ xoá ngay để reload lại không hiện nữa
+    // Lấy ra và xoá liền (success + error)
+    const successMessage = (req.session as any).successMessage || null;
+    const errorMessage = (req.session as any).errorMessage || null;
+    (req.session as any).successMessage = null;
+    (req.session as any).errorMessage = null;
 
     res.render("client/profiles/profile", {
         user,
-        successMessage
+        successMessage,
+        errorMessage,
     });
 };
+
 
 // Xử lý cập nhật profile
 const handleUpdateProfile = async (req: Request, res: Response) => {
@@ -631,4 +554,58 @@ const getUserOrders = async (req: Request, res: Response) => {
     }
 };
 
-export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser, getUserOrders };
+const SALT_ROUNDS = 10;
+
+// (tùy bạn đã có sẵn hay chưa)
+const hashPassword = async (plain: string) => bcrypt.hash(plain, SALT_ROUNDS);
+const comparePassword = async (plain: string, hashed: string) => bcrypt.compare(plain, hashed);
+
+// ========== NEW: Đổi mật khẩu ==========
+const postChangePassword = async (req: any, res: Response) => {
+    try {
+        const userId = req.user?.id;
+        const { currentPassword, newPassword, confirmPassword } = req.body || {};
+
+        if (!userId) return res.status(401).json({ ok: false, message: "Bạn cần đăng nhập." });
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return res.status(400).json({ ok: false, message: "Thiếu dữ liệu bắt buộc." });
+        }
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ ok: false, message: "Mật khẩu mới và xác nhận không khớp." });
+        }
+        if (String(newPassword).length < 8) {
+            return res.status(400).json({ ok: false, message: "Mật khẩu mới phải từ 8 ký tự trở lên." });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: Number(userId) },
+            select: { password: true },
+        });
+        if (!user) return res.status(404).json({ ok: false, message: "Tài khoản không tồn tại." });
+
+        const ok = await comparePassword(String(currentPassword), String(user.password));
+        if (!ok) return res.status(400).json({ ok: false, message: "Mật khẩu hiện tại không đúng." });
+
+        const hashed = await hashPassword(String(newPassword));
+        await prisma.user.update({
+            where: { id: Number(userId) },
+            data: { password: hashed },
+        });
+
+        // Nếu gọi bằng AJAX: trả JSON
+        if (req.xhr || req.headers["x-requested-with"] === "XMLHttpRequest") {
+            return res.json({ ok: true, message: "Đổi mật khẩu thành công." });
+        }
+
+        // Hoặc bạn vẫn muốn flow redirect + toast (dùng session message)
+        (req.session as any).successMessage = "Đổi mật khẩu thành công!";
+        return res.redirect("/profile");
+    } catch (err) {
+        console.error("postChangePassword error:", err);
+        return res.status(500).json({ ok: false, message: "Lỗi server. Vui lòng thử lại." });
+    }
+};
+
+
+export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, getProductFilterPage, getRegisterPage, updateProfilePage, handleUpdateProfile, postCancelOrderByUser, getUserOrders, postChangePassword };

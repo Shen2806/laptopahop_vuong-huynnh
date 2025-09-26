@@ -58,6 +58,204 @@
             font-size: 12px;
             color: #6b7280;
         }
+
+        /* === RÙA AI — widget === */
+        .ai-turtle {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 1100;
+        }
+
+        .ai-turtle__btn {
+            width: 64px;
+            height: 64px;
+            border: 0;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 14px 30px rgba(22, 163, 74, .35);
+            cursor: pointer;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+        .ai-turtle__btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 18px 38px rgba(22, 163, 74, .45);
+        }
+
+        .ai-pulse {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, .45);
+            animation: pulse 2.2s infinite;
+        }
+
+        @keyframes pulse {
+            70% {
+                box-shadow: 0 0 0 18px rgba(34, 197, 94, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
+        }
+
+        .ai-turtle__card {
+            position: absolute;
+            right: 0;
+            bottom: 78px;
+            width: min(360px, calc(100vw - 32px));
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid rgba(2, 6, 23, .06);
+            box-shadow: 0 18px 46px rgba(2, 6, 23, .25);
+            overflow: hidden;
+            display: none;
+        }
+
+        .ai-enter {
+            animation: aiIn .18s ease both;
+        }
+
+        @keyframes aiIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px) scale(.98)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .ai-chat__header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+        }
+
+        .ai-chat__title {
+            font-weight: 800;
+            letter-spacing: .2px;
+        }
+
+        .ai-chat__close {
+            margin-left: auto;
+            background: rgba(255, 255, 255, .18);
+            border: 0;
+            color: #fff;
+            border-radius: 8px;
+            padding: 6px 8px;
+            cursor: pointer;
+        }
+
+        .ai-chat__body {
+            background: #f8fafc;
+            max-height: 380px;
+            overflow: auto;
+            padding: 14px 12px;
+        }
+
+        .ai-msg {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .ai-msg__bubble {
+            padding: 10px 12px;
+            border-radius: 14px;
+            max-width: 80%;
+            box-shadow: 0 6px 16px rgba(2, 6, 23, .08);
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .ai-user {
+            justify-content: flex-end;
+        }
+
+        .ai-user .ai-msg__bubble {
+            background: #e8f5e9;
+            color: #064e3b;
+            border: 1px solid rgba(22, 163, 74, .2);
+        }
+
+        .ai-bot .ai-msg__bubble {
+            background: #fff;
+            border: 1px solid rgba(2, 6, 23, .06);
+        }
+
+        .ai-typing {
+            font-size: 12px;
+            color: #475569;
+            padding: 0 4px 6px;
+            display: none;
+        }
+
+        .ai-chat__footer {
+            padding: 10px;
+            background: #fff;
+            border-top: 1px solid rgba(2, 6, 23, .06);
+        }
+
+        .ai-input {
+            display: flex;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .ai-input input {
+            flex: 1;
+            border: 0;
+            background: transparent;
+            outline: none;
+        }
+
+        .ai-input button {
+            border: 0;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: #16a34a;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .ai-suggest {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 8px 10px 0;
+            background: #f8fafc;
+        }
+
+        .ai-chip {
+            font-size: 12px;
+            background: #eef2ff;
+            color: #3730a3;
+            border: 1px solid #e5e7eb;
+            padding: 6px 10px;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+
+        .ai-kicker {
+            font-size: 12px;
+            color: #eafaf0
+        }
     </style>
 </head>
 
@@ -273,20 +471,21 @@
                                                                                 <!-- Nút thêm vào giỏ + tồn kho -->
                                                                                 <div
                                                                                     class="d-flex justify-content-between align-items-center mt-1 w-100">
-                                                                                    <form method="post"
-                                                                                        action="/add-product-to-cart/<%= product.id %>">
-                                                                                        <button
-                                                                                            data-product-id="<%=product.id%>"
+                                                                                    <form onsubmit="return false;">
+                                                                                        <button type="button"
+                                                                                            data-product-id="<%= product.id %>"
                                                                                             class="btnAddToCartHomePage mx-auto btn border rounded-pill px-3 text-primary">
                                                                                             <i
                                                                                                 class="fa fa-shopping-bag me-2 text-primary"></i>
                                                                                             Thêm vào giỏ
                                                                                         </button>
                                                                                     </form>
-                                                                                    <span class="badge bg-primary ms-3">
-                                                                                        Còn: <%= product.quantity %>
+                                                                                    <span
+                                                                                        class="badge bg-primary ms-3">Còn:
+                                                                                        <%= product.quantity %>
                                                                                     </span>
                                                                                 </div>
+
                                                                 </div>
 
                                                         </div>
@@ -465,6 +664,56 @@
                     </div>
                 </div>
                 <!-- Blogs End-->
+                <!-- === RÙA AI — chatbox === -->
+                <div id="aiTurtle" class="ai-turtle">
+                    <button id="aiTurtleBtn" class="ai-turtle__btn" aria-label="Mở Rùa AI">
+                        <!-- Turtle SVG -->
+                        <span class="ai-pulse" aria-hidden="true"></span>
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M5 12c0-3.31 3.13-6 7-6s7 2.69 7 6-3.13 6-7 6-7-2.69-7-6Z" fill="#fff"
+                                opacity=".9" />
+                            <path d="M7 12h10M9 14.5h6" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
+                            <circle cx="9" cy="10" r="1" fill="#16a34a" />
+                            <circle cx="15" cy="10" r="1" fill="#16a34a" />
+                        </svg>
+                    </button>
+
+                    <div id="aiTurtleCard" class="ai-turtle__card ai-enter" role="dialog" aria-label="Rùa AI tư vấn">
+                        <div class="ai-chat__header">
+                            <div>
+                                <div class="ai-chat__title">Rùa AI tư vấn</div>
+                                <div class="ai-kicker">Hỏi gì về laptop cũng đáp 👋</div>
+                            </div>
+                            <button id="aiTurtleClose" class="ai-chat__close">Đóng</button>
+                        </div>
+
+                        <div id="aiChatBody" class="ai-chat__body">
+                            <div class="ai-msg ai-bot">
+                                <div class="ai-msg__bubble">Chào bạn! Mình có thể gợi ý laptop theo ngân sách, nhu cầu
+                                    (gaming, đồ họa, văn phòng), cân nặng… Bạn cứ hỏi nha.</div>
+                            </div>
+                            <div id="aiTyping" class="ai-typing">Rùa AI đang nhập…</div>
+                        </div>
+
+                        <div class="ai-suggest">
+                            <button class="ai-chip" data-q="Tư vấn laptop gaming tầm 20 triệu">Gaming ~20 triệu</button>
+                            <button class="ai-chip"
+                                data-q="Laptop văn phòng nhẹ dưới 1.3kg, pin tốt, giá 15-25 triệu">Văn phòng
+                                nhẹ</button>
+                            <button class="ai-chip" data-q="So sánh MacBook Air M1 và M2 để đi học">So sánh Mac</button>
+                            <button class="ai-chip" data-q="Máy dưới 12 triệu cho sinh viên IT, ưu tiên RAM 16GB">
+                                <=12tr cho SV</button>
+                        </div>
+
+                        <div class="ai-chat__footer">
+                            <form id="aiForm" class="ai-input">
+                                <input id="aiInput"
+                                    placeholder="Nhập câu hỏi… (Enter để gửi, Shift+Enter xuống dòng)" />
+                                <button id="aiSend" type="submit">Gửi</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
 
                 <!-- Footer Start -->
@@ -488,6 +737,8 @@
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
                         integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
                         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+
                     <script>
                         var swiper = new Swiper('.promo-swiper', {
                             loop: true,  // Bật vòng lặp vô hạn
@@ -574,6 +825,101 @@
                             }
                         })();
                     </script>
+
+                    <!-- Rùa AI -->
+                    <script>
+                        (function () {
+                            const $btn = document.getElementById('aiTurtleBtn');
+                            const $card = document.getElementById('aiTurtleCard');
+                            const $close = document.getElementById('aiTurtleClose');
+                            const $body = document.getElementById('aiChatBody');
+                            const $form = document.getElementById('aiForm');
+                            const $input = document.getElementById('aiInput');
+                            const $send = document.getElementById('aiSend');
+                            const $typing = document.getElementById('aiTyping');
+
+                            if (!$btn || !$card || !$form) return;
+
+                            function openCard() { $card.style.display = 'block'; setTimeout(() => $input?.focus(), 80); }
+                            function closeCard() { $card.style.display = 'none'; }
+                            $btn.addEventListener('click', openCard);
+                            $close.addEventListener('click', closeCard);
+
+                            // Chips gợi ý
+                            document.querySelectorAll('.ai-chip').forEach(ch => {
+                                ch.addEventListener('click', () => {
+                                    const q = ch.getAttribute('data-q') || '';
+                                    $input.value = q;
+                                    $input.focus();
+                                });
+                            });
+
+                            function appendMsg(role, text) {
+                                const wrap = document.createElement('div');
+                                wrap.className = 'ai-msg ' + (role === 'user' ? 'ai-user' : 'ai-bot');
+                                const b = document.createElement('div');
+                                b.className = 'ai-msg__bubble';
+                                b.textContent = text;
+                                wrap.appendChild(b);
+                                $body.appendChild(wrap);
+                                $body.scrollTop = $body.scrollHeight;
+                            }
+
+                            async function sendMessage(text) {
+                                appendMsg('user', text);
+                                $typing.style.display = 'block';
+                                $send.disabled = true; $input.disabled = true;
+
+                                try {
+                                    const res = await fetch('/api/ai/chat', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        credentials: 'same-origin',
+                                        body: JSON.stringify({
+                                            message: text,
+                                            // bạn có thể truyền thêm ngữ cảnh trang để AI hiểu:
+                                            meta: { page: 'home_show', ts: Date.now() }
+                                        })
+                                    });
+                                    const data = await res.json();
+                                    const reply = data?.reply || 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!';
+                                    appendMsg('assistant', reply);
+                                } catch (err) {
+                                    console.error(err);
+                                    appendMsg('assistant', 'Có lỗi kết nối máy chủ. Vui lòng thử lại sau nhé.');
+                                } finally {
+                                    $typing.style.display = 'none';
+                                    $send.disabled = false; $input.disabled = false; $input.focus();
+                                }
+                            }
+
+                            $form.addEventListener('submit', (e) => {
+                                e.preventDefault();
+                                const val = ($input.value || '').trim();
+                                if (!val) return;
+                                $input.value = '';
+                                sendMessage(val);
+                            });
+
+                            // Enter để gửi, Shift+Enter xuống dòng
+                            $input.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    $form.dispatchEvent(new Event('submit', { cancelable: true }));
+                                }
+                            });
+
+                            // Tự đóng khi click ra ngoài
+                            document.addEventListener('click', (e) => {
+                                const root = document.getElementById('aiTurtle');
+                                if (!root) return;
+                                if (!$card.contains(e.target) && !$btn.contains(e.target)) {
+                                    // closeCard();  // nếu muốn tự đóng khi click ra ngoài, bỏ comment
+                                }
+                            });
+                        })();
+                    </script>
+
 
 
 

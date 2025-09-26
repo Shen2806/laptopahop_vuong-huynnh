@@ -20,7 +20,6 @@ const handleCreateUser = async (
     avatar: string,
     role: string
 ) => {
-
     //hash password
     const defaultPassword = await hashPassword('123456');
     //insert user into database
@@ -38,6 +37,7 @@ const handleCreateUser = async (
     })
     return newUser;
 }
+
 const getAllUsers = async (page: number) => {
     const pageSize = TOTAL_ITEM_PER_PAGE;
     const skip = (page - 1) * pageSize;
@@ -50,29 +50,22 @@ const getAllUsers = async (page: number) => {
 
 const countTotalUserPages = async () => {
     const pageSize = TOTAL_ITEM_PER_PAGE
-
     const totalItems = await prisma.user.count();
-
     const totalPages = Math.ceil(totalItems / pageSize);
-
     return totalPages;
 }
+
 const countTotalProductPages = async () => {
     const pageSize = TOTAL_ITEM_PER_PAGE
-
     const totalItems = await prisma.product.count();
-
     const totalPages = Math.ceil(totalItems / pageSize);
-
     return totalPages;
 }
+
 const countTotalOrderPages = async () => {
     const pageSize = TOTAL_ITEM_PER_PAGE
-
     const totalItems = await prisma.order.count();
-
     const totalPages = Math.ceil(totalItems / pageSize);
-
     return totalPages;
 }
 
@@ -82,7 +75,6 @@ const getAllRoles = async () => {
 }
 
 const handleDeleteUser = async (id: number) => {
-
     try {
         const connection = await getConnection();
         const sql = 'DELETE FROM `users` WHERE id = ? LIMIT 1';
@@ -96,7 +88,6 @@ const handleDeleteUser = async (id: number) => {
 }
 
 const getUserById = async (id: number) => {
-
     const user = await prisma.user.findUnique({
         where: { id: +id },
     });
@@ -131,7 +122,40 @@ const updateUserById = async (
     }
 };
 
+/* =========================
+   ADD: Utilities for password
+   ========================= */
+const verifyPasswordByUserId = async (userId: number, plain: string) => {
+    const u = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { password: true }
+    });
+    if (!u || !u.password) return false;
+    return comparePassword(plain, u.password);
+};
 
+const changeUserPassword = async (userId: number, newPlain: string) => {
+    const newHash = await hashPassword(newPlain);
+    await prisma.user.update({
+        where: { id: userId },
+        data: { password: newHash }
+    });
+    return true;
+};
 
-export { handleCreateUser, getAllUsers, handleDeleteUser, getUserById, updateUserById, getAllRoles, hashPassword, comparePassword, countTotalUserPages, countTotalProductPages, countTotalOrderPages };
-
+export {
+    handleCreateUser,
+    getAllUsers,
+    handleDeleteUser,
+    getUserById,
+    updateUserById,
+    getAllRoles,
+    hashPassword,
+    comparePassword,
+    countTotalUserPages,
+    countTotalProductPages,
+    countTotalOrderPages,
+    // NEW
+    verifyPasswordByUserId,
+    changeUserPassword,
+};

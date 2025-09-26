@@ -990,8 +990,8 @@
 
                                                 <!-- CTA -->
                                                 <div class="d-flex justify-content-between align-items-center mt-auto">
-                                                    <form method="post" action="/add-product-to-cart/<%= product.id %>">
-                                                        <button data-product-id="<%= product.id %>"
+                                                    <form onsubmit="return false;">
+                                                        <button type="button" data-product-id="<%= product.id %>"
                                                             class="btnAddToCartHomePage btn border rounded-pill px-3">
                                                             <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ
                                                         </button>
@@ -999,6 +999,7 @@
                                                     <span class="badge bg-primary ms-3">Còn: <%= product.quantity %>
                                                     </span>
                                                 </div>
+
                                             </div>
                                         </div>
                                     </div>

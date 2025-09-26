@@ -132,14 +132,29 @@ export const initSocket = (server: HttpServer) => {
                 io!.to("admins").emit("admin:session_unread", { sessionId: sidNum, unread });
             }
 
-            // ADMIN nhắn → ping user
-            if (sender === "ADMIN" && sess.userId) {
-                io!.to(`user-${sess.userId}`).emit("chat-incoming", {
-                    sessionId: sidNum,
-                    preview: content.slice(0, 80),
-                    at: new Date().toISOString(),
+            // ADMIN nhắn → ping user kèm deep-link mở lại cuộc trò chuyện
+            if (sender === "ADMIN") {
+                const sessFull = await prisma.chatSession.findUnique({
+                    where: { id: sidNum },
+                    select: { userId: true, productId: true },
                 });
+
+                if (sessFull?.userId) {
+                    // nếu chat từ trang chi tiết sản phẩm, deep-link về /product/:id?chat=:sid
+                    const openUrl = sessFull.productId
+                        ? `/product/${sessFull.productId}?chat=${sidNum}`
+                        : `/`; // fallback (ít khi dùng vì bạn tạo phiên từ trang chi tiết)
+
+                    io!.to(`user-${sessFull.userId}`).emit("chat-incoming", {
+                        sessionId: sidNum,
+                        productId: sessFull.productId || null,
+                        preview: content.slice(0, 80),
+                        at: new Date().toISOString(),
+                        openUrl,
+                    });
+                }
             }
+
         });
 
         // ===== READ (✓/✓✓) =====
@@ -177,12 +192,20 @@ export const initSocket = (server: HttpServer) => {
         // ===== CLOSE SESSION =====
         socket.on("chat:close", async ({ sessionId }) => {
             const sidNum = Number(sessionId);
+            if (!Number.isFinite(sidNum)) return;
+
             await prisma.chatSession.update({
                 where: { id: sidNum },
                 data: { status: "CLOSED" },
             });
-            io!.to(`chat_${sidNum}`).emit("chat:closed");
+
+            // Báo cho cả phòng (admin + user trong phiên)
+            io!.to(`chat_${sidNum}`).emit("chat:closed", { sessionId: sidNum });
+
+            // (tuỳ chọn) báo cho tất cả admin khác để refresh list
+            io!.to("admins").emit("admin:session_closed", { sessionId: sidNum });
         });
+
 
         // ===== DEBUG =====
         socket.on("debug:ping", (msg, cb) => cb?.({ ok: true, got: msg, sid: socket.id }));

@@ -74,6 +74,131 @@
         .ldesc table {
             width: 100%;
         }
+
+        /* Related products */
+        #related .rel-strip {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            padding: .25rem;
+            scrollbar-width: thin;
+        }
+
+        #related .rel-card {
+            flex: 0 0 auto;
+            width: 260px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 10px;
+            text-decoration: none;
+            color: inherit;
+            scroll-snap-align: start;
+            transition: transform .12s ease, box-shadow .12s ease;
+        }
+
+        #related .rel-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, .08);
+        }
+
+        #related .rel-img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #related .rel-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        #related .rel-name {
+            margin-top: .5rem;
+            font-weight: 600;
+            font-size: .95rem;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            min-height: 2.5em;
+        }
+
+        #related .rel-price {
+            margin-top: .25rem;
+        }
+
+        #related .rel-old {
+            font-size: .85rem;
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+
+        #related .rel-new {
+            font-weight: 800;
+            color: #e53935;
+        }
+
+        #related .rel-prev,
+        #related .rel-next {
+            min-width: 34px;
+        }
+
+        /* Compare bar */
+        .compare-bar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 16px;
+            z-index: 2000;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .compare-bar .compare-inner {
+            padding: 10px 14px;
+        }
+
+        .compare-chip {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 999px;
+            padding: 6px 10px;
+            background: #f8fafc;
+        }
+
+        .compare-chip img {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .compare-chip .x {
+            cursor: pointer;
+            color: #ef4444;
+            font-weight: 700;
+            padding: 0 4px;
+        }
+
+        @media (max-width:576px) {
+            .compare-bar {
+                bottom: 8px;
+            }
+        }
     </style>
 
 </head>
@@ -773,12 +898,11 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Nút thêm giỏ -->
-                                            <form method="post"
-                                                action="/add-to-cart-from-detail-page/<%= product.id %>">
-                                                <input value="1" type="hidden" id="quantityDetail" name="quantity" />
+                                            <!-- Nút thêm giỏ + mua ngay -->
+                                            <form onsubmit="return false;">
+                                                <input type="hidden" id="quantityDetail" name="quantity" value="1" />
                                                 <div class="cta-stack mt-2">
-                                                    <button type="submit" data-product-id="<%= product.id %>"
+                                                    <button type="button" data-product-id="<%= product.id %>"
                                                         class="btnAddToCartDetail btn btn-primary rounded-pill w-100 py-2">
                                                         <i class="fa fa-shopping-bag me-2"></i> Thêm vào giỏ hàng
                                                     </button>
@@ -787,8 +911,17 @@
                                                         class="btn btn-outline-success rounded-pill w-100 py-2">
                                                         <i class="fa fa-bolt me-1"></i> Mua ngay
                                                     </button>
+                                                    <button type="button"
+                                                        class="btn btn-outline-secondary rounded-pill w-100 py-2 btnCompareToggle mt-2"
+                                                        data-product-id="<%= product.id %>"
+                                                        data-product-name="<%= product.name %>"
+                                                        data-product-image="<%= product.image %>">
+                                                        <i class="fa fa-exchange-alt me-1"></i> Thêm vào so sánh
+                                                    </button>
+
                                                 </div>
                                             </form>
+
 
 
 
@@ -918,6 +1051,7 @@
                                             <div class="accordion" id="productAccordion">
 
                                                 <!-- THÔNG SỐ KỸ THUẬT -->
+                                                <!-- THÔNG SỐ KỸ THUẬT (phiên bản EJS-safe, không dùng &&, ||, ?:) -->
                                                 <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
                                                     <h2 class="accordion-header">
                                                         <button class="accordion-button fw-semibold" type="button"
@@ -930,21 +1064,23 @@
                                                     <div id="accSpecs" class="accordion-collapse collapse show">
                                                         <div class="accordion-body">
 
-                                                            <% var p=(typeof product !=='undefined' && product) ?
-                                                                product : {}; var factoryLabel=(p && p.factory) ?
-                                                                p.factory : '-' ; if (factoryLabel==='APPLE' )
-                                                                factoryLabel='Apple (MacBook)' ; else if
-                                                                (factoryLabel==='ASUS' ) factoryLabel='Asus' ; else if
-                                                                (factoryLabel==='LENOVO' ) factoryLabel='Lenovo' ; else
-                                                                if (factoryLabel==='DELL' ) factoryLabel='Dell' ; else
-                                                                if (factoryLabel==='LG' ) factoryLabel='LG' ; else if
-                                                                (factoryLabel==='ACER' ) factoryLabel='Acer' ; else if
-                                                                (factoryLabel==='HP' ) factoryLabel='HP' ; else if
+                                                            <% /*=====Chuẩn hoá dữ liệu, KHÔNG dùng && / ||=====*/ var
+                                                                p={}; if (typeof product !=='undefined' ) { if (product)
+                                                                { p=product; } } /* Hãng */ var factoryLabel='-' ; if
+                                                                (p.factory) { factoryLabel=String(p.factory); if
+                                                                (factoryLabel==='APPLE' ) factoryLabel='Apple (MacBook)'
+                                                                ; else if (factoryLabel==='ASUS' ) factoryLabel='Asus' ;
+                                                                else if (factoryLabel==='LENOVO' ) factoryLabel='Lenovo'
+                                                                ; else if (factoryLabel==='DELL' ) factoryLabel='Dell' ;
+                                                                else if (factoryLabel==='LG' ) factoryLabel='LG' ; else
+                                                                if (factoryLabel==='ACER' ) factoryLabel='Acer' ; else
+                                                                if (factoryLabel==='HP' ) factoryLabel='HP' ; else if
                                                                 (factoryLabel==='MSI' ) factoryLabel='MSI' ; else if
                                                                 (factoryLabel==='GIGABYTE' ) factoryLabel='Gigabyte' ;
                                                                 else if (factoryLabel==='ALIENWARE' )
-                                                                factoryLabel='Alienware' ; var targetLabel=(p &&
-                                                                p.target) ? p.target : '-' ; if (targetLabel==='GAMING'
+                                                                factoryLabel='Alienware' ; } /* Mục đích */ var
+                                                                targetLabel='-' ; if (p.target) {
+                                                                targetLabel=String(p.target); if (targetLabel==='GAMING'
                                                                 ) targetLabel='Gaming' ; else if
                                                                 (targetLabel==='SINHVIEN-VANPHONG' )
                                                                 targetLabel='Sinh viên - Văn phòng' ; else if
@@ -952,37 +1088,43 @@
                                                                 targetLabel='Thiết kế đồ họa' ; else if
                                                                 (targetLabel==='MONG-NHE' ) targetLabel='Mỏng nhẹ' ;
                                                                 else if (targetLabel==='DOANH-NHAN' )
-                                                                targetLabel='Doanh nhân' ; var cpu=(p && p.cpu) ? p.cpu
-                                                                : '-' ; var ram='-' ; if (p && typeof p.ramGB==='number'
-                                                                ) { ram=String(p.ramGB) + ' GB' ; } var storage='-' ; if
-                                                                (p && typeof p.storageGB==='number' ) { var
-                                                                stype=(p.storageType) ? p.storageType : 'SSD' ; var
-                                                                storageNum=String(p.storageGB); try { storageNum=new
-                                                                Intl.NumberFormat('vi-VN').format(p.storageGB); }
-                                                                catch(e) {} storage=storageNum + ' GB ' + stype; } var
-                                                                resText=(p && p.screenResolution) ? p.screenResolution
-                                                                : '' ; if (resText==='FHD' ) resText='FHD (1920×1080)' ;
-                                                                else if (resText==='QHD' ) resText='QHD / 2K' ; else if
-                                                                (resText==='4K' ) resText='4K UHD' ; var screen='-' ; if
-                                                                (p && typeof p.screenSizeInches==='number' ) { var
+                                                                targetLabel='Doanh nhân' ; } /* Cấu hình */ var cpu='-'
+                                                                ; if (p.cpu) { cpu=String(p.cpu); } var ram='-' ; if
+                                                                (typeof p.ramGB==='number' ) { ram=String(p.ramGB)
+                                                                + ' GB' ; } var storage='-' ; if (typeof
+                                                                p.storageGB==='number' ) { var stype='SSD' ; if
+                                                                (p.storageType) { stype=String(p.storageType); }
+                                                                storage=String(p.storageGB) + ' GB ' + stype; } /* Màn
+                                                                hình */ var resText='' ; if (p.screenResolution) {
+                                                                resText=String(p.screenResolution); if (resText==='FHD'
+                                                                ) resText='FHD (1920×1080)' ; else if (resText==='QHD' )
+                                                                resText='QHD / 2K' ; else if (resText==='4K' )
+                                                                resText='4K UHD' ; } var screen='-' ; if (typeof
+                                                                p.screenSizeInches==='number' ) { var
                                                                 sizeText=String(p.screenSizeInches); if
                                                                 (sizeText.indexOf('.0') !==-1) {
                                                                 sizeText=sizeText.replace('.0',''); } sizeText=sizeText
-                                                                + '"' ; if (resText && resText.length> 0) screen =
-                                                                sizeText + ' ' + resText;
-                                                                else screen = sizeText;
+                                                                + '"' ; if (resText.length> 0) {
+                                                                screen = sizeText + ' ' + resText;
                                                                 } else {
-                                                                if (resText && resText.length > 0) screen = resText;
+                                                                screen = sizeText;
+                                                                }
+                                                                } else {
+                                                                if (resText.length > 0) {
+                                                                screen = resText;
+                                                                }
                                                                 }
 
+                                                                /* Tồn kho */
                                                                 var qty = 0;
-                                                                if (p && typeof p.quantity === 'number') {
+                                                                if (typeof p.quantity === 'number') {
                                                                 qty = p.quantity;
                                                                 }
 
+                                                                /* Tính năng (featureTags cho phép ; hoặc |) */
                                                                 var features = [];
-                                                                if (p && p.featureTags && typeof p.featureTags ===
-                                                                'string') {
+                                                                if (p.featureTags) {
+                                                                if (typeof p.featureTags === 'string') {
                                                                 var norm = p.featureTags;
                                                                 if (norm.indexOf('|') !== -1) {
                                                                 norm = norm.split('|').join(';');
@@ -996,82 +1138,165 @@
                                                                     }
                                                                     }
                                                                     }
+                                                                    }
                                                                     %>
 
-                                                                    <table class="table table-sm mb-0">
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <th style="width:180px">Hãng</th>
-                                                                                <td>
-                                                                                    <%= factoryLabel %>
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Mục đích</th>
-                                                                                <td>
-                                                                                    <%= targetLabel %>
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Tồn kho</th>
-                                                                                <td>
-                                                                                    <%= qty %>
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>CPU</th>
-                                                                                <td>
-                                                                                    <%= cpu %>
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>RAM</th>
-                                                                                <td>
-                                                                                    <%= ram %>
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Ổ cứng</th>
-                                                                                <td>
-                                                                                    <%= storage %>
-                                                                                </td>
-                                                                            </tr>
-                                                                            <tr>
-                                                                                <th>Màn hình</th>
-                                                                                <td>
-                                                                                    <%= screen %>
-                                                                                </td>
-                                                                            </tr>
+                                                                    <!-- 3 danh mục: Chung • Cấu hình • Màn hình & Tính năng -->
+                                                                    <div class="row g-3">
 
-                                                                            <% if (features && features.length> 0) { %>
-                                                                                <tr>
-                                                                                    <th>Tính năng</th>
-                                                                                    <td>
-                                                                                        <div
-                                                                                            style="display:flex;flex-wrap:wrap;gap:.25rem;">
-                                                                                            <% for (var j=0; j <
-                                                                                                features.length; j++) {
-                                                                                                %>
+                                                                        <!-- Chung -->
+                                                                        <div class="col-md-6">
+                                                                            <div class="card border-0 shadow-sm h-100">
+                                                                                <div class="card-body">
+                                                                                    <h6 class="fw-bold mb-3"><i
+                                                                                            class="fa fa-circle-info me-2 text-primary"></i>Thông
+                                                                                        tin chung</h6>
+                                                                                    <ul
+                                                                                        class="list-unstyled m-0 kv-list">
+                                                                                        <li class="d-flex py-1">
+                                                                                            <span
+                                                                                                class="kv-key">Hãng</span><span
+                                                                                                class="kv-sep">:</span>
+                                                                                            <span class="kv-val">
+                                                                                                <%= factoryLabel %>
+                                                                                            </span>
+                                                                                        </li>
+                                                                                        <li class="d-flex py-1">
+                                                                                            <span class="kv-key">Mục
+                                                                                                đích</span><span
+                                                                                                class="kv-sep">:</span>
+                                                                                            <span class="kv-val">
+                                                                                                <%= targetLabel %>
+                                                                                            </span>
+                                                                                        </li>
+                                                                                        <li class="d-flex py-1">
+                                                                                            <span class="kv-key">Tồn
+                                                                                                kho</span><span
+                                                                                                class="kv-sep">:</span>
+                                                                                            <span class="kv-val">
+                                                                                                <%= qty %>
+                                                                                            </span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- Cấu hình -->
+                                                                        <div class="col-md-6">
+                                                                            <div class="card border-0 shadow-sm h-100">
+                                                                                <div class="card-body">
+                                                                                    <h6 class="fw-bold mb-3"><i
+                                                                                            class="fa fa-microchip me-2 text-success"></i>Cấu
+                                                                                        hình</h6>
+                                                                                    <ul
+                                                                                        class="list-unstyled m-0 kv-list">
+                                                                                        <li class="d-flex py-1">
+                                                                                            <span
+                                                                                                class="kv-key">CPU</span><span
+                                                                                                class="kv-sep">:</span>
+                                                                                            <span class="kv-val">
+                                                                                                <%= cpu %>
+                                                                                            </span>
+                                                                                        </li>
+                                                                                        <li class="d-flex py-1">
+                                                                                            <span
+                                                                                                class="kv-key">RAM</span><span
+                                                                                                class="kv-sep">:</span>
+                                                                                            <span class="kv-val">
+                                                                                                <%= ram %>
+                                                                                            </span>
+                                                                                        </li>
+                                                                                        <li class="d-flex py-1">
+                                                                                            <span class="kv-key">Ổ
+                                                                                                cứng</span><span
+                                                                                                class="kv-sep">:</span>
+                                                                                            <span class="kv-val">
+                                                                                                <%= storage %>
+                                                                                            </span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <!-- Màn hình & Tính năng -->
+                                                                        <div class="col-12">
+                                                                            <div class="card border-0 shadow-sm">
+                                                                                <div class="card-body">
+                                                                                    <h6 class="fw-bold mb-3"><i
+                                                                                            class="fa fa-display me-2 text-warning"></i>Màn
+                                                                                        hình & Tính năng</h6>
+                                                                                    <ul
+                                                                                        class="list-unstyled m-0 kv-list">
+                                                                                        <li class="d-flex py-1">
+                                                                                            <span class="kv-key">Màn
+                                                                                                hình</span><span
+                                                                                                class="kv-sep">:</span>
+                                                                                            <span class="kv-val">
+                                                                                                <%= screen %>
+                                                                                            </span>
+                                                                                        </li>
+                                                                                        <% if (features.length> 0) { %>
+                                                                                            <li
+                                                                                                class="d-flex py-1 align-items-start">
                                                                                                 <span
-                                                                                                    class="badge bg-light text-dark border">
-                                                                                                    <%= features[j] %>
+                                                                                                    class="kv-key">Tính
+                                                                                                    năng</span><span
+                                                                                                    class="kv-sep">:</span>
+                                                                                                <span class="kv-val">
+                                                                                                    <div
+                                                                                                        class="d-flex flex-wrap gap-1">
+                                                                                                        <% for (var j=0;
+                                                                                                            j <
+                                                                                                            features.length;
+                                                                                                            j++) { %>
+                                                                                                            <span
+                                                                                                                class="badge bg-light text-dark border">
+                                                                                                                <%= features[j]
+                                                                                                                    %>
+                                                                                                            </span>
+                                                                                                            <% } %>
+                                                                                                    </div>
                                                                                                 </span>
-                                                                                                <% } %>
-                                                                                        </div>
-                                                                                    </td>
-                                                                                </tr>
-                                                                                <% } %>
-                                                                        </tbody>
-                                                                    </table>
+                                                                                            </li>
+                                                                                            <% } %>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                    <style>
+                                                                        .kv-list .kv-key {
+                                                                            min-width: 120px;
+                                                                            color: #6b7280;
+                                                                            font-weight: 600;
+                                                                        }
+
+                                                                        .kv-list .kv-sep {
+                                                                            width: 12px;
+                                                                            text-align: center;
+                                                                            color: #9ca3af;
+                                                                        }
+
+                                                                        .kv-list .kv-val {
+                                                                            flex: 1 1 auto;
+                                                                            color: #0f172a;
+                                                                        }
+                                                                    </style>
 
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <!-- MÔ TẢ -->
-                                                <% var _UID=(product && product.id) ? String(product.id) : 'x' ; %>
+                                                <!-- MÔ TẢ CHI TIẾT (phiên bản EJS-safe, không dùng && / || / ?:) -->
+                                                <% var _UID='x' ; if (typeof product !=='undefined' ) { if (product) {
+                                                    if (product.id) { _UID=String(product.id); } } } var _detail='' ; if
+                                                    (typeof product !=='undefined' ) { if (product) { if
+                                                    (product.detailDesc) { _detail=product.detailDesc; } } } %>
 
-                                                    <!-- MÔ TẢ CHI TIẾT -->
                                                     <div
                                                         class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden">
                                                         <h2 class="accordion-header">
@@ -1087,15 +1312,9 @@
                                                         <div id="accDesc-<%= _UID %>"
                                                             class="accordion-collapse collapse show">
                                                             <div class="accordion-body">
-
-                                                                <!-- Wrapper mô tả (mặc định thu gọn) -->
+                                                                <!-- Thu gọn mặc định -->
                                                                 <div id="desc-wrapper-<%= _UID %>"
-                                                                    class="ldesc ldesc--collapsed">
-                                                                    <%- (product && product.detailDesc) ?
-                                                                        product.detailDesc : '' %>
-                                                                </div>
-
-                                                                <!-- Nút toggle (ẩn nếu nội dung ngắn) -->
+                                                                    class="ldesc ldesc--collapsed"><%- _detail %></div>
                                                                 <div class="text-center mt-2">
                                                                     <button type="button" id="toggle-desc-<%= _UID %>"
                                                                         class="btn btn-outline-primary btn-sm"
@@ -1105,91 +1324,187 @@
                                                                         Xem thêm
                                                                     </button>
                                                                 </div>
-
                                                             </div>
                                                         </div>
                                                     </div>
 
-                                                    <!-- ĐÁNH GIÁ -->
-                                                    <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
-                                                        id="reviewsSection">
-                                                        <h2 class="accordion-header">
-                                                            <button class="accordion-button fw-semibold" type="button"
-                                                                data-bs-toggle="collapse" data-bs-target="#accReviews"
-                                                                aria-expanded="true" aria-controls="accReviews">
-                                                                Đánh giá
-                                                            </button>
-                                                        </h2>
-                                                        <div id="accReviews" class="accordion-collapse collapse show">
-                                                            <div class="accordion-body">
-                                                                <!-- Tóm tắt rating -->
-                                                                <div class="d-flex align-items-center mb-2">
-                                                                    <div id="avgStars" class="me-2"></div>
-                                                                    <small id="ratingCount" class="text-muted"></small>
+                                                    <!-- =============== SẢN PHẨM TƯƠNG TỰ (1 hàng, kéo ngang, tối đa 8) =============== -->
+                                                    <% var relAll=[]; if (typeof similarProducts !=='undefined' &&
+                                                        similarProducts && similarProducts.length) {
+                                                        relAll=similarProducts.slice(0, 8); } %>
+                                                        <% if (relAll.length> 0) { %>
+                                                            <section id="related" class="container py-4">
+                                                                <div
+                                                                    class="d-flex align-items-center justify-content-between mb-2">
+                                                                    <h5 class="mb-0">Sản phẩm tương tự</h5>
+                                                                    <div class="d-flex gap-2">
+                                                                        <button
+                                                                            class="btn btn-sm btn-outline-secondary rel-prev"
+                                                                            type="button"
+                                                                            aria-label="Trước">&laquo;</button>
+                                                                        <button
+                                                                            class="btn btn-sm btn-outline-secondary rel-next"
+                                                                            type="button"
+                                                                            aria-label="Sau">&raquo;</button>
+                                                                    </div>
                                                                 </div>
 
-                                                                <% if (user) { %>
-                                                                    <!-- Form đánh giá -->
-                                                                    <form id="reviewForm" class="mb-3">
-                                                                        <div class="mb-2">Đánh giá của bạn:</div>
-                                                                        <div id="ratingStars" class="mb-2"></div>
-                                                                        <textarea class="form-control" name="comment"
-                                                                            rows="3"
-                                                                            placeholder="Cảm nhận của bạn..."></textarea>
-                                                                        <button class="btn btn-primary mt-2">Gửi đánh
-                                                                            giá</button>
-                                                                    </form>
-                                                                    <% } else { %>
-                                                                        <div class="alert alert-warning">
-                                                                            Bạn cần <a href="/login">đăng nhập</a> để
-                                                                            đánh
-                                                                            giá.
+                                                                <div class="rel-strip" id="relTrack">
+                                                                    <% for (var i=0; i < relAll.length; i++) { var
+                                                                        it=relAll[i]; var price=Number(it && it.price ?
+                                                                        it.price : 0); var discount=Number(it &&
+                                                                        it.discount ? it.discount : 0); var
+                                                                        finalPrice=discount> 0 ? Math.round(price * (100
+                                                                        - discount) / 100) :
+                                                                        price;
+                                                                        %>
+                                                                        <a class="rel-card"
+                                                                            href="/product/<%= it.id %>">
+                                                                            <div class="rel-img">
+                                                                                <img src="/images/product/<%= it.image %>"
+                                                                                    alt="">
+                                                                            </div>
+                                                                            <div class="rel-name">
+                                                                                <%= it.name %>
+                                                                            </div>
+                                                                            <div class="rel-price">
+                                                                                <% if (discount> 0) { %>
+                                                                                    <div class="rel-old">
+                                                                                        <%= new
+                                                                                            Intl.NumberFormat('vi-VN', {
+                                                                                            style: 'currency' ,
+                                                                                            currency: 'VND'
+                                                                                            }).format(price) %>
+                                                                                    </div>
+                                                                                    <div class="rel-new">
+                                                                                        <%= new
+                                                                                            Intl.NumberFormat('vi-VN', {
+                                                                                            style: 'currency' ,
+                                                                                            currency: 'VND'
+                                                                                            }).format(finalPrice) %>
+                                                                                    </div>
+                                                                                    <% } else { %>
+                                                                                        <div class="rel-new">
+                                                                                            <%= new
+                                                                                                Intl.NumberFormat('vi-VN',
+                                                                                                { style: 'currency' ,
+                                                                                                currency: 'VND'
+                                                                                                }).format(price) %>
+                                                                                        </div>
+                                                                                        <% } %>
+                                                                            </div>
+                                                                        </a>
+                                                                        <% } %>
+                                                                </div>
+                                                            </section>
+                                                            <% } %>
+                                                                <!-- =============== /SẢN PHẨM TƯƠNG TỰ =============== -->
+                                                                <!-- ĐÁNH GIÁ -->
+                                                                <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
+                                                                    id="reviewsSection">
+                                                                    <h2 class="accordion-header">
+                                                                        <button class="accordion-button fw-semibold"
+                                                                            type="button" data-bs-toggle="collapse"
+                                                                            data-bs-target="#accReviews"
+                                                                            aria-expanded="true"
+                                                                            aria-controls="accReviews">
+                                                                            Đánh giá
+                                                                        </button>
+                                                                    </h2>
+                                                                    <div id="accReviews"
+                                                                        class="accordion-collapse collapse show">
+                                                                        <div class="accordion-body">
+                                                                            <!-- Tóm tắt rating -->
+                                                                            <div class="d-flex align-items-center mb-2">
+                                                                                <div id="avgStars" class="me-2"></div>
+                                                                                <small id="ratingCount"
+                                                                                    class="text-muted"></small>
+                                                                            </div>
+
+                                                                            <% if (user) { %>
+                                                                                <!-- Form đánh giá -->
+                                                                                <form id="reviewForm" class="mb-3">
+                                                                                    <div class="mb-2">Đánh giá của bạn:
+                                                                                    </div>
+                                                                                    <div id="ratingStars" class="mb-2">
+                                                                                    </div>
+                                                                                    <textarea class="form-control"
+                                                                                        name="comment" rows="3"
+                                                                                        placeholder="Cảm nhận của bạn..."></textarea>
+                                                                                    <button
+                                                                                        class="btn btn-primary mt-2">Gửi
+                                                                                        đánh
+                                                                                        giá</button>
+                                                                                </form>
+                                                                                <% } else { %>
+                                                                                    <div class="alert alert-warning">
+                                                                                        Bạn cần <a href="/login">đăng
+                                                                                            nhập</a> để
+                                                                                        đánh
+                                                                                        giá.
+                                                                                    </div>
+                                                                                    <% } %>
+
+                                                                                        <!-- Danh sách đánh giá -->
+                                                                                        <div id="reviewList"
+                                                                                            class="small text-muted">
+                                                                                            <!-- JS client sẽ render danh sách -->
+                                                                                        </div>
                                                                         </div>
-                                                                        <% } %>
+                                                                    </div>
+                                                                </div>
 
-                                                                            <!-- Danh sách đánh giá -->
-                                                                            <div id="reviewList"
-                                                                                class="small text-muted">
-                                                                                <!-- JS client sẽ render danh sách -->
-                                                                            </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                                <!-- Q&A -->
+                                                                <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
+                                                                    id="qaSection">
+                                                                    <h2 class="accordion-header">
+                                                                        <button class="accordion-button fw-semibold"
+                                                                            type="button" data-bs-toggle="collapse"
+                                                                            data-bs-target="#accQA" aria-expanded="true"
+                                                                            aria-controls="accQA">
+                                                                            Hỏi & Đáp (Q&A)
+                                                                        </button>
+                                                                    </h2>
+                                                                    <div id="accQA"
+                                                                        class="accordion-collapse collapse show">
+                                                                        <div class="accordion-body">
+                                                                            <% if (user) { %>
+                                                                                <form id="qaForm" class="mb-3">
+                                                                                    <textarea class="form-control"
+                                                                                        name="content" rows="2"
+                                                                                        placeholder="Đặt câu hỏi về sản phẩm..."></textarea>
+                                                                                    <button
+                                                                                        class="btn btn-success mt-2">Gửi
+                                                                                        câu
+                                                                                        hỏi</button>
+                                                                                </form>
+                                                                                <% } else { %>
+                                                                                    <div class="alert alert-info">Đăng
+                                                                                        nhập để xem
+                                                                                        và
+                                                                                        đặt câu
+                                                                                        hỏi.</div>
+                                                                                    <% } %>
 
-                                                    <!-- Q&A -->
-                                                    <div class="accordion-item mb-3 shadow-sm rounded-3 overflow-hidden"
-                                                        id="qaSection">
-                                                        <h2 class="accordion-header">
-                                                            <button class="accordion-button fw-semibold" type="button"
-                                                                data-bs-toggle="collapse" data-bs-target="#accQA"
-                                                                aria-expanded="true" aria-controls="accQA">
-                                                                Hỏi & Đáp (Q&A)
-                                                            </button>
-                                                        </h2>
-                                                        <div id="accQA" class="accordion-collapse collapse show">
-                                                            <div class="accordion-body">
-                                                                <% if (user) { %>
-                                                                    <form id="qaForm" class="mb-3">
-                                                                        <textarea class="form-control" name="content"
-                                                                            rows="2"
-                                                                            placeholder="Đặt câu hỏi về sản phẩm..."></textarea>
-                                                                        <button class="btn btn-success mt-2">Gửi câu
-                                                                            hỏi</button>
-                                                                    </form>
-                                                                    <% } else { %>
-                                                                        <div class="alert alert-info">Đăng nhập để xem
-                                                                            và
-                                                                            đặt câu
-                                                                            hỏi.</div>
-                                                                        <% } %>
-
-                                                                            <div id="qaList">
-                                                                                <!-- JS client sẽ render danh sách Q&A -->
-                                                                            </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
+                                                                                        <div id="qaList">
+                                                                                            <!-- JS client sẽ render danh sách Q&A -->
+                                                                                        </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Compare Bar -->
+                                        <div id="compareBar" class="compare-bar shadow-lg" style="display:none;">
+                                            <div class="compare-inner container d-flex align-items-center">
+                                                <div id="compareItems"
+                                                    class="d-flex align-items-center flex-wrap gap-2 flex-1"></div>
+                                                <div class="ms-auto d-flex align-items-center gap-2">
+                                                    <button id="btnCompareNow" class="btn btn-success btn-sm"
+                                                        disabled>So sánh ngay</button>
+                                                    <button id="btnCompareClear"
+                                                        class="btn btn-outline-secondary btn-sm">Xóa hết</button>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -1201,9 +1516,14 @@
                         </div>
                     </div>
                     <!-- Single Product End -->
+
+
+
+
                     <!-- Boot data -->
                     <div id="boot" data-product-id="<%= product.id %>" data-is-auth="<%= user ? 1 : 0 %>"
-                        data-user-id="<%= user ? user.id : '' %>"></div>
+                        data-user-id="<%= user ? user.id : '' %>">
+                    </div>
 
                     <!-- Chat widget (drop-in) -->
                     <div id="chatWidget" class="chat-fab">
@@ -1290,7 +1610,8 @@
                                         <h2 class="text-primary fw-bold">LaptopShop</h2>
                                     </a>
                                     <p class="small">
-                                        Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
+                                        Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính
+                                            hãng</span>,
                                         dịch vụ tận tâm và giá cả cạnh tranh nhất.
                                     </p>
                                     <!-- Icon mạng xã hội -->
@@ -1310,15 +1631,18 @@
                                 <div class="col-lg-3 col-md-6">
                                     <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
                                     <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
-                                    <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
-                                    <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
+                                    <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo
+                                        mật</a>
+                                    <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch
+                                        vụ</a>
                                     <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
                                 </div>
 
                                 <!-- Tài khoản -->
                                 <div class="col-lg-3 col-md-6">
                                     <h4 class="text-light mb-3">Tài khoản</h4>
-                                    <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
+                                    <a class="btn-link d-block mb-2" href="/profile">Tài khoản của
+                                        tôi</a>
                                     <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
                                     <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
                                     <a class="btn-link d-block" href="/blogs">Blogs</a>
@@ -1327,11 +1651,16 @@
                                 <!-- Liên hệ -->
                                 <div class="col-lg-3 col-md-6">
                                     <h4 class="text-light mb-3">Liên hệ</h4>
-                                    <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp
+                                    <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC,
+                                        Thống
+                                        Nhất, Gò Vấp
                                     </p>
-                                    <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
-                                    <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
-                                    <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
+                                    <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com
+                                    </p>
+                                    <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744
+                                    </p>
+                                    <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 -
+                                        20:00)</p>
                                     <!-- Form đăng ký nhận tin -->
                                     <form class="mt-3">
                                         <div class="input-group">
@@ -1351,7 +1680,9 @@
                             class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
                             <span class="text-light mb-2 mb-md-0">
                                 <i class="fas fa-copyright me-2"></i>2025
-                                <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
+                                <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All
+                                rights
+                                reserved.
                             </span>
                             <span class="text-white">
                                 Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML
@@ -1724,7 +2055,172 @@
                         })();
                     </script>
 
+                    <!-- tự mở widget + join lại session theo ?chat= -->
+                    <script>
+                        (function () {
+                            var params = new URLSearchParams(location.search);
+                            var sid = params.get('chat');
+                            if (!sid) return;
 
+                            // mở card chat
+                            var openBtn = document.getElementById('chatOpen');
+                            if (openBtn) openBtn.click();
+
+                            // chuyển sang màn chat chính (ẩn pre-chat)
+                            document.getElementById('preChat')?.classList.add('d-none');
+                            document.getElementById('chatMain')?.classList.remove('d-none');
+
+                            // join lại phòng chat theo sessionId
+                            try {
+                                var s = io(); // socket.io client đã được load ở header
+                                s.emit('chat:join', { sessionId: Number(sid) });
+                            } catch (e) {
+                                console.warn('join chat failed:', e);
+                            }
+                        })();
+                    </script>
+
+                    <!-- ai chat -->
+                    <!-- <script>
+                        (async function () {
+                            // tạo session 1 lần khi mở widget
+                            let aiSessionId = null;
+                            async function ensureSession() {
+                                if (aiSessionId) return aiSessionId;
+                                const res = await fetch("/api/ai/sessions", { method: "POST", credentials: "include" });
+                                const s = await res.json();
+                                aiSessionId = s.id;
+                                return aiSessionId;
+                            }
+
+                            async function sendAi(text) {
+                                const sid = await ensureSession();
+                                const res = await fetch("/api/ai/chat", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    credentials: "include",
+                                    body: JSON.stringify({ sessionId: sid, message: text })
+                                });
+                                const data = await res.json();
+                                return data.answer;
+                            }
+
+                            // hook vào form gửi chat của bạn
+                            const form = document.getElementById("chatForm");
+                            const input = document.getElementById("chatInput");
+                            const body = document.getElementById("chatBody");
+
+                            function pushBubble(who, text) {
+                                const wrap = document.createElement("div");
+                                wrap.className = "mb-2 " + (who === "me" ? "text-end" : "");
+                                wrap.innerHTML = `<div class="d-inline-block px-3 py-2 rounded ${who === "me" ? "bg-primary text-white" : "bg-light"}">${text}</div>`;
+                                body.appendChild(wrap); body.scrollTop = body.scrollHeight;
+                            }
+
+                            form.addEventListener("submit", async (e) => {
+                                e.preventDefault();
+                                const q = (input.value || "").trim(); if (!q) return;
+                                pushBubble("me", q); input.value = "";
+                                pushBubble("ai", "Đang soạn...");
+                                const typing = body.lastElementChild;
+                                const a = await sendAi(q);
+                                typing.remove();
+                                pushBubble("ai", a);
+                            });
+                        })();
+                    </script> -->
+
+                    <!-- đóng phiên chat -->
+                    <script>
+                        (function () {
+                            // dùng lại socket chung nếu có
+                            const socket = window.__CHAT_SOCKET__ || io();
+                            window.__CHAT_SOCKET__ = socket;
+
+                            // Khi server báo phiên đã đóng → khóa UI
+                            socket.off('chat:closed');
+                            socket.on('chat:closed', function (payload) {
+                                if (typeof window.setClosedUI === 'function') window.setClosedUI();
+                                // (tuỳ chọn) show banner nhỏ trong box
+                                var banner = document.getElementById('chatBanner');
+                                var text = document.getElementById('chatBannerText');
+                                if (banner) { if (text) text.textContent = 'Phiên chat đã kết thúc'; banner.classList.remove('d-none'); setTimeout(() => banner.classList.add('d-none'), 3000); }
+                            });
+
+                            // Nếu bạn có emit "chat:status" khi join → cũng khóa luôn khi status=CLOSED
+                            socket.off('chat:status');
+                            socket.on('chat:status', function ({ status }) {
+                                if (status === 'CLOSED' && typeof window.setClosedUI === 'function') window.setClosedUI();
+                            });
+                        })();
+                    </script>
+
+                    <!-- JS: tự hiện/ẩn nút, toggle mở/thu, đo lại sau khi ảnh tải xong -->
+                    <script>
+                        (function () {
+                            var uid = '<%= _UID %>';
+                            var wrap = document.getElementById('desc-wrapper-' + uid);
+                            var btn = document.getElementById('toggle-desc-' + uid);
+                            if (!wrap || !btn) return;
+
+                            var MAX = 320; // phải khớp CSS .ldesc--collapsed
+
+                            function updateButtonVisibility() {
+                                // Nếu nội dung dài hơn MAX -> hiện nút; ngắn -> ẩn
+                                // +4 đề phòng sai số layout
+                                var needMore = wrap.scrollHeight > (MAX + 4);
+                                btn.style.display = needMore ? 'inline-block' : 'none';
+                                // Đặt lại text đúng theo trạng thái hiện tại
+                                btn.textContent = wrap.classList.contains('ldesc--collapsed')
+                                    ? (btn.getAttribute('data-collapsed-text') || 'Xem thêm')
+                                    : (btn.getAttribute('data-expanded-text') || 'Thu gọn');
+                            }
+
+                            btn.onclick = function () {
+                                if (wrap.classList.contains('ldesc--collapsed')) {
+                                    wrap.classList.remove('ldesc--collapsed');
+                                    btn.textContent = btn.getAttribute('data-expanded-text') || 'Thu gọn';
+                                } else {
+                                    wrap.classList.add('ldesc--collapsed');
+                                    btn.textContent = btn.getAttribute('data-collapsed-text') || 'Xem thêm';
+                                    try { wrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { }
+                                }
+                            };
+
+                            // Khởi tạo
+                            wrap.classList.add('ldesc--collapsed');
+                            updateButtonVisibility();                   // 1) lúc DOM sẵn
+                            window.addEventListener('load', updateButtonVisibility); // 2) sau khi ảnh/load xong
+                            if ('ResizeObserver' in window) {            // 3) nếu nội dung thay đổi kích thước
+                                var ro = new ResizeObserver(updateButtonVisibility);
+                                ro.observe(wrap);
+                            }
+                        })();
+                    </script>
+
+                    <!-- render 1 hàng -->
+                    <script>
+                        (function () {
+                            var track = document.getElementById('relTrack');
+                            if (!track) return;
+                            var prev = document.querySelector('#related .rel-prev');
+                            var next = document.querySelector('#related .rel-next');
+
+                            function step() {
+                                var first = track.querySelector('.rel-card');
+                                var w = first ? first.getBoundingClientRect().width : 260;
+                                var gap = 12;
+                                return (w + gap) * 2; // cuộn ~2 card/lần
+                            }
+
+                            if (prev) prev.addEventListener('click', function () {
+                                track.scrollBy({ left: -step(), behavior: 'smooth' });
+                            });
+                            if (next) next.addEventListener('click', function () {
+                                track.scrollBy({ left: step(), behavior: 'smooth' });
+                            });
+                        })();
+                    </script>
 
 
 </body>
