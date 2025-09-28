@@ -34,36 +34,56 @@ const getDashboardPage = async (req: Request, res: Response) => {
 };
 
 const getAdminUserPage = async (req: Request, res: Response) => {
-    const { page } = req.query;
-    let currentPage = page ? +page : 1;
-    if (currentPage <= 0) currentPage = 1;
-    const users = await getAllUsers(currentPage);
-    const totalPages = await countTotalUserPages();
+    const currentPage = Math.max(parseInt(String(req.query.page || 1), 10), 1);
+    const search = String(req.query.search || '').trim();
+
+    // Cách 1: dùng 2 hàm riêng
+    const users = await getAllUsers(currentPage, search);
+    const totalPages = await countTotalUserPages(search);
+
+    // Cách 2: gọn hơn
+    // const { users, totalPages } = await getUsersPage(currentPage, search);
+
     return res.render("admin/user/show.ejs", {
-        users, totalPages: +totalPages, page: +currentPage
+        users,
+        totalPages,
+        page: currentPage,
+        search,
     });
 };
+
 
 const getAdminProductPage = async (req: Request, res: Response) => {
     const { page } = req.query;
     let currentPage = page ? +page : 1;
     if (currentPage <= 0) currentPage = 1;
-    const totalPages = await countTotalProductPages();
-    const products = await getProductList(currentPage);
+
+    const search = (String(req.query.search || '')).trim();
+
+    const totalPages = await countTotalProductPages();   // thêm search
+    const products = await getProductList(currentPage, search); // thêm search
+
     return res.render("admin/product/show.ejs", {
-        products, totalPages: +totalPages, page: +currentPage
+        products,
+        totalPages: +totalPages,
+        page: +currentPage,
+        search, // để EJS giữ lại từ khóa và gắn vào phân trang
     });
 };
+
 
 const getAdminOrderPage = async (req: Request, res: Response) => {
     const { page } = req.query;
     let currentPage = page ? +page : 1;
     if (currentPage <= 0) currentPage = 1;
-    const orders = await getOrderAdmin(currentPage);
-    const totalPages = await countTotalOrderPages();
+
+    const search = String((req.query as any).search || '').trim();
+
+    const totalPages = await countTotalOrderPages();      // thêm search
+    const orders = await getOrderAdmin(currentPage, search); // thêm search
 
     return res.render('admin/order/show.ejs', {
-        orders, totalPages: +totalPages, page: +currentPage
+        orders, totalPages: +totalPages, page: +currentPage, search
     });
 };
 

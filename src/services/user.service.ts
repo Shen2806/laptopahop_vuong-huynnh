@@ -1,8 +1,10 @@
-import { prisma } from "config/client";
+// import { prisma } from "config/client";
 import { ACCOUNT_TYPE, TOTAL_ITEM_PER_PAGE } from "config/constant";
 import getConnection from "config/database";
 import bcrypt from 'bcrypt';
+import { PrismaClient } from "@prisma/client";
 const saltRounds = 10;
+const prisma = new PrismaClient();
 
 const hashPassword = async (plainText: string) => {
     return await bcrypt.hash(plainText, saltRounds);
@@ -38,22 +40,90 @@ const handleCreateUser = async (
     return newUser;
 }
 
-const getAllUsers = async (page: number) => {
-    const pageSize = TOTAL_ITEM_PER_PAGE;
-    const skip = (page - 1) * pageSize;
-    const users = await prisma.user.findMany({
-        skip: skip,
-        take: pageSize
-    })
-    return users;
+
+/**
+ * Tạo điều kiện WHERE cho tìm kiếm.
+ * - Tìm trên fullName, username (email), address
+ * - MySQL thường dùng collation _ci nên đã không phân biệt hoa/thường.
+ */
+function buildWhere(search?: string) {
+    const q = (search ?? '').trim();
+    if (!q) return {};
+    return {
+        OR: [
+            { fullName: { contains: q } },
+            { username: { contains: q } },
+            { address: { contains: q } },
+        ],
+    };
 }
 
-const countTotalUserPages = async () => {
-    const pageSize = TOTAL_ITEM_PER_PAGE
-    const totalItems = await prisma.user.count();
-    const totalPages = Math.ceil(totalItems / pageSize);
+/**
+ * Lấy danh sách user theo trang + tìm kiếm.
+ * @param page Trang hiện tại (>=1)
+ * @param search Từ khóa tìm kiếm (tùy chọn)
+ */
+const getAllUsers = async (page: number, search?: string) => {
+    const pageSize = TOTAL_ITEM_PER_PAGE;
+    const safePage = Math.max(1, Number(page || 1));
+    const skip = (safePage - 1) * pageSize;
+
+    const where = buildWhere(search);
+
+    const users = await prisma.user.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { id: 'asc' },
+        select: {
+            id: true,
+            fullName: true,
+            username: true, // email
+            address: true,
+        },
+    });
+
+    return users;
+};
+
+/**
+ * Tính tổng số trang theo bộ lọc hiện tại.
+ * @param search Từ khóa tìm kiếm (tùy chọn)
+ */
+const countTotalUserPages = async (search?: string) => {
+    const pageSize = TOTAL_ITEM_PER_PAGE;
+    const where = buildWhere(search);
+
+    const total = await prisma.user.count({ where });
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
     return totalPages;
-}
+};
+
+/**
+ * (Tuỳ chọn) Lấy cả danh sách + tổng trang trong 1 lần gọi (tối ưu round-trip).
+ * Controller có thể dùng hàm này thay vì gọi 2 hàm riêng.
+ */
+export const getUsersPage = async (page: number, search?: string) => {
+    const pageSize = TOTAL_ITEM_PER_PAGE;
+    const safePage = Math.max(1, Number(page || 1));
+    const skip = (safePage - 1) * pageSize;
+    const where = buildWhere(search);
+
+    const [total, users] = await prisma.$transaction([
+        prisma.user.count({ where }),
+        prisma.user.findMany({
+            where,
+            skip,
+            take: pageSize,
+            orderBy: { id: 'asc' },
+            select: { id: true, fullName: true, username: true, address: true },
+        }),
+    ]);
+
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    return { users, totalPages, page: safePage };
+};
 
 const countTotalProductPages = async () => {
     const pageSize = TOTAL_ITEM_PER_PAGE

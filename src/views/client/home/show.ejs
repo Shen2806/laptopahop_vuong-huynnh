@@ -8,6 +8,15 @@
     <meta content="" name="keywords">
     <meta content="" name="description">
 
+    <!-- Favicon: Turtle -->
+    <link rel="icon" href="/client/favicon.svg?v=1" type="image/svg+xml">
+    <link rel="alternate icon" href="/client/favicon.ico">
+    <link rel="apple-touch-icon" href="/client/apple-touch-icon.png">
+    <meta name="theme-color" content="#2e7d32">
+    <!-- Favicon: Turtle (bự & rõ) -->
+    <link rel="icon" href="/client/favicon.svg?v=3" sizes="any" type="image/svg+xml">
+    <link rel="icon" href="/client/favicon-32.png" sizes="120x120"> <!-- (tuỳ chọn) -->
+
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +31,6 @@
     <!-- Libraries Stylesheet -->
     <link href="/client/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
     <link href="/client/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
-
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="/client/css/bootstrap.min.css" rel="stylesheet">
@@ -41,6 +49,7 @@
     <link href="/client/css/home/show.css" rel="stylesheet">
 
     <style>
+        /* ... giữ nguyên toàn bộ CSS của bạn bên dưới ... */
         .rating-stars {
             line-height: 1;
             font-size: 14px;
@@ -52,7 +61,6 @@
             color: #f59e0b;
         }
 
-        /* cam cho cả full/half/empty */
         .rating-stars .count {
             margin-left: .4rem;
             font-size: 12px;
@@ -256,8 +264,113 @@
             font-size: 12px;
             color: #eafaf0
         }
+
+        .ai-products {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 4px 2px 2px;
+            margin-top: 6px;
+        }
+
+        .ai-products::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .ai-products::-webkit-scrollbar-thumb {
+            background: #e5e7eb;
+            border-radius: 6px;
+        }
+
+        .ai-pcard {
+            flex: 0 0 180px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+        .ai-pcard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+        }
+
+        .ai-pimg {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            background: #f8fafc;
+        }
+
+        .ai-pbody {
+            padding: 8px 10px;
+        }
+
+        .ai-ptitle {
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 1.2;
+            height: 34px;
+            overflow: hidden;
+        }
+
+        .ai-pdesc {
+            font-size: 12px;
+            color: #64748b;
+            height: 30px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .ai-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin: 6px 0;
+        }
+
+        .ai-sale {
+            font-weight: 800;
+            color: #dc2626;
+        }
+
+        .ai-base {
+            color: #94a3b8;
+            text-decoration: line-through;
+            font-size: 12px;
+        }
+
+        .ai-badge {
+            display: inline-block;
+            font-size: 11px;
+            background: #ef4444;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 999px;
+        }
+
+        .ai-pbtn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: #16a34a;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 7px 10px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .ai-pbtn:hover {
+            background: #15803d;
+        }
     </style>
 </head>
+
 
 <body>
 
@@ -837,88 +950,119 @@
                             const $input = document.getElementById('aiInput');
                             const $send = document.getElementById('aiSend');
                             const $typing = document.getElementById('aiTyping');
-
+                            const $chipsWrap = document.querySelector('.ai-suggest');
                             if (!$btn || !$card || !$form) return;
 
-                            function openCard() { $card.style.display = 'block'; setTimeout(() => $input?.focus(), 80); }
-                            function closeCard() { $card.style.display = 'none'; }
+                            /* storage keys */
+                            const SID_KEY = "AI_TURTLE_SID";
+                            const OPEN_KEY = "AI_TURTLE_OPEN";
+                            const HIST_PREFIX = "AI_TURTLE_HISTORY_";
+                            let sessionId = Number(sessionStorage.getItem(SID_KEY) || "") || null;
+                            const histKey = () => HIST_PREFIX + (sessionId || "temp");
+                            const loadJSON = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f } catch { return f } };
+                            const saveJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { } };
+                            const migrateHistory = (oldK, newK) => { if (oldK === newK) return; const a = loadJSON(oldK, []), b = loadJSON(newK, []); if (a.length) saveJSON(newK, [...b, ...a].slice(-200)); try { localStorage.removeItem(oldK) } catch { } };
+
+                            /* UI */
+                            function openCard() { $card.style.display = 'block'; saveJSON(OPEN_KEY, true); setTimeout(() => $input?.focus(), 80); }
+                            function closeCard() { $card.style.display = 'none'; saveJSON(OPEN_KEY, false); }
                             $btn.addEventListener('click', openCard);
                             $close.addEventListener('click', closeCard);
+                            document.querySelectorAll('.ai-chip').forEach(ch => ch.addEventListener('click', () => { $input.value = ch.getAttribute('data-q') || ''; $input.focus(); }));
 
-                            // Chips gợi ý
-                            document.querySelectorAll('.ai-chip').forEach(ch => {
-                                ch.addEventListener('click', () => {
-                                    const q = ch.getAttribute('data-q') || '';
-                                    $input.value = q;
-                                    $input.focus();
-                                });
-                            });
+                            const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+                            function safeFormat(text) { let s = escapeHtml(text || ''); s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); s = s.replace(/\n/g, '<br>'); s = s.replace(/(\/product\/\d{1,10})/g, '<a href="$1" class="text-primary fw-semibold">$1</a>'); return s; }
 
-                            function appendMsg(role, text) {
-                                const wrap = document.createElement('div');
-                                wrap.className = 'ai-msg ' + (role === 'user' ? 'ai-user' : 'ai-bot');
-                                const b = document.createElement('div');
-                                b.className = 'ai-msg__bubble';
-                                b.textContent = text;
-                                wrap.appendChild(b);
-                                $body.appendChild(wrap);
-                                $body.scrollTop = $body.scrollHeight;
+                            function pushHist(entry) { const h = loadJSON(histKey(), []); h.push(entry); saveJSON(histKey(), h.slice(-200)); }
+
+                            function appendMsg(role, text, { persist = true } = {}) {
+                                const wrap = document.createElement('div'); wrap.className = 'ai-msg ' + (role === 'user' ? 'ai-user' : 'ai-bot');
+                                const b = document.createElement('div'); b.className = 'ai-msg__bubble';
+                                if (role === 'assistant') b.innerHTML = safeFormat(text); else b.textContent = text;
+                                wrap.appendChild(b); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
+                                if (persist) pushHist({ t: Date.now(), kind: 'text', role, text });
                             }
+
+                            const currencyVND = n => { try { return Number(n || 0).toLocaleString('vi-VN') + '₫' } catch { return (n || 0) + '₫' } };
+                            function appendProducts(products, { persist = true } = {}) {
+                                if (!products || !products.length) return;
+                                const wrap = document.createElement('div'); wrap.className = 'ai-msg ai-bot';
+                                const bubble = document.createElement('div'); bubble.className = 'ai-msg__bubble';
+                                const row = document.createElement('div'); row.className = 'ai-products';
+                                products.forEach(p => {
+                                    const a = document.createElement('a'); a.className = 'ai-pcard'; a.href = p.href || ('/product/' + p.id); a.setAttribute('aria-label', p.name);
+                                    const img = document.createElement('img'); img.className = 'ai-pimg'; img.loading = 'lazy'; img.src = p.image || '/images/no-image.png'; img.alt = p.name;
+                                    const body = document.createElement('div'); body.className = 'ai-pbody';
+                                    const title = document.createElement('div'); title.className = 'ai-ptitle'; title.textContent = p.name;
+                                    const desc = document.createElement('div'); desc.className = 'ai-pdesc'; desc.textContent = p.shortDesc || '';
+                                    const priceRow = document.createElement('div'); priceRow.className = 'ai-price-row';
+                                    const sale = document.createElement('div'); sale.className = 'ai-sale'; sale.textContent = currencyVND(p.salePrice ?? p.price);
+                                    priceRow.appendChild(sale);
+                                    if (p.discount && Number(p.discount) > 0) { const base = document.createElement('div'); base.className = 'ai-base'; base.textContent = currencyVND(p.price); const badge = document.createElement('span'); badge.className = 'ai-badge'; badge.textContent = '-' + p.discount + '%'; priceRow.appendChild(base); priceRow.appendChild(badge); }
+                                    const btn = document.createElement('div'); btn.className = 'ai-pbtn'; btn.textContent = 'Xem chi tiết';
+                                    body.appendChild(title); if (p.shortDesc) body.appendChild(desc); body.appendChild(priceRow); body.appendChild(btn);
+                                    a.appendChild(img); a.appendChild(body); row.appendChild(a);
+                                });
+                                bubble.appendChild(row); wrap.appendChild(bubble); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
+                                if (persist) pushHist({ t: Date.now(), kind: 'products', products });
+                            }
+
+                            function renderChips(list) {
+                                if (!$chipsWrap || !Array.isArray(list) || !list.length) return;
+                                $chipsWrap.innerHTML = '';
+                                list.slice(0, 6).forEach(text => {
+                                    const btn = document.createElement('button'); btn.className = 'ai-chip'; btn.type = 'button'; btn.textContent = text; btn.setAttribute('data-q', text);
+                                    btn.addEventListener('click', () => { $input.value = text; $input.focus(); });
+                                    $chipsWrap.appendChild(btn);
+                                });
+                            }
+
+                            // rehydrate
+                            (function () {
+                                if (!!loadJSON(OPEN_KEY, false)) $card.style.display = 'block';
+                                const hist = loadJSON(histKey(), []);
+                                if (hist.length) { $body.innerHTML = ''; hist.forEach(it => { if (it.kind === 'text') appendMsg(it.role, it.text, { persist: false }); if (it.kind === 'products') appendProducts(it.products, { persist: false }); }); $body.scrollTop = $body.scrollHeight; }
+                            })();
 
                             async function sendMessage(text) {
                                 appendMsg('user', text);
-                                $typing.style.display = 'block';
-                                $send.disabled = true; $input.disabled = true;
-
+                                $typing.style.display = 'block'; $send.disabled = true; $input.disabled = true;
                                 try {
-                                    const res = await fetch('/api/ai/chat', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        credentials: 'same-origin',
-                                        body: JSON.stringify({
-                                            message: text,
-                                            // bạn có thể truyền thêm ngữ cảnh trang để AI hiểu:
-                                            meta: { page: 'home_show', ts: Date.now() }
-                                        })
-                                    });
-                                    const data = await res.json();
-                                    const reply = data?.reply || 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!';
-                                    appendMsg('assistant', reply);
-                                } catch (err) {
-                                    console.error(err);
-                                    appendMsg('assistant', 'Có lỗi kết nối máy chủ. Vui lòng thử lại sau nhé.');
+                                    const res = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ message: text, sessionId, meta: { page: 'home_show', ts: Date.now() } }) });
+                                    const data = await res.json().catch(() => ({}));
+
+                                    if (data?.sessionId && data.sessionId !== sessionId) {
+                                        const oldKey = histKey(); sessionId = data.sessionId; sessionStorage.setItem(SID_KEY, String(sessionId)); const newKey = histKey(); migrateHistory(oldKey, newKey);
+                                    }
+
+                                    const hasCards = Array.isArray(data.products) && data.products.length > 0;
+                                    const reply = (typeof data.reply === 'string' ? data.reply.trim() : '');
+                                    if (hasCards) { appendProducts(data.products); }
+                                    else if (reply) { appendMsg('assistant', reply); }
+                                    else { appendMsg('assistant', 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!'); }
+
+                                    if (Array.isArray(data.suggestions) && data.suggestions.length) renderChips(data.suggestions);
+                                } catch (e) {
+                                    console.error(e); appendMsg('assistant', 'Có lỗi kết nối máy chủ. Vui lòng thử lại sau nhé.');
                                 } finally {
-                                    $typing.style.display = 'none';
-                                    $send.disabled = false; $input.disabled = false; $input.focus();
+                                    $typing.style.display = 'none'; $send.disabled = false; $input.disabled = false; $input.focus();
                                 }
                             }
 
-                            $form.addEventListener('submit', (e) => {
-                                e.preventDefault();
-                                const val = ($input.value || '').trim();
-                                if (!val) return;
-                                $input.value = '';
-                                sendMessage(val);
-                            });
+                            $form.addEventListener('submit', e => { e.preventDefault(); const val = ($input.value || '').trim(); if (!val) return; $input.value = ''; sendMessage(val); });
+                            $input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $form.dispatchEvent(new Event('submit', { cancelable: true })); } });
 
-                            // Enter để gửi, Shift+Enter xuống dòng
-                            $input.addEventListener('keydown', (e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    $form.dispatchEvent(new Event('submit', { cancelable: true }));
-                                }
-                            });
-
-                            // Tự đóng khi click ra ngoài
-                            document.addEventListener('click', (e) => {
-                                const root = document.getElementById('aiTurtle');
-                                if (!root) return;
-                                if (!$card.contains(e.target) && !$btn.contains(e.target)) {
-                                    // closeCard();  // nếu muốn tự đóng khi click ra ngoài, bỏ comment
-                                }
+                            // clear local history when logout (bind all logout forms/links)
+                            document.querySelectorAll('form[action="/logout"], a[href="/logout"]').forEach(el => {
+                                el.addEventListener('click', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
+                                el.addEventListener('submit', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
                             });
                         })();
                     </script>
+
+
+
+
 
 
 

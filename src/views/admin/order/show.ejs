@@ -106,6 +106,97 @@
             filter: brightness(1.05);
             transform: translateY(-1px);
         }
+
+        /* ===== Searchbar (glass) ===== */
+        .searchbar {
+            width: 100%;
+            max-width: 620px;
+        }
+
+        .searchbar-inner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
+            border: 1px solid var(--glass-bd);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: box-shadow .2s ease, border-color .2s ease;
+        }
+
+        .searchbar-inner:focus-within {
+            border-color: rgba(79, 140, 255, .45);
+            box-shadow: 0 0 0 4px rgba(79, 140, 255, .12);
+        }
+
+        .search-icon {
+            width: 28px;
+            height: 28px;
+            display: grid;
+            place-items: center;
+            opacity: .9;
+            color: #cbd5ff;
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e8ecff;
+            font-size: 14px;
+        }
+
+        .search-input::placeholder {
+            color: #aeb6c8;
+            opacity: .9;
+        }
+
+        /* Nút xóa lọc (chỉ hiện khi có từ khóa) */
+        .search-clear {
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--glass-bd);
+            color: #e7ecff;
+            text-decoration: none;
+            transition: background .2s ease, transform .1s ease;
+        }
+
+        .search-clear:hover {
+            background: rgba(255, 255, 255, .12);
+            transform: translateY(-1px);
+        }
+
+        /* Nút tìm tinh gọn */
+        .btn-search {
+            padding: 8px 14px;
+            line-height: 1;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, .15);
+            color: #fff;
+            background: linear-gradient(135deg, rgba(79, 140, 255, .9), rgba(139, 92, 246, .8));
+            transition: filter .2s ease, transform .1s ease;
+        }
+
+        .btn-search:hover {
+            filter: brightness(1.06);
+            transform: translateY(-1px);
+        }
+
+        /* Căn khối tiêu đề + search đẹp trên mobile */
+        .header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+        }
     </style>
 </head>
 
@@ -117,8 +208,31 @@
                     <main>
                         <div class="container-fluid px-4">
                             <!-- Tiêu đề -->
-                            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
-                                <h1 class="page-title h3"><i class="fa-solid fa-receipt me-2"></i> Quản lý đơn hàng</h1>
+                            <div class="header-actions mt-4 mb-3">
+                                <h1 class="page-title h3 m-0">
+                                    <i class="fa-solid fa-receipt me-2"></i> Quản lý đơn hàng
+                                </h1>
+
+                                <form class="searchbar" action="/admin/order" method="get" role="search">
+                                    <div class="searchbar-inner">
+                                        <span class="search-icon">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </span>
+
+                                        <input class="search-input" type="search" name="search"
+                                            placeholder="Tìm theo mã đơn, tên/email, sản phẩm, trạng thái..."
+                                            value="<%= typeof search !== 'undefined' ? search : '' %>"
+                                            aria-label="Search orders" />
+
+                                        <% if (search) { %>
+                                            <a class="search-clear" href="/admin/order" title="Xóa lọc">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </a>
+                                            <% } %>
+
+                                                <button class="btn-search" type="submit">Tìm</button>
+                                    </div>
+                                </form>
                             </div>
 
                             <!-- Breadcrumb -->
@@ -212,103 +326,112 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <% const queryStr=search ? '&search=' + encodeURIComponent(search) : '' ; %>
+                                        <!-- Pagination (block ranges 1–10, 11–20, ...) -->
+                                        <% const oTotalPagesNum=Number(totalPages) || 1; const oCurrentPage=Number(page)
+                                            || 1; const O_BLOCK=10; const oTotalBlocks=Math.ceil(oTotalPagesNum /
+                                            O_BLOCK); const oCurrentBlock=Math.floor((oCurrentPage - 1) / O_BLOCK);
+                                            const oBlockStart=(b)=> b * O_BLOCK + 1;
+                                            const oBlockEnd = (b) => Math.min(oBlockStart(b) + O_BLOCK - 1,
+                                            oTotalPagesNum);
 
-                                    <!-- Pagination (block ranges 1–10, 11–20, ...) -->
-                                    <% const totalPagesNum=Number(totalPages) || 1; const currentPage=Number(page) || 1;
-                                        const BLOCK=10; const totalBlocks=Math.ceil(totalPagesNum / BLOCK); const
-                                        currentBlock=Math.floor((currentPage - 1) / BLOCK); const blockStart=(b)=> b *
-                                        BLOCK + 1;
-                                        const blockEnd = (b) => Math.min(blockStart(b) + BLOCK - 1, totalPagesNum);
+                                            // chỉ hiển thị gọn quanh khối hiện tại (±2 khối)
+                                            const oWinStart = Math.max(0, oCurrentBlock - 2);
+                                            const oWinEnd = Math.min(oTotalBlocks - 1, oCurrentBlock + 2);
 
-                                        // chỉ hiển thị gọn quanh khối hiện tại (±2 khối)
-                                        const winStart = Math.max(0, currentBlock - 2);
-                                        const winEnd = Math.min(totalBlocks - 1, currentBlock + 2);
-                                        %>
+                                            // giữ từ khóa tìm kiếm (đổi tên để tránh đụng)
+                                            const orderQS = (typeof search !== 'undefined' && search) ? '&search=' +
+                                            encodeURIComponent(search) : '';
+                                            %>
 
-                                        <nav aria-label="Order pagination">
-                                            <ul class="pagination justify-content-center mt-3">
+                                            <nav aria-label="Order pagination">
+                                                <ul class="pagination justify-content-center mt-3">
 
-                                                <!-- Prev page -->
-                                                <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                                                    <a class="page-link"
-                                                        href="/admin/order?page=<%= Math.max(1, currentPage - 1) %>"
-                                                        aria-label="Previous">
-                                                        <span aria-hidden="true">&laquo;</span>
-                                                    </a>
-                                                </li>
-
-                                                <!-- Prev block (lùi 10 trang) -->
-                                                <li class="page-item <%= currentBlock === 0 ? 'disabled' : '' %>">
-                                                    <a class="page-link"
-                                                        href="/admin/order?page=<%= Math.max(1, blockStart(currentBlock) - BLOCK) %>"
-                                                        aria-label="Prev 10">‹ 10</a>
-                                                </li>
-
-                                                <!-- First block -->
-                                                <% if (winStart> 0) { %>
-                                                    <li class="page-item <%= currentBlock === 0 ? 'active' : '' %>">
+                                                    <!-- Prev page -->
+                                                    <li class="page-item <%= oCurrentPage === 1 ? 'disabled' : '' %>">
                                                         <a class="page-link"
-                                                            href="/admin/order?page=<%= blockStart(0) %>">
-                                                            <%= blockStart(0) %>-<%= blockEnd(0) %>
+                                                            href="/admin/order?page=<%= Math.max(1, oCurrentPage - 1) %><%= orderQS %>"
+                                                            aria-label="Previous">
+                                                            <span aria-hidden="true">&laquo;</span>
                                                         </a>
                                                     </li>
-                                                    <% if (winStart> 1) { %>
-                                                        <li class="page-item disabled"><span class="page-link">…</span>
+
+                                                    <!-- Prev block (lùi 10 trang) -->
+                                                    <li class="page-item <%= oCurrentBlock === 0 ? 'disabled' : '' %>">
+                                                        <a class="page-link"
+                                                            href="/admin/order?page=<%= Math.max(1, oBlockStart(oCurrentBlock) - O_BLOCK) %><%= orderQS %>"
+                                                            aria-label="Prev 10">‹ 10</a>
+                                                    </li>
+
+                                                    <!-- First block -->
+                                                    <% if (oWinStart> 0) { %>
+                                                        <li
+                                                            class="page-item <%= oCurrentBlock === 0 ? 'active' : '' %>">
+                                                            <a class="page-link"
+                                                                href="/admin/order?page=<%= oBlockStart(0) %><%= orderQS %>">
+                                                                <%= oBlockStart(0) %>-<%= oBlockEnd(0) %>
+                                                            </a>
                                                         </li>
-                                                        <% } %>
+                                                        <% if (oWinStart> 1) { %>
+                                                            <li class="page-item disabled"><span
+                                                                    class="page-link">…</span></li>
                                                             <% } %>
+                                                                <% } %>
 
-                                                                <!-- Window around current block -->
-                                                                <% for (let b=winStart; b <=winEnd; b++) { %>
-                                                                    <li
-                                                                        class="page-item <%= b === currentBlock ? 'active' : '' %>">
-                                                                        <a class="page-link"
-                                                                            href="/admin/order?page=<%= blockStart(b) %>">
-                                                                            <%= blockStart(b) %>-<%= blockEnd(b) %>
-                                                                        </a>
-                                                                    </li>
-                                                                    <% } %>
+                                                                    <!-- Window around current block -->
+                                                                    <% for (let b=oWinStart; b <=oWinEnd; b++) { %>
+                                                                        <li
+                                                                            class="page-item <%= b === oCurrentBlock ? 'active' : '' %>">
+                                                                            <a class="page-link"
+                                                                                href="/admin/order?page=<%= oBlockStart(b) %><%= orderQS %>">
+                                                                                <%= oBlockStart(b) %>-<%= oBlockEnd(b)
+                                                                                        %>
+                                                                            </a>
+                                                                        </li>
+                                                                        <% } %>
 
-                                                                        <!-- Last block -->
-                                                                        <% if (winEnd < totalBlocks - 1) { %>
-                                                                            <% if (winEnd < totalBlocks - 2) { %>
-                                                                                <li class="page-item disabled"><span
-                                                                                        class="page-link">…</span></li>
-                                                                                <% } %>
-                                                                                    <li
-                                                                                        class="page-item <%= currentBlock === totalBlocks - 1 ? 'active' : '' %>">
-                                                                                        <a class="page-link"
-                                                                                            href="/admin/order?page=<%= blockStart(totalBlocks - 1) %>">
-                                                                                            <%= blockStart(totalBlocks -
-                                                                                                1) %>-<%=
-                                                                                                    blockEnd(totalBlocks
-                                                                                                    - 1) %>
-                                                                                        </a>
+                                                                            <!-- Last block -->
+                                                                            <% if (oWinEnd < oTotalBlocks - 1) { %>
+                                                                                <% if (oWinEnd < oTotalBlocks - 2) { %>
+                                                                                    <li class="page-item disabled"><span
+                                                                                            class="page-link">…</span>
                                                                                     </li>
                                                                                     <% } %>
-
-                                                                                        <!-- Next block (tiến 10 trang) -->
                                                                                         <li
-                                                                                            class="page-item <%= currentBlock >= totalBlocks - 1 ? 'disabled' : '' %>">
+                                                                                            class="page-item <%= oCurrentBlock === oTotalBlocks - 1 ? 'active' : '' %>">
                                                                                             <a class="page-link"
-                                                                                                href="/admin/order?page=<%= Math.min(totalPagesNum, blockEnd(currentBlock) + 1) %>"
-                                                                                                aria-label="Next 10">10
-                                                                                                ›</a>
-                                                                                        </li>
-
-                                                                                        <!-- Next page -->
-                                                                                        <li
-                                                                                            class="page-item <%= currentPage === totalPagesNum ? 'disabled' : '' %>">
-                                                                                            <a class="page-link"
-                                                                                                href="/admin/order?page=<%= Math.min(totalPagesNum, currentPage + 1) %>"
-                                                                                                aria-label="Next">
-                                                                                                <span
-                                                                                                    aria-hidden="true">&raquo;</span>
+                                                                                                href="/admin/order?page=<%= oBlockStart(oTotalBlocks - 1) %><%= orderQS %>">
+                                                                                                <%= oBlockStart(oTotalBlocks
+                                                                                                    - 1) %>-<%=
+                                                                                                        oBlockEnd(oTotalBlocks
+                                                                                                        - 1) %>
                                                                                             </a>
                                                                                         </li>
+                                                                                        <% } %>
 
-                                            </ul>
-                                        </nav>
+                                                                                            <!-- Next block (tiến 10 trang) -->
+                                                                                            <li
+                                                                                                class="page-item <%= oCurrentBlock >= oTotalBlocks - 1 ? 'disabled' : '' %>">
+                                                                                                <a class="page-link"
+                                                                                                    href="/admin/order?page=<%= Math.min(oTotalPagesNum, oBlockEnd(oCurrentBlock) + 1) %><%= orderQS %>"
+                                                                                                    aria-label="Next 10">10
+                                                                                                    ›</a>
+                                                                                            </li>
+
+                                                                                            <!-- Next page -->
+                                                                                            <li
+                                                                                                class="page-item <%= oCurrentPage === oTotalPagesNum ? 'disabled' : '' %>">
+                                                                                                <a class="page-link"
+                                                                                                    href="/admin/order?page=<%= Math.min(oTotalPagesNum, oCurrentPage + 1) %><%= orderQS %>"
+                                                                                                    aria-label="Next">
+                                                                                                    <span
+                                                                                                        aria-hidden="true">&raquo;</span>
+                                                                                                </a>
+                                                                                            </li>
+
+                                                </ul>
+                                            </nav>
+
 
 
                                 </div>

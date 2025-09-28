@@ -30,15 +30,49 @@ type UpdateProductInput = CreateProductInput & {
     id: number;
     image?: string | null;
 };
-export const getProductList = async (page: number) => {
+const buildProductWhere = (search?: string) => {
+    const q = (search ?? '').trim();
+    if (!q) return undefined;
+
+    // Chọn các field bạn có thật trong schema Product
+    return {
+        OR: [
+            { name: { contains: q } },
+            { factory: { contains: q } },
+            { target: { contains: q } },
+            { shortDesc: { contains: q } },
+            { detailDesc: { contains: q } },
+            { featureTags: { contains: q } },
+            { cpu: { contains: q } },
+            // có thể thêm các field khác nếu tồn tại: ramGB/storageGB/screenResolution...
+        ],
+    } as Prisma.ProductWhereInput;
+};
+
+export const getProductList = async (page: number, search?: string) => {
     const pageSize = TOTAL_ITEM_PER_PAGE;
     const skip = (page - 1) * pageSize;
+
+    const where = buildProductWhere(search);
+
     const products = await prisma.product.findMany({
-        skip: skip,
-        take: pageSize
-    })
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { id: "asc" },
+        // select: { id: true, name: true, price: true, factory: true } // nếu muốn tối ưu payload
+    });
+
     return products;
-}
+};
+
+export const countTotalProductPages = async (search?: string) => {
+    const pageSize = TOTAL_ITEM_PER_PAGE;
+    const where = buildProductWhere(search);
+
+    const total = await prisma.product.count({ where });
+    return Math.max(1, Math.ceil(total / pageSize));
+};
 export async function createProduct(data: {
     name: string; price: number; quantity: number; factory: string; target: string;
     discount?: number; detailDesc?: string; shortDesc?: string; imageUpload?: string | null;

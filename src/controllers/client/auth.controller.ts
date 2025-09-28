@@ -162,16 +162,6 @@ const postRegister = async (req: Request, res: Response) => {
     return res.redirect("/login");
 }
 
-// const getSuccessRedirectPage = async (req: Request, res: Response) => {
-//     const user = req.user as any;
-//     if (user?.role?.name === "ADMIN") {
-//         return res.redirect("/admin");
-//     } else {
-//         return res.redirect("/");
-//     }
-
-// }
-
 const getSuccessRedirectPage = async (req: any, res: any) => {
     const hasAT = Boolean(req.cookies?.access_token);
     const hasRT = Boolean(req.cookies?.refresh_token);
@@ -203,12 +193,32 @@ const getSuccessRedirectPage = async (req: any, res: any) => {
 };
 
 const postLogout = async (req: Request, res: Response, next: NextFunction) => {
-    req.logout(function (err) {
-        if (err) { return next(err); }
-        res.redirect("/");
-    });
+    const userId = (req as any)?.user?.id as number | undefined;
 
-}
+    req.logout(async (err) => {
+        if (err) return next(err);
+
+        // huỷ session express trước rồi dọn AI (không chặn redirect)
+        req.session.destroy(async () => {
+            if (userId) {
+                try {
+                    await prisma.aiEmbedding.deleteMany({
+                        where: {
+                            OR: [
+                                { message: { session: { userId } } },
+                                { memory: { userId } }
+                            ]
+                        }
+                    });
+                    await prisma.aiChatMessage.deleteMany({ where: { session: { userId } } });
+                    await prisma.aiMemory.deleteMany({ where: { userId } });
+                    await prisma.aiChatSession.deleteMany({ where: { userId } });
+                } catch { }
+            }
+            res.redirect("/");
+        });
+    });
+};
 
 
 

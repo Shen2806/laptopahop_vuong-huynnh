@@ -131,6 +131,20 @@
                             <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
                                 <h1 class="page-title h3"><i class="fa-solid fa-boxes-stacked me-2"></i> Quản lý sản
                                     phẩm</h1>
+                                <form class="d-flex gap-2" action="/admin/product" method="get" role="search">
+                                    <input class="form-control" type="search" name="search"
+                                        placeholder="Tìm theo tên, NSX, mô tả..."
+                                        value="<%= typeof search !== 'undefined' ? search : '' %>"
+                                        aria-label="Search products" style="min-width:260px" />
+                                    <button class="btn btn-brand shadow-sm" type="submit">
+                                        <i class="fa-solid fa-magnifying-glass me-1"></i> Tìm
+                                    </button>
+                                    <% if (search) { %>
+                                        <a class="btn btn-soft" href="/admin/product">
+                                            <i class="fa-solid fa-xmark me-1"></i> Xóa lọc
+                                        </a>
+                                        <% } %>
+                                </form>
                                 <a href="/admin/create-product" class="btn btn-brand shadow-sm">
                                     <i class="fa-solid fa-plus me-1"></i> Thêm sản phẩm
                                 </a>
@@ -195,33 +209,39 @@
                                             </tbody>
                                         </table>
                                     </div>
+                                    <% const queryStr=search ? '&search=' + encodeURIComponent(search) : '' ; %>
 
-                                    <!-- phân trang -->
-                                    <nav aria-label="Product pagination">
-                                        <ul class="pagination justify-content-center mt-3">
-                                            <li class="page-item">
-                                                <a class="<%= page === 1 ? 'disabled page-link' : 'page-link' %>"
-                                                    href="/admin/product?page=<%= page - 1 %>" aria-label="Previous">
-                                                    <span aria-hidden="true">&laquo;</span>
-                                                </a>
-                                            </li>
-                                            <% for(var i=1; i<=totalPages; i++) { %>
-                                                <li class="page-item <%= page === i ? 'active' : '' %>">
-                                                    <a class="page-link <%= page === i ? 'active' : '' %>"
-                                                        href="/admin/product?page=<%= i %>">
-                                                        <%= i %>
+                                        <!-- phân trang -->
+                                        <nav aria-label="Product pagination">
+                                            <ul class="pagination justify-content-center mt-3">
+                                                <li class="page-item <%= page === 1 ? 'disabled' : '' %>">
+                                                    <a class="page-link"
+                                                        href="/admin/product?page=<%= page - 1 %><%= queryStr %>"
+                                                        aria-label="Previous">
+                                                        <span aria-hidden="true">&laquo;</span>
                                                     </a>
                                                 </li>
-                                                <% } %>
-                                                    <li class="page-item">
-                                                        <a class="<%= page === totalPages ? 'disabled page-link' : 'page-link' %>"
-                                                            href="/admin/product?page=<%= page + 1 %>"
-                                                            aria-label="Next">
-                                                            <span aria-hidden="true">&raquo;</span>
+
+                                                <% for (var i=1; i <=totalPages; i++) { %>
+                                                    <li class="page-item <%= page === i ? 'active' : '' %>">
+                                                        <a class="page-link"
+                                                            href="/admin/product?page=<%= i %><%= queryStr %>">
+                                                            <%= i %>
                                                         </a>
                                                     </li>
-                                        </ul>
-                                    </nav>
+                                                    <% } %>
+
+                                                        <li
+                                                            class="page-item <%= page === totalPages ? 'disabled' : '' %>">
+                                                            <a class="page-link"
+                                                                href="/admin/product?page=<%= page + 1 %><%= queryStr %>"
+                                                                aria-label="Next">
+                                                                <span aria-hidden="true">&raquo;</span>
+                                                            </a>
+                                                        </li>
+                                            </ul>
+                                        </nav>
+
                                 </div>
                             </div>
                         </div>
