@@ -231,6 +231,33 @@ model CartDetail {
   @@map("cart_detail")
 }
 
+model Province {
+  code      Int        @id
+  name      String
+  type      String? // "Tỉnh", "Thành phố" (optional)
+  districts District[]
+  Order     Order[]
+}
+
+model District {
+  code         Int      @id
+  name         String
+  type         String? // "Quận","Huyện","Thị xã"
+  provinceCode Int
+  province     Province @relation(fields: [provinceCode], references: [code])
+  wards        Ward[]
+  Order        Order[]
+}
+
+model Ward {
+  code         Int      @id
+  name         String
+  type         String? // "Phường","Xã","Thị trấn"
+  districtCode Int
+  district     District @relation(fields: [districtCode], references: [code])
+  Order        Order[]
+}
+
 model Order {
   id             Int     @id @default(autoincrement())
   totalPrice     Int
@@ -249,6 +276,15 @@ model Order {
 
   cancelReason String? @db.VarChar(255)
 
+  receiverProvinceCode Int?
+  receiverDistrictCode Int?
+  receiverWardCode     Int?
+  receiverStreet       String?
+
+  province Province? @relation(fields: [receiverProvinceCode], references: [code])
+  district District? @relation(fields: [receiverDistrictCode], references: [code])
+  ward     Ward?     @relation(fields: [receiverWardCode], references: [code])
+
   user   User @relation(fields: [userId], references: [id])
   userId Int
 
@@ -257,6 +293,9 @@ model Order {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  @@index([receiverProvinceCode])
+  @@index([receiverDistrictCode])
+  @@index([receiverWardCode])
   @@map("orders")
 }
 

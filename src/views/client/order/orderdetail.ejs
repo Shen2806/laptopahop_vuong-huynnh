@@ -23,8 +23,8 @@
     <link href="/client/css/bootstrap.min.css" rel="stylesheet">
     <link href="/client/css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="/client/css/order/orderuser.css">
-<link rel="stylesheet" href="/client/css/order/orderdetail.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="/client/css/order/orderdetail.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 
 <body>
@@ -100,8 +100,9 @@
                                 <%= order.receiverPhone %>
                             </div>
                             <div class="mb-2"><strong>Địa chỉ:</strong>
-                                <%= order.receiverAddress %>
+                                <%= addressDisplay %>
                             </div>
+
                             <% if (order.receiverNote) { %>
                                 <div class="mb-2"><strong>Ghi chú:</strong>
                                     <%= order.receiverNote %>

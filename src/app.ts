@@ -18,7 +18,7 @@ import "./middleware/passport.jwt";
 import path from "path";
 import paymentRoutes from './routes/payment';
 import aiRoutes from "./routes/ai";
-
+import locationRoutes from './routes/location.routes';
 const app = express();
 app.use(cookieParser());
 
@@ -75,6 +75,8 @@ apiRoutes(app);
 app.use('/payment', paymentRoutes);
 
 app.use("/api", aiRoutes);
+
+app.use(locationRoutes);
 
 // seeding data
 initDatabase()

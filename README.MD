@@ -65,5 +65,7 @@ Quốc Huỳnh:
 Huỳnh chỉnh sửa;
 1. giao diện trang so sánh ( compare.ejs )
 2. gom gọn css các file tui làm ( detail.ejs) ==> nhớ kiểm tra lại toàn bộ coi sót file nào không
-3. làm cho tin nhắn trong trang detail.ejs có hiệu ứng động 
-4.
+3. làm cho cái box tin nhắn trong trang detail.ejs có hiệu ứng động 
+4. chỉnh lại trang orderdetail.ejs ( có css trên đầu file )
+5. cập nhật lại trang checkout ở phần thông tin người đặt là cho các ô select nhìn nổi bật hơn chút với lại thay đổi lại mấy cái ô nó cho khác đi css bằng mọi giá cho tôi ! :>
+

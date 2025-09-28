@@ -80,7 +80,7 @@ const getAdminOrderPage = async (req: Request, res: Response) => {
     const search = String((req.query as any).search || '').trim();
 
     const totalPages = await countTotalOrderPages();      // thêm search
-    const orders = await getOrderAdmin(currentPage, search); // thêm search
+    const orders = await getOrderAdmin(currentPage); // chỉ truyền currentPage vì hàm chỉ nhận 1 tham số
 
     return res.render('admin/order/show.ejs', {
         orders, totalPages: +totalPages, page: +currentPage, search
@@ -89,21 +89,35 @@ const getAdminOrderPage = async (req: Request, res: Response) => {
 
 const getAdminOrderDetailPage = async (req: Request, res: Response) => {
     const { id } = req.params;
+    const orderId = Number(id);
+    if (!Number.isFinite(orderId)) return res.status(400).send("Invalid order id");
 
     const order = await prisma.order.findUnique({
-        where: { id: +id },
+        where: { id: orderId },
         include: {
             user: true,
-            orderDetails: { include: { product: true } }
-        }
+            province: true,   // lấy tên Tỉnh/Thành
+            district: true,   // lấy tên Quận/Huyện
+            ward: true,       // lấy tên Phường/Xã
+            orderDetails: { include: { product: true } },
+        },
     });
 
     if (!order) return res.status(404).send("Order not found");
 
     // VN time
-    const timeZone = 'Asia/Ho_Chi_Minh';
+    const timeZone = "Asia/Ho_Chi_Minh";
     const orderCreatedAtVN = toZonedTime(order.createdAt, timeZone);
     const formattedCreatedAtVN = format(orderCreatedAtVN, "dd/MM/yyyy HH:mm:ss", { timeZone });
+
+    // Chuẩn hóa địa chỉ hiển thị: "Số nhà/đường, Phường, Quận, Tỉnh" (fallback receiverAddress nếu thiếu)
+    const addressParts = [
+        order.receiverStreet || null,
+        order.ward?.name || null,
+        order.district?.name || null,
+        order.province?.name || null,
+    ].filter(Boolean) as string[];
+    const addressDisplay = addressParts.length ? addressParts.join(", ") : (order.receiverAddress || "");
 
     // allowed transitions cho view
     const allowedNext = ALLOWED_NEXT[order.status] || [];
@@ -111,13 +125,14 @@ const getAdminOrderDetailPage = async (req: Request, res: Response) => {
     return res.render("admin/order/detail.ejs", {
         order,
         orderDetails: order.orderDetails,
-        id,
+        id: orderId,
         formattedCreatedAtVN,
         STATUS_LABEL_VI,
-        // ORDER_STATUS,
-        allowedNext
+        allowedNext,
+        addressDisplay, // <-- dùng biến này trong EJS để hiện địa chỉ đẹp
     });
 };
+
 
 
 /** XÁC NHẬN ĐƠN */

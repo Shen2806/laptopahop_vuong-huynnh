@@ -341,12 +341,12 @@ const postPlaceOrder = async (req: Request, res: Response) => {
 
     const {
         receiverName,
-        receiverAddress,
+        receiverAddress, // vẫn nhận từ form cũ để backward-compat
         receiverPhone,
         receiverNote,
         couponCode,
         mode: modeRaw,            // 'buy' | 'cart'
-        paymentMethod: pmRaw,     // 'ONLINE' | 'COD' (từ form)
+        paymentMethod: pmRaw,     // 'ONLINE' | 'COD'
     } = req.body;
 
     const coupon = (couponCode || "").trim() || null;
@@ -368,6 +368,46 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         req.ip ||
         "127.0.0.1";
 
+    // ===== Helpers địa chỉ (Cách A) =====
+    const toCode = (v: any) => {
+        const n = Number(v);
+        return Number.isFinite(n) && n > 0 ? n : null;
+    };
+    const composeAddress = (
+        street?: string | null,
+        wardName?: string | null,
+        distName?: string | null,
+        provName?: string | null
+    ) => [street, wardName, distName, provName].filter(Boolean).join(", ");
+
+    // Lấy code & street từ body (đến từ 4 input mới trong checkout)
+    const provinceCode = toCode(req.body.receiverProvinceCode);
+    const districtCode = toCode(req.body.receiverDistrictCode);
+    const wardCode = toCode(req.body.receiverWardCode);
+    const receiverStreet = (req.body.receiverStreet || "").trim();
+
+    // Tra tên qua Prisma (chỉ tra khi có mã)
+    let provinceName: string | null = null;
+    let districtName: string | null = null;
+    let wardName: string | null = null;
+    try {
+        const [p, d, w] = await Promise.all([
+            provinceCode ? prisma.province.findUnique({ where: { code: provinceCode } }) : Promise.resolve(null),
+            districtCode ? prisma.district.findUnique({ where: { code: districtCode } }) : Promise.resolve(null),
+            wardCode ? prisma.ward.findUnique({ where: { code: wardCode } }) : Promise.resolve(null),
+        ]);
+        provinceName = p?.name ?? null;
+        districtName = d?.name ?? null;
+        wardName = w?.name ?? null;
+    } catch (e) {
+        console.warn("Lookup province/district/ward failed:", e);
+    }
+
+    // Ưu tiên chuỗi receiverAddress (nếu form cũ vẫn gửi), nếu không thì ghép từ 4 phần
+    const receiverAddressRaw = (receiverAddress || "").trim();
+    const finalReceiverAddress =
+        receiverAddressRaw || composeAddress(receiverStreet, wardName, districtName, provinceName);
+
     try {
         // =========================
         // ======== BUY MODE =======
@@ -379,7 +419,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
                 return res.redirect("/checkout?mode=buy");
             }
 
-            const pid = toInt(ticket.productId);
+            const pid = toInt(ticket.productId); // toInt của bạn đã dùng sẵn ở file này
             const qty = Math.max(1, toInt(ticket.quantity));
             if (!pid || !qty) {
                 pushMsg("warning", "Dữ liệu 'Mua ngay' không hợp lệ. Vui lòng thao tác lại.");
@@ -389,7 +429,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
             const result = await handlePlaceOrder({
                 userId: Number(user.id),
                 receiverName,
-                receiverAddress,
+                receiverAddress: finalReceiverAddress, // dùng địa chỉ đã chuẩn hoá
                 receiverPhone,
                 receiverNote,
                 couponCode: coupon,
@@ -400,6 +440,22 @@ const postPlaceOrder = async (req: Request, res: Response) => {
             if (!result?.success) {
                 pushMsg("danger", result?.error || "Đặt hàng thất bại. Vui lòng thử lại!");
                 return res.redirect("/checkout?mode=buy");
+            }
+
+            // Ghi thêm các trường địa chỉ mới vào Order (không thay đổi handlePlaceOrder)
+            try {
+                await prisma.order.update({
+                    where: { id: result.orderId! },
+                    data: {
+                        receiverAddress: finalReceiverAddress || null,
+                        receiverStreet: receiverStreet || null,
+                        receiverProvinceCode: provinceCode,
+                        receiverDistrictCode: districtCode,
+                        receiverWardCode: wardCode,
+                    },
+                });
+            } catch (err) {
+                console.warn("Update order address (buy) failed:", err);
             }
 
             // Clear vé buyNow để tránh reuse
@@ -452,7 +508,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         const result = await handlePlaceOrder({
             userId: Number(user.id),
             receiverName,
-            receiverAddress,
+            receiverAddress: finalReceiverAddress, // dùng địa chỉ đã chuẩn hoá
             receiverPhone,
             receiverNote,
             couponCode: coupon,
@@ -462,6 +518,22 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         if (!result?.success) {
             pushMsg("danger", result?.error || "Đặt hàng thất bại. Vui lòng thử lại!");
             return res.redirect("/checkout");
+        }
+
+        // Ghi thêm các trường địa chỉ mới vào Order
+        try {
+            await prisma.order.update({
+                where: { id: result.orderId! },
+                data: {
+                    receiverAddress: finalReceiverAddress || null,
+                    receiverStreet: receiverStreet || null,
+                    receiverProvinceCode: provinceCode,
+                    receiverDistrictCode: districtCode,
+                    receiverWardCode: wardCode,
+                },
+            });
+        } catch (err) {
+            console.warn("Update order address (cart) failed:", err);
         }
 
         // Emit cho admin
@@ -510,6 +582,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         return res.redirect(back);
     }
 };
+
 
 
 
@@ -599,8 +672,11 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
     const order = await prisma.order.findFirst({
         where: { id, userId: user.id },
         include: {
-            orderDetails: { include: { product: true } },
             user: true,
+            province: true,   // <-- Tỉnh/Thành
+            district: true,   // <-- Quận/Huyện
+            ward: true,       // <-- Phường/Xã
+            orderDetails: { include: { product: true } },
         },
     });
     if (!order) return res.status(404).render("status/404.ejs", { user });
@@ -609,10 +685,18 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
     const currentStep = canceled ? -1 : ORDER_STEPS.indexOf(order.status as $Enums.OrderStatus);
 
     const items = order.orderDetails || [];
-    // nếu orderDetail có field price/quantity:
-    const subTotal = items.reduce((sum, it: any) => sum + Number(it.price) * Number(it.quantity), 0);
+    const subTotal = items.reduce((sum: number, it: any) => sum + Number(it.price) * Number(it.quantity), 0);
     const discountAmount = Number(order.discountAmount || 0);
     const total = subTotal - discountAmount;
+
+    // Ghép địa chỉ hiển thị: ưu tiên street + ward + district + province; fallback receiverAddress
+    const addressParts = [
+        order.receiverStreet || null,
+        order.ward?.name || null,
+        order.district?.name || null,
+        order.province?.name || null,
+    ].filter(Boolean) as string[];
+    const addressDisplay = addressParts.length ? addressParts.join(", ") : (order.receiverAddress || "—");
 
     return res.render("client/order/orderdetail.ejs", {
         user,
@@ -625,8 +709,10 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
         STATUS_LABEL_VI,
         currentStep,
         canceled,
+        addressDisplay, // <-- dùng trong EJS để hiện địa chỉ đẹp
     });
 };
+
 
 
 

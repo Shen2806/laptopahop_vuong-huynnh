@@ -45,20 +45,20 @@ function buildOrderWhere(search?: string): Prisma.OrderWhereInput | undefined {
     return { OR: or };
 }
 
-const getOrderAdmin = async (page: number, search?: string) => {
+const getOrderAdmin = async (page: number) => {
     const pageSize = TOTAL_ITEM_PER_PAGE;
-
     const orders = await prisma.order.findMany({
-        where: buildOrderWhere(search),
         skip: (page - 1) * pageSize,
         take: pageSize,
         include: {
             user: true,
-            orderDetails: { include: { product: true } },
+            province: true,   // +++++
+            district: true,   // +++++
+            ward: true,       // +++++
+            orderDetails: { include: { product: true } }
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: "desc" }
     });
-
     return orders;
 };
 

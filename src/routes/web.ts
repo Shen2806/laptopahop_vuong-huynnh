@@ -331,6 +331,8 @@ const webRoutes = (app: Express) => {
 
     // So sánh sản phẩm
     router.get("/compare", getComparePage);
+    // API lấy danh sách tỉnh/thành
+
 
     // ====== ADMIN GUARD CHO TOÀN NHÁNH /admin ======
     router.use('/admin', isAdmin);

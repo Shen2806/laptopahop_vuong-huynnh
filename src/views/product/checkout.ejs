@@ -440,16 +440,35 @@
                                         <div class="bg-white rounded shadow-sm p-4 border border-light h-100">
                                             <h5 class="mb-4 fw-bold text-uppercase border-bottom pb-2"><i
                                                     class="fa fa-user"></i> Thông Tin Người Nhận</h5>
-
                                             <div class="mb-3">
                                                 <label class="form-label fw-semibold">Tên người nhận</label>
                                                 <input class="form-control rounded-pill" name="receiverName" required>
                                             </div>
-                                            <div class="mb-3">
-                                                <label class="form-label fw-semibold">Địa chỉ người nhận</label>
-                                                <input class="form-control rounded-pill" name="receiverAddress"
-                                                    required>
+                                            <div class="row g-3">
+                                                <div class="col-12">
+                                                    <label class="form-label fw-semibold">Tỉnh/Thành phố</label>
+                                                    <select id="province" name="receiverProvinceCode"
+                                                        class="form-select rounded-pill" required></select>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label fw-semibold">Quận/Huyện</label>
+                                                    <select id="district" name="receiverDistrictCode"
+                                                        class="form-select rounded-pill" required disabled></select>
+                                                </div>
+                                                <div class="col-12 col-md-6">
+                                                    <label class="form-label fw-semibold">Phường/Xã</label>
+                                                    <select id="ward" name="receiverWardCode"
+                                                        class="form-select rounded-pill" required disabled></select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label fw-semibold">Số nhà, đường</label>
+                                                    <input id="street" class="form-control rounded-pill"
+                                                        name="receiverStreet" placeholder="VD: 123/4 Lê Lợi" required>
+                                                </div>
                                             </div>
+
+                                            <input type="hidden" class="form-control rounded-pill"
+                                                name="receiverAddress" required>
 
                                             <div class="mb-3">
                                                 <label class="form-label fw-semibold">Số điện thoại</label>
@@ -558,10 +577,7 @@
             </div>
             <!-- Checkout Page End -->
 
-
-
             <!-- Cart Page End -->
-
             <!-- Footer Start -->
             <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
                 <div class="container py-5">
@@ -656,71 +672,6 @@
 
             <!-- Template Javascript -->
             <script src="/client/js/main.js"></script>
-            <!-- cập nhật tổng khi chọn coupon -->
-            <!-- <script>
-                (function () {
-                    const $total = document.getElementById("checkout-total");
-                    if (!$total) return;
-
-                    const fmt = n => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n);
-                    const base = Number($total.dataset.checkoutBase || 0); // ✅ tổng sau KM SP
-
-                    // Reset về base nếu chưa chọn coupon
-                    $total.textContent = fmt(base);
-
-                    // Lắng nghe chọn coupon
-                    document.querySelectorAll("input[name='couponId']").forEach(input => {
-                        input.addEventListener("change", function () {
-                            const percent = Math.max(0, parseInt(this.dataset.discount || "0", 10));
-                            const discountAmount = Math.round(base * percent / 100); // ✅ giảm trên base
-                            const finalAmount = Math.max(0, base - discountAmount);
-
-                            // Cập nhật hiển thị
-                            $total.textContent = fmt(finalAmount);
-
-                            // Cập nhật hidden inputs để submit
-                            const codeText = this.nextElementSibling?.textContent || "";
-                            const code = codeText.split(" - ")[0].trim(); // "COUPON2025 - Giảm 10% (...)"
-
-                            const $discountAmount = document.getElementById("discountAmount");
-                            const $couponCode = document.getElementById("couponCode");
-                            if ($discountAmount) $discountAmount.value = discountAmount;
-                            if ($couponCode) $couponCode.value = code;
-                        });
-                    });
-                })();
-            </script> -->
-            <!-- cập nhật tổng khi chọn coupon -->
-            <!-- <script>
-                (function () {
-                    var totalEl = document.getElementById('checkout-total');
-                    if (!totalEl) return;
-
-                    var base = Number(totalEl.getAttribute('data-checkout-base') || '0');
-                    var discountAmountInput = document.getElementById('discountAmount');
-                    var couponCodeInput = document.getElementById('couponCode');
-
-                    function fmt(n) {
-                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n);
-                    }
-
-                    var radios = document.querySelectorAll('input[name="couponId"]');
-                    for (var i = 0; i < radios.length; i++) {
-                        radios[i].addEventListener('change', function (e) {
-                            var r = e.target;
-                            var pct = Number(r.getAttribute('data-discount') || '0');
-                            var code = r.getAttribute('data-code') || '';
-                            var discount = Math.round(base * pct / 100);
-                            var final = Math.max(0, base - discount);
-
-                            totalEl.textContent = fmt(final);
-                            if (discountAmountInput) discountAmountInput.value = String(discount);
-                            if (couponCodeInput) couponCodeInput.value = code;
-                        });
-                    }
-                })();
-            </script> -->
-
             <!-- cập nhật 2 cái trên  -->
             <script>
                 (function () {
@@ -807,7 +758,7 @@
                 }
             </script>
 
-<script>
+            <script>
                 (() => {
                     const form = document.getElementById('headerSearchForm');
                     const input = document.getElementById('headerSearch');
@@ -969,6 +920,70 @@
                     });
                 })();
             </script>
+
+            <!-- api address -->
+            <script>
+                (async function () {
+                    const $p = document.getElementById('province');
+                    const $d = document.getElementById('district');
+                    const $w = document.getElementById('ward');
+                    const $street = document.getElementById('street');
+                    const $preview = document.getElementById('addrPreview');
+                    const $hiddenAddr = document.getElementById('receiverAddressInput');
+
+                    let pName = '', dName = '', wName = '';
+
+                    const fetchJSON = (u) => fetch(u, { headers: { 'Accept': 'application/json' } }).then(r => r.json());
+                    const joinAddr = (street, w, d, p) => [street, w, d, p].filter(Boolean).join(', ');
+                    const refreshPreview = () => {
+                        const full = joinAddr(($street.value || '').trim(), wName, dName, pName);
+                        $preview.textContent = full || '—';
+                        $hiddenAddr.value = full; // giữ tương thích
+                    };
+
+                    // load provinces
+                    const provinces = await fetchJSON('/api/locations/provinces');
+                    $p.innerHTML =
+                        '<option value="" hidden>Chọn tỉnh/thành...</option>' +
+                        provinces.map(p => `<option value="${p.code}">${p.name}</option>`).join('');
+
+                    $p.addEventListener('change', async () => {
+                        const code = $p.value;
+                        pName = $p.options[$p.selectedIndex]?.text || '';
+                        $d.disabled = !code; $w.disabled = true;
+                        wName = dName = '';
+                        $w.innerHTML = '<option value="" hidden>Chọn phường/xã...</option>';
+                        if (!code) { $d.innerHTML = '<option value="" hidden>Chọn quận/huyện...</option>'; refreshPreview(); return; }
+                        const districts = await fetchJSON('/api/locations/districts?provinceCode=' + code);
+                        $d.innerHTML =
+                            '<option value="" hidden>Chọn quận/huyện...</option>' +
+                            districts.map(d => `<option value="${d.code}">${d.name}</option>`).join('');
+                        refreshPreview();
+                    });
+
+                    $d.addEventListener('change', async () => {
+                        const code = $d.value;
+                        dName = $d.options[$d.selectedIndex]?.text || '';
+                        $w.disabled = !code;
+                        wName = '';
+                        if (!code) { $w.innerHTML = '<option value="" hidden>Chọn phường/xã...</option>'; refreshPreview(); return; }
+                        const wards = await fetchJSON('/api/locations/wards?districtCode=' + code);
+                        $w.innerHTML =
+                            '<option value="" hidden>Chọn phường/xã...</option>' +
+                            wards.map(w => `<option value="${w.code}">${w.name}</option>`).join('');
+                        refreshPreview();
+                    });
+
+                    $w.addEventListener('change', () => {
+                        wName = $w.options[$w.selectedIndex]?.text || '';
+                        refreshPreview();
+                    });
+
+                    $street.addEventListener('input', refreshPreview);
+                })();
+            </script>
+
+
 
 </body>
 
