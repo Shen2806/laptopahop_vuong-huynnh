@@ -135,8 +135,8 @@ const webRoutes = (app: Express) => {
     router.post("/profile/update", upload.single("avatar"), handleUpdateProfile);
     // NEW: đổi mật khẩu (cần đăng nhập)
     router.post("/profile/change-password", ensureAuthenticated, postChangePassword);
-    // GET /order-user
-    router.get("/order-user", ensureAuthenticated, getUserOrders);
+    //  lịch sử mua hàng
+    router.get("/order-history", ensureAuthenticated, getUserOrders);
     // Chính sách sử dụng
     router.get("/terms", getTermPage);
     // Chính sách bảo hành
@@ -168,8 +168,8 @@ const webRoutes = (app: Express) => {
     router.post("/place-order", postPlaceOrder)
     // cam on mua hang
     router.get("/thanks", getThanksPage)
-    // lịch sử mua hàng
-    router.get("/order-history", getOrderHistoryPage)
+    // GET /order-user
+    router.get("/order-user", getOrderHistoryPage)
     // chi tiết đơn hàng của user
     router.get("/order/:id", ensureAuthenticated, getOrderDetailPage);
 

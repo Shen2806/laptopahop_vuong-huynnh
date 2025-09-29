@@ -43,164 +43,6 @@
     <!-- Bootstrap Icons (bi-*) nếu bạn dùng thêm -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
 
-    <style>
-        .ldesc {
-            position: relative;
-        }
-
-        .ldesc--collapsed {
-            max-height: 270px;
-            /* chỉnh theo ý */
-            overflow: hidden;
-            transition: max-height .25s ease;
-        }
-
-        .ldesc--collapsed::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 64px;
-            background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--bs-body-bg, #fff) 70%);
-            pointer-events: none;
-        }
-
-        .ldesc img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .ldesc table {
-            width: 100%;
-        }
-
-        /* Related products */
-        #related .rel-strip {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            padding: .25rem;
-            scrollbar-width: thin;
-        }
-
-        #related .rel-card {
-            flex: 0 0 auto;
-            width: 260px;
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 10px;
-            text-decoration: none;
-            color: inherit;
-            scroll-snap-align: start;
-            transition: transform .12s ease, box-shadow .12s ease;
-        }
-
-        #related .rel-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 18px rgba(0, 0, 0, .08);
-        }
-
-        #related .rel-img {
-            width: 100%;
-            aspect-ratio: 4/3;
-            overflow: hidden;
-            border-radius: 8px;
-            background: #f8fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #related .rel-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        #related .rel-name {
-            margin-top: .5rem;
-            font-weight: 600;
-            font-size: .95rem;
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-            overflow: hidden;
-            min-height: 2.5em;
-        }
-
-        #related .rel-price {
-            margin-top: .25rem;
-        }
-
-        #related .rel-old {
-            font-size: .85rem;
-            color: #9ca3af;
-            text-decoration: line-through;
-        }
-
-        #related .rel-new {
-            font-weight: 800;
-            color: #e53935;
-        }
-
-        #related .rel-prev,
-        #related .rel-next {
-            min-width: 34px;
-        }
-
-        /* Compare bar */
-        .compare-bar {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 16px;
-            z-index: 2000;
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-        }
-
-        .compare-bar .compare-inner {
-            padding: 10px 14px;
-        }
-
-        .compare-chip {
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 999px;
-            padding: 6px 10px;
-            background: #f8fafc;
-        }
-
-        .compare-chip img {
-            width: 36px;
-            height: 36px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .compare-chip .x {
-            cursor: pointer;
-            color: #ef4444;
-            font-weight: 700;
-            padding: 0 4px;
-        }
-
-        @media (max-width:576px) {
-            .compare-bar {
-                bottom: 8px;
-            }
-        }
-    </style>
-
 </head>
 
 <body>
@@ -1267,26 +1109,6 @@
                                                                         </div>
 
                                                                     </div>
-
-                                                                    <style>
-                                                                        .kv-list .kv-key {
-                                                                            min-width: 120px;
-                                                                            color: #6b7280;
-                                                                            font-weight: 600;
-                                                                        }
-
-                                                                        .kv-list .kv-sep {
-                                                                            width: 12px;
-                                                                            text-align: center;
-                                                                            color: #9ca3af;
-                                                                        }
-
-                                                                        .kv-list .kv-val {
-                                                                            flex: 1 1 auto;
-                                                                            color: #0f172a;
-                                                                        }
-                                                                    </style>
-
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1717,6 +1539,8 @@
                         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
                     <!-- nút xem thêm -->
                     <!-- JS: tự hiện/ẩn nút, toggle mở/thu, đo lại sau khi ảnh tải xong -->
+
+                    
                     <script>
                         (function () {
                             var uid = '<%= _UID %>';

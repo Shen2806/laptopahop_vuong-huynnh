@@ -1,3 +1,4 @@
+
 /* Style dropdown menu */
 .navbar .dropdown-menu {
   border-radius: 8px;
@@ -333,262 +334,62 @@
     width: clamp(220px, 24vw, 320px);
   }
 }
-
-    /* Banner thông báo trong box chat */
-    .chat-banner {
-        background: #fff9db;
-        border: 1px solid #ffe58f;
-        color: #7a6a00;
-        padding: .45rem .6rem;
-        border-radius: 10px;
-        margin: 8px 10px 0;
-        display: flex;
-        align-items: center;
-        gap: .5rem;
-        cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, .06);
-        animation: chatSlide .25s ease-out;
-    }
-
-    .chat-banner i {
-        font-size: 14px
-    }
-
-    @keyframes chatSlide {
-        from {
-            opacity: 0;
-            transform: translateY(-6px)
+        .cmp-table {
+            min-width: 760px;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0)
-        }
-    }
-
-    /* Nhịp nhẹ cho nút tròn khi có tin mới (khi box đang đóng) */
-    .chat-fab__btn.pulse {
-        animation: chatPulse 1.2s ease-in-out infinite
-    }
-
-    @keyframes chatPulse {
-        0% {
-            transform: scale(1)
+        .cmp-table th,
+        .cmp-table td {
+            vertical-align: top;
         }
 
-        50% {
-            transform: scale(1.06)
+        .cmp-header img {
+            width: 120px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
         }
 
-        100% {
-            transform: scale(1)
+        .cmp-name {
+            font-weight: 700;
+            line-height: 1.25;
         }
-    }
 
+        .cmp-price .old {
+            font-size: 12px;
+            color: #9aa1a9;
+            text-decoration: line-through;
+        }
 
-/* ============ AI RÙA — SKIN 4 CHÂN + ĐUÔI (NO HTML/JS CHANGE) ============ */
-#aiTurtle {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 1050;
-}
+        .cmp-price .new {
+            font-size: 16px;
+            font-weight: 800;
+            color: #e53935;
+        }
 
-/* Nút tròn = mai rùa */
-#aiTurtleBtn {
-  width: 64px;
-  height: 64px;
-  border: 0;
-  border-radius: 50%;
-  cursor: pointer;
-  outline: none;
-  position: relative;
-  background:
-    /* highlight bóng sáng trên mai */
-    radial-gradient(70% 60% at 50% 32%, rgba(255, 255, 255, .28) 0%, rgba(255, 255, 255, 0) 68%),
-    /* màu mai */
-    radial-gradient(65% 65% at 50% 58%, #7cca7a 0%, #53ae56 55%, #338a37 100%),
-    /* hoạ tiết lục giác mờ */
-    url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>\
-  <g fill='none' stroke='%23ffffff22' stroke-width='2'>\
-    <path d='M32 8l12 8v16l-12 8-12-8V16z'/>\
-    <path d='M20 16l-8 6v12l8 6M44 16l8 6v12l-8 6'/>\
-  </g>\
-</svg>");
-  background-blend-mode: normal, normal, overlay;
-  box-shadow:
-    0 10px 22px rgba(0, 0, 0, .22),
-    inset 0 2px 6px rgba(255, 255, 255, .25);
-  transition: transform .15s ease, filter .18s ease, box-shadow .2s ease;
-}
+        .cmp-diff td {
+            background: #fff7ed;
+        }
 
-#aiTurtleBtn:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.03);
-}
+        /* highlight khác nhau */
+        .cmp-spec {
+            color: #6b7280;
+            width: 180px;
+            white-space: nowrap;
+        }
 
-#aiTurtleBtn:active {
-  transform: translateY(0);
-}
+        .badge-kv {
+            background: #f1f5f9;
+            color: #111827;
+            border: 1px solid #e5e7eb;
+        }
 
-/* ĐẦU RÙA (nổi ở mép trên) */
-#aiTurtleBtn::before {
-  content: "";
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  left: 8px;
-  top: -6px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 35% 45%, #1e2a1e 2px, transparent 2.6px),
-    /* mắt trái */
-    radial-gradient(circle at 65% 45%, #1e2a1e 2px, transparent 2.6px),
-    /* mắt phải */
-    linear-gradient(#6fbe6f, #5cad5c);
-  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .08), 0 2px 4px rgba(0, 0, 0, .12);
-  pointer-events: none;
-}
+        .cmp-remove {
+            cursor: pointer;
+            color: #dc2626;
+        }
 
-/* 4 CHÂN — dùng 1 pseudo + box-shadow để nhân bản thành 4 cái */
-#aiTurtleBtn::after {
-  content: "";
-  position: absolute;
-  width: 14px;
-  height: 16px;
-  left: 11px;
-  bottom: -6px;
-  /* CHÂN TRƯỚC-TRÁI (gốc) */
-  border-radius: 10px;
-  background: linear-gradient(#63b963, #4aa64a);
-  border: 1px solid #2f7b34;
-  box-shadow:
-    /* TRƯỚC-PHẢI */
-    34px 0 0 #63b963,
-    /* SAU-TRÁI   */
-    0 -36px 0 #63b963,
-    /* SAU-PHẢI   */
-    34px -36px 0 #63b963;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .15));
-  transform: rotate(3deg);
-  pointer-events: none;
-  transition: transform .2s ease;
-}
-
-/* nhịp nhẹ (walking vibe) */
-#aiTurtleBtn:hover::after {
-  transform: rotate(0deg) translateY(-1px);
-}
-
-/* ĐUÔI — vểnh nhẹ bên phải, gắn ở container để không tốn pseudo của nút */
-#aiTurtle::before {
-  content: "";
-  position: absolute;
-  right: 4px;
-  bottom: 30px;
-  /* căn với nút 64px ở dưới */
-  width: 16px;
-  height: 16px;
-  border-radius: 50% 0 50% 50%;
-  transform: rotate(-40deg);
-  background: linear-gradient(#5cab5c, #4a9c4a);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, .2), 0 1px 2px rgba(0, 0, 0, .16);
-  pointer-events: none;
-}
-
-/* HINT: “AI Rùa – Tư vấn cho bạn!” (tự hiện 6s, hover để xem lại) */
-#aiTurtle::after {
-  content: "AI Rùa – Tư vấn cho bạn!";
-  position: absolute;
-  right: 72px;
-  bottom: 10px;
-  background: #111827;
-  color: #fff;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: .2px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, .22);
-  opacity: 1;
-  transform: translateY(0);
-  white-space: nowrap;
-  pointer-events: none;
-  animation: turtleHint 3s ease-in-out forwards;
-}
-
-#aiTurtle:hover::after {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-  animation: none;
-}
-
-@keyframes turtleHint {
-
-  0%,
-  70% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-}
-
-/* CARD mở chat — bo tròn & tông xanh lá */
-#aiTurtleCard {
-  border: 1px solid #d1fadf;
-  border-radius: 18px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, .18);
-  overflow: hidden;
-  animation: cardPop .18s ease-out;
-}
-
-@keyframes cardPop {
-  from {
-    transform: translateY(8px);
-    opacity: .0
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1
-  }
-}
-
-#aiTurtleCard .ai-card__header {
-  background: linear-gradient(135deg, #5cc56a, #2f9e44);
-  color: #fff;
-  border-bottom: 1px solid #2aa04a33;
-}
-
-/* Bubble chat */
-#aiChatBody .ai-msg.ai-user .ai-msg__bubble {
-  background: #e8f9ee;
-  border: 1px solid #c6f0d4;
-  color: #114b22;
-}
-
-#aiChatBody .ai-msg.ai-bot .ai-msg__bubble {
-  background: #fff;
-  border: 1px solid #e5f2e9;
-}
-
-/* Nút gửi */
-#aiForm #aiSend {
-  background: #2f9e44;
-  border-color: #2f9e44;
-}
-
-#aiForm #aiSend:hover {
-  filter: brightness(1.05);
-}
-
-/* Typing */
-#aiTyping {
-  color: #2f9e44;
-  font-weight: 600;
-}
+        .cmp-top-actions .btn {
+            margin-right: .5rem;
+        }

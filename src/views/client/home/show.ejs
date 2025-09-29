@@ -48,327 +48,6 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <link href="/client/css/home/show.css" rel="stylesheet">
 
-    <style>
-        /* ... giữ nguyên toàn bộ CSS của bạn bên dưới ... */
-        .rating-stars {
-            line-height: 1;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .rating-stars i {
-            color: #f59e0b;
-        }
-
-        .rating-stars .count {
-            margin-left: .4rem;
-            font-size: 12px;
-            color: #6b7280;
-        }
-
-        /* === RÙA AI — widget === */
-        .ai-turtle {
-            position: fixed;
-            right: 22px;
-            bottom: 22px;
-            z-index: 1100;
-        }
-
-        .ai-turtle__btn {
-            width: 64px;
-            height: 64px;
-            border: 0;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 14px 30px rgba(22, 163, 74, .35);
-            cursor: pointer;
-            transition: transform .15s ease, box-shadow .15s ease;
-        }
-
-        .ai-turtle__btn:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 18px 38px rgba(22, 163, 74, .45);
-        }
-
-        .ai-pulse {
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            box-shadow: 0 0 0 0 rgba(34, 197, 94, .45);
-            animation: pulse 2.2s infinite;
-        }
-
-        @keyframes pulse {
-            70% {
-                box-shadow: 0 0 0 18px rgba(34, 197, 94, 0);
-            }
-
-            100% {
-                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-            }
-        }
-
-        .ai-turtle__card {
-            position: absolute;
-            right: 0;
-            bottom: 78px;
-            width: min(360px, calc(100vw - 32px));
-            background: #fff;
-            border-radius: 16px;
-            border: 1px solid rgba(2, 6, 23, .06);
-            box-shadow: 0 18px 46px rgba(2, 6, 23, .25);
-            overflow: hidden;
-            display: none;
-        }
-
-        .ai-enter {
-            animation: aiIn .18s ease both;
-        }
-
-        @keyframes aiIn {
-            from {
-                opacity: 0;
-                transform: translateY(6px) scale(.98)
-            }
-
-            to {
-                opacity: 1;
-                transform: none
-            }
-        }
-
-        .ai-chat__header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #fff;
-        }
-
-        .ai-chat__title {
-            font-weight: 800;
-            letter-spacing: .2px;
-        }
-
-        .ai-chat__close {
-            margin-left: auto;
-            background: rgba(255, 255, 255, .18);
-            border: 0;
-            color: #fff;
-            border-radius: 8px;
-            padding: 6px 8px;
-            cursor: pointer;
-        }
-
-        .ai-chat__body {
-            background: #f8fafc;
-            max-height: 380px;
-            overflow: auto;
-            padding: 14px 12px;
-        }
-
-        .ai-msg {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .ai-msg__bubble {
-            padding: 10px 12px;
-            border-radius: 14px;
-            max-width: 80%;
-            box-shadow: 0 6px 16px rgba(2, 6, 23, .08);
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
-
-        .ai-user {
-            justify-content: flex-end;
-        }
-
-        .ai-user .ai-msg__bubble {
-            background: #e8f5e9;
-            color: #064e3b;
-            border: 1px solid rgba(22, 163, 74, .2);
-        }
-
-        .ai-bot .ai-msg__bubble {
-            background: #fff;
-            border: 1px solid rgba(2, 6, 23, .06);
-        }
-
-        .ai-typing {
-            font-size: 12px;
-            color: #475569;
-            padding: 0 4px 6px;
-            display: none;
-        }
-
-        .ai-chat__footer {
-            padding: 10px;
-            background: #fff;
-            border-top: 1px solid rgba(2, 6, 23, .06);
-        }
-
-        .ai-input {
-            display: flex;
-            gap: 8px;
-            background: #f1f5f9;
-            padding: 8px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .ai-input input {
-            flex: 1;
-            border: 0;
-            background: transparent;
-            outline: none;
-        }
-
-        .ai-input button {
-            border: 0;
-            padding: 8px 12px;
-            border-radius: 10px;
-            background: #16a34a;
-            color: #fff;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .ai-suggest {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            padding: 8px 10px 0;
-            background: #f8fafc;
-        }
-
-        .ai-chip {
-            font-size: 12px;
-            background: #eef2ff;
-            color: #3730a3;
-            border: 1px solid #e5e7eb;
-            padding: 6px 10px;
-            border-radius: 999px;
-            cursor: pointer;
-        }
-
-        .ai-kicker {
-            font-size: 12px;
-            color: #eafaf0
-        }
-
-        .ai-products {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 4px 2px 2px;
-            margin-top: 6px;
-        }
-
-        .ai-products::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .ai-products::-webkit-scrollbar-thumb {
-            background: #e5e7eb;
-            border-radius: 6px;
-        }
-
-        .ai-pcard {
-            flex: 0 0 180px;
-            text-decoration: none;
-            color: inherit;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #fff;
-            transition: transform .15s ease, box-shadow .15s ease;
-        }
-
-        .ai-pcard:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
-        }
-
-        .ai-pimg {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            background: #f8fafc;
-        }
-
-        .ai-pbody {
-            padding: 8px 10px;
-        }
-
-        .ai-ptitle {
-            font-weight: 700;
-            font-size: 14px;
-            line-height: 1.2;
-            height: 34px;
-            overflow: hidden;
-        }
-
-        .ai-pdesc {
-            font-size: 12px;
-            color: #64748b;
-            height: 30px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
-
-        .ai-price-row {
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-            margin: 6px 0;
-        }
-
-        .ai-sale {
-            font-weight: 800;
-            color: #dc2626;
-        }
-
-        .ai-base {
-            color: #94a3b8;
-            text-decoration: line-through;
-            font-size: 12px;
-        }
-
-        .ai-badge {
-            display: inline-block;
-            font-size: 11px;
-            background: #ef4444;
-            color: #fff;
-            padding: 2px 6px;
-            border-radius: 999px;
-        }
-
-        .ai-pbtn {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background: #16a34a;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: 7px 10px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .ai-pbtn:hover {
-            background: #15803d;
-        }
-    </style>
 </head>
 
 
@@ -457,7 +136,7 @@
                                     <div class="swiper-button-prev"></div>
 
                                     <!-- Thanh pagination -->
-                                    <div class="swiper-pagination"></div>
+                                    <div class="swiper-pagination" hidden></div>
                                 </div>
                             </section>
 
@@ -606,29 +285,67 @@
                                                 </div>
                                                 <% }) %>
                                                     <div class="pagination d-flex justify-content-center mt-5">
-                                                        <li
-                                                            class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
-                                                            <a class="page-link" href="/?page=<%= page - 1  %>"
-                                                                aria-label="Previous">
-                                                                <span aria-hidden="true">&laquo;</span>
-                                                            </a>
-                                                        </li>
-                                                        <% for(var i=1; i <=totalPages; i++) {%>
-                                                            <li class="page-item">
-                                                                <a class="<%= page === i ? 'active page-link' : 'page-link' %>"
-                                                                    href="/?page=<%= i  %>">
-                                                                    <%= i %>
-                                                                </a>
-                                                            </li>
-                                                            <% } %>
-                                                                <li
-                                                                    class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
-                                                                    <a class="page-link" href="/?page=<%= page + 1  %>"
-                                                                        aria-label="Next">
-                                                                        <span aria-hidden="true">&raquo;</span>
-                                                                    </a>
-                                                                </li>
-                                                    </div>
+  <!-- Nút Previous -->
+  <li class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
+    <a class="page-link" href="/?page=<%= page - 1 %>" aria-label="Previous">
+      <span aria-hidden="true">&laquo;</span>
+    </a>
+  </li>
+
+  <% 
+    // JS function tạo danh sách trang
+    function getPagination(current, total) {
+      const pages = [];
+      const range = (start, end) => {
+        const arr = [];
+        for (let i = start; i <= end; i++) arr.push(i);
+        return arr;
+      };
+      if (total <= 7) return range(1, total);
+
+      const left = 1;   // 3 trang đầu
+      const right = 1;  // 3 trang cuối
+
+      pages.push(...range(1, left));
+
+      if (current > left + 2) {
+        pages.push("...");
+      }
+
+      const start = Math.max(current - 1, left + 1);
+      const end = Math.min(current + 1, total - right);
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (current < total - right - 1) {
+        pages.push("...");
+      }
+
+      pages.push(...range(total - right + 1, total));
+      return pages;
+    }
+
+    const pagination = getPagination(page, totalPages);
+  %>
+
+  <% pagination.forEach(p => { %>
+    <% if (p === "...") { %>
+      <li class="page-item disabled"><span class="page-link">...</span></li>
+    <% } else { %>
+      <li class="page-item">
+        <a class="page-link <%= page === p ? 'active' : '' %>" href="/?page=<%= p %>"><%= p %></a>
+      </li>
+    <% } %>
+  <% }) %>
+
+  <!-- Nút Next -->
+  <li class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
+    <a class="page-link" href="/?page=<%= page + 1 %>" aria-label="Next">
+      <span aria-hidden="true">&raquo;</span>
+    </a>
+  </li>
+</div>
 
                                         </div>
                                     </div>
@@ -853,22 +570,25 @@
                     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 
                     <script>
-                        var swiper = new Swiper('.promo-swiper', {
-                            loop: true,  // Bật vòng lặp vô hạn
-                            slidesPerView: 3,  // Hiển thị 3 sản phẩm mỗi lần
-                            spaceBetween: 30,  // Khoảng cách giữa các sản phẩm
-                            autoplay: {
-                                delay: 2000,  // Thời gian chuyển slide (2.5 giây)
-                            },
-                            navigation: {
-                                nextEl: '.swiper-button-next',
-                                prevEl: '.swiper-button-prev',
-                            },
-                            pagination: {
-                                el: '.swiper-pagination',
-                                clickable: true,
-                            },
-                        });
+var swiper = new Swiper('.promo-swiper', {
+    loop: true,                 // vòng lặp vô hạn
+    slidesPerView: 3,           // luôn hiển thị 3 sản phẩm
+    slidesPerGroup: 1,          // mỗi lần trượt chỉ dịch 1 sản phẩm
+    spaceBetween: 30,           // khoảng cách giữa các sản phẩm
+    autoplay: {
+        delay: 2000,
+        disableOnInteraction: false, // không tắt khi user bấm
+        stopOnLastSlide: false,      // không dừng ở cuối
+    },
+    navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
+    pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+    },
+});
 
                         /*tin tức công nghệ*/
                         var newsSwiper = new Swiper(".news-swiper", {
