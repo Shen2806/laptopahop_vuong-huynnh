@@ -47,6 +47,63 @@
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <link href="/client/css/home/show.css" rel="stylesheet">
+    <style>
+        /* ====== AI – LIST view giống ảnh bạn gửi ====== */
+        .ai-list {
+            background: #e9f2ff;
+            border: 1px solid #cfe0ff;
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+
+        .ai-li+.ai-li {
+            border-top: 1px dashed #c7d7ff;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+
+        .ai-li__title {
+            font-size: 15px;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .ai-li__index {
+            font-weight: 800;
+            margin-right: 6px;
+            color: #334155;
+        }
+
+        .ai-li__row {
+            font-size: 14px;
+            color: #1f2937;
+            margin: 4px 0;
+        }
+
+        .ai-li__label {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .ai-li__cta {
+            margin-top: 6px;
+        }
+
+        .ai-btn {
+            display: inline-block;
+            background: #2563eb;
+            color: #fff !important;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .ai-btn:hover {
+            background: #1d4ed8;
+        }
+    </style>
 
 </head>
 
@@ -727,6 +784,43 @@
                                     $chipsWrap.appendChild(btn);
                                 });
                             }
+                            // ===== NEW: render dạng DANH SÁCH chi tiết + nút Xem chi tiết =====
+                            function appendProductList(products, { persist = true } = {}) {
+                                if (!products || !products.length) return;
+                                const wrap = document.createElement('div'); wrap.className = 'ai-msg ai-bot';
+                                const bubble = document.createElement('div'); bubble.className = 'ai-msg__bubble';
+
+                                const list = document.createElement('div'); list.className = 'ai-list';
+                                products.forEach((p, idx) => {
+                                    const item = document.createElement('div'); item.className = 'ai-li';
+
+                                    const title = document.createElement('div'); title.className = 'ai-li__title';
+                                    title.innerHTML = `<span class="ai-li__index">${idx + 1}.</span> <strong>${p.name}</strong>`;
+                                    item.appendChild(title);
+
+                                    if (p.specs || p.shortDesc) {
+                                        const spec = document.createElement('div'); spec.className = 'ai-li__row';
+                                        spec.innerHTML = `<span class="ai-li__label">Cấu hình:</span> ${p.specs || p.shortDesc}`;
+                                        item.appendChild(spec);
+                                    }
+
+                                    const priceLine = document.createElement('div'); priceLine.className = 'ai-li__row';
+                                    const priceTxt = p.priceText || (((p.salePrice ?? p.price) || 0).toLocaleString('vi-VN') + '₫');
+                                    priceLine.innerHTML = `<span class="ai-li__label">Giá tham khảo:</span> ${priceTxt}`;
+                                    item.appendChild(priceLine);
+
+                                    const cta = document.createElement('div'); cta.className = 'ai-li__cta';
+                                    const a = document.createElement('a'); a.href = p.href || ('/product/' + p.id);
+                                    a.className = 'ai-btn'; a.textContent = 'Xem chi tiết';
+                                    cta.appendChild(a); item.appendChild(cta);
+
+                                    list.appendChild(item);
+                                });
+
+                                bubble.appendChild(list); wrap.appendChild(bubble); $body.appendChild(wrap);
+                                $body.scrollTop = $body.scrollHeight;
+                                if (persist) pushHist({ t: Date.now(), kind: 'product-list', products });
+                            }
 
                             // rehydrate
                             (function () {
@@ -739,18 +833,41 @@
                                 appendMsg('user', text);
                                 $typing.style.display = 'block'; $send.disabled = true; $input.disabled = true;
                                 try {
-                                    const res = await fetch('/api/ai/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ message: text, sessionId, meta: { page: 'home_show', ts: Date.now() } }) });
+                                    const res = await fetch('/api/ai/chat', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        credentials: 'same-origin',
+                                        body: JSON.stringify({ message: text, sessionId, meta: { page: 'home_show', ts: Date.now() } })
+                                    });
+                                    if (!res.ok) throw new Error('HTTP ' + res.status);
                                     const data = await res.json().catch(() => ({}));
 
                                     if (data?.sessionId && data.sessionId !== sessionId) {
-                                        const oldKey = histKey(); sessionId = data.sessionId; sessionStorage.setItem(SID_KEY, String(sessionId)); const newKey = histKey(); migrateHistory(oldKey, newKey);
+                                        const oldKey = histKey(); sessionId = data.sessionId;
+                                        sessionStorage.setItem(SID_KEY, String(sessionId));
+                                        const newKey = histKey(); migrateHistory(oldKey, newKey);
                                     }
 
-                                    const hasCards = Array.isArray(data.products) && data.products.length > 0;
+                                    const hasProducts = Array.isArray(data.products) && data.products.length > 0;
                                     const reply = (typeof data.reply === 'string' ? data.reply.trim() : '');
-                                    if (hasCards) { appendProducts(data.products); }
-                                    else if (reply) { appendMsg('assistant', reply); }
-                                    else { appendMsg('assistant', 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!'); }
+                                    if (hasProducts) {
+                                        if (data.format === 'list') appendProductList(data.products);
+                                        else appendProducts(data.products); // mặc định card
+                                    } else if (reply) {
+                                        appendMsg('assistant', reply);
+                                    } else {
+                                        appendMsg('assistant', 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!');
+                                    }
+
+
+                                    // render filters nếu server trả
+                                    if (data?.activeFilters) {
+                                        const chips = [];
+                                        if (data.activeFilters.brand) chips.push('Hãng: ' + data.activeFilters.brand);
+                                        if (data.activeFilters.target) chips.push('Nhu cầu: ' + data.activeFilters.target);
+                                        if (data.activeFilters.min || data.activeFilters.max) chips.push('Ngân sách: ' + ((data.activeFilters.min || 0) / 1e6) + '–' + (data.activeFilters.max ? (data.activeFilters.max / 1e6) : '∞') + 'tr');
+                                        if (chips.length) renderChips(chips);
+                                    }
 
                                     if (Array.isArray(data.suggestions) && data.suggestions.length) renderChips(data.suggestions);
                                 } catch (e) {
@@ -759,6 +876,7 @@
                                     $typing.style.display = 'none'; $send.disabled = false; $input.disabled = false; $input.focus();
                                 }
                             }
+
 
                             $form.addEventListener('submit', e => { e.preventDefault(); const val = ($input.value || '').trim(); if (!val) return; $input.value = ''; sendMessage(val); });
                             $input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $form.dispatchEvent(new Event('submit', { cancelable: true })); } });

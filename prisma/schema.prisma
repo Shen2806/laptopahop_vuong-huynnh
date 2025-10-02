@@ -51,7 +51,7 @@ model AiChatSession {
   id         Int      @id @default(autoincrement())
   userId     Int?
   topic      String?  @db.VarChar(255)
-  summary    String?  @db.Text // tóm tắt cuộn (rolling)
+  summary    String?  @db.Text
   status     String   @default("OPEN") // OPEN | CLOSED
   lastUsedAt DateTime @default(now())
   createdAt  DateTime @default(now())
@@ -64,15 +64,19 @@ model AiChatSession {
 }
 
 model AiChatMessage {
-  id        Int      @id @default(autoincrement())
-  sessionId Int
-  role      AiRole
-  content   String   @db.Text
-  tokens    Int? // optional
-  createdAt DateTime @default(now())
+  id               Int      @id @default(autoincrement())
+  sessionId        Int
+  role             AiRole
+  content          String   @db.Text
+  tokens           Int? // tổng token
+  promptTokens     Int? // token prompt
+  completionTokens Int? // token completion
+  createdAt        DateTime @default(now())
 
   session   AiChatSession @relation(fields: [sessionId], references: [id])
   embedding AiEmbedding?
+
+  @@index([sessionId, id])
 }
 
 model AiMemory {
@@ -86,23 +90,26 @@ model AiMemory {
   expiresAt DateTime?
   createdAt DateTime  @default(now())
 
-  session     AiChatSession? @relation(fields: [sessionId], references: [id])
-  AiEmbedding AiEmbedding[]
+  session    AiChatSession? @relation(fields: [sessionId], references: [id])
+  embeddings AiEmbedding[] // Đổi tên cho rõ: danh sách embedding gắn với memory
 
   @@index([userId, sessionId, type])
 }
 
 model AiEmbedding {
-  id        Int  @id @default(autoincrement())
-  messageId Int? @unique
+  id        Int      @id @default(autoincrement())
+  messageId Int?     @unique
   memoryId  Int?
   dim       Int
-  // MySQL không có vector-native -> lưu JSON float[]
-  vector    Json
+  vector    Json // MySQL: lưu JSON float[]
+  model     String   @default("text-embedding-3-small") @db.VarChar(64)
+  createdAt DateTime @default(now())
 
   message AiChatMessage? @relation(fields: [messageId], references: [id])
   memory  AiMemory?      @relation(fields: [memoryId], references: [id])
 
+  @@unique([messageId, model])
+  @@unique([memoryId, model])
   @@index([messageId])
   @@index([memoryId])
 }
