@@ -179,6 +179,10 @@
                                                 <p><strong>Mã giảm giá:</strong>
                                                     <%= order.couponCode || "-" %>
                                                 </p>
+                                                <p><strong>Phí vận chuyển:</strong>
+                                                    <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                        currency: 'VND' }) .format(Number(order.shippingFee || 0)) %>
+                                                </p>
                                                 <p><strong>Tổng tiền:</strong>
                                                     <%= new Intl.NumberFormat('vi-VN', {style:'currency',
                                                         currency:'VND'}).format(subTotal) %>

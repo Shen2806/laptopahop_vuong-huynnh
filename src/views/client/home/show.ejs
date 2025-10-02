@@ -285,67 +285,58 @@
                                                 </div>
                                                 <% }) %>
                                                     <div class="pagination d-flex justify-content-center mt-5">
-  <!-- Nút Previous -->
-  <li class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
-    <a class="page-link" href="/?page=<%= page - 1 %>" aria-label="Previous">
-      <span aria-hidden="true">&laquo;</span>
-    </a>
-  </li>
+                                                        <!-- Nút Previous -->
+                                                        <li
+                                                            class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
+                                                            <a class="page-link" href="/?page=<%= page - 1 %>"
+                                                                aria-label="Previous">
+                                                                <span aria-hidden="true">&laquo;</span>
+                                                            </a>
+                                                        </li>
 
-  <% 
-    // JS function tạo danh sách trang
-    function getPagination(current, total) {
-      const pages = [];
-      const range = (start, end) => {
-        const arr = [];
-        for (let i = start; i <= end; i++) arr.push(i);
-        return arr;
-      };
-      if (total <= 7) return range(1, total);
+                                                        <% function getPagination(current, total) { const pages=[];
+                                                            const range=(start, end)=> {
+                                                            const arr = [];
+                                                            for (let i = start; i <= end; i++) arr.push(i); return arr;
+                                                                }; if (total <=7) return range(1, total); const left=1;
+                                                                const right=1; pages.push(...range(1, left)); if
+                                                                (current> left + 2) {
+                                                                pages.push("...");
+                                                                }
 
-      const left = 1;   // 3 trang đầu
-      const right = 1;  // 3 trang cuối
+                                                                const start = Math.max(current - 1, left + 1);
+                                                                const end = Math.min(current + 1, total - right);
+                                                                for (let i = start; i <= end; i++) { pages.push(i); } if
+                                                                    (current < total - right - 1) { pages.push("..."); }
+                                                                    pages.push(...range(total - right + 1, total));
+                                                                    return pages; } const pagination=getPagination(page,
+                                                                    totalPages); %>
 
-      pages.push(...range(1, left));
+                                                                    <% pagination.forEach(p=> { %>
+                                                                        <% if (p==="..." ) { %>
+                                                                            <li class="page-item disabled"><span
+                                                                                    class="page-link">...</span></li>
+                                                                            <% } else { %>
+                                                                                <li class="page-item">
+                                                                                    <a class="page-link <%= page === p ? 'active' : '' %>"
+                                                                                        href="/?page=<%= p %>">
+                                                                                        <%= p %>
+                                                                                    </a>
+                                                                                </li>
+                                                                                <% } %>
+                                                                                    <% }) %>
 
-      if (current > left + 2) {
-        pages.push("...");
-      }
-
-      const start = Math.max(current - 1, left + 1);
-      const end = Math.min(current + 1, total - right);
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-
-      if (current < total - right - 1) {
-        pages.push("...");
-      }
-
-      pages.push(...range(total - right + 1, total));
-      return pages;
-    }
-
-    const pagination = getPagination(page, totalPages);
-  %>
-
-  <% pagination.forEach(p => { %>
-    <% if (p === "...") { %>
-      <li class="page-item disabled"><span class="page-link">...</span></li>
-    <% } else { %>
-      <li class="page-item">
-        <a class="page-link <%= page === p ? 'active' : '' %>" href="/?page=<%= p %>"><%= p %></a>
-      </li>
-    <% } %>
-  <% }) %>
-
-  <!-- Nút Next -->
-  <li class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
-    <a class="page-link" href="/?page=<%= page + 1 %>" aria-label="Next">
-      <span aria-hidden="true">&raquo;</span>
-    </a>
-  </li>
-</div>
+                                                                                        <!-- Nút Next -->
+                                                                                        <li
+                                                                                            class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
+                                                                                            <a class="page-link"
+                                                                                                href="/?page=<%= page + 1 %>"
+                                                                                                aria-label="Next">
+                                                                                                <span
+                                                                                                    aria-hidden="true">&raquo;</span>
+                                                                                            </a>
+                                                                                        </li>
+                                                    </div>
 
                                         </div>
                                     </div>
@@ -570,25 +561,25 @@
                     <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 
                     <script>
-var swiper = new Swiper('.promo-swiper', {
-    loop: true,                 // vòng lặp vô hạn
-    slidesPerView: 3,           // luôn hiển thị 3 sản phẩm
-    slidesPerGroup: 1,          // mỗi lần trượt chỉ dịch 1 sản phẩm
-    spaceBetween: 30,           // khoảng cách giữa các sản phẩm
-    autoplay: {
-        delay: 2000,
-        disableOnInteraction: false, // không tắt khi user bấm
-        stopOnLastSlide: false,      // không dừng ở cuối
-    },
-    navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-    },
-    pagination: {
-        el: '.swiper-pagination',
-        clickable: true,
-    },
-});
+                        var swiper = new Swiper('.promo-swiper', {
+                            loop: true,                 // vòng lặp vô hạn
+                            slidesPerView: 3,           // luôn hiển thị 3 sản phẩm
+                            slidesPerGroup: 1,          // mỗi lần trượt chỉ dịch 1 sản phẩm
+                            spaceBetween: 30,           // khoảng cách giữa các sản phẩm
+                            autoplay: {
+                                delay: 2000,
+                                disableOnInteraction: false, // không tắt khi user bấm
+                                stopOnLastSlide: false,      // không dừng ở cuối
+                            },
+                            navigation: {
+                                nextEl: '.swiper-button-next',
+                                prevEl: '.swiper-button-prev',
+                            },
+                            pagination: {
+                                el: '.swiper-pagination',
+                                clickable: true,
+                            },
+                        });
 
                         /*tin tức công nghệ*/
                         var newsSwiper = new Swiper(".news-swiper", {

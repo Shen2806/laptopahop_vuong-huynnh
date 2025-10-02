@@ -11,7 +11,8 @@
   <!-- Google Web Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Raleway:wght@600;800&display=swap"
+    rel="stylesheet">
 
   <!-- Icon Font Stylesheet -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
@@ -33,344 +34,203 @@
 
 <body>
   <!-- Spinner Start -->
-  <div id="spinner" class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
+  <div id="spinner"
+    class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50 d-flex align-items-center justify-content-center">
     <div class="spinner-grow text-primary" role="status"></div>
   </div>
   <!-- Spinner End -->
 
   <!-- Navbar start -->
-  <header class="container-fluid shadow" style="margin-top:10px;">
-    <!-- Topbar -->
-    <div class="container topbar bg-primary d-none d-lg-block">
-      <div class="d-flex justify-content-between">
-        <div class="top-info ps-2">
-          <% if (user) { %>
-            <small class="me-3">
-              <i class="fas fa-map-marker-alt me-2 text-secondary"></i>
-              <a href="#" class="text-white"><%= user?.address || "" %></a>
-            </small>
-            <small class="me-3">
-              <i class="fas fa-envelope me-2 text-secondary"></i>
-              <a href="#" class="text-white"><%= user?.username || "" %></a>
-            </small>
-          <% } else { %>
-            <small class="me-3"><i class="fas fa-voicemail me-2 text-secondary"></i></small>
-          <% } %>
-        </div>
-        <div class="top-link pe-2">
-          <a href="/terms" class="text-white"><small class="text-white mx-2">Điều khoản sử dụng</small>/</a>
-          <a href="/support" class="text-white"><small class="text-white mx-2">Hỗ trợ</small></a>
-        </div>
-      </div>
-    </div>
+  <%- include('../client/layout/header'); -%>
 
-    <!-- Navbar -->
-    <div class="container px-0 position-relative bg-white ">
-      <nav class="navbar navbar-light bg-white navbar-expand-xl">
-        <div class="d-flex align-items-center">
-          <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle" />
-          <a href="/" class="navbar-brand ms-2">
-            <h1 class="text-primary display-6 m-0">LaptopShop</h1>
-          </a>
-        </div>
-
-        <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
-                aria-label="Toggle navigation">
-          <span class="fa fa-bars text-primary"></span>
-        </button>
-
-        <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
-          <div>
-            <ul class="navbar-nav mx-auto">
-              <li class="nav-item"><a href="/" class="nav-link active">Trang chủ</a></li>
-              <li class="nav-item"><a href="/products" class="nav-link">Sản phẩm</a></li>
-              <li class="nav-item"><a href="/about" class="nav-link">Giới thiệu</a></li>
-              <li class="nav-item"><a href="/contact" class="nav-link">Liên hệ</a></li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Thông tin</a>
-                <ul class="dropdown-menu" aria-labelledby="policyDropdown">
-                  <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
-                  <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
-                  <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-
-          <!-- SEARCH BOX -->
-          <div class="header-search position-relative my-2 my-xl-0 mx-xl-3" style="min-width: 180px;">
-            <form id="headerSearchForm" action="/products" method="get" class="d-flex align-items-center rounded-pill border px-2 bg-white">
-              <input class="form-control border-0 shadow-none" id="headerSearch" name="q" type="search"
-                     placeholder="Tìm laptop, hãng, từ khóa..." aria-label="Tìm kiếm" autocomplete="off" />
-              <button class="btn btn-link px-2" type="submit" aria-label="Tìm kiếm">
-                <i class="fas fa-search"></i>
-              </button>
-            </form>
-
-            <!-- Popup gợi ý -->
-            <div id="searchPopup" class="shadow" style="
-                display:none; position:absolute; top:110%; left:0; right:0; z-index: 2000;
-                background:#fff; border-radius:12px; overflow:hidden; max-height:420px; overflow-y:auto;">
-            </div>
-          </div>
-
-          <div class="d-flex ms-auto align-items-center position-relative">
-            <% if (user) { %>
-              <!-- Chuông thông báo -->
-              <button class="notification-icon position-relative me-3 btn btn-link p-0 border-0"
-                      id="notificationDropdown" type="button" aria-label="Thông báo">
-                <i class="fas fa-bell fa-2x"></i>
-                <span id="notificationBadge"
-                      class="position-absolute bg-danger text-white rounded-circle d-flex align-items-center justify-content-center"
-                      style="top:-5px; right:-5px; width:20px; height:20px; font-size:12px; display:none;">0</span>
-              </button>
-
-              <!-- Âm thanh -->
-              <audio id="notificationSound" src="/ring.wav" preload="auto"></audio>
-            <% } %>
-
-            <!-- Giỏ hàng -->
-            <a href="/cart" class="position-relative me-3" aria-label="Giỏ hàng">
-              <i class="fa fa-shopping-bag fa-2x"></i>
-              <span class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
-                    id="sumCart" style="top:-5px; left:15px; height:20px; min-width:20px;">
-                <%= user?.sumCart ?? 0 %>
-              </span>
-            </a>
-
-            <!-- User -->
-            <% if (user) { %>
-              <div class="dropdown my-auto">
-                <a href="#" class="dropdown-toggle" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="fas fa-user fa-2x"></i>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end p-4" aria-labelledby="dropdownMenuLink">
-                  <li class="d-flex align-items-center flex-column" style="min-width:300px;">
-                    <img style="width:150px; height:150px; border-radius:50%; overflow:hidden;"
-                         src="/images/<%= user.avatar %>" alt="Avatar người dùng" />
-                    <div class="text-center my-3"><%= user.fullName %></div>
-                  </li>
-                  <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
-                  <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
-                  <li><a class="dropdown-item" href="/order-user">Đơn hàng của tôi</a></li>
-                  <li><hr class="dropdown-divider" /></li>
-                  <li>
-                    <form method="post" action="/logout">
-                      <button class="dropdown-item" type="submit">Đăng xuất</button>
-                    </form>
-                  </li>
-                </ul>
-              </div>
-            <% } else { %>
-              <a href="/login" class="a-login" aria-label="Đăng nhập"><i class="fas fa-user fa-2x"></i></a>
-            <% } %>
-          </div>
-        </div>
-      </nav>
-
-      <% if (user) { %>
-        <!-- Panel dropdown notification cho User -->
-        <div id="uNotificationPanel" class="dropdown-menu show"
-             style="display:none; position:absolute; right:10px; top:72px; width:360px; max-height:420px; overflow:auto; z-index:1050;">
-          <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-            <strong>Thông báo</strong>
-            <button id="uMarkAllRead" class="btn btn-sm btn-link">Đánh dấu đã đọc</button>
-          </div>
-          <ul id="uNotificationList" class="list-group list-group-flush"></ul>
-        </div>
+    <% if (user) { %>
+      <script>window.USER_ID = "<%= String(user.id) %>";</script>
       <% } %>
-    </div>
-  </header>
 
-  <% if (user) { %>
-    <script>window.USER_ID = "<%= String(user.id) %>";</script>
-  <% } %>
+        <!-- Socket.IO client -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+          (function () {
+            if (!window.USER_ID) return; // chưa login thì thôi
+            const uBadge = document.getElementById('notificationBadge');
+            const uIcon = document.getElementById('notificationDropdown');
+            const uPanel = document.getElementById('uNotificationPanel');
+            const uList = document.getElementById('uNotificationList');
+            const uSound = document.getElementById('notificationSound');
+            const USER_ID = window.USER_ID;
 
-  <!-- Socket.IO client -->
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    (function () {
-      if (!window.USER_ID) return; // chưa login thì thôi
-      const uBadge = document.getElementById('notificationBadge');
-      const uIcon = document.getElementById('notificationDropdown');
-      const uPanel = document.getElementById('uNotificationPanel');
-      const uList = document.getElementById('uNotificationList');
-      const uSound = document.getElementById('notificationSound');
-      const USER_ID = window.USER_ID;
+            if (uIcon && uPanel) {
+              uIcon.addEventListener('click', () => {
+                const shown = uPanel.style.display === 'block';
+                uPanel.style.display = shown ? 'none' : 'block';
+              });
+            }
 
-      if (uIcon && uPanel) {
-        uIcon.addEventListener('click', () => {
-          const shown = uPanel.style.display === 'block';
-          uPanel.style.display = shown ? 'none' : 'block';
-        });
-      }
+            let audioUnlocked = false;
+            if (uIcon && uSound) {
+              uIcon.addEventListener('click', () => {
+                if (!audioUnlocked) {
+                  uSound.volume = 0.0;
+                  uSound.play().catch(() => { });
+                  setTimeout(() => {
+                    try { uSound.pause(); uSound.currentTime = 0; } catch { }
+                    uSound.volume = 1.0;
+                    audioUnlocked = true;
+                  }, 50);
+                }
+              });
+            }
 
-      let audioUnlocked = false;
-      if (uIcon && uSound) {
-        uIcon.addEventListener('click', () => {
-          if (!audioUnlocked) {
-            uSound.volume = 0.0;
-            uSound.play().catch(() => { });
-            setTimeout(() => {
-              try { uSound.pause(); uSound.currentTime = 0; } catch { }
-              uSound.volume = 1.0;
-              audioUnlocked = true;
-            }, 50);
-          }
-        });
-      }
+            function uUpdateBadge(delta = 1) {
+              if (!uBadge) return;
+              let cur = parseInt(uBadge.textContent || "0", 10);
+              cur = isNaN(cur) ? 0 : cur;
+              cur += delta;
+              if (cur <= 0) {
+                uBadge.style.display = "none";
+                uBadge.textContent = "0";
+              } else {
+                uBadge.style.display = "flex";
+                uBadge.textContent = cur > 9 ? "9+" : String(cur);
+              }
+            }
 
-      function uUpdateBadge(delta = 1) {
-        if (!uBadge) return;
-        let cur = parseInt(uBadge.textContent || "0", 10);
-        cur = isNaN(cur) ? 0 : cur;
-        cur += delta;
-        if (cur <= 0) {
-          uBadge.style.display = "none";
-          uBadge.textContent = "0";
-        } else {
-          uBadge.style.display = "flex";
-          uBadge.textContent = cur > 9 ? "9+" : String(cur);
-        }
-      }
+            function uPrepend(itemHtml) {
+              if (!uList) return;
+              const li = document.createElement('li');
+              li.className = 'list-group-item';
+              li.innerHTML = itemHtml;
+              uList.prepend(li);
+            }
 
-      function uPrepend(itemHtml) {
-        if (!uList) return;
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.innerHTML = itemHtml;
-        uList.prepend(li);
-      }
+            const markBtn = document.getElementById('uMarkAllRead');
+            if (markBtn && uBadge) {
+              markBtn.addEventListener('click', () => {
+                uBadge.style.display = 'none';
+                uBadge.textContent = '0';
+              });
+            }
 
-      const markBtn = document.getElementById('uMarkAllRead');
-      if (markBtn && uBadge) {
-        markBtn.addEventListener('click', () => {
-          uBadge.style.display = 'none';
-          uBadge.textContent = '0';
-        });
-      }
+            const uSocket = io(); // same-origin
+            uSocket.on('connect', () => {
+              uSocket.emit('join-user-room', USER_ID);
+            });
 
-      const uSocket = io(); // same-origin
-      uSocket.on('connect', () => {
-        uSocket.emit('join-user-room', USER_ID);
-      });
+            uSocket.on('order-confirmed', (data) => {
+              try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+              uUpdateBadge(1);
+              const url = `/order/${data.orderId}`;
+              const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
+              uPrepend(
+                '<div class="d-flex justify-content-between align-items-start">' +
+                '<div>' +
+                '<div class="fw-semibold">' + msg + '</div>' +
+                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                '</div>' +
+                '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                '</div>'
+              );
+            });
 
-      uSocket.on('order-confirmed', (data) => {
-        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-        uUpdateBadge(1);
-        const url = `/order/${data.orderId}`;
-        const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
-        uPrepend(
-          '<div class="d-flex justify-content-between align-items-start">' +
-            '<div>' +
-              '<div class="fw-semibold">' + msg + '</div>' +
-              '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-            '</div>' +
-            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-          '</div>'
-        );
-      });
+            uSocket.on('order-canceled', (data) => {
+              try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+              uUpdateBadge(1);
+              const url = `/order/${data.orderId}`;
+              const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
+              uPrepend(
+                '<div class="d-flex justify-content-between align-items-start">' +
+                '<div>' +
+                '<div class="fw-semibold">' + msg + '</div>' +
+                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                '</div>' +
+                '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
+                '</div>'
+              );
+            });
 
-      uSocket.on('order-canceled', (data) => {
-        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-        uUpdateBadge(1);
-        const url = `/order/${data.orderId}`;
-        const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
-        uPrepend(
-          '<div class="d-flex justify-content-between align-items-start">' +
-            '<div>' +
-              '<div class="fw-semibold">' + msg + '</div>' +
-              '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-            '</div>' +
-            '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
-          '</div>'
-        );
-      });
+            uSocket.on('order-updated', (data) => {
+              try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+              uUpdateBadge(1);
+              const url = `/order/${data.orderId}`;
+              const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
+              uPrepend(
+                '<div class="d-flex justify-content-between align-items-start">' +
+                '<div>' +
+                '<div class="fw-semibold">' + msg + '</div>' +
+                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                '</div>' +
+                '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                '</div>'
+              );
+            });
 
-      uSocket.on('order-updated', (data) => {
-        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-        uUpdateBadge(1);
-        const url = `/order/${data.orderId}`;
-        const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
-        uPrepend(
-          '<div class="d-flex justify-content-between align-items-start">' +
-            '<div>' +
-              '<div class="fw-semibold">' + msg + '</div>' +
-              '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-            '</div>' +
-            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-          '</div>'
-        );
-      });
+            uSocket.on('chat-incoming', (data) => {
+              try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+              uUpdateBadge(1);
+              uPrepend(
+                '<div class="d-flex justify-content-between align-items-start">' +
+                '<div>' +
+                '<div class="fw-semibold">Tin nhắn mới từ hỗ trợ</div>' +
+                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                '</div>' +
+                '<a href="javascript:void(0)" onclick="document.getElementById(\'chatOpen\').click()" class="btn btn-sm btn-primary ms-2">Mở</a>' +
+                '</div>'
+              );
+            });
+          })();
+        </script>
 
-      uSocket.on('chat-incoming', (data) => {
-        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-        uUpdateBadge(1);
-        uPrepend(
-          '<div class="d-flex justify-content-between align-items-start">' +
-            '<div>' +
-              '<div class="fw-semibold">Tin nhắn mới từ hỗ trợ</div>' +
-              '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-            '</div>' +
-            '<a href="javascript:void(0)" onclick="document.getElementById(\'chatOpen\').click()" class="btn btn-sm btn-primary ms-2">Mở</a>' +
-          '</div>'
-        );
-      });
-    })();
-  </script>
+        <script>
+          (() => {
+            const form = document.getElementById('headerSearchForm');
+            const input = document.getElementById('headerSearch');
+            const popup = document.getElementById('searchPopup');
 
-  <script>
-    (() => {
-      const form = document.getElementById('headerSearchForm');
-      const input = document.getElementById('headerSearch');
-      const popup = document.getElementById('searchPopup');
+            let timer = null;
+            let activeIndex = -1;
+            let currentItems = []; // giữ dữ liệu gợi ý hiện tại
 
-      let timer = null;
-      let activeIndex = -1;
-      let currentItems = []; // giữ dữ liệu gợi ý hiện tại
+            const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, s => ({
+              '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[s]));
 
-      const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, s => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[s]));
+            const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
 
-      const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
+            const highlight = (text, q) => {
+              if (!q) return escapeHtml(text);
+              const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+              return escapeHtml(text).replace(re, '<mark>$1</mark>');
+            };
 
-      const highlight = (text, q) => {
-        if (!q) return escapeHtml(text);
-        const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
-        return escapeHtml(text).replace(re, '<mark>$1</mark>');
-      };
+            const toImg = (v) => {
+              if (!v) return '/images/no-image.png';
+              if (/^https?:\/\//.test(v)) return v;
+              if (v.startsWith('/')) return v;
+              if (v.startsWith('images/')) return '/' + v;
+              return '/images/product/' + encodeURIComponent(v);
+            };
 
-      const toImg = (v) => {
-        if (!v) return '/images/no-image.png';
-        if (/^https?:\/\//.test(v)) return v;
-        if (v.startsWith('/')) return v;
-        if (v.startsWith('images/')) return '/' + v;
-        return '/images/product/' + encodeURIComponent(v);
-      };
+            async function fetchSuggest(q) {
+              const url = '/api/suggest?q=' + encodeURIComponent(q);
+              const res = await fetch(url, { credentials: 'same-origin' });
+              if (!res.ok) throw new Error('Network');
+              return res.json();
+            }
 
-      async function fetchSuggest(q) {
-        const url = '/api/suggest?q=' + encodeURIComponent(q);
-        const res = await fetch(url, { credentials: 'same-origin' });
-        if (!res.ok) throw new Error('Network');
-        return res.json();
-      }
+            function render(items, q) {
+              currentItems = items;
+              activeIndex = -1;
 
-      function render(items, q) {
-        currentItems = items;
-        activeIndex = -1;
+              if (!items.length) {
+                popup.innerHTML = `<div class="empty">Không tìm thấy sản phẩm phù hợp.</div>`;
+                popup.style.display = 'block';
+                return;
+              }
 
-        if (!items.length) {
-          popup.innerHTML = `<div class="empty">Không tìm thấy sản phẩm phù hợp.</div>`;
-          popup.style.display = 'block';
-          return;
-        }
-
-        popup.innerHTML = items.map((x, i) => {
-          const img = toImg(x.image);
-          const href = `/product/${encodeURIComponent(String(x.id))}`;
-          return `
+              popup.innerHTML = items.map((x, i) => {
+                const img = toImg(x.image);
+                const href = `/product/${encodeURIComponent(String(x.id))}`;
+                return `
             <a class="sug-item" data-index="${i}" data-href="${href}" href="${href}">
               <img src="${img}" alt="">
               <div class="flex-1">
@@ -378,368 +238,410 @@
                 <div class="price">${money(x.price)}</div>
               </div>
             </a>`;
-        }).join('');
+              }).join('');
 
-        popup.querySelectorAll('.sug-item').forEach(el => {
-          el.addEventListener('mouseenter', () => { setActive(Number(el.dataset.index)); });
-        });
+              popup.querySelectorAll('.sug-item').forEach(el => {
+                el.addEventListener('mouseenter', () => { setActive(Number(el.dataset.index)); });
+              });
 
-        popup.style.display = 'block';
-      }
+              popup.style.display = 'block';
+            }
 
-      function hide() {
-        popup.style.display = 'none';
-        activeIndex = -1;
-        currentItems = [];
-      }
+            function hide() {
+              popup.style.display = 'none';
+              activeIndex = -1;
+              currentItems = [];
+            }
 
-      function setActive(index) {
-        const items = popup.querySelectorAll('.sug-item');
-        items.forEach(a => a.classList.remove('active'));
-        if (items[index]) { items[index].classList.add('active'); activeIndex = index; }
-        else { activeIndex = -1; }
-      }
+            function setActive(index) {
+              const items = popup.querySelectorAll('.sug-item');
+              items.forEach(a => a.classList.remove('active'));
+              if (items[index]) { items[index].classList.add('active'); activeIndex = index; }
+              else { activeIndex = -1; }
+            }
 
-      input.addEventListener('input', () => {
-        const q = input.value.trim();
-        clearTimeout(timer);
-        if (!q) return hide();
-        timer = setTimeout(async () => {
-          try { const items = await fetchSuggest(q); render(items, q); }
-          catch { hide(); }
-        }, 200);
-      });
+            input.addEventListener('input', () => {
+              const q = input.value.trim();
+              clearTimeout(timer);
+              if (!q) return hide();
+              timer = setTimeout(async () => {
+                try { const items = await fetchSuggest(q); render(items, q); }
+                catch { hide(); }
+              }, 200);
+            });
 
-      input.addEventListener('focus', () => {
-        if (popup.innerHTML.trim()) popup.style.display = 'block';
-      });
+            input.addEventListener('focus', () => {
+              if (popup.innerHTML.trim()) popup.style.display = 'block';
+            });
 
-      document.addEventListener('click', (e) => {
-        if (!popup.contains(e.target) && e.target !== input) hide();
-      });
+            document.addEventListener('click', (e) => {
+              if (!popup.contains(e.target) && e.target !== input) hide();
+            });
 
-      input.addEventListener('keydown', (e) => {
-        const items = popup.querySelectorAll('.sug-item');
-        if (!items.length) return;
-        if (e.key === 'ArrowDown') {
-          e.preventDefault(); const next = (activeIndex + 1) % items.length; setActive(next);
-        } else if (e.key === 'ArrowUp') {
-          e.preventDefault(); const prev = (activeIndex - 1 + items.length) % items.length; setActive(prev);
-        } else if (e.key === 'Enter') {
-          if (activeIndex >= 0 && items[activeIndex]) {
-            e.preventDefault(); window.location.href = items[activeIndex].dataset.href;
-          }
-        } else if (e.key === 'Escape') { hide(); }
-      });
+            input.addEventListener('keydown', (e) => {
+              const items = popup.querySelectorAll('.sug-item');
+              if (!items.length) return;
+              if (e.key === 'ArrowDown') {
+                e.preventDefault(); const next = (activeIndex + 1) % items.length; setActive(next);
+              } else if (e.key === 'ArrowUp') {
+                e.preventDefault(); const prev = (activeIndex - 1 + items.length) % items.length; setActive(prev);
+              } else if (e.key === 'Enter') {
+                if (activeIndex >= 0 && items[activeIndex]) {
+                  e.preventDefault(); window.location.href = items[activeIndex].dataset.href;
+                }
+              } else if (e.key === 'Escape') { hide(); }
+            });
 
-      form.addEventListener('submit', (e) => {
-        const q = input.value.trim();
-        if (!q) { e.preventDefault(); hide(); }
-      });
-    })();
+            form.addEventListener('submit', (e) => {
+              const q = input.value.trim();
+              if (!q) { e.preventDefault(); hide(); }
+            });
+          })();
 
-    // mở rộng/thu gọn search theo click kính lúp (giữ logic)
-    (() => {
-      const form = document.getElementById('headerSearchForm');
-      const input = document.getElementById('headerSearch');
-      const btn   = form?.querySelector('button[type="submit"]');
-      if (!form || !input || !btn) return;
+          // mở rộng/thu gọn search theo click kính lúp (giữ logic)
+          (() => {
+            const form = document.getElementById('headerSearchForm');
+            const input = document.getElementById('headerSearch');
+            const btn = form?.querySelector('button[type="submit"]');
+            if (!form || !input || !btn) return;
 
-      btn.addEventListener('click', (e) => {
-        if (!input.value.trim()) { e.preventDefault(); form.classList.add('open'); input.focus(); }
-      });
-      input.addEventListener('blur', () => {
-        if (!input.value.trim()) form.classList.remove('open');
-      });
-    })();
-  </script>
-  <!-- Navbar End -->
+            btn.addEventListener('click', (e) => {
+              if (!input.value.trim()) { e.preventDefault(); form.classList.add('open'); input.focus(); }
+            });
+            input.addEventListener('blur', () => {
+              if (!input.value.trim()) form.classList.remove('open');
+            });
+          })();
+        </script>
+        <!-- Navbar End -->
 
-  <div class='py-3'></div>
+        <div class='py-3'></div>
 
-  <!-- Cart Page Start -->
-  <div class="container py-5">
+        <!-- Cart Page Start -->
+        <div class="container py-5">
 
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb bg-white shadow-sm p-3 rounded">
-        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Chi Tiết Giỏ Hàng</li>
-      </ol>
-    </nav>
+          <!-- Breadcrumb -->
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-white shadow-sm p-3 rounded">
+              <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Chi Tiết Giỏ Hàng</li>
+            </ol>
+          </nav>
 
-    <% if (user && user.sumCart > 0) { %>
-      <!-- ============== GIỎ HÀNG CÓ SẢN PHẨM ============== -->
-      <div class="row g-4 mt-3">
-        <!-- Cart Items -->
-        <div class="col-lg-8">
-          <h5 class="fw-bold mb-4" style="color: #8BC34A;">
-            <i class="fa fa-shopping-cart me-2 text-primary"></i>Giỏ hàng của bạn
-          </h5>
-          <div class="card shadow-sm rounded-3 border-0">
-            <div class="card-body p-0">
-              <% var totalPrice = 0; %>
-              <% for (var i = 0; i < cartDetails.length; i++) { 
-                   var cartDetail = cartDetails[i];
-                   var priceAfterDiscount = cartDetail.product.discount > 0
+          <% if (user && user.sumCart> 0) { %>
+            <!-- ============== GIỎ HÀNG CÓ SẢN PHẨM ============== -->
+            <div class="row g-4 mt-3">
+              <!-- Cart Items -->
+              <div class="col-lg-8">
+                <h5 class="fw-bold mb-4" style="color: #8BC34A;">
+                  <i class="fa fa-shopping-cart me-2 text-primary"></i>Giỏ hàng của bạn
+                </h5>
+                <div class="card shadow-sm rounded-3 border-0">
+                  <div class="card-body p-0">
+                    <% var totalPrice=0; %>
+                      <% for (var i=0; i < cartDetails.length; i++) { var cartDetail=cartDetails[i]; var
+                        priceAfterDiscount=cartDetail.product.discount> 0
                         ? Math.round(cartDetail.product.price * (100 - cartDetail.product.discount) / 100)
                         : cartDetail.product.price;
-                   var itemTotal = priceAfterDiscount * cartDetail.quantity;
-                   totalPrice += itemTotal;
-                   var formattedPrice = new Intl.NumberFormat('vi-VN', {style:'currency', currency:'VND'}).format(priceAfterDiscount);
-                   var formattedItemTotal = new Intl.NumberFormat('vi-VN', {style:'currency', currency:'VND'}).format(itemTotal);
-                   var formattedOriginalPrice = new Intl.NumberFormat('vi-VN', {style:'currency', currency:'VND'}).format(cartDetail.product.price);
-              %>
-                <!-- Item Row -->
-                <div class="cart-item d-grid align-items-center py-3 px-3 border-bottom"
-                     style="grid-template-columns: 80px 1fr 150px 150px 40px; gap: 15px;">
-                  <!-- Ảnh -->
-                  <div>
-                    <img src="/images/product/<%= cartDetail.product.image %>" class="rounded shadow-sm"
-                         style="width:80px; height:80px; object-fit:cover;" alt="">
-                  </div>
+                        var itemTotal = priceAfterDiscount * cartDetail.quantity;
+                        totalPrice += itemTotal;
+                        var formattedPrice = new Intl.NumberFormat('vi-VN', {style:'currency',
+                        currency:'VND'}).format(priceAfterDiscount);
+                        var formattedItemTotal = new Intl.NumberFormat('vi-VN', {style:'currency',
+                        currency:'VND'}).format(itemTotal);
+                        var formattedOriginalPrice = new Intl.NumberFormat('vi-VN', {style:'currency',
+                        currency:'VND'}).format(cartDetail.product.price);
+                        %>
+                        <!-- Item Row -->
+                        <div class="cart-item d-grid align-items-center py-3 px-3 border-bottom"
+                          style="grid-template-columns: 80px 1fr 150px 150px 40px; gap: 15px;">
+                          <!-- Ảnh -->
+                          <div>
+                            <img src="/images/product/<%= cartDetail.product.image %>" class="rounded shadow-sm"
+                              style="width:80px; height:80px; object-fit:cover;" alt="">
+                          </div>
 
-                  <!-- Tên + Giá -->
-                  <div>
-                    <a href="/product/<%= cartDetail.product.id %>" class="fw-semibold text-dark text-decoration-none d-block">
-                      <%= cartDetail.product.name %>
-                    </a>
-                    <% if (cartDetail.product.discount > 0) { %>
-                      <p class="mb-1 text-decoration-line-through text-muted small"><%= formattedOriginalPrice %></p>
-                      <p class="fw-bold text-danger fs-5 mb-3"><%= formattedPrice %></p>
-                    <% } else { %>
-                      <p class="text-dark fs-5 fw-bold mb-3"><%= formattedPrice %></p>
-                    <% } %>
-                  </div>
+                          <!-- Tên + Giá -->
+                          <div>
+                            <a href="/product/<%= cartDetail.product.id %>"
+                              class="fw-semibold text-dark text-decoration-none d-block">
+                              <%= cartDetail.product.name %>
+                            </a>
+                            <% if (cartDetail.product.discount> 0) { %>
+                              <p class="mb-1 text-decoration-line-through text-muted small">
+                                <%= formattedOriginalPrice %>
+                              </p>
+                              <p class="fw-bold text-danger fs-5 mb-3">
+                                <%= formattedPrice %>
+                              </p>
+                              <% } else { %>
+                                <p class="text-dark fs-5 fw-bold mb-3">
+                                  <%= formattedPrice %>
+                                </p>
+                                <% } %>
+                          </div>
 
-                  <!-- Số lượng -->
-                  <div class="d-flex justify-content-center align-items-center">
-                    <button type="button" class="btn btn-outline-success btn-sm rounded-circle btn-minus" data-index="<%= i %>">
-                      <i class="fa fa-minus" style="color: #8BC34A;"></i>
-                    </button>
-                    <input type="text" class="form-control text-center border-0 fw-semibold cart-qty mx-1"
-                           style="width:50px;" value="<%= cartDetail.quantity %>"
-                           data-cart-detail-id="<%= cartDetail.id %>"
-                           data-cart-detail-price="<%= priceAfterDiscount %>"
-                           data-cart-detail-index="<%= i %>">
-                    <button type="button" class="btn btn-outline-success btn-sm rounded-circle btn-plus" data-index="<%= i %>">
-                      <i class="fa fa-plus" style="color: #8BC34A;"></i>
-                    </button>
-                  </div>
+                          <!-- Số lượng -->
+                          <div class="d-flex justify-content-center align-items-center">
+                            <button type="button" class="btn btn-outline-success btn-sm rounded-circle btn-minus"
+                              data-index="<%= i %>">
+                              <i class="fa fa-minus" style="color: #8BC34A;"></i>
+                            </button>
+                            <input type="text" class="form-control text-center border-0 fw-semibold cart-qty mx-1"
+                              style="width:50px;" value="<%= cartDetail.quantity %>"
+                              data-cart-detail-id="<%= cartDetail.id %>"
+                              data-cart-detail-price="<%= priceAfterDiscount %>" data-cart-detail-index="<%= i %>">
+                            <button type="button" class="btn btn-outline-success btn-sm rounded-circle btn-plus"
+                              data-index="<%= i %>">
+                              <i class="fa fa-plus" style="color: #8BC34A;"></i>
+                            </button>
+                          </div>
 
-                  <!-- Thành tiền -->
-                  <div class="text-danger fw-bold text-end cart-item-total" data-cart-detail-id="<%= cartDetail.id %>">
-                    <p class="fw-bold text-danger fs-5 mb-3"><%= formattedItemTotal %></p>
-                  </div>
+                          <!-- Thành tiền -->
+                          <div class="text-danger fw-bold text-end cart-item-total"
+                            data-cart-detail-id="<%= cartDetail.id %>">
+                            <p class="fw-bold text-danger fs-5 mb-3">
+                              <%= formattedItemTotal %>
+                            </p>
+                          </div>
 
-                  <!-- Xóa -->
-                  <form action="/delete-product-in-cart/<%= cartDetail.id %>" method="post">
-                    <button class="btn-delete" type="submit"><i class="fa fa-trash text-danger"></i></button>
-                  </form>
+                          <!-- Xóa -->
+                          <form action="/delete-product-in-cart/<%= cartDetail.id %>" method="post">
+                            <button class="btn-delete" type="submit"><i class="fa fa-trash text-danger"></i></button>
+                          </form>
+                        </div>
+                        <% } %>
+                  </div>
                 </div>
+              </div>
+
+              <!-- Checkout Summary -->
+              <div class="col-lg-4">
+                <div class="card shadow-sm rounded-3 border-0 sticky-top" style="top: 20px; z-index: 10;">
+                  <div class="card-body">
+                    <h4 class="mb-4 fw-semibold"><i class="fa fa-box-open me-2" style="color: #8BC34A;"></i>Thông tin
+                      đơn
+                      hàng</h4>
+
+                    <% var formattedTotalPrice=new Intl.NumberFormat('vi-VN', {style:'currency',
+                      currency:'VND'}).format(totalPrice); %>
+
+                      <div class="d-flex justify-content-between mb-2">
+                        <span>Tạm tính</span>
+                        <span id="cart-subtotal" class="fw-bold text-primary" data-cart-total-price="<%= totalPrice %>">
+                          <%= formattedTotalPrice %>
+                        </span>
+                      </div>
+
+                      <div class="d-flex justify-content-between mb-2">
+                        <span>Phí vận chuyển</span>
+                        <span class="fw-bold">0 đ</span>
+                      </div>
+
+                      <hr>
+
+                      <div class="d-flex justify-content-between mb-3">
+                        <span class="fw-semibold fs-5">Tổng cộng</span>
+                        <span id="cart-total" class="fw-bold text-danger fs-5"
+                          data-cart-total-price="<%= totalPrice %>">
+                          <%= formattedTotalPrice %>
+                        </span>
+                      </div>
+
+                      <form action="/handle-cart-to-checkout" method="post" id="checkout-form">
+                        <input type="hidden" name="cartId" value="<%= cartId %>">
+                        <input type="hidden" name="mode" value="cart"><!-- đảm bảo server hiểu là checkout giỏ -->
+
+                        <% for (var i=0; i < cartDetails.length; i++) { var cd=cartDetails[i]; %>
+                          <!-- GIỮ NGUYÊN: dạng lồng nhau -->
+                          <input type="hidden" name="cartDetails[<%= i %>][id]" value="<%= cd.id %>">
+                          <input type="hidden" name="cartDetails[<%= i %>][quantity]" value="<%= cd.quantity %>">
+
+                          <!-- BỔ SUNG: dạng mảng phẳng, parse được cả khi extended:false -->
+                          <input type="hidden" name="cartDetailIds[]" value="<%= cd.id %>">
+                          <input type="hidden" name="cartDetailQtys[]" id="qty_flat_<%= i %>"
+                            value="<%= cd.quantity %>">
+                          <% } %>
+
+                            <button type="submit"
+                              class="btn btn-primary w-100 rounded-pill py-3 fw-bold text-uppercase">
+                              Xác nhận đặt hàng
+                            </button>
+                      </form>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- ============ /END: GIỎ HÀNG CÓ SẢN PHẨM ============ -->
+
+            <% } else { %>
+              <!-- ============== GIỎ HÀNG TRỐNG ============== -->
+              <div class="container py-5">
+                <div class="empty-cart-card card border-0 shadow-sm mx-auto">
+                  <div class="card-body text-center p-5">
+                    <div class="empty-icon mx-auto mb-3">
+                      <i class="fa fa-shopping-bag"></i>
+                    </div>
+                    <h4 class="fw-bold mb-2">Giỏ hàng của bạn đang trống</h4>
+                    <p class="text-muted mb-4">Hãy khám phá các sản phẩm laptop chất lượng tại LaptopShop.</p>
+                    <div class="d-flex justify-content-center gap-2">
+                      <a href="/products" class="btn btn-primary px-4">
+                        <i class="fa fa-laptop me-2"></i>Mua sắm ngay
+                      </a>
+                      <a href="/" class="btn btn-outline-secondary px-4">
+                        <i class="fa fa-home me-2"></i>Về trang chủ
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- ============ /END: GIỎ HÀNG TRỐNG ============ -->
               <% } %>
-            </div>
-          </div>
+
         </div>
+        <!-- Cart Page End -->
 
-        <!-- Checkout Summary -->
-        <div class="col-lg-4">
-          <div class="card shadow-sm rounded-3 border-0 sticky-top" style="top: 20px; z-index: 10;">
-            <div class="card-body">
-              <h4 class="mb-4 fw-semibold"><i class="fa fa-box-open me-2" style="color: #8BC34A;"></i>Thông tin đơn hàng</h4>
-
-              <% var formattedTotalPrice = new Intl.NumberFormat('vi-VN', {style:'currency', currency:'VND'}).format(totalPrice); %>
-
-              <div class="d-flex justify-content-between mb-2">
-                <span>Tạm tính</span>
-                <span id="cart-subtotal" class="fw-bold text-primary" data-cart-total-price="<%= totalPrice %>">
-                  <%= formattedTotalPrice %>
-                </span>
+        <!-- Footer Start -->
+        <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+          <div class="container py-5">
+            <div class="row g-5">
+              <div class="col-lg-3 col-md-6">
+                <a href="/" class="d-inline-block mb-3">
+                  <h2 class="text-primary fw-bold">LaptopShop</h2>
+                </a>
+                <p class="small">Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>, dịch vụ
+                  tận tâm và giá cả cạnh tranh nhất.</p>
+                <div class="d-flex pt-2">
+                  <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                      class="fab fa-facebook-f"></i></a>
+                  <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                      class="fab fa-instagram"></i></a>
+                  <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                      class="fab fa-youtube"></i></a>
+                  <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i class="fab fa-tiktok"></i></a>
+                </div>
               </div>
-
-              <div class="d-flex justify-content-between mb-2">
-                <span>Phí vận chuyển</span>
-                <span class="fw-bold">0 đ</span>
+              <div class="col-lg-3 col-md-6">
+                <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
+                <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
+                <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
+                <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
+                <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
               </div>
-
-              <hr>
-
-              <div class="d-flex justify-content-between mb-3">
-                <span class="fw-semibold fs-5">Tổng cộng</span>
-                <span id="cart-total" class="fw-bold text-danger fs-5" data-cart-total-price="<%= totalPrice %>">
-                  <%= formattedTotalPrice %>
-                </span>
+              <div class="col-lg-3 col-md-6">
+                <h4 class="text-light mb-3">Tài khoản</h4>
+                <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
+                <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
+                <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
+                <a class="btn-link d-block" href="/blogs">Blogs</a>
               </div>
-
-              <form action="/handle-cart-to-checkout" method="post" id="checkout-form">
-                <input type="hidden" name="cartId" value="<%= cartId %>">
-                <% for (var i = 0; i < cartDetails.length; i++) { var cd = cartDetails[i]; %>
-                  <input type="hidden" name="cartDetails[<%= i %>][id]" value="<%= cd.id %>">
-                  <input type="hidden" name="cartDetails[<%= i %>][quantity]" value="<%= cd.quantity %>">
-                <% } %>
-                <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold text-uppercase">Xác nhận đặt hàng</button>
-              </form>
+              <div class="col-lg-3 col-md-6">
+                <h4 class="text-light mb-3">Liên hệ</h4>
+                <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
+                <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
+                <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
+                <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
+                <form class="mt-3">
+                  <div class="input-group">
+                    <input type="email" class="form-control border-0" placeholder="Nhập email của bạn">
+                    <button class="btn btn-primary">Đăng ký</button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- ============ /END: GIỎ HÀNG CÓ SẢN PHẨM ============ -->
 
-    <% } else { %>
-      <!-- ============== GIỎ HÀNG TRỐNG ============== -->
-      <div class="container py-5">
-        <div class="empty-cart-card card border-0 shadow-sm mx-auto">
-          <div class="card-body text-center p-5">
-            <div class="empty-icon mx-auto mb-3">
-              <i class="fa fa-shopping-bag"></i>
-            </div>
-            <h4 class="fw-bold mb-2">Giỏ hàng của bạn đang trống</h4>
-            <p class="text-muted mb-4">Hãy khám phá các sản phẩm laptop chất lượng tại LaptopShop.</p>
-            <div class="d-flex justify-content-center gap-2">
-              <a href="/products" class="btn btn-primary px-4">
-                <i class="fa fa-laptop me-2"></i>Mua sắm ngay
-              </a>
-              <a href="/" class="btn btn-outline-secondary px-4">
-                <i class="fa fa-home me-2"></i>Về trang chủ
-              </a>
-            </div>
+        <!-- Copyright -->
+        <div class="container-fluid bg-dark copyright bg-black py-3">
+          <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
+            <span class="text-light mb-2 mb-md-0">
+              <i class="fas fa-copyright me-2"></i>2025
+              <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
+            </span>
+            <span class="text-white">
+              Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML Codex</a> |
+              Distributed by <a class="text-primary border-bottom" href="https://themewagon.com">ThemeWagon</a>
+            </span>
           </div>
         </div>
-      </div>
-      <!-- ============ /END: GIỎ HÀNG TRỐNG ============ -->
-    <% } %>
+        <!-- Footer End -->
 
-  </div>
-  <!-- Cart Page End -->
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+            class="fa fa-arrow-up"></i></a>
 
-  <!-- Footer Start -->
-  <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-    <div class="container py-5">
-      <div class="row g-5">
-        <div class="col-lg-3 col-md-6">
-          <a href="/" class="d-inline-block mb-3"><h2 class="text-primary fw-bold">LaptopShop</h2></a>
-          <p class="small">Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>, dịch vụ tận tâm và giá cả cạnh tranh nhất.</p>
-          <div class="d-flex pt-2">
-            <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i class="fab fa-facebook-f"></i></a>
-            <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i class="fab fa-instagram"></i></a>
-            <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i class="fab fa-youtube"></i></a>
-            <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i class="fab fa-tiktok"></i></a>
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-          <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
-          <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
-          <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
-          <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
-          <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
-        </div>
-        <div class="col-lg-3 col-md-6">
-          <h4 class="text-light mb-3">Tài khoản</h4>
-          <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
-          <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
-          <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
-          <a class="btn-link d-block" href="/blogs">Blogs</a>
-        </div>
-        <div class="col-lg-3 col-md-6">
-          <h4 class="text-light mb-3">Liên hệ</h4>
-          <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
-          <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
-          <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
-          <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
-          <form class="mt-3">
-            <div class="input-group">
-              <input type="email" class="form-control border-0" placeholder="Nhập email của bạn">
-              <button class="btn btn-primary">Đăng ký</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+        <!-- JavaScript Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/client/lib/easing/easing.min.js"></script>
+        <script src="/client/lib/waypoints/waypoints.min.js"></script>
+        <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+        <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
-  <!-- Copyright -->
-  <div class="container-fluid bg-dark copyright bg-black py-3">
-    <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
-      <span class="text-light mb-2 mb-md-0">
-        <i class="fas fa-copyright me-2"></i>2025
-        <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
-      </span>
-      <span class="text-white">
-        Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML Codex</a> |
-        Distributed by <a class="text-primary border-bottom" href="https://themewagon.com">ThemeWagon</a>
-      </span>
-    </div>
-  </div>
-  <!-- Footer End -->
+        <!-- Template Javascript -->
+        <script src="/client/js/main.js"></script>
 
-  <!-- Back to Top -->
-  <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>
+        <!-- Cập nhật số lượng & tổng tiền (giữ logic, chỉ sync hidden field) -->
+        <script>
+          document.addEventListener("DOMContentLoaded", () => {
+            const formatVND = (n) => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n);
 
-  <!-- JavaScript Libraries -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/client/lib/easing/easing.min.js"></script>
-  <script src="/client/lib/waypoints/waypoints.min.js"></script>
-  <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-  <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+            const updateTotals = () => {
+              let subtotal = 0;
 
-  <!-- Template Javascript -->
-  <script src="/client/js/main.js"></script>
+              document.querySelectorAll(".cart-item").forEach((item) => {
+                const qtyInput = item.querySelector(".cart-qty");
+                const price = parseInt(qtyInput.dataset.cartDetailPrice) || 0;
+                const index = qtyInput.dataset.cartDetailIndex;
+                const quantity = Math.max(1, parseInt(qtyInput.value) || 1);
 
-  <!-- Cập nhật số lượng & tổng tiền (giữ logic, chỉ sync hidden field) -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const formatVND = (n) => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n);
+                // Cập nhật hidden input TRONG #checkout-form theo index
+                const hiddenInForm = document.querySelector(
+                  `#checkout-form input[name="cartDetails[${index}][quantity]"]`
+                );
+                if (hiddenInForm) hiddenInForm.value = quantity;
 
-      const updateTotals = () => {
-        let subtotal = 0;
+                // BỔ SUNG: đồng bộ field phẳng (parse chắc chắn trên server)
+                const flatQty = document.getElementById(`qty_flat_${index}`);
+                if (flatQty) flatQty.value = quantity;
 
-        document.querySelectorAll(".cart-item").forEach((item) => {
-          const qtyInput = item.querySelector(".cart-qty");
-          const price = parseInt(qtyInput.dataset.cartDetailPrice) || 0;
-          const index = qtyInput.dataset.cartDetailIndex;
-          const quantity = Math.max(1, parseInt(qtyInput.value) || 1);
+                // Tính & hiển thị thành tiền từng sản phẩm
+                const itemTotal = price * quantity;
+                subtotal += itemTotal;
+                const itemTotalEl = item.querySelector(".cart-item-total p");
+                if (itemTotalEl) itemTotalEl.textContent = formatVND(itemTotal);
+              });
 
-          // Cập nhật hidden input TRONG #checkout-form theo index
-          const hiddenInForm = document.querySelector(
-            `#checkout-form input[name="cartDetails[${index}][quantity]"]`
-          );
-          if (hiddenInForm) hiddenInForm.value = quantity;
+              // Tổng cộng
+              const subEl = document.getElementById("cart-subtotal");
+              const totEl = document.getElementById("cart-total");
+              if (subEl) subEl.textContent = formatVND(subtotal);
+              if (totEl) totEl.textContent = formatVND(subtotal);
+            };
 
-          // Tính & hiển thị thành tiền từng sản phẩm
-          const itemTotal = price * quantity;
-          subtotal += itemTotal;
-          const itemTotalEl = item.querySelector(".cart-item-total p");
-          if (itemTotalEl) itemTotalEl.textContent = formatVND(itemTotal);
-        });
+            document.querySelectorAll(".btn-plus, .btn-minus").forEach((btn) => {
+              btn.addEventListener("click", () => {
+                const index = btn.dataset.index;
+                const qtyInput = document.querySelector(`.cart-qty[data-cart-detail-index="${index}"]`);
+                let value = Math.max(1, parseInt(qtyInput.value) || 1);
+                value += btn.classList.contains("btn-plus") ? 1 : value > 1 ? -1 : 0;
+                qtyInput.value = value;
+                updateTotals();
+              });
+            });
 
-        // Tổng cộng
-        const subEl = document.getElementById("cart-subtotal");
-        const totEl = document.getElementById("cart-total");
-        if (subEl) subEl.textContent = formatVND(subtotal);
-        if (totEl) totEl.textContent = formatVND(subtotal);
-      };
+            document.querySelectorAll(".cart-qty").forEach((input) => {
+              input.addEventListener("input", () => {
+                input.value = Math.max(1, parseInt(input.value) || 1);
+                updateTotals();
+              });
+            });
 
-      document.querySelectorAll(".btn-plus, .btn-minus").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const index = btn.dataset.index;
-          const qtyInput = document.querySelector(`.cart-qty[data-cart-detail-index="${index}"]`);
-          let value = Math.max(1, parseInt(qtyInput.value) || 1);
-          value += btn.classList.contains("btn-plus") ? 1 : value > 1 ? -1 : 0;
-          qtyInput.value = value;
-          updateTotals();
-        });
-      });
-
-      document.querySelectorAll(".cart-qty").forEach((input) => {
-        input.addEventListener("input", () => {
-          input.value = Math.max(1, parseInt(input.value) || 1);
-          updateTotals();
-        });
-      });
-
-      updateTotals();
-    });
-  </script>
+            updateTotals();
+          });
+        </script>
 </body>
+
 </html>

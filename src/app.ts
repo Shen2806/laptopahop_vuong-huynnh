@@ -19,6 +19,7 @@ import path from "path";
 import paymentRoutes from './routes/payment';
 import aiRoutes from "./routes/ai";
 import locationRoutes from './routes/location.routes';
+import { headerCartCount } from './middleware/headerCartCount';
 const app = express();
 app.use(cookieParser());
 
@@ -63,7 +64,7 @@ app.use((req, res, next) => {
     res.locals.user = req.user || null; // Pass user object to all views
     next();
 });
-
+app.use(headerCartCount); // phải đặt sau khi req.user đã có
 const PORT = process.env.PORT || 8080;
 //configure web routes
 webRoutes(app);

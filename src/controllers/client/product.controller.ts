@@ -173,172 +173,214 @@ const postDeleteProductInCart = async (req: Request, res: Response) => {
 
 // GET /checkout
 const getCheckOutPage = async (req: Request, res: Response) => {
-    const user = (req as any).user;
+    const user: any = (req as any).user;
     if (!user) return res.redirect("/login");
 
+    const qMode = String(asStr((req.query as any).mode)).toLowerCase();
+    let mode: "cart" | "buy";
+
+    if (qMode === "cart") {
+        mode = "cart";
+        if ((req as any).session) (req as any).session.buyNow = undefined; // clear vé buy
+    } else if (qMode === "buy") {
+        mode = "buy";
+    } else {
+        mode = (req as any).session?.buyNow ? "buy" : "cart";
+    }
+
+    const unitAfterDiscount = (price: number, discount: number) =>
+        discount > 0 ? Math.round(price * (100 - discount) / 100) : price;
+
     try {
-        // Ưu tiên "Mua ngay" khi có session buyNow hoặc query ?mode=buy
-        const wantBuyMode = req.query.mode === "buy" || Boolean(req.session?.buyNow);
+        if (mode === "buy") {
+            const ticket = (req as any).session?.buyNow;
+            if (!ticket) return res.redirect("/checkout?mode=cart");
 
-        if (wantBuyMode && req.session?.buyNow) {
-            const { productId, quantity } = req.session.buyNow;
-            const pid = Number(productId);
-            const qtyReq = Math.max(1, Number(quantity) || 1);
+            const pid = asInt(ticket.productId);
+            const qty = Math.max(1, asInt(ticket.quantity));
+            const product = await prisma.product.findUnique({ where: { id: pid } });
+            if (!product) {
+                (req as any).session.buyNow = undefined;
+                return res.redirect("/checkout?mode=cart");
+            }
 
-            // Lấy sản phẩm
-            const p = await prisma.product.findUnique({
-                where: { id: pid },
-                select: {
-                    id: true,
-                    name: true,
-                    price: true,
-                    discount: true,
-                    quantity: true,
-                    image: true,
-                },
+            const unit = unitAfterDiscount(product.price, product.discount || 0);
+            const totalPrice = unit * qty;
+
+            const cartDetails = [{ product, quantity: qty }];
+            const coupons = await prisma.coupon.findMany({
+                where: { isActive: true, expiryDate: { gte: new Date() } },
+                orderBy: { expiryDate: "asc" },
             });
 
-            if (!p) {
-                // Không còn sản phẩm -> bỏ buyNow & fallback về giỏ
-                req.session.buyNow = undefined;
-                return res.redirect("/cart");
-            }
-
-            const stock = Number(p.quantity) || 0;
-            const qty = Math.min(qtyReq, stock);
-            if (qty <= 0) {
-                // Hết hàng -> bỏ buyNow và quay lại trang sản phẩm
-                req.session.buyNow = undefined;
-                return res.redirect(`/product/${pid}`);
-            }
-
-            // Tính tiền: trước/sau KM
-            const price = Number(p.price) || 0;
-            const discount = Number(p.discount || 0); // %
-            const unitAfter = discount > 0 ? Math.round(price * (100 - discount) / 100) : price;
-
-            const subtotalBefore = price * qty;
-            const subtotalAfter = unitAfter * qty;
-
-            // Ngưỡng coupon giữ nguyên logic của bạn
-            const coupons =
-                subtotalAfter >= 25_000_000
-                    ? await prisma.coupon.findMany({
-                        where: { expiryDate: { gte: new Date() } },
-                        orderBy: { updatedAt: "desc" },
-                    })
-                    : [];
-
-            // Giả lập cấu trúc cartDetails đúng view (product + quantity)
-            const cartDetails = [
-                {
-                    id: 0,            // dummy
-                    cartId: 0,        // dummy
-                    productId: p.id,
-                    quantity: qty,
-                    product: p,       // view dùng cd.product.*
-                },
-            ];
-
-            return res.render("product/checkout", {
+            // CHỈ SỬA Ở ĐÂY:
+            return res.render("product/checkout.ejs", {
+                mode: "buy",
                 cartDetails,
-                subtotalBefore,
-                totalPrice: subtotalAfter, // base sau KM SP
+                totalPrice,
                 coupons,
-                mode: "buy",               // để view biết đang ở buy-mode (nếu bạn muốn hiển thị khác)
+                user,
             });
         }
 
-        // ==== Mặc định: Checkout theo GIỎ HÀNG (logic gốc của bạn) ====
-        // 1) Tìm cart theo userId
-        const cart = await prisma.cart.findFirst({
-            where: { userId: Number(user.id) },
-            select: { id: true },
+        // CART MODE
+        const cartId = await getActiveCartId(Number(user.id));
+        let cartDetails: any[] = [];
+        let totalPrice = 0;
+
+        if (cartId) {
+            const details = await prisma.cartDetail.findMany({
+                where: { cartId, quantity: { gt: 0 } },
+                include: { product: true },
+            });
+            cartDetails = details;
+            totalPrice = details.reduce(
+                (s, d) => s + unitAfterDiscount(d.product.price, d.product.discount || 0) * d.quantity,
+                0
+            );
+        }
+
+        const coupons = await prisma.coupon.findMany({
+            where: { isActive: true, expiryDate: { gte: new Date() } },
+            orderBy: { expiryDate: "asc" },
         });
 
-        if (!cart) {
-            return res.render("product/checkout", {
-                cartDetails: [],
-                subtotalBefore: 0,
-                totalPrice: 0,
-                coupons: [],
-                mode: "cart",
-            });
-        }
-
-        const cartId = cart.id;
-
-        // 2) Lấy chi tiết giỏ + product
-        const cartDetails = await prisma.cartDetail.findMany({
-            where: { cartId },
-            include: { product: true },
-        });
-
-        // 3) Tổng trước KM
-        const subtotalBefore = cartDetails.reduce((sum, cd) => {
-            return sum + Number(cd.product.price) * Number(cd.quantity);
-        }, 0);
-
-        // 4) Tổng sau KM từng SP
-        const subtotalAfter = cartDetails.reduce((sum, cd) => {
-            const price = Number(cd.product.price);
-            const discount = Number(cd.product.discount || 0);
-            const unit = discount > 0 ? Math.round(price * (100 - discount) / 100) : price;
-            return sum + unit * Number(cd.quantity);
-        }, 0);
-
-        // 5) Coupon nếu đạt ngưỡng
-        let coupons: any[] = [];
-        if (subtotalAfter >= 25_000_000) {
-            coupons = await prisma.coupon.findMany({
-                where: { expiryDate: { gte: new Date() } },
-                orderBy: { updatedAt: "desc" },
-            });
-        }
-
-        // 6) Render
-        return res.render("product/checkout", {
-            cartDetails,
-            subtotalBefore,
-            totalPrice: subtotalAfter,
-            coupons,
+        // VÀ SỬA Ở ĐÂY NỮA:
+        return res.render("product/checkout.ejs", {
             mode: "cart",
+            cartDetails,
+            totalPrice,
+            coupons,
+            user,
         });
     } catch (e) {
-        console.error("getCheckOutPage error:", e);
+        console.error("getCheckout error:", e);
         return res.redirect("/cart");
     }
 };
 
 
+
+
+const asStr = (v: any) =>
+    v == null ? "" : (Array.isArray(v) ? String(v[v.length - 1] ?? "") : String(v));
+const asInt = (v: any) => {
+    const n = Number(Array.isArray(v) ? v[0] : v);
+    return Number.isFinite(n) ? n : 0;
+};
+
+async function getActiveCartId(userId: number) {
+    const c = await prisma.cart.findFirst({
+        where: { userId, cartDetails: { some: {} } },
+        orderBy: { id: "desc" },
+        select: { id: true },
+    });
+    return c?.id ?? null;
+}
+
 const postHandleCartToCheckOut = async (req: Request, res: Response) => {
-    const user = (req as any).user;
+    const user: any = (req as any).user;
     if (!user) return res.redirect("/login");
 
     try {
-        const cartId = Number(req.body.cartId);
-        if (!Number.isFinite(cartId)) return res.redirect("/cart");
+        const cartIdFromBody = asInt(req.body.cartId);
 
-        // cartDetails có thể là mảng hoặc object dạng { "0": {id, quantity}, ... }
-        const raw = req.body?.cartDetails ?? [];
-        const items: Array<{ id: any; quantity: any }> = Array.isArray(raw) ? raw : Object.values(raw);
+        // Thu thập (id, qty) từ dạng mảng phẳng nếu có
+        const idsFlat = (req.body["cartDetailIds[]"] ?? req.body.cartDetailIds) ?? [];
+        const qtysFlat = (req.body["cartDetailQtys[]"] ?? req.body.cartDetailQtys) ?? [];
 
-        await updateCartDetailBeforeCheckOut(items, cartId);
+        const pairs: Array<{ id: number; qty: number }> = [];
 
-        return res.redirect("/checkout");
-    } catch (err) {
-        console.error("postHandleCartToCheckOut error:", err);
+        if (idsFlat.length || qtysFlat.length) {
+            const idsArr = Array.isArray(idsFlat) ? idsFlat : [idsFlat];
+            const qtyArr = Array.isArray(qtysFlat) ? qtysFlat : [qtysFlat];
+            const len = Math.min(idsArr.length, qtyArr.length);
+            for (let i = 0; i < len; i++) {
+                const id = asInt(idsArr[i]);
+                const qty = Math.max(1, asInt(qtyArr[i]));
+                if (id) pairs.push({ id, qty });
+            }
+        } else {
+            // Thu thập từ dạng lồng nhau cartDetails[i][id], cartDetails[i][quantity]
+            const nested: Record<string, { id?: any; quantity?: any }> = {};
+            for (const key of Object.keys(req.body)) {
+                const m = key.match(/^cartDetails\[(\d+)\]\[(id|quantity)\]$/);
+                if (!m) continue;
+                const idx = m[1]; const field = m[2] as "id" | "quantity";
+                nested[idx] ??= {};
+                (nested[idx] as any)[field] = (req.body as any)[key];
+            }
+            for (const idx of Object.keys(nested)) {
+                const id = asInt(nested[idx].id);
+                const qty = Math.max(1, asInt(nested[idx].quantity));
+                if (id) pairs.push({ id, qty });
+            }
+        }
+
+        // Helper function to calculate price after discount
+        const unitAfterDiscount = (price: number, discount: number) => {
+            return discount > 0 ? Math.round(price * (100 - discount) / 100) : price;
+        };
+
+        await prisma.$transaction(async (tx) => {
+            const activeCartId = cartIdFromBody || (await getActiveCartId(Number(user.id)));
+            if (!activeCartId) return;
+
+            // Giới hạn update vào cart của user
+            const valid = await tx.cartDetail.findMany({
+                where: { cartId: activeCartId },
+                select: { id: true },
+            });
+            const validSet = new Set(valid.map(v => v.id));
+
+            for (const { id, qty } of pairs) {
+                if (!validSet.has(id)) continue;
+                await tx.cartDetail.update({ where: { id }, data: { quantity: qty } });
+            }
+
+            // (tuỳ bạn dùng) cập nhật lại sum
+            const details = await tx.cartDetail.findMany({
+                where: { cartId: activeCartId },
+                include: { product: { select: { price: true, discount: true } } },
+            });
+            const sum = details.reduce((s, d) =>
+                s + unitAfterDiscount(d.product.price, d.product.discount || 0) * d.quantity, 0);
+            await tx.cart.update({ where: { id: activeCartId }, data: { sum } });
+        });
+
+        // QUAN TRỌNG: sang flow giỏ → xoá vé Mua ngay còn tồn trong session
+        if ((req as any).session) (req as any).session.buyNow = undefined;
+
+        // Ép mode=cart để GET /checkout tôn trọng
+        return res.redirect("/checkout?mode=cart");
+    } catch (e) {
+        console.error("handleCartToCheckout error:", e);
         return res.redirect("/cart");
     }
 };
+
 const toInt = (v: any) => {
     const n = Number(v);
     return Number.isFinite(n) ? Math.floor(n) : 0;
 };
+
 const postPlaceOrder = async (req: Request, res: Response) => {
     const user: any = (req as any).user;
     if (!user) return res.redirect("/login");
 
+    // === Helpers ép kiểu an toàn (string/array/undefined -> string, number) ===
+    const asStr = (v: any): string =>
+        v == null ? "" : (Array.isArray(v) ? String(v[0] ?? "") : String(v));
+
+    const asUpper = (v: any): string => asStr(v).toUpperCase();
+
+    const asIntOrNull = (v: any): number | null => {
+        const raw = Array.isArray(v) ? v[0] : v;
+        const n = Number(raw);
+        return Number.isFinite(n) && n > 0 ? n : null;
+    };
+
+    // Lấy body (giữ nguyên destructure để không đổi tên biến ở dưới)
     const {
         receiverName,
         receiverAddress, // vẫn nhận từ form cũ để backward-compat
@@ -349,9 +391,10 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         paymentMethod: pmRaw,     // 'ONLINE' | 'COD'
     } = req.body;
 
-    const coupon = (couponCode || "").trim() || null;
-    const mode: "buy" | "cart" = modeRaw === "buy" ? "buy" : "cart";
-    const paymentMethod = String(pmRaw || "").toUpperCase();
+    // ==== CHỈNH Ở ĐÂY: chuẩn hoá input ====
+    const coupon = (asStr(couponCode).trim() || null);                    // <== hết lỗi .trim()
+    const mode: "buy" | "cart" = asStr(modeRaw).toLowerCase() === "buy" ? "buy" : "cart";
+    const paymentMethod = asUpper(pmRaw) === "ONLINE" ? "ONLINE" : "COD";
 
     const pushMsg = (type: "danger" | "warning" | "success", text: string) => {
         const sess: any = (req as any).session || ((req as any).session = {});
@@ -369,6 +412,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         "127.0.0.1";
 
     // ===== Helpers địa chỉ (Cách A) =====
+    // (giữ lại nếu bạn còn dùng nơi khác; không bắt buộc dùng dưới)
     const toCode = (v: any) => {
         const n = Number(v);
         return Number.isFinite(n) && n > 0 ? n : null;
@@ -380,11 +424,11 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         provName?: string | null
     ) => [street, wardName, distName, provName].filter(Boolean).join(", ");
 
-    // Lấy code & street từ body (đến từ 4 input mới trong checkout)
-    const provinceCode = toCode(req.body.receiverProvinceCode);
-    const districtCode = toCode(req.body.receiverDistrictCode);
-    const wardCode = toCode(req.body.receiverWardCode);
-    const receiverStreet = (req.body.receiverStreet || "").trim();
+    // Lấy code & street từ body (đã chuẩn hoá chống array)
+    const provinceCode = asIntOrNull(req.body.receiverProvinceCode);
+    const districtCode = asIntOrNull(req.body.receiverDistrictCode);
+    const wardCode = asIntOrNull(req.body.receiverWardCode);
+    const receiverStreet = asStr(req.body.receiverStreet).trim();
 
     // Tra tên qua Prisma (chỉ tra khi có mã)
     let provinceName: string | null = null;
@@ -403,8 +447,8 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         console.warn("Lookup province/district/ward failed:", e);
     }
 
-    // Ưu tiên chuỗi receiverAddress (nếu form cũ vẫn gửi), nếu không thì ghép từ 4 phần
-    const receiverAddressRaw = (receiverAddress || "").trim();
+    // Ưu tiên chuỗi từ form cũ nếu có; không thì ghép từ 4 phần mới
+    const receiverAddressRaw = asStr(receiverAddress).trim();
     const finalReceiverAddress =
         receiverAddressRaw || composeAddress(receiverStreet, wardName, districtName, provinceName);
 
@@ -419,7 +463,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
                 return res.redirect("/checkout?mode=buy");
             }
 
-            const pid = toInt(ticket.productId); // toInt của bạn đã dùng sẵn ở file này
+            const pid = toInt(ticket.productId); // helper cũ của bạn
             const qty = Math.max(1, toInt(ticket.quantity));
             if (!pid || !qty) {
                 pushMsg("warning", "Dữ liệu 'Mua ngay' không hợp lệ. Vui lòng thao tác lại.");
@@ -429,12 +473,19 @@ const postPlaceOrder = async (req: Request, res: Response) => {
             const result = await handlePlaceOrder({
                 userId: Number(user.id),
                 receiverName,
-                receiverAddress: finalReceiverAddress, // dùng địa chỉ đã chuẩn hoá
+                receiverAddress: finalReceiverAddress,
                 receiverPhone,
                 receiverNote,
                 couponCode: coupon,
                 mode: "buy",
                 items: [{ productId: pid, quantity: qty }],
+
+                // bổ sung để tính ship (không đổi logic tính)
+                paymentMethod: paymentMethod === "ONLINE" ? "ONLINE" : "COD",
+                receiverProvinceCode: provinceCode,
+                receiverDistrictCode: districtCode,
+                receiverWardCode: wardCode,
+                receiverStreet: receiverStreet || null,
             });
 
             if (!result?.success) {
@@ -442,7 +493,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
                 return res.redirect("/checkout?mode=buy");
             }
 
-            // Ghi thêm các trường địa chỉ mới vào Order (không thay đổi handlePlaceOrder)
+            // Vẫn update các field địa chỉ mới (backward-safe)
             try {
                 await prisma.order.update({
                     where: { id: result.orderId! },
@@ -458,7 +509,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
                 console.warn("Update order address (buy) failed:", err);
             }
 
-            // Clear vé buyNow để tránh reuse
+            // Clear vé buyNow
             (req as any).session.buyNow = undefined;
 
             // Emit cho admin
@@ -476,7 +527,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
                 console.error("emit new-order error:", e);
             }
 
-            // Nếu người dùng chọn ONLINE → redirect VNPAY
+            // ONLINE → redirect VNPAY
             if (paymentMethod === "ONLINE") {
                 try {
                     const gw = paymentGateway();
@@ -508,11 +559,18 @@ const postPlaceOrder = async (req: Request, res: Response) => {
         const result = await handlePlaceOrder({
             userId: Number(user.id),
             receiverName,
-            receiverAddress: finalReceiverAddress, // dùng địa chỉ đã chuẩn hoá
+            receiverAddress: finalReceiverAddress,
             receiverPhone,
             receiverNote,
             couponCode: coupon,
             mode: "cart",
+
+            // bổ sung để tính ship (không đổi logic tính)
+            paymentMethod: paymentMethod === "ONLINE" ? "ONLINE" : "COD",
+            receiverProvinceCode: provinceCode,
+            receiverDistrictCode: districtCode,
+            receiverWardCode: wardCode,
+            receiverStreet: receiverStreet || null,
         });
 
         if (!result?.success) {
@@ -520,7 +578,7 @@ const postPlaceOrder = async (req: Request, res: Response) => {
             return res.redirect("/checkout");
         }
 
-        // Ghi thêm các trường địa chỉ mới vào Order
+        // Update địa chỉ mới
         try {
             await prisma.order.update({
                 where: { id: result.orderId! },
@@ -713,7 +771,16 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
     });
 };
 
+const handleBuyNow = (req: Request, res: Response) => {
+    const user: any = (req as any).user;
+    if (!user) return res.redirect("/login");
+    const pid = asInt(req.body.productId);
+    const qty = Math.max(1, asInt(req.body.quantity));
+    (req as any).session.buyNow = { productId: pid, quantity: qty };
+    return res.redirect("/checkout?mode=buy"); // ép mode=buy
+};
 
 
 
-export { getProductPage, postAddProductToCart, getCartPage, postDeleteProductInCart, getCheckOutPage, postHandleCartToCheckOut, postPlaceOrder, getThanksPage, getOrderHistoryPage, postAddToCartFromDetailPage, postCancelOrder, getOrderDetailPage };
+
+export { getProductPage, postAddProductToCart, getCartPage, postDeleteProductInCart, getCheckOutPage, postHandleCartToCheckOut, postPlaceOrder, getThanksPage, getOrderHistoryPage, postAddToCartFromDetailPage, postCancelOrder, getOrderDetailPage, handleBuyNow };

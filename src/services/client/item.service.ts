@@ -150,10 +150,36 @@ const updateCartDetailBeforeCheckOut = async (
     });
 };
 
-/* =========================
-   Place Order (cart-mode / buy-mode)
-========================= */
+// ---------- Helpers phí ship (nhúng ngay trong file này để không phải import) ----------
+type RegionKey = 'HN_INNER' | 'HCM_INNER' | 'NEAR' | 'FAR';
+const HN_PROVINCE = 1;
+const HCM_PROVINCE = 79;
+// Nếu bạn có danh sách quận nội thành thật, điền vào Set; nếu chưa có thì để rỗng → sẽ rơi về NEAR/FAR
+const HN_INNER_DIST = new Set<number>([]);
+const HCM_INNER_DIST = new Set<number>([]);
 
+const SHIPPING_RULES: Record<RegionKey, { base: number; codSurcharge?: number }> = {
+    HN_INNER: { base: 15000, codSurcharge: 0 },
+    HCM_INNER: { base: 15000, codSurcharge: 0 },
+    NEAR: { base: 25000, codSurcharge: 5000 },
+    FAR: { base: 35000, codSurcharge: 5000 },
+};
+
+function classifyRegion(provinceCode?: number | null, districtCode?: number | null): RegionKey {
+    if (provinceCode === HN_PROVINCE && districtCode && HN_INNER_DIST.has(districtCode)) return 'HN_INNER';
+    if (provinceCode === HCM_PROVINCE && districtCode && HCM_INNER_DIST.has(districtCode)) return 'HCM_INNER';
+    // chưa có map đầy đủ → tạm coi là NEAR
+    return 'NEAR';
+}
+
+function calcShippingFee(paymentMethod: 'COD' | 'ONLINE', provinceCode?: number | null, districtCode?: number | null) {
+    const region = classifyRegion(provinceCode, districtCode);
+    const rule = SHIPPING_RULES[region];
+    const fee = rule.base + (paymentMethod === 'COD' ? (rule.codSurcharge ?? 0) : 0);
+    return fee;
+}
+
+// ---------- Types ----------
 type PlaceOrderArgs = {
     userId: number;
     receiverName: string;
@@ -165,6 +191,13 @@ type PlaceOrderArgs = {
     // Mở rộng cho buy-mode
     mode?: "cart" | "buy";
     items?: Array<{ productId: number; quantity: number }>;
+
+    // NEW: để tính ship chính xác
+    paymentMethod?: "COD" | "ONLINE";
+    receiverProvinceCode?: number | null;
+    receiverDistrictCode?: number | null;
+    receiverWardCode?: number | null;
+    receiverStreet?: string | null;
 };
 
 type PlaceOrderResult = {
@@ -172,8 +205,14 @@ type PlaceOrderResult = {
     orderId?: number;
     totalPrice?: number;
     error?: string;
+
+    // optional trả thêm cho tiện debug
+    shippingFee?: number;
+    shippingDiscount?: number;
+    discountAmount?: number;
 };
 
+// ---------- Core ----------
 async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult> {
     const {
         userId,
@@ -184,15 +223,20 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
         couponCode,
         mode = "cart",
         items = [],
+
+        paymentMethod = "COD",
+        receiverProvinceCode = null,
+        receiverDistrictCode = null,
+        receiverWardCode = null,
+        receiverStreet = null,
     } = args;
 
-    // =========================
-    // ======= BUY MODE ========
-    // =========================
+    const pm: "COD" | "ONLINE" = (paymentMethod === "ONLINE") ? "ONLINE" : "COD";
+
+    // ========= BUY MODE =========
     if (mode === "buy") {
         if (!items.length) return { success: false, error: "Thiếu dữ liệu sản phẩm mua ngay." };
 
-        // Lấy sản phẩm & build map
         const pids = Array.from(new Set(items.map(i => fmtInt(i.productId)))).filter(Boolean);
         const products = await prisma.product.findMany({
             where: { id: { in: pids } },
@@ -200,7 +244,7 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
         });
         const map = new Map(products.map(p => [p.id, p]));
 
-        // Validate & tính base
+        // base: tổng tiền hàng sau KM từng SP
         let base = 0;
         for (const it of items) {
             const pid = fmtInt(it.productId);
@@ -211,21 +255,38 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
             base += unitAfterDiscount(p.price, p.discount || 0) * qty;
         }
 
-        // Coupon (nếu có) + ngưỡng
+        // Tính phí ship trước
+        const shippingFee = calcShippingFee(pm, receiverProvinceCode, receiverDistrictCode);
+
+        // Coupon
         let appliedCode: string | null = null;
-        let discountAmount = 0;
+        let discountAmount = 0;      // giảm trên HÀNG HÓA (logic cũ)
+        let shippingDiscount = 0;    // giảm trên PHÍ SHIP (freeship)
+
         if (couponCode) {
             const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
-            const valid = coupon && coupon.expiryDate >= new Date();
+            const valid = coupon && (!!coupon.isActive) && coupon.expiryDate >= new Date();
             if (!valid) return { success: false, error: "Mã giảm giá không hợp lệ hoặc đã hết hạn." };
-            if (base < COUPON_THRESHOLD) return { success: false, error: "Đơn chưa đạt ngưỡng áp mã giảm giá." };
-            discountAmount = Math.round(base * Number(coupon!.discount) / 100);
-            appliedCode = coupon!.code;
+
+            if (coupon.freeShip) {
+                // freeship: áp trên phí ship, cần check minOrder nếu có
+                if ((coupon.minOrder ?? 0) > base) {
+                    return { success: false, error: "Đơn chưa đạt ngưỡng áp mã freeship." };
+                }
+                const cap = coupon.shipDiscountCap ?? shippingFee;
+                shippingDiscount = Math.min(shippingFee, cap);
+                appliedCode = coupon.code;
+            } else {
+                // giảm % trên hàng hóa: giữ nguyên NGƯỠNG cũ của bạn (COUPON_THRESHOLD)
+                if (base < COUPON_THRESHOLD) return { success: false, error: "Đơn chưa đạt ngưỡng áp mã giảm giá." };
+                discountAmount = Math.round(base * Number(coupon!.discount) / 100);
+                appliedCode = coupon!.code;
+            }
         }
 
-        const finalTotal = Math.max(0, base - discountAmount);
+        const finalTotal = Math.max(0, base - discountAmount + shippingFee - shippingDiscount);
 
-        // Transaction: tạo order + orderDetails + trừ kho
+        // Transaction: tạo order + details + trừ kho
         const created = await prisma.$transaction(async (tx) => {
             const order = await tx.order.create({
                 data: {
@@ -234,12 +295,23 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
                     discountAmount,
                     couponCode: appliedCode,
 
+                    // NEW
+                    shippingFee,
+                    shippingDiscount,
+
                     receiverAddress,
                     receiverName,
                     receiverPhone,
                     receiverNote: receiverNote || "",
 
+                    // Lưu code địa chỉ để hiển thị đẹp (client/admin)
+                    receiverProvinceCode,
+                    receiverDistrictCode,
+                    receiverWardCode,
+                    receiverStreet,
+
                     status: "PENDING",
+                    // GIỮ logic cũ: tạo mặc định COD/UNPAID, nếu ONLINE sẽ update sau ở controller
                     paymentMethod: "COD",
                     paymentStatus: "UNPAID",
                 },
@@ -274,20 +346,36 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
             return order;
         });
 
-        return { success: true, orderId: created.id, totalPrice: finalTotal };
+        return {
+            success: true,
+            orderId: created.id,
+            totalPrice: finalTotal,
+            discountAmount,
+            shippingFee,
+            shippingDiscount,
+        };
     }
 
-    // =========================
-    // ======= CART MODE =======
-    // =========================
+    // ========= CART MODE =========
+    // ========= CART MODE =========
     const cart = await prisma.cart.findFirst({
-        where: { userId },
+        where: {
+            userId,
+            // CHỈ lấy cart có item (tránh vớ phải cart rỗng/cũ)
+            cartDetails: { some: {} },
+        },
+        // Ưu tiên cart mới nhất (không cần updatedAt)
+        orderBy: { id: 'desc' },
         select: { id: true },
     });
     if (!cart) return { success: false, error: "Giỏ hàng trống." };
 
     const cartDetails = await prisma.cartDetail.findMany({
-        where: { cartId: cart.id },
+        where: {
+            cartId: cart.id,
+            // Bỏ item qty <= 0 (nếu có)
+            quantity: { gt: 0 },
+        },
         include: { product: true },
     });
     if (cartDetails.length === 0) return { success: false, error: "Giỏ hàng trống." };
@@ -299,19 +387,34 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
         base += unit * fmtInt(cd.quantity);
     }
 
-    // Coupon (nếu có)
+    // ship
+    const shippingFee = calcShippingFee(pm, receiverProvinceCode, receiverDistrictCode);
+
+    // Coupon
     let appliedCode: string | null = null;
     let discountAmount = 0;
+    let shippingDiscount = 0;
+
     if (couponCode) {
         const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
-        const valid = coupon && coupon.expiryDate >= new Date();
+        const valid = coupon && (!!coupon.isActive) && coupon.expiryDate >= new Date();
         if (!valid) return { success: false, error: "Mã giảm giá không hợp lệ hoặc đã hết hạn." };
-        if (base < COUPON_THRESHOLD) return { success: false, error: "Đơn chưa đạt ngưỡng áp mã giảm giá." };
-        discountAmount = Math.round(base * Number(coupon!.discount) / 100);
-        appliedCode = coupon!.code;
+
+        if (coupon.freeShip) {
+            if ((coupon.minOrder ?? 0) > base) {
+                return { success: false, error: "Đơn chưa đạt ngưỡng áp mã freeship." };
+            }
+            const cap = coupon.shipDiscountCap ?? shippingFee;
+            shippingDiscount = Math.min(shippingFee, cap);
+            appliedCode = coupon.code;
+        } else {
+            if (base < COUPON_THRESHOLD) return { success: false, error: "Đơn chưa đạt ngưỡng áp mã giảm giá." };
+            discountAmount = Math.round(base * Number(coupon!.discount) / 100);
+            appliedCode = coupon!.code;
+        }
     }
 
-    const finalTotal = Math.max(0, base - discountAmount);
+    const finalTotal = Math.max(0, base - discountAmount + shippingFee - shippingDiscount);
 
     // Transaction: tạo order + trừ kho + clear cart
     const order = await prisma.$transaction(async (tx) => {
@@ -333,10 +436,19 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
                 discountAmount,
                 couponCode: appliedCode,
 
+                // NEW
+                shippingFee,
+                shippingDiscount,
+
                 receiverAddress,
                 receiverName,
                 receiverPhone,
                 receiverNote: receiverNote || "",
+
+                receiverProvinceCode,
+                receiverDistrictCode,
+                receiverWardCode,
+                receiverStreet,
 
                 status: "PENDING",
                 paymentMethod: "COD",
@@ -364,7 +476,15 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
         return created;
     });
 
-    return { success: true, orderId: order.id, totalPrice: finalTotal };
+    return {
+        success: true,
+        orderId: order.id,
+        totalPrice: finalTotal,
+        discountAmount,
+        shippingFee,
+        shippingDiscount,
+    };
+
 }
 
 /* =========================

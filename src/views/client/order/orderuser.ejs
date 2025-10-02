@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Đơn hàng của tôi</title>
+    <title>Lịch sử mua hàng</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
     <!-- Fonts & Icons -->
@@ -24,9 +24,6 @@
     <link href="/client/css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="/client/css/order/orderuser.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
-
-
-
 </head>
 
 <body>
@@ -37,11 +34,13 @@
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Đơn hàng của tôi</li>
+                    <li class="breadcrumb-item active" aria-current="page">Lịch sử mua hàng</li>
                 </ol>
             </nav>
 
-            <h2 class="mb-4"><i class="fas fa-shopping-bag me-2" style="color: #8BC34A;"></i>Đơn hàng của tôi</h2>
+            <h2 class="mb-4">
+                <i class="fas fa-shopping-bag me-2" style="color: #8BC34A;"></i>Lịch sử mua hàng
+            </h2>
 
             <% if (orders.length===0) { %>
                 <div class="alert alert-info">
@@ -51,27 +50,29 @@
                     <div class="row g-4">
                         <% orders.forEach(order=> { %>
                             <div class="col-12">
-                                <div class="card order-card mb-4">
+                                <!-- Gắn id để toast có thể cuộn tới -->
+                                <div class="card order-card mb-4" id="order-<%= order.id %>">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <h5 class="order-header mb-0">Đơn hàng #<%= order.id %>
                                             </h5>
+
                                             <span class="badge
-  <% if(order.status==='PENDING'){ %> bg-warning text-dark
-  <% } else if(order.status==='CONFIRMED'){ %> bg-info text-dark
-  <% } else if(order.status==='SHIPPING'){ %> bg-primary
-  <% } else if(order.status==='OUT_FOR_DELIVERY'){ %> bg-secondary
-  <% } else if(order.status==='DELIVERED'){ %> bg-success
-  <% } else if(order.status==='CANCELED'){ %> bg-danger
-  <% } else { %> bg-light text-dark <% } %>">
+                                        <% if(order.status==='PENDING'){ %> bg-warning text-dark
+                                        <% } else if(order.status==='CONFIRMED'){ %> bg-info text-dark
+                                        <% } else if(order.status==='SHIPPING'){ %> bg-primary
+                                        <% } else if(order.status==='OUT_FOR_DELIVERY'){ %> bg-secondary
+                                        <% } else if(order.status==='DELIVERED'){ %> bg-success
+                                        <% } else if(order.status==='CANCELED'){ %> bg-danger
+                                        <% } else { %> bg-light text-dark <% } %>">
                                                 <% const viLabel={ PENDING: 'Chờ xử lý' , CONFIRMED: 'Đã xác nhận đơn' ,
                                                     SHIPPING: 'Đang vận chuyển' , OUT_FOR_DELIVERY: 'Đang giao hàng' ,
                                                     DELIVERED: 'Đã giao hàng' , CANCELED: 'Đã hủy' }[order.status] ||
                                                     order.status; %>
                                                     <%= viLabel %>
                                             </span>
-
                                         </div>
+
                                         <p><b>Ngày đặt:</b>
                                             <%= order.createdAt.toLocaleDateString('vi-VN') %>
                                         </p>
@@ -98,10 +99,10 @@
                                                     <% order.orderDetails.forEach(item=> { %>
                                                         <tr>
                                                             <td style="width: 80px;">
-                                                                <img src="/images/product/<%=item.product.image %>"
-                                                                    alt=" <%=item.product.name %>"
-                                                                    class="img-fluid rounded" style="max-width: 60px; max-height: 60px; object-fit:
-                                                                cover;">
+                                                                <img src="/images/product/<%= item.product.image %>"
+                                                                    alt="<%= item.product.name %>"
+                                                                    class="img-fluid rounded"
+                                                                    style="max-width: 60px; max-height: 60px; object-fit: cover;">
                                                             </td>
                                                             <td>
                                                                 <%= item.product.name %>
@@ -118,9 +119,27 @@
                                             </table>
                                         </div>
 
+                                        <!-- NHẮC ĐÁNH GIÁ: hiện khi đã giao và chưa đánh giá -->
+                                        <% const isDelivered=order.status==='DELIVERED' ; %>
+                                            <% const isReviewed=order.isReviewed===true; /* Đổi theo field của bạn nếu
+                                                khác */ %>
+                                                <% if (isDelivered && !isReviewed) { %>
+                                                    <div class="alert alert-success d-flex align-items-center justify-content-between mt-3 mb-0"
+                                                        role="alert">
+                                                        <div class="me-3">
+                                                            <i class="fas fa-star me-2"></i>
+                                                            Đơn hàng của bạn đã được giao. Hãy đánh giá để giúp chúng
+                                                            tôi phục vụ tốt hơn!
+                                                        </div>
+                                                        <!-- Đổi route này nếu bạn đánh giá theo từng sản phẩm -->
+                                                        <a href="/orders/<%= order.id %>/review"
+                                                            class="btn btn-outline-success btn-sm">
+                                                            Đánh giá ngay
+                                                        </a>
+                                                    </div>
+                                                    <% } %>
                                     </div>
                                 </div>
-
                             </div>
                             <% }) %>
                     </div>
@@ -129,9 +148,28 @@
 
         <%- include('../layout/footer'); -%>
 
-            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top">
+            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"
+                aria-label="Lên đầu trang">
                 <i class="fa fa-arrow-up"></i>
             </a>
+
+            <!-- TOAST NHẮC ĐÁNH GIÁ (hiện 1 lần mỗi phiên) -->
+            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+                <div id="reviewToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true"
+                    data-bs-delay="9000">
+                    <div class="toast-header">
+                        <i class="fas fa-bell me-2" aria-hidden="true"></i>
+                        <strong class="me-auto">Đánh giá đơn hàng</strong>
+                        <small>Gợi ý</small>
+                        <button type="button" class="btn-close ms-2 mb-1" data-bs-dismiss="toast"
+                            aria-label="Đóng"></button>
+                    </div>
+                    <div class="toast-body">
+                        Bạn có <span id="reviewCount">0</span> đơn đã giao đang chờ đánh giá.
+                        <a id="toastReviewLink" href="#" class="btn btn-primary btn-sm ms-2">Đánh giá ngay</a>
+                    </div>
+                </div>
+            </div>
 
             <!-- Scripts -->
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -141,6 +179,33 @@
             <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
             <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
             <script src="/client/js/main.js"></script>
+
+            <!-- Logic bật toast tự động khi có ít nhất 1 đơn đã giao mà chưa đánh giá -->
+            <script>
+                (function () {
+                    // Lấy các card đơn đã giao nhưng chưa đánh giá (đã được gắn class needs-review ở bước 1)
+                    const reviewCards = Array.from(document.querySelectorAll('.order-card.needs-review'));
+                    if (reviewCards.length === 0) return;
+
+                    const shownKey = 'reviewToastShown';
+                    if (sessionStorage.getItem(shownKey)) return;
+
+                    const toastEl = document.getElementById('reviewToast');
+                    const reviewCountEl = document.getElementById('reviewCount');
+                    const reviewLinkEl = document.getElementById('toastReviewLink');
+
+                    if (!(toastEl && window.bootstrap && bootstrap.Toast)) return;
+
+                    // Cập nhật số lượng và link cuộn tới card đầu tiên
+                    reviewCountEl.textContent = String(reviewCards.length);
+                    const firstId = reviewCards[0].id || (reviewCards[0].getAttribute('id'));
+                    if (firstId) reviewLinkEl.setAttribute('href', '#' + firstId);
+
+                    new bootstrap.Toast(toastEl).show();
+                    sessionStorage.setItem(shownKey, '1');
+                })();
+            </script>
+
 </body>
 
 </html>

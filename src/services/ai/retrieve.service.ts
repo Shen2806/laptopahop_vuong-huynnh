@@ -70,7 +70,7 @@ export async function retrieveContext(opts: {
     // 3) (Tuỳ chọn) Cohere Rerank – nhanh & chính xác hơn
     if (cohere && candidate.length) {
         const { results } = await cohere.rerank({
-            model: "rerank-english-v3.0",
+            model: "cohere rerank-multilingual-*",
             query,
             documents: candidate.map((c) => c.text),
             topN: Math.min(topK, candidate.length),

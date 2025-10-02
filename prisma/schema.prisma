@@ -264,6 +264,10 @@ model Order {
   discountAmount Int     @default(0) // số tiền giảm giá
   couponCode     String? // mã giảm giá nếu có
 
+  // === NEW ===
+  shippingFee      Int @default(0) // phí vận chuyển gốc
+  shippingDiscount Int @default(0) // giảm phí vận chuyển (freeship)
+
   receiverAddress String      @db.VarChar(255)
   receiverName    String      @db.VarChar(255)
   receiverPhone   String      @db.VarChar(255)
@@ -300,9 +304,16 @@ model Order {
 }
 
 model Coupon {
-  id         Int      @id @default(autoincrement())
-  code       String   @unique
-  discount   Int // % giảm giá
+  id       Int    @id @default(autoincrement())
+  code     String @unique
+  discount Int // % giảm giá
+
+  // === NEW: freeship ===
+  freeShip        Boolean @default(false) // nếu true => chỉ giảm trên phí ship
+  shipDiscountCap Int? // trần giảm ship (VND)
+  minOrder        Int? // điều kiện tối thiểu subTotal hàng hóa
+
+  isActive   Boolean  @default(true)
   expiryDate DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

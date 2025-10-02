@@ -4,6 +4,7 @@ import { countTotalProductClientPages, getProducts } from 'services/client/item.
 import { changeUserPassword, getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById, verifyPasswordByUserId } from 'services/user.service';
 import bcrypt from 'bcrypt';
 
+
 const getHomePage = async (req: Request, res: Response) => {
     const { page } = req.query;
 
@@ -534,10 +535,13 @@ const postCancelOrderByUser = async (req: Request, res: Response) => {
     return res.json({ message: "Hủy đơn hàng thành công" });
 };
 
+
 const getUserOrders = async (req: Request, res: Response) => {
     try {
         const userId = req.user.id; // lấy từ passport
-        const orders = await prisma.order.findMany({
+
+        // Lấy tất cả đơn theo thời gian tạo (mới nhất trước) để giữ thứ tự gốc cho "others"
+        const allOrders = await prisma.order.findMany({
             where: { userId },
             include: {
                 orderDetails: {
@@ -547,12 +551,30 @@ const getUserOrders = async (req: Request, res: Response) => {
             orderBy: { createdAt: "desc" },
         });
 
-        res.render("client/order/orderuser.ejs", { user: req.user, orders });
+        // Helper: thời điểm ưu tiên để sort trong nhóm DELIVERED
+        const getSortTime = (o: any) =>
+            new Date(o.deliveredAt ?? o.updatedAt ?? o.createdAt).getTime();
+
+        // 1) Nhóm DELIVERED và sort "mới nhất trước"
+        const delivered = allOrders
+            .filter((o) => o.status === "DELIVERED")
+            .sort((a, b) => getSortTime(b) - getSortTime(a));
+
+        // 2) Các đơn còn lại: giữ nguyên thứ tự đã fetch (createdAt desc)
+        const others = allOrders.filter((o) => o.status !== "DELIVERED");
+
+        // 3) Ghép lại: DELIVERED trước, sau đó đến các trạng thái khác
+        const sortedOrders = [...delivered, ...others];
+
+        // Render ra view
+        res.render("client/order/orderuser.ejs", { user: req.user, orders: sortedOrders });
     } catch (err) {
-        console.error(" Lỗi lấy đơn hàng:", err);
+        console.error("Lỗi lấy đơn hàng:", err);
         res.status(500).send("Có lỗi xảy ra khi tải đơn hàng");
     }
 };
+
+
 
 const SALT_ROUNDS = 10;
 

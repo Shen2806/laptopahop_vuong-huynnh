@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE `coupon` ADD COLUMN `freeShip` BOOLEAN NOT NULL DEFAULT false,
+    ADD COLUMN `isActive` BOOLEAN NOT NULL DEFAULT true,
+    ADD COLUMN `minOrder` INTEGER NULL,
+    ADD COLUMN `shipDiscountCap` INTEGER NULL;
+
+-- AlterTable
+ALTER TABLE `orders` ADD COLUMN `shippingDiscount` INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN `shippingFee` INTEGER NOT NULL DEFAULT 0;

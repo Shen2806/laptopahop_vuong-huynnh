@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        Lịch sử mua hàng - LaptopShop
+        Đơn hàng của tôi - LaptopShop
     </title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
@@ -68,813 +68,666 @@
     <!-- Spinner End -->
 
     <!-- Navbar start -->
-    <header class="container-fluid shadow" style="margin-top:10px;">
-        <!-- Topbar -->
-        <div class="container topbar bg-primary d-none d-lg-block">
-            <div class="d-flex justify-content-between">
-                <div class="top-info ps-2">
-                    <% if (user) { %>
-                        <small class="me-3">
-                            <i class="fas fa-map-marker-alt me-2 text-secondary"></i>
-                            <a href="#" class="text-white">
-                                <%= user?.address || "" %>
-                            </a>
-                        </small>
-                        <small class="me-3">
-                            <i class="fas fa-envelope me-2 text-secondary"></i>
-                            <a href="#" class="text-white">
-                                <%= user?.username || "" %>
-                            </a>
-                        </small>
-                        <% } else { %>
-                            <small class="me-3"><i class="fas fa-voicemail me-2 text-secondary"></i></small>
-                            <% } %>
-                </div>
-                <div class="top-link pe-2">
-                    <a href="/terms" class="text-white">
-                        <small class="text-white mx-2">Điều khoản sử dụng</small>/
-                    </a>
-                    <a href="/support" class="text-white"><small class="text-white mx-2">Hỗ trợ</small></a>
-                </div>
-            </div>
-        </div>
+    <%- include('../client/layout/header'); -%>
 
-        <!-- Navbar -->
-        <div class="container px-0 position-relative">
-            <nav class="navbar navbar-light bg-white navbar-expand-xl">
-                <div class="d-flex align-items-center">
-                    <img src="/images/logo/logo.png" alt="LaptopShop" class="logo-circle" />
-                    <a href="/" class="navbar-brand ms-2">
-                        <h1 class="text-primary display-6 m-0">LaptopShop</h1>
-                    </a>
-                </div>
-
-                <button class="navbar-toggler py-2 px-3" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
-                    aria-label="Toggle navigation">
-                    <span class="fa fa-bars text-primary"></span>
-                </button>
-
-                <div class="collapse navbar-collapse bg-white" id="navbarCollapse" style="margin-left: 20px;">
-                    <ul class="navbar-nav mx-auto">
-                        <li class="nav-item"><a href="/" class="nav-link active">Trang chủ</a></li>
-                        <li class="nav-item"><a href="/products" class="nav-link">Sản phẩm</a></li>
-                        <li class="nav-item"><a href="/about" class="nav-link">Giới thiệu</a></li>
-                        <li class="nav-item"><a href="/contact" class="nav-link">Liên hệ</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">Thông tin</a>
-                            <ul class="dropdown-menu" aria-labelledby="policyDropdown">
-                                <li><a class="dropdown-item" href="/warranty">Chính sách bảo hành</a></li>
-                                <li><a class="dropdown-item" href="/return">Chính sách đổi trả</a></li>
-                                <li><a class="dropdown-item" href="/privacy">Chính sách bảo mật</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-
-                    <!-- SEARCH BOX -->
-                    <div class="header-search position-relative my-2 my-xl-0 mx-xl-3" style="min-width: 180px;">
-                        <form id="headerSearchForm" action="/products" method="get"
-                            class="d-flex align-items-center rounded-pill border px-2 bg-white">
-                            <input class="form-control border-0 shadow-none" id="headerSearch" name="q" type="search"
-                                placeholder="Tìm laptop, hãng, từ khóa..." aria-label="Tìm kiếm" autocomplete="off" />
-                            <button class="btn btn-link px-2" type="submit" aria-label="Tìm kiếm">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </form>
-
-                        <!-- Popup gợi ý -->
-                        <div id="searchPopup" class="shadow" style="
-    display:none; position:absolute; top:110%; left:0; right:0; z-index: 2000;
-    background:#fff; border-radius:12px; overflow:hidden; max-height:420px; overflow-y:auto;">
-                        </div>
-                    </div>
-
-                    <div class="d-flex ms-auto align-items-center position-relative">
-                        <% if (user) { %>
-                            <!-- Chuông thông báo -->
-                            <button class="notification-icon position-relative me-3 btn btn-link p-0 border-0"
-                                id="notificationDropdown" type="button" aria-label="Thông báo">
-                                <i class="fas fa-bell fa-2x"></i>
-                                <span id="notificationBadge"
-                                    class="position-absolute bg-danger text-white rounded-circle d-flex align-items-center justify-content-center"
-                                    style="top:-5px; right:-5px; width:20px; height:20px; font-size:12px; display:none;">0</span>
-                            </button>
-
-                            <!-- Âm thanh -->
-                            <audio id="notificationSound" src="/ring.wav" preload="auto"></audio>
-                            <% } %>
-
-                                <!-- Giỏ hàng -->
-                                <a href="/cart" class="position-relative me-3" aria-label="Giỏ hàng">
-                                    <i class="fa fa-shopping-bag fa-2x"></i>
-                                    <span
-                                        class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
-                                        id="sumCart" style="top:-5px; left:15px; height:20px; min-width:20px;">
-                                        <%= user?.sumCart ?? 0 %>
-                                    </span>
-                                </a>
-
-                                <!-- User -->
-                                <% if (user) { %>
-                                    <div class="dropdown my-auto">
-                                        <a href="#" class="dropdown-toggle" role="button" id="dropdownMenuLink"
-                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-user fa-2x"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-menu-end p-4"
-                                            aria-labelledby="dropdownMenuLink">
-                                            <li class="d-flex align-items-center flex-column" style="min-width:300px;">
-                                                <img style="width:150px; height:150px; border-radius:50%; overflow:hidden;"
-                                                    src="/images/<%= user.avatar %>" alt="Avatar người dùng" />
-                                                <div class="text-center my-3">
-                                                    <%= user.fullName %>
-                                                </div>
-                                            </li>
-                                            <li><a class="dropdown-item" href="/profile">Thông tin cá nhân</a></li>
-                                            <li><a class="dropdown-item" href="/order-history">Lịch sử mua hàng</a></li>
-                                            <li><a class="dropdown-item" href="/order-user">Đơn hàng của tôi</a></li>
-                                            <li>
-                                                <hr class="dropdown-divider" />
-                                            </li>
-                                            <li>
-                                                <form method="post" action="/logout">
-                                                    <button class="dropdown-item" type="submit">Đăng xuất</button>
-                                                </form>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <% } else { %>
-                                        <a href="/login" class="a-login" aria-label="Đăng nhập"><i
-                                                class="fas fa-user fa-2x"></i></a>
-                                        <% } %>
-                    </div>
-                </div>
-            </nav>
-
-            <% if (user) { %>
-                <!-- Panel dropdown notification cho User -->
-                <div id="uNotificationPanel" class="dropdown-menu show"
-                    style="display:none; position:absolute; right:10px; top:72px; width:360px; max-height:420px; overflow:auto; z-index:1050;">
-                    <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
-                        <strong>Thông báo</strong>
-                        <button id="uMarkAllRead" class="btn btn-sm btn-link">Đánh dấu đã đọc</button>
-                    </div>
-                    <ul id="uNotificationList" class="list-group list-group-flush"></ul>
-                </div>
-                <% } %>
-        </div>
-
-    </header>
-
-    <% if (user) { %>
-        <script>
-            window.USER_ID = "<%= String(user.id) %>";
-        </script>
-        <% } %>
-
-            <!-- Socket.IO client -->
-            <script src="/socket.io/socket.io.js"></script>
+        <% if (user) { %>
             <script>
-                (function () {
-                    if (!window.USER_ID) return; // chưa login thì thôi
-
-                    const uBadge = document.getElementById('notificationBadge');
-                    const uIcon = document.getElementById('notificationDropdown');
-                    const uPanel = document.getElementById('uNotificationPanel');
-                    const uList = document.getElementById('uNotificationList');
-                    const uSound = document.getElementById('notificationSound');
-                    const USER_ID = window.USER_ID;
-
-                    // Toggle panel
-                    if (uIcon && uPanel) {
-                        uIcon.addEventListener('click', () => {
-                            const shown = uPanel.style.display === 'block';
-                            uPanel.style.display = shown ? 'none' : 'block';
-                        });
-                    }
-
-                    // Unlock audio lần click đầu vào chuông
-                    let audioUnlocked = false;
-                    if (uIcon && uSound) {
-                        uIcon.addEventListener('click', () => {
-                            if (!audioUnlocked) {
-                                uSound.volume = 0.0;
-                                uSound.play().catch(() => { });
-                                setTimeout(() => {
-                                    try { uSound.pause(); uSound.currentTime = 0; } catch { }
-                                    uSound.volume = 1.0;
-                                    audioUnlocked = true;
-                                }, 50);
-                            }
-                        });
-                    }
-
-                    function uUpdateBadge(delta = 1) {
-                        if (!uBadge) return;
-                        let cur = parseInt(uBadge.textContent || "0", 10);
-                        cur = isNaN(cur) ? 0 : cur;
-                        cur += delta;
-                        if (cur <= 0) {
-                            uBadge.style.display = "none";
-                            uBadge.textContent = "0";
-                        } else {
-                            uBadge.style.display = "flex";
-                            uBadge.textContent = cur > 9 ? "9+" : String(cur);
-                        }
-                    }
-
-                    function uPrepend(itemHtml) {
-                        if (!uList) return;
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item';
-                        li.innerHTML = itemHtml;
-                        uList.prepend(li);
-                    }
-
-                    const markBtn = document.getElementById('uMarkAllRead');
-                    if (markBtn && uBadge) {
-                        markBtn.addEventListener('click', () => {
-                            uBadge.style.display = 'none';
-                            uBadge.textContent = '0';
-                        });
-                    }
-
-                    // Socket
-                    const uSocket = io(); // same-origin
-                    uSocket.on('connect', () => {
-                        console.log('[SOCKET] user connected, USER_ID=', USER_ID);
-                        uSocket.emit('join-user-room', USER_ID);
-                    });
-
-                    // Admin xác nhận
-                    uSocket.on('order-confirmed', (data) => {
-                        console.log('[SOCKET] order-confirmed:', data);
-                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                        uUpdateBadge(1);
-                        const url = `/order/${data.orderId}`;
-                        const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
-                        uPrepend(
-                            '<div class="d-flex justify-content-between align-items-start">' +
-                            '<div>' +
-                            '<div class="fw-semibold">' + msg + '</div>' +
-                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                            '</div>' +
-                            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-                            '</div>'
-                        );
-                    });
-
-                    uSocket.on('order-canceled', (data) => {
-                        console.log('[SOCKET] order-canceled:', data);
-                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                        uUpdateBadge(1);
-                        const url = `/order/${data.orderId}`;
-                        const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
-                        uPrepend(
-                            '<div class="d-flex justify-content-between align-items-start">' +
-                            '<div>' +
-                            '<div class="fw-semibold">' + msg + '</div>' +
-                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                            '</div>' +
-                            '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
-                            '</div>'
-                        );
-                    });
-
-                    uSocket.on('order-updated', (data) => {
-                        console.log('[SOCKET] order-updated:', data);
-                        try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                        uUpdateBadge(1);
-                        const url = `/order/${data.orderId}`;
-                        const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
-                        uPrepend(
-                            '<div class="d-flex justify-content-between align-items-start">' +
-                            '<div>' +
-                            '<div class="fw-semibold">' + msg + '</div>' +
-                            '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                            '</div>' +
-                            '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-                            '</div>'
-                        );
-                    });
-                })();
+                window.USER_ID = "<%= String(user.id) %>";
             </script>
-            <!-- Navbar End -->
+            <% } %>
 
-            <!-- Cart Page Start -->
-            <div class="container-fluid py-5 bg-light">
-                <div class="container py-4">
+                <!-- Socket.IO client -->
+                <script src="/socket.io/socket.io.js"></script>
+                <script>
+                    (function () {
+                        if (!window.USER_ID) return; // chưa login thì thôi
 
-                    <!-- Breadcrumb -->
-                    <nav aria-label="breadcrumb" class="mb-4">
-                        <ol class="breadcrumb bg-white shadow-sm rounded-3 p-2">
-                            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Chi Tiết Giỏ Hàng</li>
-                        </ol>
-                    </nav>
+                        const uBadge = document.getElementById('notificationBadge');
+                        const uIcon = document.getElementById('notificationDropdown');
+                        const uPanel = document.getElementById('uNotificationPanel');
+                        const uList = document.getElementById('uNotificationList');
+                        const uSound = document.getElementById('notificationSound');
+                        const USER_ID = window.USER_ID;
 
-                    <div class="orders-pro">
+                        // Toggle panel
+                        if (uIcon && uPanel) {
+                            uIcon.addEventListener('click', () => {
+                                const shown = uPanel.style.display === 'block';
+                                uPanel.style.display = shown ? 'none' : 'block';
+                            });
+                        }
 
-                        <% if (!orders || orders.length===0) { %>
-                            <div class="empty-state fw-bold">Không có đơn hàng nào được tạo!</div>
-                            <% } else { %>
+                        // Unlock audio lần click đầu vào chuông
+                        let audioUnlocked = false;
+                        if (uIcon && uSound) {
+                            uIcon.addEventListener('click', () => {
+                                if (!audioUnlocked) {
+                                    uSound.volume = 0.0;
+                                    uSound.play().catch(() => { });
+                                    setTimeout(() => {
+                                        try { uSound.pause(); uSound.currentTime = 0; } catch { }
+                                        uSound.volume = 1.0;
+                                        audioUnlocked = true;
+                                    }, 50);
+                                }
+                            });
+                        }
 
-                                <% orders.forEach(function(order){ %>
-                                    <% const statusMap={ PENDING: { dot: 'dot-pending' , cls: 'is-pending' ,
-                                        label: 'Chờ xử lý' }, CONFIRMED: { dot: 'dot-confirmed' , cls: 'is-confirmed' ,
-                                        label: 'Đã xác nhận đơn' }, SHIPPING: { dot: 'dot-shipping' , cls: 'is-shipping'
-                                        , label: 'Đang vận chuyển' }, OUT_FOR_DELIVERY: { dot: 'dot-out' , cls: 'is-out'
-                                        , label: 'Đang giao hàng' }, DELIVERED: { dot: 'dot-delivered' ,
-                                        cls: 'is-delivered' , label: 'Đã giao hàng' }, CANCELED: { dot: 'dot-canceled' ,
-                                        cls: 'is-canceled' , label: 'Đã hủy' } }; const st=statusMap[order.status] || {
-                                        dot: 'dot-default' , cls: 'is-default' , label: String(order.status) }; const
-                                        firstName=(order.orderDetails[0] && order.orderDetails[0].product &&
-                                        order.orderDetails[0].product.name) || '—' ; const collapseId='o' + order.id; %>
+                        function uUpdateBadge(delta = 1) {
+                            if (!uBadge) return;
+                            let cur = parseInt(uBadge.textContent || "0", 10);
+                            cur = isNaN(cur) ? 0 : cur;
+                            cur += delta;
+                            if (cur <= 0) {
+                                uBadge.style.display = "none";
+                                uBadge.textContent = "0";
+                            } else {
+                                uBadge.style.display = "flex";
+                                uBadge.textContent = cur > 9 ? "9+" : String(cur);
+                            }
+                        }
+
+                        function uPrepend(itemHtml) {
+                            if (!uList) return;
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item';
+                            li.innerHTML = itemHtml;
+                            uList.prepend(li);
+                        }
+
+                        const markBtn = document.getElementById('uMarkAllRead');
+                        if (markBtn && uBadge) {
+                            markBtn.addEventListener('click', () => {
+                                uBadge.style.display = 'none';
+                                uBadge.textContent = '0';
+                            });
+                        }
+
+                        // Socket
+                        const uSocket = io(); // same-origin
+                        uSocket.on('connect', () => {
+                            console.log('[SOCKET] user connected, USER_ID=', USER_ID);
+                            uSocket.emit('join-user-room', USER_ID);
+                        });
+
+                        // Admin xác nhận
+                        uSocket.on('order-confirmed', (data) => {
+                            console.log('[SOCKET] order-confirmed:', data);
+                            try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                            uUpdateBadge(1);
+                            const url = `/order/${data.orderId}`;
+                            const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
+                            uPrepend(
+                                '<div class="d-flex justify-content-between align-items-start">' +
+                                '<div>' +
+                                '<div class="fw-semibold">' + msg + '</div>' +
+                                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                                '</div>' +
+                                '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                                '</div>'
+                            );
+                        });
+
+                        uSocket.on('order-canceled', (data) => {
+                            console.log('[SOCKET] order-canceled:', data);
+                            try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                            uUpdateBadge(1);
+                            const url = `/order/${data.orderId}`;
+                            const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
+                            uPrepend(
+                                '<div class="d-flex justify-content-between align-items-start">' +
+                                '<div>' +
+                                '<div class="fw-semibold">' + msg + '</div>' +
+                                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                                '</div>' +
+                                '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
+                                '</div>'
+                            );
+                        });
+
+                        uSocket.on('order-updated', (data) => {
+                            console.log('[SOCKET] order-updated:', data);
+                            try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                            uUpdateBadge(1);
+                            const url = `/order/${data.orderId}`;
+                            const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
+                            uPrepend(
+                                '<div class="d-flex justify-content-between align-items-start">' +
+                                '<div>' +
+                                '<div class="fw-semibold">' + msg + '</div>' +
+                                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
+                                '</div>' +
+                                '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
+                                '</div>'
+                            );
+                        });
+                    })();
+                </script>
+                <!-- Navbar End -->
+
+                <!-- Cart Page Start -->
+                <div class="container-fluid py-5 bg-light">
+                    <div class="container py-4">
+
+                        <!-- Breadcrumb -->
+                        <nav aria-label="breadcrumb" class="mb-4">
+                            <ol class="breadcrumb bg-white shadow-sm rounded-3 p-2">
+                                <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Chi Tiết Giỏ Hàng</li>
+                            </ol>
+                        </nav>
+
+                        <div class="orders-pro">
+
+                            <% if (!orders || orders.length===0) { %>
+                                <div class="empty-state fw-bold">Không có đơn hàng nào được tạo!</div>
+                                <% } else { %>
+
+                                    <% orders.forEach(function(order){ %>
+                                        <% const statusMap={ PENDING: { dot: 'dot-pending' , cls: 'is-pending' ,
+                                            label: 'Chờ xử lý' }, CONFIRMED: { dot: 'dot-confirmed' ,
+                                            cls: 'is-confirmed' , label: 'Đã xác nhận đơn' }, SHIPPING: {
+                                            dot: 'dot-shipping' , cls: 'is-shipping' , label: 'Đang vận chuyển' },
+                                            OUT_FOR_DELIVERY: { dot: 'dot-out' , cls: 'is-out' , label: 'Đang giao hàng'
+                                            }, DELIVERED: { dot: 'dot-delivered' , cls: 'is-delivered' ,
+                                            label: 'Đã giao hàng' }, CANCELED: { dot: 'dot-canceled' ,
+                                            cls: 'is-canceled' , label: 'Đã hủy' } }; const st=statusMap[order.status]
+                                            || { dot: 'dot-default' , cls: 'is-default' , label: String(order.status) };
+                                            const firstName=(order.orderDetails[0] && order.orderDetails[0].product &&
+                                            order.orderDetails[0].product.name) || '—' ; const collapseId='o' +
+                                            order.id; %>
 
 
-                                        <article class="order-card">
-                                            <!-- HEAD: nút toggle -->
-                                            <!-- HEAD: click = đi trang chi tiết, chevron = mở/đóng -->
-                                            <div class="order-head-btn" data-detail-url="/order/<%= order.id %>">
+                                            <article class="order-card">
+                                                <!-- HEAD: nút toggle -->
+                                                <!-- HEAD: click = đi trang chi tiết, chevron = mở/đóng -->
+                                                <div class="order-head-btn" data-detail-url="/order/<%= order.id %>">
 
-                                                <!-- status dot -->
-                                                <div class="head-left">
-                                                    <span class="status-dot <%= st.dot %>"></span>
-                                                </div>
+                                                    <!-- status dot -->
+                                                    <div class="head-left">
+                                                        <span class="status-dot <%= st.dot %>"></span>
+                                                    </div>
 
-                                                <!-- info giữa (click vào đây sẽ đi chi tiết) -->
-                                                <div class="head-mid">
-                                                    <div class="h-row1">
-                                                        <div class="h-orderid">Order #<%= order.id %>
+                                                    <!-- info giữa (click vào đây sẽ đi chi tiết) -->
+                                                    <div class="head-mid">
+                                                        <div class="h-row1">
+                                                            <div class="h-orderid">Order #<%= order.id %>
+                                                            </div>
+                                                            <div class="h-date">• <%= new
+                                                                    Date(order.createdAt).toLocaleDateString('vi-VN') %>
+                                                            </div>
                                                         </div>
-                                                        <div class="h-date">• <%= new
-                                                                Date(order.createdAt).toLocaleDateString('vi-VN') %>
+                                                        <div class="h-name" title="<%= firstName %>">
+                                                            <%= firstName %>
                                                         </div>
-                                                    </div>
-                                                    <div class="h-name" title="<%= firstName %>">
-                                                        <%= firstName %>
-                                                    </div>
-                                                    <div class="h-thumbs mt-1">
-                                                        <% const showN=Math.min(6, order.orderDetails.length); %>
-                                                            <% for (let i=0; i<showN; i++){ const
-                                                                d=order.orderDetails[i]; %>
-                                                                <img src="/images/product/<%= d.product.image %>"
-                                                                    alt="">
-                                                                <% } %>
-                                                                    <% if (order.orderDetails.length> showN) { %>
-                                                                        <span class="more">+<%=
-                                                                                order.orderDetails.length - showN %>
-                                                                        </span>
-                                                                        <% } %>
-                                                    </div>
-                                                </div>
-
-                                                <!-- phải -->
-                                                <div class="head-right">
-                                                    <div class="h-total text-primary">
-                                                        <%= new
-                                                            Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(order.totalPrice)
-                                                            %>
-                                                    </div>
-                                                    <span class="status-chip <%= st.cls %>">
-                                                        <%= st.label %>
-                                                    </span>
-
-                                                    <!-- chevron: CHỈ để mở/đóng collapse -->
-                                                    <button class="btn btn-sm btn-light toggle-collapse ms-2"
-                                                        type="button" data-bs-toggle="collapse"
-                                                        data-bs-target="#<%= collapseId %>" aria-expanded="false"
-                                                        aria-controls="<%= collapseId %>"
-                                                        onclick="event.stopPropagation()">
-                                                        <i class="fas fa-chevron-down chev"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-
-                                            <!-- BODY: chi tiết -->
-                                            <div id="<%= collapseId %>" class="collapse order-body">
-                                                <div class="table-responsive px-3 pt-3">
-                                                    <table class="table align-middle">
-                                                        <thead class="table-light text-center">
-                                                            <tr>
-                                                                <th>Sản phẩm</th>
-                                                                <th>Tên</th>
-                                                                <th>Giá</th>
-                                                                <th>Số lượng</th>
-                                                                <th>Tổng tiền</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <% order.orderDetails.forEach(function(detail){ const
-                                                                discountedPrice=detail.product.discount>0
-                                                                ? Math.round(detail.product.price * (100 -
-                                                                detail.product.discount) / 100)
-                                                                : detail.product.price;
-                                                                %>
-                                                                <tr>
-                                                                    <td class="text-center">
-                                                                        <img src="/images/product/<%= detail.product.image %>"
-                                                                            class="rounded-circle shadow-sm border"
-                                                                            style="width:50px; height:50px; object-fit:cover;">
-                                                                    </td>
-                                                                    <td class="text-center">
-                                                                        <a href="/product/<%= detail.product.id %>"
-                                                                            target="_blank"
-                                                                            class="text-decoration-none fw-semibold text-dark">
-                                                                            <%= detail.product.name %>
-                                                                        </a>
-                                                                    </td>
-                                                                    <td class="text-center">
-                                                                        <% if(detail.product.discount>0){ %>
-                                                                            <div
-                                                                                class="text-muted text-decoration-line-through small">
-                                                                                <%= new
-                                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(detail.product.price)
-                                                                                    %>
-                                                                            </div>
-                                                                            <span class="fw-bold text-danger">
-                                                                                <%= new
-                                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountedPrice)
-                                                                                    %>
+                                                        <div class="h-thumbs mt-1">
+                                                            <% const showN=Math.min(6, order.orderDetails.length); %>
+                                                                <% for (let i=0; i<showN; i++){ const
+                                                                    d=order.orderDetails[i]; %>
+                                                                    <img src="/images/product/<%= d.product.image %>"
+                                                                        alt="">
+                                                                    <% } %>
+                                                                        <% if (order.orderDetails.length> showN) { %>
+                                                                            <span class="more">+<%=
+                                                                                    order.orderDetails.length - showN %>
                                                                             </span>
-                                                                            <% } else { %>
-                                                                                <span class="fw-bold text-dark">
+                                                                            <% } %>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- phải -->
+                                                    <div class="head-right">
+                                                        <div class="h-total text-primary">
+                                                            <%= new
+                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(order.totalPrice)
+                                                                %>
+                                                        </div>
+                                                        <span class="status-chip <%= st.cls %>">
+                                                            <%= st.label %>
+                                                        </span>
+
+                                                        <!-- chevron: CHỈ để mở/đóng collapse -->
+                                                        <button class="btn btn-sm btn-light toggle-collapse ms-2"
+                                                            type="button" data-bs-toggle="collapse"
+                                                            data-bs-target="#<%= collapseId %>" aria-expanded="false"
+                                                            aria-controls="<%= collapseId %>"
+                                                            onclick="event.stopPropagation()">
+                                                            <i class="fas fa-chevron-down chev"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+
+                                                <!-- BODY: chi tiết -->
+                                                <div id="<%= collapseId %>" class="collapse order-body">
+                                                    <div class="table-responsive px-3 pt-3">
+                                                        <table class="table align-middle">
+                                                            <thead class="table-light text-center">
+                                                                <tr>
+                                                                    <th>Sản phẩm</th>
+                                                                    <th>Tên</th>
+                                                                    <th>Giá</th>
+                                                                    <th>Số lượng</th>
+                                                                    <th>Tổng tiền</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <% order.orderDetails.forEach(function(detail){ const
+                                                                    discountedPrice=detail.product.discount>0
+                                                                    ? Math.round(detail.product.price * (100 -
+                                                                    detail.product.discount) / 100)
+                                                                    : detail.product.price;
+                                                                    %>
+                                                                    <tr>
+                                                                        <td class="text-center">
+                                                                            <img src="/images/product/<%= detail.product.image %>"
+                                                                                class="rounded-circle shadow-sm border"
+                                                                                style="width:50px; height:50px; object-fit:cover;">
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <a href="/product/<%= detail.product.id %>"
+                                                                                target="_blank"
+                                                                                class="text-decoration-none fw-semibold text-dark">
+                                                                                <%= detail.product.name %>
+                                                                            </a>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <% if(detail.product.discount>0){ %>
+                                                                                <div
+                                                                                    class="text-muted text-decoration-line-through small">
                                                                                     <%= new
                                                                                         Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(detail.product.price)
                                                                                         %>
+                                                                                </div>
+                                                                                <span class="fw-bold text-danger">
+                                                                                    <%= new
+                                                                                        Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountedPrice)
+                                                                                        %>
                                                                                 </span>
-                                                                                <% } %>
-                                                                    </td>
-                                                                    <td class="text-center">
-                                                                        <%= detail.quantity %>
-                                                                    </td>
-                                                                    <td class="text-center fw-bold text-danger">
-                                                                        <%= new
-                                                                            Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountedPrice
-                                                                            * detail.quantity) %>
-                                                                    </td>
-                                                                </tr>
-                                                                <% }) %>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
+                                                                                <% } else { %>
+                                                                                    <span class="fw-bold text-dark">
+                                                                                        <%= new
+                                                                                            Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(detail.product.price)
+                                                                                            %>
+                                                                                    </span>
+                                                                                    <% } %>
+                                                                        </td>
+                                                                        <td class="text-center">
+                                                                            <%= detail.quantity %>
+                                                                        </td>
+                                                                        <td class="text-center fw-bold text-danger">
+                                                                            <%= new
+                                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountedPrice
+                                                                                * detail.quantity) %>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <% }) %>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
 
-                                                <!-- FOOT: thêm thông tin & hành động -->
-                                                <div
-                                                    class="order-foot px-3 py-3 border-top d-flex flex-wrap justify-content-between align-items-center">
-                                                    <div>Ngày đặt: <strong>
-                                                            <%= new Date(order.createdAt).toLocaleDateString('vi-VN') %>
-                                                        </strong></div>
+                                                    <!-- FOOT: thêm thông tin & hành động -->
+                                                    <div
+                                                        class="order-foot px-3 py-3 border-top d-flex flex-wrap justify-content-between align-items-center">
+                                                        <div>Ngày đặt: <strong>
+                                                                <%= new
+                                                                    Date(order.createdAt).toLocaleDateString('vi-VN') %>
+                                                            </strong></div>
 
-                                                    <% if(order.status==='PENDING' || order.status==='CONFIRMED' ){ %>
-                                                        <button type="button" class="btn btn-danger btn-sm btn-cancel"
-                                                            data-order-id="<%= order.id %>" data-bs-toggle="modal"
-                                                            data-bs-target="#cancelOrderModal">
-                                                            Hủy đơn
-                                                        </button>
+                                                        <% if(order.status==='PENDING' || order.status==='CONFIRMED' ){
+                                                            %>
+                                                            <button type="button"
+                                                                class="btn btn-danger btn-sm btn-cancel"
+                                                                data-order-id="<%= order.id %>" data-bs-toggle="modal"
+                                                                data-bs-target="#cancelOrderModal">
+                                                                Hủy đơn
+                                                            </button>
+                                                            <% } %>
+                                                    </div>
+
+                                                    <% if(order.status==='CANCELED' ){ %>
+                                                        <div
+                                                            class="px-3 py-3 bg-light border-top text-danger fw-semibold">
+                                                            Lý do hủy: <%= order.cancelReason || 'Không có lý do' %>
+                                                        </div>
                                                         <% } %>
                                                 </div>
+                                            </article>
+                                            <% }) %>
 
-                                                <% if(order.status==='CANCELED' ){ %>
-                                                    <div class="px-3 py-3 bg-light border-top text-danger fw-semibold">
-                                                        Lý do hủy: <%= order.cancelReason || 'Không có lý do' %>
-                                                    </div>
-                                                    <% } %>
-                                            </div>
-                                        </article>
-                                        <% }) %>
-
-                                            <% } %>
-                    </div>
-
-
-                    <div class="mt-4 text-end">
-                        <a href="/" class="btn btn-success btn-lg shadow-sm">
-                            <i class="fa fa-arrow-left me-2"></i> Trở về
-                        </a>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- Modal Hủy đơn hàng -->
-            <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <form id="cancelOrderForm">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="cancelOrderLabel">Hủy đơn hàng</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="hidden" id="cancelOrderId">
-                                <div class="mb-3">
-                                    <label for="cancelReason" class="form-label">Chọn lý do hủy:</label>
-                                    <select class="form-select" id="cancelReason" required>
-                                        <option value="">-- Chọn lý do --</option>
-                                        <option value="Đổi ý - không mua nữa">Đối ý - không mua nữa</option>
-                                        <option value="Đặt nhầm">Đặt nhầm</option>
-                                        <option value="Giao hàng lâu">Giao hàng lâu</option>
-                                        <option value="Khác">Khác</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                <button type="submit" class="btn btn-danger">Hủy đơn</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Toast Container -->
-            <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
-                <div id="notifyToast" class="toast align-items-center text-white bg-success border-0" role="alert"
-                    aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex">
-                        <div class="toast-body" id="notifyToastBody">
-                            Thông báo ở đây
+                                                <% } %>
                         </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                            aria-label="Close"></button>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Footer Start -->
-            <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-                <div class="container py-5">
-                    <div class="row g-5">
-                        <!-- Logo & Giới thiệu -->
-                        <div class="col-lg-3 col-md-6">
-                            <a href="/" class="d-inline-block mb-3">
-                                <h2 class="text-primary fw-bold">LaptopShop</h2>
+
+                        <div class="mt-4 text-end">
+                            <a href="/" class="btn btn-success btn-lg shadow-sm">
+                                <i class="fa fa-arrow-left me-2"></i> Trở về
                             </a>
-                            <p class="small">
-                                Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
-                                dịch vụ tận tâm và giá cả cạnh tranh nhất.
-                            </p>
-                            <!-- Icon mạng xã hội -->
-                            <div class="d-flex pt-2">
-                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                        class="fab fa-facebook-f"></i></a>
-                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                        class="fab fa-instagram"></i></a>
-                                <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                        class="fab fa-youtube"></i></a>
-                                <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
-                                        class="fab fa-tiktok"></i></a>
-                            </div>
                         </div>
 
-                        <!-- Thông tin cửa hàng -->
-                        <div class="col-lg-3 col-md-6">
-                            <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
-                            <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
-                            <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
-                            <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
-                            <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
-                        </div>
+                    </div>
+                </div>
 
-                        <!-- Tài khoản -->
-                        <div class="col-lg-3 col-md-6">
-                            <h4 class="text-light mb-3">Tài khoản</h4>
-                            <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
-                            <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
-                            <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
-                            <a class="btn-link d-block" href="/blogs">Blogs</a>
-                        </div>
-
-                        <!-- Liên hệ -->
-                        <div class="col-lg-3 col-md-6">
-                            <h4 class="text-light mb-3">Liên hệ</h4>
-                            <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
-                            <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
-                            <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
-                            <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
-                            <!-- Form đăng ký nhận tin -->
-                            <form class="mt-3">
-                                <div class="input-group">
-                                    <input type="email" class="form-control border-0" placeholder="Nhập email của bạn">
-                                    <button class="btn btn-primary">Đăng ký</button>
+                <!-- Modal Hủy đơn hàng -->
+                <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form id="cancelOrderForm">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="cancelOrderLabel">Hủy đơn hàng</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="hidden" id="cancelOrderId">
+                                    <div class="mb-3">
+                                        <label for="cancelReason" class="form-label">Chọn lý do hủy:</label>
+                                        <select class="form-select" id="cancelReason" required>
+                                            <option value="">-- Chọn lý do --</option>
+                                            <option value="Đổi ý - không mua nữa">Đối ý - không mua nữa</option>
+                                            <option value="Đặt nhầm">Đặt nhầm</option>
+                                            <option value="Giao hàng lâu">Giao hàng lâu</option>
+                                            <option value="Khác">Khác</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Đóng</button>
+                                    <button type="submit" class="btn btn-danger">Hủy đơn</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Copyright -->
-            <div class="container-fluid bg-dark copyright bg-black py-3">
-                <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
-                    <span class="text-light mb-2 mb-md-0">
-                        <i class="fas fa-copyright me-2"></i>2025
-                        <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
-                    </span>
-                    <span class="text-white">
-                        Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML Codex</a> |
-                        Distributed by <a class="text-primary border-bottom"
-                            href="https://themewagon.com">ThemeWagon</a>
-                    </span>
+                <!-- Toast Container -->
+                <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+                    <div id="notifyToast" class="toast align-items-center text-white bg-success border-0" role="alert"
+                        aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body" id="notifyToastBody">
+                                Thông báo ở đây
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                                aria-label="Close"></button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <!-- Footer End -->
+
+                <!-- Footer Start -->
+                <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+                    <div class="container py-5">
+                        <div class="row g-5">
+                            <!-- Logo & Giới thiệu -->
+                            <div class="col-lg-3 col-md-6">
+                                <a href="/" class="d-inline-block mb-3">
+                                    <h2 class="text-primary fw-bold">LaptopShop</h2>
+                                </a>
+                                <p class="small">
+                                    Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
+                                    dịch vụ tận tâm và giá cả cạnh tranh nhất.
+                                </p>
+                                <!-- Icon mạng xã hội -->
+                                <div class="d-flex pt-2">
+                                    <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                            class="fab fa-facebook-f"></i></a>
+                                    <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                            class="fab fa-instagram"></i></a>
+                                    <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                            class="fab fa-youtube"></i></a>
+                                    <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
+                                            class="fab fa-tiktok"></i></a>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin cửa hàng -->
+                            <div class="col-lg-3 col-md-6">
+                                <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
+                                <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
+                                <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
+                                <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
+                                <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
+                            </div>
+
+                            <!-- Tài khoản -->
+                            <div class="col-lg-3 col-md-6">
+                                <h4 class="text-light mb-3">Tài khoản</h4>
+                                <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
+                                <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
+                                <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
+                                <a class="btn-link d-block" href="/blogs">Blogs</a>
+                            </div>
+
+                            <!-- Liên hệ -->
+                            <div class="col-lg-3 col-md-6">
+                                <h4 class="text-light mb-3">Liên hệ</h4>
+                                <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
+                                <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
+                                <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
+                                <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
+                                <!-- Form đăng ký nhận tin -->
+                                <form class="mt-3">
+                                    <div class="input-group">
+                                        <input type="email" class="form-control border-0"
+                                            placeholder="Nhập email của bạn">
+                                        <button class="btn btn-primary">Đăng ký</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Copyright -->
+                <div class="container-fluid bg-dark copyright bg-black py-3">
+                    <div
+                        class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
+                        <span class="text-light mb-2 mb-md-0">
+                            <i class="fas fa-copyright me-2"></i>2025
+                            <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
+                        </span>
+                        <span class="text-white">
+                            Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML
+                                Codex</a> |
+                            Distributed by <a class="text-primary border-bottom"
+                                href="https://themewagon.com">ThemeWagon</a>
+                        </span>
+                    </div>
+                </div>
+                <!-- Footer End -->
 
 
 
 
-            <!-- Back to Top -->
-            <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-                    class="fa fa-arrow-up"></i></a>
+                <!-- Back to Top -->
+                <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                        class="fa fa-arrow-up"></i></a>
 
 
-            <!-- JavaScript Libraries -->
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-            <script src="/client/lib/easing/easing.min.js"></script>
-            <script src="/client/lib/waypoints/waypoints.min.js"></script>
-            <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-            <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+                <!-- JavaScript Libraries -->
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="/client/lib/easing/easing.min.js"></script>
+                <script src="/client/lib/waypoints/waypoints.min.js"></script>
+                <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+                <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
-            <!-- Template Javascript -->
-            <script src="/client/js/main.js"></script>
-            <!-- AJAX HỦY ĐƠN HÀNG -->
-            <script>
-                // Hàm toast đếm ngược
-                function showToastCountdown(message, isSuccess = true, seconds = 3) {
-                    const toastEl = document.getElementById('notifyToast');
-                    const toastBody = document.getElementById('notifyToastBody');
+                <!-- Template Javascript -->
+                <script src="/client/js/main.js"></script>
+                <!-- AJAX HỦY ĐƠN HÀNG -->
+                <script>
+                    // Hàm toast đếm ngược
+                    function showToastCountdown(message, isSuccess = true, seconds = 3) {
+                        const toastEl = document.getElementById('notifyToast');
+                        const toastBody = document.getElementById('notifyToastBody');
 
-                    if (!toastEl || !toastBody) return;
+                        if (!toastEl || !toastBody) return;
 
-                    toastEl.classList.remove('bg-success', 'bg-danger');
-                    toastEl.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
+                        toastEl.classList.remove('bg-success', 'bg-danger');
+                        toastEl.classList.add(isSuccess ? 'bg-success' : 'bg-danger');
 
-                    let remaining = seconds;
-                    toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
+                        let remaining = seconds;
+                        toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
 
-                    let toast = bootstrap.Toast.getInstance(toastEl);
-                    if (!toast) {
-                        toast = new bootstrap.Toast(toastEl, { autohide: false });
-                    }
-
-                    toast.show();
-
-                    const interval = setInterval(() => {
-                        remaining--;
-                        if (remaining > 0) {
-                            toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
-                        } else {
-                            clearInterval(interval);
-                            toast.hide();
+                        let toast = bootstrap.Toast.getInstance(toastEl);
+                        if (!toast) {
+                            toast = new bootstrap.Toast(toastEl, { autohide: false });
                         }
-                    }, 1000);
-                }
 
-                (function () {
-                    const modalEl = document.getElementById('cancelOrderModal');
-                    const cancelForm = document.getElementById('cancelOrderForm');
-                    const cancelIdInput = document.getElementById('cancelOrderId');
-                    const cancelReason = document.getElementById('cancelReason');
+                        toast.show();
 
-                    const escapeHtml = (str = '') => String(str)
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;');
-
-                    // Gán orderId vào hidden input khi bấm nút hủy
-                    document.addEventListener('click', (e) => {
-                        const btn = e.target.closest('.btn-cancel');
-                        if (!btn) return;
-                        const orderId = btn.dataset.orderId || btn.getAttribute('data-order-id');
-                        if (!orderId) return;
-                        if (cancelIdInput) cancelIdInput.value = orderId;
-                        if (cancelReason) cancelReason.selectedIndex = 0;
-                    });
-
-                    if (!cancelForm) return;
-
-                    cancelForm.addEventListener('submit', async (e) => {
-                        e.preventDefault();
-
-                        const orderId = (cancelIdInput && cancelIdInput.value) ? cancelIdInput.value.trim() : '';
-                        const reason = (cancelReason && cancelReason.value) ? cancelReason.value.trim() : '';
-
-                        if (!orderId) {
-                            showToastCountdown('Không xác định được mã đơn hàng. Vui lòng thử lại.', false, 3);
-                            return;
-                        }
-                        if (!reason) {
-                            showToastCountdown('Vui lòng chọn lý do hủy!', false, 3);
-                            return;
-                        }
-
-                        const submitBtn = cancelForm.querySelector('button[type="submit"]');
-                        if (submitBtn) submitBtn.disabled = true;
-
-                        try {
-                            const res = await fetch(`/order-history/${encodeURIComponent(orderId)}/cancel`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ reason })
-                            });
-
-                            let data = {};
-                            try { data = await res.json(); } catch (err) { }
-
-                            if (res.ok) {
-                                // Update UI
-                                const btn = document.querySelector(`button.btn-cancel[data-order-id="${orderId}"]`);
-                                if (btn) {
-                                    const cell = btn.closest('td') || btn.parentElement;
-                                    if (cell) {
-                                        const title = escapeHtml(reason);
-                                        cell.innerHTML = `<span class="badge bg-danger fs-6 px-3 py-2" title="${title}">Đã hủy</span>`;
-                                    }
-                                }
-
-                                // Đóng modal (Bootstrap 5.0)
-                                if (modalEl && typeof bootstrap !== 'undefined') {
-                                    let modal = bootstrap.Modal.getInstance(modalEl);
-                                    if (!modal) modal = new bootstrap.Modal(modalEl);
-                                    modal.hide();
-                                }
-
-                                showToastCountdown(data.message || 'Hủy đơn hàng thành công!', true, 4);
+                        const interval = setInterval(() => {
+                            remaining--;
+                            if (remaining > 0) {
+                                toastBody.textContent = `${message} (đóng sau ${remaining}s)`;
                             } else {
-                                const msg = (data && data.message) ? data.message : 'Có lỗi xảy ra!';
-                                showToastCountdown(msg, false, 3);
+                                clearInterval(interval);
+                                toast.hide();
                             }
-                        } catch (err) {
-                            console.error('Cancel order error:', err);
-                            showToastCountdown('Có lỗi xảy ra. Vui lòng kiểm tra console server.', false, 4);
-                        } finally {
-                            if (submitBtn) submitBtn.disabled = false;
-                        }
-                    });
-                })();
-            </script>
-
-            <script>
-                (() => {
-                    const form = document.getElementById('headerSearchForm');
-                    const input = document.getElementById('headerSearch');
-                    const popup = document.getElementById('searchPopup');
-
-                    let timer = null;
-                    let activeIndex = -1;
-                    let currentItems = []; // giữ dữ liệu gợi ý hiện tại
-
-                    const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, s => ({
-                        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-                    }[s]));
-
-                    const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
-
-                    const highlight = (text, q) => {
-                        if (!q) return escapeHtml(text);
-                        const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
-                        return escapeHtml(text).replace(re, '<mark>$1</mark>');
-                    };
-
-                    // Chuẩn hoá đường dẫn ảnh từ DB
-                    const toImg = (v) => {
-                        if (!v) return '/images/no-image.png';
-                        if (/^https?:\/\//.test(v)) return v;   // URL tuyệt đối
-                        if (v.startsWith('/')) return v;        // đã có slash
-                        if (v.startsWith('images/')) return '/' + v; // có thư mục sẵn
-                        // còn lại coi như chỉ là filename
-                        return '/images/product/' + encodeURIComponent(v);
-                    };
-
-                    async function fetchSuggest(q) {
-                        const url = '/api/suggest?q=' + encodeURIComponent(q);
-                        const res = await fetch(url, { credentials: 'same-origin' });
-                        if (!res.ok) throw new Error('Network');
-                        return res.json();
+                        }, 1000);
                     }
 
-                    function render(items, q) {
-                        currentItems = items;           // lưu lại để điều hướng bàn phím
-                        activeIndex = -1;
+                    (function () {
+                        const modalEl = document.getElementById('cancelOrderModal');
+                        const cancelForm = document.getElementById('cancelOrderForm');
+                        const cancelIdInput = document.getElementById('cancelOrderId');
+                        const cancelReason = document.getElementById('cancelReason');
 
-                        if (!items.length) {
-                            popup.innerHTML = `<div class="empty">Không tìm thấy sản phẩm phù hợp.</div>`;
-                            popup.style.display = 'block';
-                            return;
+                        const escapeHtml = (str = '') => String(str)
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')
+                            .replace(/"/g, '&quot;')
+                            .replace(/'/g, '&#39;');
+
+                        // Gán orderId vào hidden input khi bấm nút hủy
+                        document.addEventListener('click', (e) => {
+                            const btn = e.target.closest('.btn-cancel');
+                            if (!btn) return;
+                            const orderId = btn.dataset.orderId || btn.getAttribute('data-order-id');
+                            if (!orderId) return;
+                            if (cancelIdInput) cancelIdInput.value = orderId;
+                            if (cancelReason) cancelReason.selectedIndex = 0;
+                        });
+
+                        if (!cancelForm) return;
+
+                        cancelForm.addEventListener('submit', async (e) => {
+                            e.preventDefault();
+
+                            const orderId = (cancelIdInput && cancelIdInput.value) ? cancelIdInput.value.trim() : '';
+                            const reason = (cancelReason && cancelReason.value) ? cancelReason.value.trim() : '';
+
+                            if (!orderId) {
+                                showToastCountdown('Không xác định được mã đơn hàng. Vui lòng thử lại.', false, 3);
+                                return;
+                            }
+                            if (!reason) {
+                                showToastCountdown('Vui lòng chọn lý do hủy!', false, 3);
+                                return;
+                            }
+
+                            const submitBtn = cancelForm.querySelector('button[type="submit"]');
+                            if (submitBtn) submitBtn.disabled = true;
+
+                            try {
+                                const res = await fetch(`/order-history/${encodeURIComponent(orderId)}/cancel`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ reason })
+                                });
+
+                                let data = {};
+                                try { data = await res.json(); } catch (err) { }
+
+                                if (res.ok) {
+                                    // Update UI
+                                    const btn = document.querySelector(`button.btn-cancel[data-order-id="${orderId}"]`);
+                                    if (btn) {
+                                        const cell = btn.closest('td') || btn.parentElement;
+                                        if (cell) {
+                                            const title = escapeHtml(reason);
+                                            cell.innerHTML = `<span class="badge bg-danger fs-6 px-3 py-2" title="${title}">Đã hủy</span>`;
+                                        }
+                                    }
+
+                                    // Đóng modal (Bootstrap 5.0)
+                                    if (modalEl && typeof bootstrap !== 'undefined') {
+                                        let modal = bootstrap.Modal.getInstance(modalEl);
+                                        if (!modal) modal = new bootstrap.Modal(modalEl);
+                                        modal.hide();
+                                    }
+
+                                    showToastCountdown(data.message || 'Hủy đơn hàng thành công!', true, 4);
+                                } else {
+                                    const msg = (data && data.message) ? data.message : 'Có lỗi xảy ra!';
+                                    showToastCountdown(msg, false, 3);
+                                }
+                            } catch (err) {
+                                console.error('Cancel order error:', err);
+                                showToastCountdown('Có lỗi xảy ra. Vui lòng kiểm tra console server.', false, 4);
+                            } finally {
+                                if (submitBtn) submitBtn.disabled = false;
+                            }
+                        });
+                    })();
+                </script>
+
+                <script>
+                    (() => {
+                        const form = document.getElementById('headerSearchForm');
+                        const input = document.getElementById('headerSearch');
+                        const popup = document.getElementById('searchPopup');
+
+                        let timer = null;
+                        let activeIndex = -1;
+                        let currentItems = []; // giữ dữ liệu gợi ý hiện tại
+
+                        const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, s => ({
+                            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                        }[s]));
+
+                        const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
+
+                        const highlight = (text, q) => {
+                            if (!q) return escapeHtml(text);
+                            const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+                            return escapeHtml(text).replace(re, '<mark>$1</mark>');
+                        };
+
+                        // Chuẩn hoá đường dẫn ảnh từ DB
+                        const toImg = (v) => {
+                            if (!v) return '/images/no-image.png';
+                            if (/^https?:\/\//.test(v)) return v;   // URL tuyệt đối
+                            if (v.startsWith('/')) return v;        // đã có slash
+                            if (v.startsWith('images/')) return '/' + v; // có thư mục sẵn
+                            // còn lại coi như chỉ là filename
+                            return '/images/product/' + encodeURIComponent(v);
+                        };
+
+                        async function fetchSuggest(q) {
+                            const url = '/api/suggest?q=' + encodeURIComponent(q);
+                            const res = await fetch(url, { credentials: 'same-origin' });
+                            if (!res.ok) throw new Error('Network');
+                            return res.json();
                         }
 
-                        popup.innerHTML = items.map((x, i) => {
-                            const img = toImg(x.image);
-                            const href = `/product/${encodeURIComponent(String(x.id))}`;
-                            return `
+                        function render(items, q) {
+                            currentItems = items;           // lưu lại để điều hướng bàn phím
+                            activeIndex = -1;
+
+                            if (!items.length) {
+                                popup.innerHTML = `<div class="empty">Không tìm thấy sản phẩm phù hợp.</div>`;
+                                popup.style.display = 'block';
+                                return;
+                            }
+
+                            popup.innerHTML = items.map((x, i) => {
+                                const img = toImg(x.image);
+                                const href = `/product/${encodeURIComponent(String(x.id))}`;
+                                return `
         <a class="sug-item" data-index="${i}" data-href="${href}" href="${href}">
           <img src="${img}" alt="">
           <div class="flex-1">
@@ -883,123 +736,123 @@
           </div>
         </a>
       `;
-                        }).join('');
+                            }).join('');
 
-                        // Gán hover để set active
-                        popup.querySelectorAll('.sug-item').forEach(el => {
-                            el.addEventListener('mouseenter', () => {
-                                setActive(Number(el.dataset.index));
+                            // Gán hover để set active
+                            popup.querySelectorAll('.sug-item').forEach(el => {
+                                el.addEventListener('mouseenter', () => {
+                                    setActive(Number(el.dataset.index));
+                                });
                             });
+
+                            popup.style.display = 'block';
+                        }
+
+                        function hide() {
+                            popup.style.display = 'none';
+                            activeIndex = -1;
+                            currentItems = [];
+                        }
+
+                        function setActive(index) {
+                            const items = popup.querySelectorAll('.sug-item');
+                            items.forEach(a => a.classList.remove('active'));
+                            if (items[index]) {
+                                items[index].classList.add('active');
+                                activeIndex = index;
+                            } else {
+                                activeIndex = -1;
+                            }
+                        }
+
+                        input.addEventListener('input', () => {
+                            const q = input.value.trim();
+                            clearTimeout(timer);
+                            if (!q) return hide();
+                            timer = setTimeout(async () => {
+                                try {
+                                    const items = await fetchSuggest(q);
+                                    render(items, q);
+                                } catch {
+                                    hide();
+                                }
+                            }, 200);
                         });
 
-                        popup.style.display = 'block';
-                    }
+                        input.addEventListener('focus', () => {
+                            if (popup.innerHTML.trim()) popup.style.display = 'block';
+                        });
 
-                    function hide() {
-                        popup.style.display = 'none';
-                        activeIndex = -1;
-                        currentItems = [];
-                    }
+                        document.addEventListener('click', (e) => {
+                            if (!popup.contains(e.target) && e.target !== input) hide();
+                        });
 
-                    function setActive(index) {
-                        const items = popup.querySelectorAll('.sug-item');
-                        items.forEach(a => a.classList.remove('active'));
-                        if (items[index]) {
-                            items[index].classList.add('active');
-                            activeIndex = index;
-                        } else {
-                            activeIndex = -1;
-                        }
-                    }
+                        input.addEventListener('keydown', (e) => {
+                            const items = popup.querySelectorAll('.sug-item');
+                            if (!items.length) return;
 
-                    input.addEventListener('input', () => {
-                        const q = input.value.trim();
-                        clearTimeout(timer);
-                        if (!q) return hide();
-                        timer = setTimeout(async () => {
-                            try {
-                                const items = await fetchSuggest(q);
-                                render(items, q);
-                            } catch {
+                            if (e.key === 'ArrowDown') {
+                                e.preventDefault();
+                                const next = (activeIndex + 1) % items.length;
+                                setActive(next);
+                            } else if (e.key === 'ArrowUp') {
+                                e.preventDefault();
+                                const prev = (activeIndex - 1 + items.length) % items.length;
+                                setActive(prev);
+                            } else if (e.key === 'Enter') {
+                                if (activeIndex >= 0 && items[activeIndex]) {
+                                    e.preventDefault();
+                                    // Điều hướng thẳng tới sản phẩm đang chọn
+                                    const href = items[activeIndex].dataset.href;
+                                    window.location.href = href;
+                                }
+                                // nếu không có item đang active, để form submit bình thường
+                            } else if (e.key === 'Escape') {
                                 hide();
                             }
-                        }, 200);
+                        });
+
+                        // Submit form: chuyển đến /products?q=...
+                        form.addEventListener('submit', (e) => {
+                            const q = input.value.trim();
+                            if (!q) { e.preventDefault(); hide(); }
+                        });
+                    })();
+
+                    /**/
+                    (() => {
+                        const form = document.getElementById('headerSearchForm');
+                        const input = document.getElementById('headerSearch');
+                        const btn = form?.querySelector('button[type="submit"]');
+                        if (!form || !input || !btn) return;
+
+                        // Click kính lúp: nếu ô trống => chỉ mở & focus (không submit)
+                        btn.addEventListener('click', (e) => {
+                            if (!input.value.trim()) { e.preventDefault(); form.classList.add('open'); input.focus(); }
+                        });
+
+                        // Rời khỏi input mà không gõ gì => thu gọn lại
+                        input.addEventListener('blur', () => {
+                            if (!input.value.trim()) form.classList.remove('open');
+                        });
+                    })();
+                </script>
+
+                <!--  Điều hướng khi click vào header đơn hàng -->
+                <script>
+                    // Click header (trừ các phần tử tương tác) -> đi /order/:id
+                    document.addEventListener('click', function (e) {
+                        const head = e.target.closest('.order-head-btn');
+                        if (!head) return;
+
+                        // Nếu click vào phần tử tương tác (nút chevron, nút hủy, link, input...) thì KHÔNG điều hướng
+                        const interactive = e.target.closest('a,button,input,select,textarea,.btn,.toggle-collapse');
+                        if (interactive) return;
+
+                        const url = head.dataset.detailUrl;
+                        if (url) window.location.href = url;
                     });
-
-                    input.addEventListener('focus', () => {
-                        if (popup.innerHTML.trim()) popup.style.display = 'block';
-                    });
-
-                    document.addEventListener('click', (e) => {
-                        if (!popup.contains(e.target) && e.target !== input) hide();
-                    });
-
-                    input.addEventListener('keydown', (e) => {
-                        const items = popup.querySelectorAll('.sug-item');
-                        if (!items.length) return;
-
-                        if (e.key === 'ArrowDown') {
-                            e.preventDefault();
-                            const next = (activeIndex + 1) % items.length;
-                            setActive(next);
-                        } else if (e.key === 'ArrowUp') {
-                            e.preventDefault();
-                            const prev = (activeIndex - 1 + items.length) % items.length;
-                            setActive(prev);
-                        } else if (e.key === 'Enter') {
-                            if (activeIndex >= 0 && items[activeIndex]) {
-                                e.preventDefault();
-                                // Điều hướng thẳng tới sản phẩm đang chọn
-                                const href = items[activeIndex].dataset.href;
-                                window.location.href = href;
-                            }
-                            // nếu không có item đang active, để form submit bình thường
-                        } else if (e.key === 'Escape') {
-                            hide();
-                        }
-                    });
-
-                    // Submit form: chuyển đến /products?q=...
-                    form.addEventListener('submit', (e) => {
-                        const q = input.value.trim();
-                        if (!q) { e.preventDefault(); hide(); }
-                    });
-                })();
-
-                /**/
-                (() => {
-                    const form = document.getElementById('headerSearchForm');
-                    const input = document.getElementById('headerSearch');
-                    const btn = form?.querySelector('button[type="submit"]');
-                    if (!form || !input || !btn) return;
-
-                    // Click kính lúp: nếu ô trống => chỉ mở & focus (không submit)
-                    btn.addEventListener('click', (e) => {
-                        if (!input.value.trim()) { e.preventDefault(); form.classList.add('open'); input.focus(); }
-                    });
-
-                    // Rời khỏi input mà không gõ gì => thu gọn lại
-                    input.addEventListener('blur', () => {
-                        if (!input.value.trim()) form.classList.remove('open');
-                    });
-                })();
-            </script>
-
-            <!--  Điều hướng khi click vào header đơn hàng -->
-            <script>
-                // Click header (trừ các phần tử tương tác) -> đi /order/:id
-                document.addEventListener('click', function (e) {
-                    const head = e.target.closest('.order-head-btn');
-                    if (!head) return;
-
-                    // Nếu click vào phần tử tương tác (nút chevron, nút hủy, link, input...) thì KHÔNG điều hướng
-                    const interactive = e.target.closest('a,button,input,select,textarea,.btn,.toggle-collapse');
-                    if (interactive) return;
-
-                    const url = head.dataset.detailUrl;
-                    if (url) window.location.href = url;
-                });
-            </script>
+                </script>
 
 </body>
 
