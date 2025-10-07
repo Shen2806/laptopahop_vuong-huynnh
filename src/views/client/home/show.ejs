@@ -48,61 +48,7 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <link href="/client/css/home/show.css" rel="stylesheet">
     <style>
-        /* ====== AI – LIST view giống ảnh bạn gửi ====== */
-        .ai-list {
-            background: #e9f2ff;
-            border: 1px solid #cfe0ff;
-            border-radius: 12px;
-            padding: 12px 14px;
-        }
 
-        .ai-li+.ai-li {
-            border-top: 1px dashed #c7d7ff;
-            margin-top: 10px;
-            padding-top: 10px;
-        }
-
-        .ai-li__title {
-            font-size: 15px;
-            color: #0f172a;
-            margin-bottom: 6px;
-        }
-
-        .ai-li__index {
-            font-weight: 800;
-            margin-right: 6px;
-            color: #334155;
-        }
-
-        .ai-li__row {
-            font-size: 14px;
-            color: #1f2937;
-            margin: 4px 0;
-        }
-
-        .ai-li__label {
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .ai-li__cta {
-            margin-top: 6px;
-        }
-
-        .ai-btn {
-            display: inline-block;
-            background: #2563eb;
-            color: #fff !important;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .ai-btn:hover {
-            background: #1d4ed8;
-        }
     </style>
 
 </head>
@@ -406,142 +352,351 @@
             </div>
             <!-- Fruits Shop End-->
 
+            <!-- Hướng dẫn mua laptop (pro) -->
+            <div class="container-fluid py-5 guide-wrap">
+                <div class="container">
+                    <section id="buying-guide"
+                        class="rounded-4 shadow-lg position-relative overflow-hidden p-4 p-md-5 bg-white">
+                        <!-- Header -->
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+                            <div>
+                                <div class="text-uppercase small fw-semibold text-success opacity-75">Buying Guide
+                                </div>
+                                <h2 class="mb-1">Hướng dẫn mua laptop chuẩn chuyên gia</h2>
+                                <div class="text-muted">Chọn theo ngân sách, nhu cầu hoặc cấu hình đề xuất — nhanh,
+                                    dễ, chuẩn.</div>
+                            </div>
+                            <div class="mt-3 mt-md-0">
+                                <a href="/products" class="btn btn-success rounded-pill px-4">
+                                    <i class="fa fa-laptop me-2"></i> Xem tất cả laptop
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- 3 khối chính -->
+                        <div class="row g-3 g-lg-4">
+                            <!-- Theo ngân sách -->
+                            <div class="col-md-6 col-lg-4">
+                                <div class="guide-card h-100 p-4 rounded-4 border">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <span class="icon-pill me-2"><i class="fa fa-wallet"></i></span>
+                                        <h5 class="mb-0">Chọn theo ngân sách</h5>
+                                    </div>
+                                    <p class="text-muted mb-3">Tối ưu chi phí theo mức giá bạn muốn.</p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <!-- dùng chip để đẩy câu hỏi vào chat AI của bạn -->
+                                        <button class="chip" type="button"
+                                            data-q="Tư vấn laptop dưới 12 triệu, ưu tiên RAM 16GB">≤ 12
+                                            triệu</button>
+                                        <button class="chip" type="button"
+                                            data-q="Tư vấn laptop 12–20 triệu cho văn phòng, nhẹ pin trâu">12–20
+                                            triệu</button>
+                                        <button class="chip" type="button"
+                                            data-q="Tư vấn laptop 20–30 triệu cho đồ họa nhẹ, màn đẹp">20–30
+                                            triệu</button>
+                                        <button class="chip" type="button"
+                                            data-q="Laptop cao cấp trên 30 triệu, build tốt, màn 100% sRGB">≥ 30
+                                            triệu</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Theo nhu cầu -->
+                            <div class="col-md-6 col-lg-4">
+                                <div class="guide-card h-100 p-4 rounded-4 border">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <span class="icon-pill me-2"><i class="fa fa-bullseye"></i></span>
+                                        <h5 class="mb-0">Chọn theo nhu cầu</h5>
+                                    </div>
+                                    <p class="text-muted mb-3">Ưu tiên đúng việc để hiệu quả nhất.</p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button class="chip" type="button"
+                                            data-q="Tư vấn laptop văn phòng nhẹ dưới 1.3kg, pin tốt">Văn
+                                            phòng</button>
+                                        <button class="chip" type="button"
+                                            data-q="Tư vấn laptop cho sinh viên IT, ưu tiên RAM 16GB và SSD 512GB">Sinh
+                                            viên IT</button>
+                                        <button class="chip" type="button"
+                                            data-q="Tư vấn laptop gaming 20–30 triệu, RTX 4050 trở lên">Gaming</button>
+                                        <button class="chip" type="button"
+                                            data-q="Tư vấn laptop đồ họa/creator màn đẹp 100% sRGB">Đồ họa</button>
+                                        <button class="chip" type="button"
+                                            data-q="Tư vấn ultrabook mỏng nhẹ dưới 1.2kg, sạc Type-C">Mỏng
+                                            nhẹ</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cấu hình đề xuất -->
+                            <div class="col-md-12 col-lg-4">
+                                <div class="guide-card h-100 p-4 rounded-4 border">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <span class="icon-pill me-2"><i class="fa fa-microchip"></i></span>
+                                        <h5 class="mb-0">Cấu hình đề xuất nhanh</h5>
+                                    </div>
+
+                                    <ul class="list-unstyled mb-0 small">
+                                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Văn phòng:
+                                            Core i5 / Ryzen 5 • RAM ≥ 16GB • SSD ≥ 512GB</li>
+                                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Gaming: i5/i7
+                                            + RTX 4050↑ • RAM 16–32GB • tản tốt</li>
+                                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Đồ họa: i7/R7
+                                            • RTX 4060↑ • Màn ≥ 100% sRGB/IPS hoặc OLED</li>
+                                        <li class="mb-2"><i class="fa fa-check text-success me-2"></i>Di động: ≤
+                                            1.3kg • pin ≥ 50Wh • sạc USB-C PD</li>
+                                        <li><i class="fa fa-check text-success me-2"></i>Ưu tiên Wi-Fi 6/6E, bàn
+                                            phím tốt, bảo hành chính hãng</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <hr class="my-4 my-lg-5 divider">
+
+                        <!-- Accordion chi tiết -->
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="accordion guide-accordion" id="guideAccordion">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="cpuHead">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#cpu">
+                                                CPU & RAM
+                                            </button>
+                                        </h2>
+                                        <div id="cpu" class="accordion-collapse collapse show"
+                                            data-bs-parent="#guideAccordion">
+                                            <div class="accordion-body">
+                                                <p class="mb-2">CPU quyết định tốc độ xử lý; RAM quyết định độ mượt
+                                                    khi đa nhiệm.</p>
+                                                <ul class="small mb-0">
+                                                    <li>Văn phòng: <strong>Intel Core i5 / Ryzen 5</strong>, RAM
+                                                        <strong>16GB</strong>.
+                                                    </li>
+                                                    <li>Đồ họa/Gaming: <strong>Core i7 / Ryzen 7</strong>, RAM
+                                                        <strong>16–32GB</strong>.
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="gpuHead">
+                                            <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#gpu">
+                                                GPU & Màn hình
+                                            </button>
+                                        </h2>
+                                        <div id="gpu" class="accordion-collapse collapse"
+                                            data-bs-parent="#guideAccordion">
+                                            <div class="accordion-body">
+                                                <ul class="small mb-0">
+                                                    <li>Gaming/3D: <strong>RTX 4050</strong> trở lên.</li>
+                                                    <li>Thiết kế: màn <strong>100% sRGB</strong> trở lên, ưu tiên
+                                                        <strong>IPS/OLED</strong>, 300 nits+.
+                                                    </li>
+                                                    <li>Tần số quét 120–165Hz giúp cuộn/điều hướng mượt hơn.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="storageHead">
+                                            <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#storage">
+                                                Lưu trữ & Pin
+                                            </button>
+                                        </h2>
+                                        <div id="storage" class="accordion-collapse collapse"
+                                            data-bs-parent="#guideAccordion">
+                                            <div class="accordion-body">
+                                                <ul class="small mb-0">
+                                                    <li><strong>SSD ≥ 512GB</strong> cho trải nghiệm nhanh; cân nhắc
+                                                        khe trống để nâng cấp.</li>
+                                                    <li>Pin: 50–70Wh là ngưỡng tốt; sạc <strong>USB-C PD</strong>
+                                                        tiện dùng chung.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="buildHead">
+                                            <button class="accordion-button collapsed" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#build">
+                                                Trọng lượng & Độ bền
+                                            </button>
+                                        </h2>
+                                        <div id="build" class="accordion-collapse collapse"
+                                            data-bs-parent="#guideAccordion">
+                                            <div class="accordion-body">
+                                                <ul class="small mb-0">
+                                                    <li>Di động nhiều: trọng lượng <strong>≤ 1.3kg</strong>.</li>
+                                                    <li>Vỏ kim loại, bản lề chắc; bàn phím có đèn nền, hành trình
+                                                        ổn.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Checklist nhanh + CTA -->
+                            <div class="col-lg-4 mt-4 mt-lg-0">
+                                <div class="p-4 rounded-4 border h-100">
+                                    <h6 class="mb-3"><i class="fa fa-list-check me-2"></i>Checklist 30 giây</h6>
+                                    <ul class="small mb-4">
+                                        <li>Ngân sách & nhu cầu đã rõ?</li>
+                                        <li>RAM 16GB, SSD 512GB đủ dùng?</li>
+                                        <li>Màn đáp ứng: IPS/OLED, 100% sRGB?</li>
+                                        <li>Trọng lượng & thời lượng pin ổn?</li>
+                                        <li>Bảo hành chính hãng, hậu mãi yên tâm?</li>
+                                    </ul>
+                                    <a href="/terms" class="btn btn-outline-success w-100 rounded-pill">Đọc thêm điều khoản sử dụng</a>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <!-- /Hướng dẫn mua laptop (pro) -->
+
+            <!-- Recently Viewed Start -->
+            <div class="container-fluid pt-3">
+                <div class="container">
+                    <section id="recent-viewed" class="mt-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h2 class="mb-0" style="color:#57B212">Sản phẩm đã xem</h2>
+                        </div>
+
+                        <% if (recentProducts && recentProducts.length) { %>
+                            <div class="row g-3">
+                                <% recentProducts.forEach(p=> {
+                                    const price = Number(p.price||0);
+                                    const finalPrice = p.discount ? Math.max(0, price - Math.round(price *
+                                    p.discount / 100)) : price;
+                                    %>
+                                    <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                                        <a href="/product/<%= p.id %>"
+                                            class="card recent-card h-100 text-decoration-none">
+                                            <div class="ratio ratio-4x3">
+                                                <img src="<%= p.thumb || '/images/no-image.png' %>"
+                                                    class="card-img-top object-fit-cover" alt="<%= p.name %>">
+                                            </div>
+                                            <div class="card-body p-2">
+                                                <div class="line-clamp-2 small fw-semibold text-dark">
+                                                    <%= p.name %>
+                                                </div>
+                                                <div class="mt-1">
+                                                    <% if (p.discount && p.discount> 0) { %>
+                                                        <div class="d-flex align-items-baseline gap-2">
+                                                            <div class="fw-bold text-danger">
+                                                                <%= finalPrice.toLocaleString('vi-VN') %>₫
+                                                            </div>
+                                                            <div class="text-muted text-decoration-line-through small">
+                                                                <%= price.toLocaleString('vi-VN') %>₫
+                                                            </div>
+                                                        </div>
+                                                        <% } else { %>
+                                                            <div class="fw-bold text-dark">
+                                                                <%= price.toLocaleString('vi-VN') %>₫
+                                                            </div>
+                                                            <% } %>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                            <% } else { %>
+                                <div class="text-muted fst-italic">Chưa có sản phẩm nào.</div>
+                                <% } %>
+                    </section>
+                </div>
+            </div>
+            <!-- Recently Viewed End -->
+
+            <!-- Blogs Start-->
+            <div class="container-fluid">
+                <div class="container">
+                    <div class="tab-class text-center">
+                        <div class="row g-4">
+                            <section class="mt-5" id="tech-news">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <h2 class="mb-0 text-primary">Tin tức công nghệ</h2>
+                                    <a href="/blogs" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+                                </div>
+
+                                <% if (latestBlogs && latestBlogs.length) { %>
+                                    <div class="swiper news-swiper">
+                                        <div class="swiper-wrapper">
+                                            <% latestBlogs.forEach(b=> {
+                                                // Rút gọn content, loại bỏ thẻ HTML
+                                                const plain = (b.content || '').replace(/<[^>]*>/g, '');
+                                                    const short = plain.length > 140 ? (plain.slice(0, 140) + '...')
+                                                    : plain;
+                                                    %>
+                                                    <div class="swiper-slide">
+                                                        <div
+                                                            class="news-card shadow-sm rounded h-100 d-flex flex-column">
+                                                            <img src="<%= b.thumbnail || '/images/default-blog.jpg' %>"
+                                                                class="news-img" alt="<%= b.title %>"
+                                                                style="height:180px; object-fit:cover; width:100%;" />
+                                                            <div class="p-3 d-flex flex-column flex-grow-1 text-start">
+                                                                <h5 class="fw-bold mb-2 text-truncate">
+                                                                    <a href="/blogs/<%= b.slug %>"
+                                                                        class="text-decoration-none text-dark">
+                                                                        <%= b.title %>
+                                                                    </a>
+                                                                </h5>
+
+                                                                <p class="news-summary text-muted mb-2"
+                                                                    style="min-height:48px;">
+                                                                    <%= short %>
+                                                                </p>
+
+                                                                <div class="small text-secondary mt-auto">
+                                                                    <i class="bi bi-calendar3"></i>
+                                                                    <%= new
+                                                                        Date(b.createdAt).toLocaleDateString('vi-VN') %>
+                                                                        <% if (b.author) { %>
+                                                                            &nbsp;•&nbsp;<i class="bi bi-person"></i>
+                                                                            <%= b.author %>
+                                                                                <% } %>
+                                                                </div>
+
+                                                                <a href="/blogs/<%= b.slug %>"
+                                                                    class="btn btn-sm btn-primary mt-2 align-self-start">
+                                                                    Đọc tiếp
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <% }) %>
+                                        </div>
+
+                                        <!-- Nút điều hướng + Pagination -->
+                                        <div class="swiper-button-next"></div>
+                                        <div class="swiper-button-prev"></div>
+                                    </div>
+                                    <% } else { %>
+                                        <div class="text-muted fst-italic">Chưa có bài viết nào.</div>
+                                        <% } %>
+
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Blogs End-->
+
             <!-- Features Section Start -->
             <%- include('../layout/feature'); -%>
                 <!-- Features Section End -->
 
-                <!-- Recently Viewed Start -->
-                <div class="container-fluid pt-3">
-                    <div class="container">
-                        <section id="recent-viewed" class="mt-4">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <h2 class="mb-0" style="color:#57B212">Sản phẩm đã xem</h2>
-                            </div>
-
-                            <% if (recentProducts && recentProducts.length) { %>
-                                <div class="row g-3">
-                                    <% recentProducts.forEach(p=> {
-                                        const price = Number(p.price||0);
-                                        const finalPrice = p.discount ? Math.max(0, price - Math.round(price *
-                                        p.discount / 100)) : price;
-                                        %>
-                                        <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-                                            <a href="/product/<%= p.id %>"
-                                                class="card recent-card h-100 text-decoration-none">
-                                                <div class="ratio ratio-4x3">
-                                                    <img src="<%= p.thumb || '/images/no-image.png' %>"
-                                                        class="card-img-top object-fit-cover" alt="<%= p.name %>">
-                                                </div>
-                                                <div class="card-body p-2">
-                                                    <div class="line-clamp-2 small fw-semibold text-dark">
-                                                        <%= p.name %>
-                                                    </div>
-                                                    <div class="mt-1">
-                                                        <% if (p.discount && p.discount> 0) { %>
-                                                            <div class="d-flex align-items-baseline gap-2">
-                                                                <div class="fw-bold text-danger">
-                                                                    <%= finalPrice.toLocaleString('vi-VN') %>₫
-                                                                </div>
-                                                                <div
-                                                                    class="text-muted text-decoration-line-through small">
-                                                                    <%= price.toLocaleString('vi-VN') %>₫
-                                                                </div>
-                                                            </div>
-                                                            <% } else { %>
-                                                                <div class="fw-bold text-dark">
-                                                                    <%= price.toLocaleString('vi-VN') %>₫
-                                                                </div>
-                                                                <% } %>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <% }) %>
-                                </div>
-                                <% } else { %>
-                                    <div class="text-muted fst-italic">Chưa có sản phẩm nào.</div>
-                                    <% } %>
-                        </section>
-                    </div>
-                </div>
-                <!-- Recently Viewed End -->
-
-                <!-- Blogs Start-->
-                <div class="container-fluid">
-                    <div class="container">
-                        <div class="tab-class text-center">
-                            <div class="row g-4">
-                                <section class="mt-5" id="tech-news">
-                                    <div class="d-flex align-items-center justify-content-between mb-3">
-                                        <h2 class="mb-0 text-primary">Tin tức công nghệ</h2>
-                                        <a href="/blogs" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
-                                    </div>
-
-                                    <% if (latestBlogs && latestBlogs.length) { %>
-                                        <div class="swiper news-swiper">
-                                            <div class="swiper-wrapper">
-                                                <% latestBlogs.forEach(b=> {
-                                                    // Rút gọn content, loại bỏ thẻ HTML
-                                                    const plain = (b.content || '').replace(/<[^>]*>/g, '');
-                                                        const short = plain.length > 140 ? (plain.slice(0, 140) + '...')
-                                                        : plain;
-                                                        %>
-                                                        <div class="swiper-slide">
-                                                            <div
-                                                                class="news-card shadow-sm rounded h-100 d-flex flex-column">
-                                                                <img src="<%= b.thumbnail || '/images/default-blog.jpg' %>"
-                                                                    class="news-img" alt="<%= b.title %>"
-                                                                    style="height:180px; object-fit:cover; width:100%;" />
-                                                                <div
-                                                                    class="p-3 d-flex flex-column flex-grow-1 text-start">
-                                                                    <h5 class="fw-bold mb-2 text-truncate">
-                                                                        <a href="/blogs/<%= b.slug %>"
-                                                                            class="text-decoration-none text-dark">
-                                                                            <%= b.title %>
-                                                                        </a>
-                                                                    </h5>
-
-                                                                    <p class="news-summary text-muted mb-2"
-                                                                        style="min-height:48px;">
-                                                                        <%= short %>
-                                                                    </p>
-
-                                                                    <div class="small text-secondary mt-auto">
-                                                                        <i class="bi bi-calendar3"></i>
-                                                                        <%= new
-                                                                            Date(b.createdAt).toLocaleDateString('vi-VN')
-                                                                            %>
-                                                                            <% if (b.author) { %>
-                                                                                &nbsp;•&nbsp;<i
-                                                                                    class="bi bi-person"></i>
-                                                                                <%= b.author %>
-                                                                                    <% } %>
-                                                                    </div>
-
-                                                                    <a href="/blogs/<%= b.slug %>"
-                                                                        class="btn btn-sm btn-primary mt-2 align-self-start">
-                                                                        Đọc tiếp
-                                                                    </a>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <% }) %>
-                                            </div>
-
-                                            <!-- Nút điều hướng + Pagination -->
-                                            <div class="swiper-button-next"></div>
-                                            <div class="swiper-button-prev"></div>
-                                        </div>
-                                        <% } else { %>
-                                            <div class="text-muted fst-italic">Chưa có bài viết nào.</div>
-                                            <% } %>
-
-                                </section>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Blogs End-->
                 <!-- === RÙA AI — chatbox === -->
                 <div id="aiTurtle" class="ai-turtle">
                     <button id="aiTurtleBtn" class="ai-turtle__btn" aria-label="Mở Rùa AI">
@@ -656,8 +811,9 @@
                                 prevEl: ".news-swiper .swiper-button-prev",
                             },
                         });
+                    </script>
 
-
+                    <script>
                         /*animation*/
                         // 1) Gán hiệu ứng cho phần tử theo selector (không cần sửa EJS)
                         document.addEventListener('DOMContentLoaded', () => {

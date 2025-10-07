@@ -404,169 +404,142 @@
                             %>
 
                             <div class="d-flex align-items-center justify-content-between cmp-top-actions mb-3">
-                                <div>
-                                    <a href="/products" class="btn btn-outline-secondary btn-sm"><i
-                                            class="fa fa-arrow-left me-1"></i> Tiếp tục mua</a>
-                                </div>
-                                <div>
-                                    <a href="/compare?ids=<%= (ids && ids.length) ? ids.join(',') : '' %>"
-                                        class="btn btn-primary btn-sm">
-                                        Làm mới trang so sánh
-                                    </a>
-                                </div>
-                            </div>
+  <div>
+    <!-- <a href="/products" class="btn btn-outline-secondary btn-sm">
+      <i class="fa fa-arrow-left me-1"></i> Tiếp tục mua
+    </a> -->
+  </div>
+  <div class="d-flex align-items-center">
+    <!-- <a href="/compare?ids=<%= (ids && ids.length) ? ids.join(',') : '' %>" class="btn btn-primary btn-sm me-2">
+      Làm mới trang so sánh
+    </a> -->
+    <!-- NEW: toggle chỉ hiển thị khác nhau -->
+    <div class="form-check form-switch m-0">
+      <input class="form-check-input" type="checkbox" id="cmpOnlyDiff">
+      <label class="form-check-label" for="cmpOnlyDiff">Chỉ hiển thị khác nhau</label>
+    </div>
+  </div>
+</div>
 
-                            <% if (list.length===0) { %>
-                                <div class="alert alert-info">Chưa có sản phẩm nào để so sánh. Hãy thêm sản phẩm bằng
-                                    nút
-                                    “So
-                                    sánh” ở trang sản phẩm.</div>
-                                <% } %>
+<% if (list.length===0) { %>
+  <div class="alert alert-info">Chưa có sản phẩm nào để so sánh. Hãy thêm sản phẩm bằng nút “So sánh” ở trang sản phẩm.</div>
+<% } %>
 
-                                    <% if (list.length> 0) { %>
-                                        <div class="table-responsive">
-                                            <table class="table cmp-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="cmp-spec">Thuộc tính</th>
-                                                        <% var k=0; for (k=0; k<list.length; k++){ %>
-                                                            <th class="text-center cmp-header">
-                                                                <a href="/product/<%= list[k].id %>">
-                                                                    <img src="/images/product/<%= list[k].image %>"
-                                                                        alt="prod">
-                                                                </a>
-                                                                <div class="cmp-name mt-2"><a
-                                                                        href="/product/<%= list[k].id %>"
-                                                                        class="text-decoration-none">
-                                                                        <%= list[k].name %>
-                                                                    </a></div>
-                                                                <div class="small text-muted">
-                                                                    <%= list[k].shortDesc %>
-                                                                </div>
-                                                                <div class="mt-1">
-                                                                    <span class="cmp-remove"
-                                                                        data-id="<%= list[k].id %>"><i
-                                                                            class="fa fa-times"></i> Xóa</span>
-                                                                </div>
-                                                            </th>
-                                                            <% } %>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="cmpBody">
-                                                    <!-- Giá -->
-                                                    <tr data-row="price">
-                                                        <td class="cmp-spec">Giá</td>
-                                                        <% var a=0; for (a=0; a<list.length; a++){ %>
-                                                            <td>
-                                                                <% if (list[a].discount> 0) { %>
-                                                                    <div class="cmp-price">
-                                                                        <div class="old">
-                                                                            <%= new
-                                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(list[a].price)
-                                                                                %>
-                                                                        </div>
-                                                                        <div class="new">
-                                                                            <%= new
-                                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(list[a].finalPrice)
-                                                                                %>
-                                                                        </div>
-                                                                    </div>
-                                                                    <% } else { %>
-                                                                        <div class="cmp-price">
-                                                                            <div class="new">
-                                                                                <%= new
-                                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(list[a].price)
-                                                                                    %>
-                                                                            </div>
-                                                                        </div>
-                                                                        <% } %>
-                                                            </td>
-                                                            <% } %>
-                                                    </tr>
+<% if (list.length>0) { %>
+<div class="cmp-wrap table-responsive">
+  <table class="table cmp-table">
+    <thead>
+      <tr>
+        <th class="cmp-spec text-center"></th>
+        <% for (var k=0; k<list.length; k++){ %>
+          <th class="text-center cmp-header">
+            <a href="/product/<%= list[k].id %>">
+              <img src="/images/product/<%= list[k].image %>" alt="<%= list[k].name %>">
+            </a>
+            <div class="cmp-name mt-2">
+              <a href="/product/<%= list[k].id %>" class="text-decoration-none"><%= list[k].name %></a>
+            </div>
+            <div class="small text-muted"><%= list[k].shortDesc %></div>
+            <div class="mt-1">
+              <span class="cmp-remove" data-id="<%= list[k].id %>"><i class="fa fa-times"></i> Xóa</span>
+            </div>
+          </th>
+        <% } %>
+      </tr>
+    </thead>
+ 
+    <tbody id="cmpBody">
+      <!-- Giá -->
+      <tr data-row="price">
+        <td class="cmp-spec text-center">Giá</td>
+        <% for (var a=0; a<list.length; a++){ %>
+          <td class="text-center" data-final="<%= list[a].finalPrice %>">
+            <% if (list[a].discount>0) { %>
+              <div class="cmp-price">
+                <div class="old"><%= new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(list[a].price) %></div>
+                <div class="new"><%= new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(list[a].finalPrice) %></div>
+              </div>
+            <% } else { %>
+              <div class="cmp-price">
+                <div class="new"><%= new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(list[a].price) %></div>
+              </div>
+            <% } %>
+          </td>
+        <% } %>
+      </tr>
 
-                                                    <!-- Hãng -->
-                                                    <tr data-row="factory">
-                                                        <td class="cmp-spec">Hãng</td>
-                                                        <% var b=0; for (b=0; b<list.length; b++){ %>
-                                                            <td>
-                                                                <%= list[b].factoryLabel %>
-                                                            </td>
-                                                            <% } %>
-                                                    </tr>
+      <!-- Hãng -->
+      <tr data-row="factory">
+        <td class="cmp-spec text-center">Hãng</td>
+        <% for (var b=0; b<list.length; b++){ %>
+          <td class="text-center"><%= list[b].factoryLabel %></td>
+        <% } %>
+      </tr>
 
-                                                    <!-- Mục đích -->
-                                                    <tr data-row="target">
-                                                        <td class="cmp-spec">Mục đích</td>
-                                                        <% var c=0; for (c=0; c<list.length; c++){ %>
-                                                            <td>
-                                                                <%= list[c].targetLabel %>
-                                                            </td>
-                                                            <% } %>
-                                                    </tr>
+      <!-- Mục đích -->
+      <tr data-row="target">
+        <td class="cmp-spec text-center">Mục đích</td>
+        <% for (var c=0; c<list.length; c++){ %>
+          <td class="text-center"><%= list[c].targetLabel %></td>
+        <% } %>
+      </tr>
 
-                                                    <!-- CPU -->
-                                                    <tr data-row="cpu">
-                                                        <td class="cmp-spec">CPU</td>
-                                                        <% var d=0; for (d=0; d<list.length; d++){ %>
-                                                            <td>
-                                                                <%= list[d].cpu %>
-                                                            </td>
-                                                            <% } %>
-                                                    </tr>
+      <!-- CPU -->
+      <tr data-row="cpu">
+        <td class="cmp-spec text-center">CPU</td>
+        <% for (var d=0; d<list.length; d++){ %>
+          <td class="text-center"><%= list[d].cpu %></td>
+        <% } %>
+      </tr>
 
-                                                    <!-- RAM -->
-                                                    <tr data-row="ram">
-                                                        <td class="cmp-spec">RAM</td>
-                                                        <% var e=0; for (e=0; e<list.length; e++){ %>
-                                                            <td>
-                                                                <%= list[e].ramText %>
-                                                            </td>
-                                                            <% } %>
-                                                    </tr>
+      <!-- RAM -->
+      <tr data-row="ram">
+        <td class="cmp-spec text-center">RAM</td>
+        <% for (var e=0; e<list.length; e++){ %>
+          <td class="text-center" data-ram="<%= (list[e].ramText||'').replace(/[^0-9.]/g,'') %>">
+            <%= list[e].ramText %>
+          </td>
+        <% } %>
+      </tr>
 
-                                                    <!-- Ổ cứng -->
-                                                    <tr data-row="storage">
-                                                        <td class="cmp-spec">Ổ cứng</td>
-                                                        <% var f=0; for (f=0; f<list.length; f++){ %>
-                                                            <td>
-                                                                <%= list[f].storageText %>
-                                                            </td>
-                                                            <% } %>
-                                                    </tr>
+      <!-- Ổ cứng -->
+      <tr data-row="storage">
+        <td class="cmp-spec text-center">Ổ cứng</td>
+        <% for (var f=0; f<list.length; f++){ %>
+          <td class="text-center" data-ssd="<%= (list[f].storageText||'').replace(/[^0-9.]/g,'') %>">
+            <%= list[f].storageText %>
+          </td>
+        <% } %>
+      </tr>
 
-                                                    <!-- Màn hình -->
-                                                    <tr data-row="screen">
-                                                        <td class="cmp-spec">Màn hình</td>
-                                                        <% var g=0; for (g=0; g<list.length; g++){ %>
-                                                            <td>
-                                                                <%= list[g].screenText %>
-                                                            </td>
-                                                            <% } %>
-                                                    </tr>
+      <!-- Màn hình -->
+      <tr data-row="screen">
+        <td class="cmp-spec text-center">Màn hình</td>
+        <% for (var g=0; g<list.length; g++){ %>
+          <td class="text-center"><%= list[g].screenText %></td>
+        <% } %>
+      </tr>
 
-                                                    <!-- Tính năng -->
-                                                    <tr data-row="features">
-                                                        <td class="cmp-spec">Tính năng</td>
-                                                        <% var h=0; for (h=0; h<list.length; h++){ %>
-                                                            <td>
-                                                                <%= list[h].featuresText %>
-                                                            </td>
-                                                            <% } %>
-                                                    </tr>
+      <!-- Tính năng -->
+      <tr data-row="features">
+        <td class="cmp-spec text-center">Tính năng</td>
+        <% for (var h=0; h<list.length; h++){ %>
+          <td class="text-center"><%= list[h].featuresText %></td>
+        <% } %>
+      </tr>
 
-                                                    <!-- Tồn kho -->
-                                                    <tr data-row="qty">
-                                                        <td class="cmp-spec">Tồn kho</td>
-                                                        <% var z=0; for (z=0; z<list.length; z++){ %>
-                                                            <td>
-                                                                <%= list[z].qty %>
-                                                            </td>
-                                                            <% } %>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <% } %>
+      <!-- Tồn kho -->
+      <tr data-row="qty">
+        <td class="cmp-spec text-center">Tồn kho</td>
+        <% for (var z=0; z<list.length; z++){ %>
+          <td class="text-center"><%= list[z].qty %></td>
+        <% } %>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<% } %>
+
                 </div>
 
                 <link rel="stylesheet" href="/client/css/layout/footer.css">
@@ -653,6 +626,84 @@
                 <!-- Footer End -->
 
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+                <script>
+(function(){
+  const table = document.querySelector('.cmp-table');
+  if (!table) return;
+
+  // 1) phân loại hàng giống/khác
+  const rows = table.querySelectorAll('tbody tr');
+  rows.forEach(row => {
+    const cells = [...row.querySelectorAll('td:not(.cmp-spec)')];
+    if (!cells.length) return;
+    const norm = s => (s||'').replace(/\s+/g,' ').trim().toLowerCase();
+    const values = cells.map(td => norm(td.textContent));
+    const same = values.every(v => v === values[0]);
+    row.classList.toggle('row-same', same);
+    row.classList.toggle('row-diff', !same);
+  });
+
+  // 2) đánh dấu "giá tốt nhất"
+  const priceRow = table.querySelector('tr[data-row="price"]');
+  if (priceRow) {
+    const cells = [...priceRow.querySelectorAll('td:not(.cmp-spec)')];
+    let min = Infinity, best = null;
+    cells.forEach(td => {
+      const v = parseFloat(td.getAttribute('data-final'));
+      if (!isNaN(v) && v < min) { min = v; best = td; }
+    });
+    if (best) best.classList.add('best-deal');
+  }
+
+  // 3) highlight RAM/SSD cao hơn
+  function markMax(rowSel, attr){
+    const r = table.querySelector(rowSel);
+    if (!r) return;
+    const cells = [...r.querySelectorAll('td:not(.cmp-spec)')];
+    const nums = cells.map(td => parseFloat(td.getAttribute(attr)||'0')||0);
+    const max = Math.max.apply(null, nums);
+    const min = Math.min.apply(null, nums);
+    cells.forEach((td,i)=>{
+      if (nums[i] === max && max !== min) {
+        td.classList.add('cell-up');
+        const b = document.createElement('span'); b.className='badge-mark'; b.textContent='cao hơn';
+        td.appendChild(b);
+      } else if (nums[i] === min && max !== min) {
+        td.classList.add('cell-down');
+      }
+    });
+  }
+  markMax('tr[data-row="ram"]', 'data-ram');
+  markMax('tr[data-row="storage"]', 'data-ssd');
+
+  // 4) toggle “chỉ hiển thị khác nhau”
+  const toggle = document.getElementById('cmpOnlyDiff');
+  const applyToggle = () => {
+    rows.forEach(r=>{
+      if (toggle.checked && r.classList.contains('row-same') && r.getAttribute('data-row')!=='price'){
+        r.style.display='none';
+      } else {
+        r.style.display='';
+      }
+    });
+  };
+  if (toggle){
+    toggle.addEventListener('change', applyToggle);
+    applyToggle();
+  }
+
+  // 5) đồng bộ màu nền sticky cột theo hàng
+  const fixStickyBg = () => {
+    const specCells = table.querySelectorAll('.cmp-spec');
+    specCells.forEach(td=>{
+      td.style.background = getComputedStyle(td.parentElement).backgroundColor || '#fff';
+    });
+  };
+  fixStickyBg();
+})();
+</script>
+
                 <script>
                     // Highlight các dòng có giá trị khác nhau
                     (function () {

@@ -393,3 +393,85 @@
         .cmp-top-actions .btn {
             margin-right: .5rem;
         }
+
+         :root{
+    --cmp-bg:#fff; --cmp-soft:#f8fafc; --cmp-line:#e5e7eb;
+    --cmp-label:#f3f4f6; --cmp-accent:#2563eb; --cmp-good:#16a34a; --cmp-bad:#ef4444;
+    --cmp-text:#111827; --cmp-sub:#6b7280;
+  }
+
+  .cmp-wrap{background:var(--cmp-bg);border-radius:16px;box-shadow:0 10px 28px rgba(16,24,40,.06);overflow:auto}
+
+  .cmp-table{width:100%;border-collapse:separate;border-spacing:0;background:var(--cmp-bg)}
+  .cmp-table th,.cmp-table td{padding:16px;vertical-align:middle}
+  .cmp-table thead th{position:sticky;top:0;z-index:5;background:var(--cmp-soft);border-bottom:1px solid var(--cmp-line)}
+  .cmp-table tbody tr + tr td,.cmp-table tbody tr + tr .cmp-spec{border-top:1px dashed var(--cmp-line)}
+  .cmp-table tbody tr:hover td{background:#fafbff}
+
+  /* cột Thuộc tính luôn hiện */
+  .cmp-spec{
+    position:sticky;left:0;z-index:6;background:#fff;font-weight:700;
+    width:260px;min-width:220px;color:var(--cmp-text)
+  }
+  .cmp-table tbody tr:nth-child(odd) .cmp-spec{background:var(--cmp-label)}
+
+  /* header sản phẩm */
+  .cmp-header{min-width:280px;vertical-align:top}
+  .cmp-header a{text-decoration:none}
+  .cmp-header img{width:140px;height:140px;object-fit:contain;border-radius:12px;background:#f3f4f6}
+  .cmp-name a{font-weight:700;color:var(--cmp-text)}
+  .cmp-remove{cursor:pointer;color:var(--cmp-bad);font-size:.9rem}
+  .cmp-remove:hover{text-decoration:underline}
+
+  /* section row (Tiêu đề nhóm) */
+  .cmp-section td{
+    background:linear-gradient(180deg,#f7faff,#fff); color:#0f172a; font-weight:800;
+    font-size:1rem; letter-spacing:.2px; border-top:1px solid var(--cmp-line);
+  }
+
+  /* giá */
+  .cmp-price .old{color:#9ca3af;text-decoration:line-through;font-size:.9rem}
+  .cmp-price .new{color:#e11d48;font-weight:800;font-size:1.1rem}
+  td.best-deal{box-shadow:inset 0 0 0 2px var(--cmp-good);border-radius:10px;background:#f0fff4}
+  td.best-deal .new{color:var(--cmp-good)}
+  td.best-deal::after{
+    content:"Tốt nhất";display:inline-block;margin-left:.5rem;
+    font-size:.75rem;padding:.1rem .5rem;border-radius:999px;background:var(--cmp-good);color:#fff;vertical-align:middle
+  }
+
+  /* hàng giống/khác */
+  tbody tr.row-same td{opacity:.78}
+  tbody tr.row-diff td{background-image:linear-gradient(180deg,rgba(37,99,235,.05),rgba(37,99,235,0))}
+
+  /* bullet đẹp cho ô nhiều dòng */
+  .cmp-list{margin:0;padding-left:1.15rem}
+  .cmp-list li{margin:.15rem 0}
+  .cmp-cell-sub{display:block;color:var(--cmp-sub);font-size:.92rem}
+
+  /* nhãn nhỏ */
+  .badge-mark{margin-left:.35rem;padding:.05rem .45rem;font-size:.7rem;border-radius:999px;background:#e5e7eb;color:#374151}
+  td.cell-up{background:#f0fff4}
+  td.cell-up .badge-mark{background:var(--cmp-good);color:#fff}
+  td.cell-down{background:#fff5f5}
+
+  /* mobile */
+  @media (max-width: 768px){
+    .cmp-spec{width:180px;min-width:170px}
+    .cmp-header img{width:110px;height:110px}
+  }
+
+  /* TẮT border-bottom mặc định của Bootstrap trong bảng so sánh */
+.cmp-table.table > :not(caption) > * > * {
+  border-bottom-width: 0;            /* hoặc border-bottom: 0; */
+}
+
+/* Giữ đường kẻ dưới header (nếu bạn muốn có) */
+.cmp-table thead th {
+  border-bottom: 1px solid #e5e7eb;  /* đồng bộ màu bạn đang dùng */
+}
+
+/* Chắc chắn hàng cuối cùng không có border-bottom */
+.cmp-table tbody tr:last-child td,
+.cmp-table tbody tr:last-child .cmp-spec {
+  border-bottom: 0;
+}

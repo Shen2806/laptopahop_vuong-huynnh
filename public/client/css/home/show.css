@@ -481,53 +481,67 @@
 }
 
 /*animation*/
-  :root{
-    --reveal-duration: 650ms;
-    --reveal-ease: cubic-bezier(.2,.65,.3,1);
+:root {
+  --reveal-duration: 650ms;
+  --reveal-ease: cubic-bezier(.2, .65, .3, 1);
+}
+
+/* trạng thái ẩn ban đầu */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition:
+    transform var(--reveal-duration) var(--reveal-ease),
+    opacity var(--reveal-duration) var(--reveal-ease);
+  will-change: transform, opacity;
+}
+
+/* hiện */
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+/* biến thể */
+[data-reveal="fade-up"] {
+  transform: translate3d(0, 24px, 0);
+}
+
+[data-reveal="fade-down"] {
+  transform: translate3d(0, -24px, 0);
+}
+
+[data-reveal="fade-left"] {
+  transform: translate3d(-24px, 0, 0);
+}
+
+[data-reveal="fade-right"] {
+  transform: translate3d(24px, 0, 0);
+}
+
+[data-reveal="zoom-in"] {
+  transform: scale(.96);
+}
+
+/* nếu người dùng chọn giảm chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
+}
 
-  /* trạng thái ẩn ban đầu */
-  [data-reveal]{
-    opacity: 0;
-    transform: translate3d(0,24px,0);
-    transition:
-      transform var(--reveal-duration) var(--reveal-ease),
-      opacity   var(--reveal-duration) var(--reveal-ease);
-    will-change: transform, opacity;
-  }
-
-  /* hiện */
-  [data-reveal].is-visible{
-    opacity: 1;
-    transform: none;
-    transition-delay: var(--reveal-delay, 0ms);
-  }
-
-  /* biến thể */
-  [data-reveal="fade-up"]    { transform: translate3d(0,24px,0); }
-  [data-reveal="fade-down"]  { transform: translate3d(0,-24px,0); }
-  [data-reveal="fade-left"]  { transform: translate3d(-24px,0,0); }
-  [data-reveal="fade-right"] { transform: translate3d(24px,0,0); }
-  [data-reveal="zoom-in"]    { transform: scale(.96); }
-
-  /* nếu người dùng chọn giảm chuyển động */
-  @media (prefers-reduced-motion: reduce){
-    [data-reveal]{
-      opacity: 1 !important;
-      transform: none !important;
-      transition: none !important;
-    }
-  }
-
-  /* biến dễ chỉnh */
-:root{
+/* biến dễ chỉnh */
+:root {
   --sw-btn-size: 44px;
-  --sw-btn-bg: rgba(0,0,0,0.55);
+  --sw-btn-bg: rgba(0, 0, 0, 0.55);
   --sw-btn-color: #fff;
-  --sw-btn-hover-bg: rgba(0,0,0,0.75);
+  --sw-btn-hover-bg: rgba(0, 0, 0, 0.75);
   --sw-bullet-size: 10px;
   --sw-bullet-active: #1a73e8;
-  --sw-bullet-bg: rgba(255,255,255,0.45);
+  --sw-bullet-bg: rgba(255, 255, 255, 0.45);
   --sw-z: 50;
 }
 
@@ -547,7 +561,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
   transition: transform .16s ease, background .12s ease, opacity .12s ease;
   z-index: var(--sw-z);
   cursor: pointer;
@@ -557,12 +571,18 @@
   opacity: 0.98;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  border: none; /* nếu swiper chèn button element */
+  border: none;
+  /* nếu swiper chèn button element */
 }
 
 /* vị trí trái/phải */
-.swiper-button-prev { left: 10px; }
-.swiper-button-next { right: 10px; }
+.swiper-button-prev {
+  left: 10px;
+}
+
+.swiper-button-next {
+  right: 10px;
+}
 
 /* icon mặc định ẩn nếu bạn dùng custom icon; Swiper có sẵn pseudo-element, giữ nó */
 .swiper-button-next::after,
@@ -581,7 +601,7 @@
   background: var(--sw-btn-hover-bg);
   transform: translateY(-50%) scale(1.06);
   outline: none;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.32);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
 }
 
 /* disabled state */
@@ -622,15 +642,18 @@
   transform: scale(1.25);
   width: calc(var(--sw-bullet-size) * 1.6);
   height: var(--sw-bullet-size);
-  border-radius: 999px; /* pill shape */
+  border-radius: 999px;
+  /* pill shape */
 }
 
 /* responsive: ẩn nút trên màn nhỏ, show pagination */
 @media (max-width: 640px) {
+
   .swiper-button-next,
   .swiper-button-prev {
     display: none;
   }
+
   .swiper-pagination {
     bottom: 8px;
   }
@@ -638,321 +661,436 @@
 
 /*rùa ai */
 /* ... giữ nguyên toàn bộ CSS của bạn bên dưới ... */
-        .rating-stars {
-            line-height: 1;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-        }
+.rating-stars {
+  line-height: 1;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+}
 
-        .rating-stars i {
-            color: #f59e0b;
-        }
+.rating-stars i {
+  color: #f59e0b;
+}
 
-        .rating-stars .count {
-            margin-left: .4rem;
-            font-size: 12px;
-            color: #6b7280;
-        }
+.rating-stars .count {
+  margin-left: .4rem;
+  font-size: 12px;
+  color: #6b7280;
+}
 
-        /* === RÙA AI — widget === */
-        .ai-turtle {
-            position: fixed;
-            right: 22px;
-            bottom: 22px;
-            z-index: 1100;
-        }
+/* === RÙA AI — widget === */
+.ai-turtle {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 1100;
+}
 
-        .ai-turtle__btn {
-            width: 64px;
-            height: 64px;
-            border: 0;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 14px 30px rgba(22, 163, 74, .35);
-            cursor: pointer;
-            transition: transform .15s ease, box-shadow .15s ease;
-        }
+.ai-turtle__btn {
+  width: 64px;
+  height: 64px;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 14px 30px rgba(22, 163, 74, .35);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
 
-        .ai-turtle__btn:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 18px 38px rgba(22, 163, 74, .45);
-        }
+.ai-turtle__btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 18px 38px rgba(22, 163, 74, .45);
+}
 
-        .ai-pulse {
-            position: absolute;
-            inset: 0;
-            border-radius: 50%;
-            box-shadow: 0 0 0 0 rgba(34, 197, 94, .45);
-            animation: pulse 2.2s infinite;
-        }
+.ai-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(34, 197, 94, .45);
+  animation: pulse 2.2s infinite;
+}
 
-        @keyframes pulse {
-            70% {
-                box-shadow: 0 0 0 18px rgba(34, 197, 94, 0);
-            }
+@keyframes pulse {
+  70% {
+    box-shadow: 0 0 0 18px rgba(34, 197, 94, 0);
+  }
 
-            100% {
-                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-            }
-        }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
 
-        .ai-turtle__card {
-            position: absolute;
-            right: 0;
-            bottom: 78px;
-            width: min(360px, calc(100vw - 32px));
-            background: #fff;
-            border-radius: 16px;
-            border: 1px solid rgba(2, 6, 23, .06);
-            box-shadow: 0 18px 46px rgba(2, 6, 23, .25);
-            overflow: hidden;
-            display: none;
-        }
+.ai-turtle__card {
+  position: absolute;
+  right: 0;
+  bottom: 78px;
+  width: min(360px, calc(100vw - 32px));
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid rgba(2, 6, 23, .06);
+  box-shadow: 0 18px 46px rgba(2, 6, 23, .25);
+  overflow: hidden;
+  display: none;
+}
 
-        .ai-enter {
-            animation: aiIn .18s ease both;
-        }
+.ai-enter {
+  animation: aiIn .18s ease both;
+}
 
-        @keyframes aiIn {
-            from {
-                opacity: 0;
-                transform: translateY(6px) scale(.98)
-            }
+@keyframes aiIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(.98)
+  }
 
-            to {
-                opacity: 1;
-                transform: none
-            }
-        }
+  to {
+    opacity: 1;
+    transform: none
+  }
+}
 
-        .ai-chat__header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #fff;
-        }
+.ai-chat__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+}
 
-        .ai-chat__title {
-            font-weight: 800;
-            letter-spacing: .2px;
-        }
+.ai-chat__title {
+  font-weight: 800;
+  letter-spacing: .2px;
+}
 
-        .ai-chat__close {
-            margin-left: auto;
-            background: rgba(255, 255, 255, .18);
-            border: 0;
-            color: #fff;
-            border-radius: 8px;
-            padding: 6px 8px;
-            cursor: pointer;
-        }
+.ai-chat__close {
+  margin-left: auto;
+  background: rgba(255, 255, 255, .18);
+  border: 0;
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
 
-        .ai-chat__body {
-            background: #f8fafc;
-            max-height: 380px;
-            overflow: auto;
-            padding: 14px 12px;
-        }
+.ai-chat__body {
+  background: #f8fafc;
+  max-height: 380px;
+  overflow: auto;
+  padding: 14px 12px;
+}
 
-        .ai-msg {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
+.ai-msg {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
 
-        .ai-msg__bubble {
-            padding: 10px 12px;
-            border-radius: 14px;
-            max-width: 80%;
-            box-shadow: 0 6px 16px rgba(2, 6, 23, .08);
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
+.ai-msg__bubble {
+  padding: 10px 12px;
+  border-radius: 14px;
+  max-width: 80%;
+  box-shadow: 0 6px 16px rgba(2, 6, 23, .08);
+  word-break: break-word;
+  white-space: pre-wrap;
+}
 
-        .ai-user {
-            justify-content: flex-end;
-        }
+.ai-user {
+  justify-content: flex-end;
+}
 
-        .ai-user .ai-msg__bubble {
-            background: #e8f5e9;
-            color: #064e3b;
-            border: 1px solid rgba(22, 163, 74, .2);
-        }
+.ai-user .ai-msg__bubble {
+  background: #e8f5e9;
+  color: #064e3b;
+  border: 1px solid rgba(22, 163, 74, .2);
+}
 
-        .ai-bot .ai-msg__bubble {
-            background: #fff;
-            border: 1px solid rgba(2, 6, 23, .06);
-        }
+.ai-bot .ai-msg__bubble {
+  background: #fff;
+  border: 1px solid rgba(2, 6, 23, .06);
+}
 
-        .ai-typing {
-            font-size: 12px;
-            color: #475569;
-            padding: 0 4px 6px;
-            display: none;
-        }
+.ai-typing {
+  font-size: 12px;
+  color: #475569;
+  padding: 0 4px 6px;
+  display: none;
+}
 
-        .ai-chat__footer {
-            padding: 10px;
-            background: #fff;
-            border-top: 1px solid rgba(2, 6, 23, .06);
-        }
+.ai-chat__footer {
+  padding: 10px;
+  background: #fff;
+  border-top: 1px solid rgba(2, 6, 23, .06);
+}
 
-        .ai-input {
-            display: flex;
-            gap: 8px;
-            background: #f1f5f9;
-            padding: 8px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-        }
+.ai-input {
+  display: flex;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
 
-        .ai-input input {
-            flex: 1;
-            border: 0;
-            background: transparent;
-            outline: none;
-        }
+.ai-input input {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  outline: none;
+}
 
-        .ai-input button {
-            border: 0;
-            padding: 8px 12px;
-            border-radius: 10px;
-            background: #16a34a;
-            color: #fff;
-            font-weight: 600;
-            cursor: pointer;
-        }
+.ai-input button {
+  border: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #16a34a;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-        .ai-suggest {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            padding: 8px 10px 0;
-            background: #f8fafc;
-        }
+.ai-suggest {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 10px 0;
+  background: #f8fafc;
+}
 
-        .ai-chip {
-            font-size: 12px;
-            background: #eef2ff;
-            color: #3730a3;
-            border: 1px solid #e5e7eb;
-            padding: 6px 10px;
-            border-radius: 999px;
-            cursor: pointer;
-        }
+.ai-chip {
+  font-size: 12px;
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #e5e7eb;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
 
-        .ai-kicker {
-            font-size: 12px;
-            color: #eafaf0
-        }
+.ai-kicker {
+  font-size: 12px;
+  color: #eafaf0
+}
 
-        .ai-products {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 4px 2px 2px;
-            margin-top: 6px;
-        }
+.ai-products {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px 2px;
+  margin-top: 6px;
+}
 
-        .ai-products::-webkit-scrollbar {
-            height: 8px;
-        }
+.ai-products::-webkit-scrollbar {
+  height: 8px;
+}
 
-        .ai-products::-webkit-scrollbar-thumb {
-            background: #e5e7eb;
-            border-radius: 6px;
-        }
+.ai-products::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 6px;
+}
 
-        .ai-pcard {
-            flex: 0 0 180px;
-            text-decoration: none;
-            color: inherit;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #fff;
-            transition: transform .15s ease, box-shadow .15s ease;
-        }
+.ai-pcard {
+  flex: 0 0 180px;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
 
-        .ai-pcard:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
-        }
+.ai-pcard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+}
 
-        .ai-pimg {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            background: #f8fafc;
-        }
+.ai-pimg {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  background: #f8fafc;
+}
 
-        .ai-pbody {
-            padding: 8px 10px;
-        }
+.ai-pbody {
+  padding: 8px 10px;
+}
 
-        .ai-ptitle {
-            font-weight: 700;
-            font-size: 14px;
-            line-height: 1.2;
-            height: 34px;
-            overflow: hidden;
-        }
+.ai-ptitle {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.2;
+  height: 34px;
+  overflow: hidden;
+}
 
-        .ai-pdesc {
-            font-size: 12px;
-            color: #64748b;
-            height: 30px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
+.ai-pdesc {
+  font-size: 12px;
+  color: #64748b;
+  height: 30px;
+  overflow: hidden;
+  margin-top: 4px;
+}
 
-        .ai-price-row {
-            display: flex;
-            align-items: baseline;
-            gap: 6px;
-            margin: 6px 0;
-        }
+.ai-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 6px 0;
+}
 
-        .ai-sale {
-            font-weight: 800;
-            color: #dc2626;
-        }
+.ai-sale {
+  font-weight: 800;
+  color: #dc2626;
+}
 
-        .ai-base {
-            color: #94a3b8;
-            text-decoration: line-through;
-            font-size: 12px;
-        }
+.ai-base {
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-size: 12px;
+}
 
-        .ai-badge {
-            display: inline-block;
-            font-size: 11px;
-            background: #ef4444;
-            color: #fff;
-            padding: 2px 6px;
-            border-radius: 999px;
-        }
+.ai-badge {
+  display: inline-block;
+  font-size: 11px;
+  background: #ef4444;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
 
-        .ai-pbtn {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background: #16a34a;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: 7px 10px;
-            font-weight: 600;
-            font-size: 14px;
-        }
+.ai-pbtn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-weight: 600;
+  font-size: 14px;
+}
 
-        .ai-pbtn:hover {
-            background: #15803d;
-        }
+.ai-pbtn:hover {
+  background: #15803d;
+}
+
+/*hướng dẫn mua laptop*/
+
+#buying-guide .icon-pill {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eaf7e6;
+  color: #2e7d32
+}
+
+#buying-guide .chip {
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 999px;
+  padding: .4rem .8rem;
+  font-size: .9rem;
+  line-height: 1;
+  cursor: pointer
+}
+
+#buying-guide .chip:hover {
+  background: #f5f7ff;
+  border-color: #c7d2fe
+}
+
+#buying-guide .guide-card {
+  background: #fff
+}
+
+#buying-guide .divider {
+  opacity: .25
+}
+
+/* accordion tinh tế hơn */
+#buying-guide .accordion-button {
+  border-radius: 12px;
+  background: #f8fafc
+}
+
+#buying-guide .accordion-button:not(.collapsed) {
+  color: #1f2937;
+  background: #eef6ff
+}
+
+#buying-guide .accordion-item {
+  border: none;
+  margin-bottom: .75rem
+}
+
+#buying-guide .accordion-body {
+  background: #fff;
+  border: 1px solid #eef2f7;
+  border-top: none;
+  border-radius: 0 0 12px 12px
+}
+
+/* ====== AI – LIST view giống ảnh bạn gửi ====== */
+.ai-list {
+  background: #e9f2ff;
+  border: 1px solid #cfe0ff;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.ai-li+.ai-li {
+  border-top: 1px dashed #c7d7ff;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.ai-li__title {
+  font-size: 15px;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.ai-li__index {
+  font-weight: 800;
+  margin-right: 6px;
+  color: #334155;
+}
+
+.ai-li__row {
+  font-size: 14px;
+  color: #1f2937;
+  margin: 4px 0;
+}
+
+.ai-li__label {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.ai-li__cta {
+  margin-top: 6px;
+}
+
+.ai-btn {
+  display: inline-block;
+  background: #2563eb;
+  color: #fff !important;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.ai-btn:hover {
+  background: #1d4ed8;
+}
