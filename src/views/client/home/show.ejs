@@ -352,6 +352,135 @@
             </div>
             <!-- Fruits Shop End-->
 
+            <!-- Recently Viewed Start -->
+            <div class="container-fluid pt-3">
+                <div class="container">
+                    <section id="recent-viewed" class="mt-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h2 class="mb-0" style="color:#57B212">Sản phẩm đã xem</h2>
+                        </div>
+
+                        <% if (recentProducts && recentProducts.length) { %>
+                            <div class="row g-3">
+                                <% recentProducts.forEach(p=> {
+                                    const price = Number(p.price||0);
+                                    const finalPrice = p.discount ? Math.max(0, price - Math.round(price *
+                                    p.discount / 100)) : price;
+                                    %>
+                                    <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                                        <a href="/product/<%= p.id %>"
+                                            class="card recent-card h-100 text-decoration-none">
+                                            <div class="ratio ratio-4x3">
+                                                <img src="<%= p.thumb || '/images/no-image.png' %>"
+                                                    class="card-img-top object-fit-cover" alt="<%= p.name %>">
+                                            </div>
+                                            <div class="card-body p-2">
+                                                <div class="line-clamp-2 small fw-semibold text-dark">
+                                                    <%= p.name %>
+                                                </div>
+                                                <div class="mt-1">
+                                                    <% if (p.discount && p.discount> 0) { %>
+                                                        <div class="d-flex align-items-baseline gap-2">
+                                                            <div class="fw-bold text-danger">
+                                                                <%= finalPrice.toLocaleString('vi-VN') %>₫
+                                                            </div>
+                                                            <div class="text-muted text-decoration-line-through small">
+                                                                <%= price.toLocaleString('vi-VN') %>₫
+                                                            </div>
+                                                        </div>
+                                                        <% } else { %>
+                                                            <div class="fw-bold text-dark">
+                                                                <%= price.toLocaleString('vi-VN') %>₫
+                                                            </div>
+                                                            <% } %>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <% }) %>
+                            </div>
+                            <% } else { %>
+                                <div class="text-muted fst-italic">Chưa có sản phẩm nào.</div>
+                                <% } %>
+                    </section>
+                </div>
+            </div>
+            <!-- Recently Viewed End -->
+
+            <!-- Blogs Start-->
+            <div class="container-fluid">
+                <div class="container">
+                    <div class="tab-class text-center">
+                        <div class="row g-4">
+                            <section class="mt-5" id="tech-news">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <h2 class="mb-0 text-primary">Tin tức công nghệ</h2>
+                                    <a href="/blogs" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+                                </div>
+
+                                <% if (latestBlogs && latestBlogs.length) { %>
+                                    <div class="swiper news-swiper">
+                                        <div class="swiper-wrapper">
+                                            <% latestBlogs.forEach(b=> {
+                                                // Rút gọn content, loại bỏ thẻ HTML
+                                                const plain = (b.content || '').replace(/<[^>]*>/g, '');
+                                                    const short = plain.length > 140 ? (plain.slice(0, 140) + '...')
+                                                    : plain;
+                                                    %>
+                                                    <div class="swiper-slide">
+                                                        <div
+                                                            class="news-card shadow-sm rounded h-100 d-flex flex-column">
+                                                            <img src="<%= b.thumbnail || '/images/default-blog.jpg' %>"
+                                                                class="news-img" alt="<%= b.title %>"
+                                                                style="height:180px; object-fit:cover; width:100%;" />
+                                                            <div class="p-3 d-flex flex-column flex-grow-1 text-start">
+                                                                <h5 class="fw-bold mb-2 text-truncate">
+                                                                    <a href="/blogs/<%= b.slug %>"
+                                                                        class="text-decoration-none text-dark">
+                                                                        <%= b.title %>
+                                                                    </a>
+                                                                </h5>
+
+                                                                <p class="news-summary text-muted mb-2"
+                                                                    style="min-height:48px;">
+                                                                    <%= short %>
+                                                                </p>
+
+                                                                <div class="small text-secondary mt-auto">
+                                                                    <i class="bi bi-calendar3"></i>
+                                                                    <%= new
+                                                                        Date(b.createdAt).toLocaleDateString('vi-VN') %>
+                                                                        <% if (b.author) { %>
+                                                                            &nbsp;•&nbsp;<i class="bi bi-person"></i>
+                                                                            <%= b.author %>
+                                                                                <% } %>
+                                                                </div>
+
+                                                                <a href="/blogs/<%= b.slug %>"
+                                                                    class="btn btn-sm btn-primary mt-2 align-self-start">
+                                                                    Đọc tiếp
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <% }) %>
+                                        </div>
+
+                                        <!-- Nút điều hướng + Pagination -->
+                                        <div class="swiper-button-next"></div>
+                                        <div class="swiper-button-prev"></div>
+                                    </div>
+                                    <% } else { %>
+                                        <div class="text-muted fst-italic">Chưa có bài viết nào.</div>
+                                        <% } %>
+
+                            </section>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Blogs End-->
+
             <!-- Hướng dẫn mua laptop (pro) -->
             <div class="container-fluid py-5 guide-wrap">
                 <div class="container">
@@ -555,147 +684,578 @@
                                         <li>Trọng lượng & thời lượng pin ổn?</li>
                                         <li>Bảo hành chính hãng, hậu mãi yên tâm?</li>
                                     </ul>
-                                    <a href="/terms" class="btn btn-outline-success w-100 rounded-pill">Đọc thêm điều khoản sử dụng</a>
+                                    <a href="/terms" class="btn btn-outline-success w-100 rounded-pill">Đọc thêm điều
+                                        khoản sử dụng</a>
                                 </div>
                             </div>
                         </div>
                     </section>
                 </div>
             </div>
-            <!-- /Hướng dẫn mua laptop (pro) -->
 
-            <!-- Recently Viewed Start -->
-            <div class="container-fluid pt-3">
-                <div class="container">
-                    <section id="recent-viewed" class="mt-4">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <h2 class="mb-0" style="color:#57B212">Sản phẩm đã xem</h2>
+            <!-- Nội dung Start-->
+            <div class="container">
+                <div class="toc-tabs">
+                    <!-- radios -->
+                    <input type="radio" id="t1" name="tab" checked>
+                    <input type="radio" id="t2" name="tab">
+                    <input type="radio" id="t3" name="tab">
+                    <input type="radio" id="t4" name="tab">
+                    <input type="radio" id="t5" name="tab">
+                    <input type="radio" id="t6" name="tab">
+                    <input type="radio" id="t7" name="tab">
+                    <input type="radio" id="t8" name="tab">
+                    <input type="radio" id="t9" name="tab">
+                    <input type="radio" id="t10" name="tab">
+
+                    <!-- labels / TOC -->
+                    <aside class="labels" aria-label="Nội dung chính">
+                        <h3>Nội dung chính</h3>
+                        <div class="list">
+                            <label for="t1" class="l1"><span class="num">1.</span> Laptop (máy tính xách tay) – Phục vụ
+                                công việc, học tập, giải trí</label>
+                            <label for="t2" class="l2"><span class="num">2.</span> Lợi ích khi sử dụng máy tính laptop
+                                là gì?</label>
+                            <label for="t3" class="l3"><span class="num">3.</span> Các loại máy tính laptop phổ
+                                biến<small>3.1 Thông thường • 3.2 2-in-1 • 3.3 Workstation</small></label>
+                            <label for="t4" class="l4"><span class="num">4.</span> Tiêu chí chọn mua laptop chất lượng
+                                vượt trội<small>4.1–4.9 Thương hiệu → Giá</small></label>
+                            <label for="t5" class="l5"><span class="num">5.</span> Chọn theo hệ điều hành<small>Windows
+                                    • Mac • ChromeOS</small></label>
+                            <label for="t6" class="l6"><span class="num">6.</span> Chọn mua theo nhu cầu<small>Sinh viên
+                                    • Đồ hoạ • Gaming • Doanh nhân • Mỏng nhẹ</small></label>
+                            <label for="t7" class="l7"><span class="num">7.</span> Phân loại theo thương
+                                hiệu<small>MacBook • Dell • Asus • Surface • LG Gram • HP • Acer</small></label>
+                            <label for="t8" class="l8"><span class="num">8.</span> Kinh nghiệm bảo quản máy tính xách
+                                tay bền lâu hơn</label>
+                            <label for="t9" class="l9"><span class="num">9.</span> Mua laptop bao nhiêu tiền phù
+                                hợp?</label>
+                            <label for="t10" class="l10"><span class="num">10.</span> Mua laptop giá rẻ, trả góp
+                                0%</label>
                         </div>
+                    </aside>
 
-                        <% if (recentProducts && recentProducts.length) { %>
-                            <div class="row g-3">
-                                <% recentProducts.forEach(p=> {
-                                    const price = Number(p.price||0);
-                                    const finalPrice = p.discount ? Math.max(0, price - Math.round(price *
-                                    p.discount / 100)) : price;
-                                    %>
-                                    <div class="col-6 col-md-4 col-lg-3 col-xl-2">
-                                        <a href="/product/<%= p.id %>"
-                                            class="card recent-card h-100 text-decoration-none">
-                                            <div class="ratio ratio-4x3">
-                                                <img src="<%= p.thumb || '/images/no-image.png' %>"
-                                                    class="card-img-top object-fit-cover" alt="<%= p.name %>">
-                                            </div>
-                                            <div class="card-body p-2">
-                                                <div class="line-clamp-2 small fw-semibold text-dark">
-                                                    <%= p.name %>
-                                                </div>
-                                                <div class="mt-1">
-                                                    <% if (p.discount && p.discount> 0) { %>
-                                                        <div class="d-flex align-items-baseline gap-2">
-                                                            <div class="fw-bold text-danger">
-                                                                <%= finalPrice.toLocaleString('vi-VN') %>₫
-                                                            </div>
-                                                            <div class="text-muted text-decoration-line-through small">
-                                                                <%= price.toLocaleString('vi-VN') %>₫
-                                                            </div>
-                                                        </div>
-                                                        <% } else { %>
-                                                            <div class="fw-bold text-dark">
-                                                                <%= price.toLocaleString('vi-VN') %>₫
-                                                            </div>
-                                                            <% } %>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <% }) %>
+                    <!-- panels -->
+                    <main class="panels">
+                        <!-- 1 -->
+                        <section id="p1" class="panel" aria-labelledby="t1">
+                            <h2>1. Laptop (máy tính xách tay) – Phục vụ công việc, học tập, giải trí</h2>
+                            <div class="hero ratio ratio-16x9">
+                                <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1600&auto=format&fit=crop"
+                                    alt="Laptop dùng cho học tập, làm việc" loading="lazy">
                             </div>
-                            <% } else { %>
-                                <div class="text-muted fst-italic">Chưa có sản phẩm nào.</div>
-                                <% } %>
-                    </section>
-                </div>
-            </div>
-            <!-- Recently Viewed End -->
+                            <p>Laptop mang thiết kế sang trọng, nhỏ gọn, tiện lợi cùng cấu hình mạnh mẽ, hiệu năng mượt
+                                để học tập, làm việc, giải trí. Nhiều mẫu hỗ trợ xoay/gập/tách rời, màn hình cảm ứng như
+                                máy tính bảng.</p>
+                            <table class="spec" aria-label="Thông số nhanh">
+                                <tbody>
+                                    <tr>
+                                        <th>Màn hình</th>
+                                        <td>13", 14", 15–16"</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Chip xử lý</th>
+                                        <td>Intel, AMD</td>
+                                    </tr>
+                                    <tr>
+                                        <th>RAM</th>
+                                        <td>8GB, 16GB, 32GB</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Ổ cứng</th>
+                                        <td>SSD NVMe 256GB – 1TB</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Card đồ hoạ</th>
+                                        <td>Tích hợp (iGPU) hoặc rời (NVIDIA/AMD)</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Độ phân giải</th>
+                                        <td>FHD, 2K, 4K</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Tần số quét</th>
+                                        <td>60–240Hz</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="media-grid">
+                                <div class="ratio ratio-16x9"><img
+                                        src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop"
+                                        alt="Làm dự án nhóm"></div>
+                                <div class="ratio ratio-16x9"><img
+                                        src="https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?q=80&w=1200&auto=format&fit=crop"
+                                        alt="Đồ hoạ & chỉnh ảnh"></div>
+                                <div class="ratio ratio-16x9"><img
+                                        src="https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=1200&auto=format&fit=crop"
+                                        alt="Giải trí & xem phim"></div>
+                            </div>
+                        </section>
 
-            <!-- Blogs Start-->
-            <div class="container-fluid">
-                <div class="container">
-                    <div class="tab-class text-center">
-                        <div class="row g-4">
-                            <section class="mt-5" id="tech-news">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <h2 class="mb-0 text-primary">Tin tức công nghệ</h2>
-                                    <a href="/blogs" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
-                                </div>
+                        <!-- 2 -->
+                        <section id="p2" class="panel" aria-labelledby="t2">
+                            <h2>2. Lợi ích khi sử dụng máy tính laptop là gì?</h2>
+                            <ul>
+                                <li><strong>Hệ điều hành tối ưu</strong> + phần cứng phù hợp cho trải nghiệm mượt.</li>
+                                <li><strong>Phụ kiện đầy đủ</strong>: bàn phím, touchpad/chuột, webcam, mic.</li>
+                                <li><strong>Dễ nâng cấp</strong>: RAM/SSD (tuỳ máy) giúp tăng tuổi thọ sử dụng.</li>
+                                <li><strong>Lưu trữ nhanh</strong>: SSD NVMe giảm thời gian tải app & dự án.</li>
+                            </ul>
+                            <div class="callout">Tip: nếu bạn di chuyển nhiều, ưu tiên máy ≤ 1.4kg, pin 7–10h, sạc USB‑C
+                                65–100W.</div>
+                            <div class="media-grid">
+                                <div class="ratio ratio-1x1"><img
+                                        src="https://img4.thuthuatphanmem.vn/uploads/2020/12/26/hinh-anh-ban-phim-doc-dao_033843150.jpg"
+                                        alt="Bàn phím tốt giúp gõ thoải mái"></div>
+                                <div class="ratio ratio-1x1"><img
+                                        src="https://images.unsplash.com/photo-1523961131990-5ea7c61b2107?q=80&w=800&auto=format&fit=crop"
+                                        alt="Touchpad rộng, cử chỉ mượt"></div>
+                                <div class="ratio ratio-1x1"><img
+                                        src="https://gamek.mediacdn.vn/133514250583805952/2020/3/25/photo-1-15851267308751979729792.jpg"
+                                        alt="SSD tăng tốc độ"></div>
+                            </div>
+                        </section>
 
-                                <% if (latestBlogs && latestBlogs.length) { %>
-                                    <div class="swiper news-swiper">
-                                        <div class="swiper-wrapper">
-                                            <% latestBlogs.forEach(b=> {
-                                                // Rút gọn content, loại bỏ thẻ HTML
-                                                const plain = (b.content || '').replace(/<[^>]*>/g, '');
-                                                    const short = plain.length > 140 ? (plain.slice(0, 140) + '...')
-                                                    : plain;
-                                                    %>
-                                                    <div class="swiper-slide">
-                                                        <div
-                                                            class="news-card shadow-sm rounded h-100 d-flex flex-column">
-                                                            <img src="<%= b.thumbnail || '/images/default-blog.jpg' %>"
-                                                                class="news-img" alt="<%= b.title %>"
-                                                                style="height:180px; object-fit:cover; width:100%;" />
-                                                            <div class="p-3 d-flex flex-column flex-grow-1 text-start">
-                                                                <h5 class="fw-bold mb-2 text-truncate">
-                                                                    <a href="/blogs/<%= b.slug %>"
-                                                                        class="text-decoration-none text-dark">
-                                                                        <%= b.title %>
-                                                                    </a>
-                                                                </h5>
-
-                                                                <p class="news-summary text-muted mb-2"
-                                                                    style="min-height:48px;">
-                                                                    <%= short %>
-                                                                </p>
-
-                                                                <div class="small text-secondary mt-auto">
-                                                                    <i class="bi bi-calendar3"></i>
-                                                                    <%= new
-                                                                        Date(b.createdAt).toLocaleDateString('vi-VN') %>
-                                                                        <% if (b.author) { %>
-                                                                            &nbsp;•&nbsp;<i class="bi bi-person"></i>
-                                                                            <%= b.author %>
-                                                                                <% } %>
-                                                                </div>
-
-                                                                <a href="/blogs/<%= b.slug %>"
-                                                                    class="btn btn-sm btn-primary mt-2 align-self-start">
-                                                                    Đọc tiếp
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <% }) %>
-                                        </div>
-
-                                        <!-- Nút điều hướng + Pagination -->
-                                        <div class="swiper-button-next"></div>
-                                        <div class="swiper-button-prev"></div>
+                        <!-- 3 -->
+                        <section id="p3" class="panel" aria-labelledby="t3">
+                            <h2>3. Các loại máy tính laptop phổ biến</h2>
+                            <details class="sub" open>
+                                <summary>3.1. Máy tính xách tay thông thường</summary>
+                                <div class="body">
+                                    <p>Đủ tính năng cho web, email, Office… Giá dễ tiếp cận, phù hợp đa số người dùng.
+                                    </p>
+                                    <div class="media-grid">
+                                        <div class="ratio ratio-16x9"><img
+                                                src="https://images.unsplash.com/photo-1516387938699-a93567ec168e?q=80&w=1200&auto=format&fit=crop"
+                                                alt="Laptop phổ thông"></div>
                                     </div>
-                                    <% } else { %>
-                                        <div class="text-muted fst-italic">Chưa có bài viết nào.</div>
-                                        <% } %>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>3.2. Laptop 2 in 1</summary>
+                                <div class="body">
+                                    <p>Xoay 360°/tách rời, hỗ trợ cảm ứng/pen. Linh hoạt cho ghi chú, trình bày.</p>
+                                    <div class="media-grid">
+                                        <div class="ratio ratio-16x9"><img
+                                                src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop"
+                                                alt="Laptop 2-in-1"></div>
+                                    </div>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>3.3. Laptop Workstation</summary>
+                                <div class="body">
+                                    <p>CPU/GPU mạnh, RAM/SSD lớn, tản nhiệt tốt cho 3D/CAD/render. Thường nặng & giá
+                                        cao.</p>
+                                    <div class="media-grid">
+                                        <div class="ratio ratio-16x9"><img
+                                                src="/images/product/06a4a7a1-fee0-43c1-ad67-71bcca830752.jpg"
+                                                alt="Workstation"></div>
+                                    </div>
+                                </div>
+                            </details>
+                        </section>
 
-                            </section>
-                        </div>
-                    </div>
+                        <!-- 4 -->
+                        <section id="p4" class="panel" aria-labelledby="t4">
+                            <h2>4. Các tiêu chí chọn mua laptop chất lượng vượt trội</h2>
+                            <details class="sub" open>
+                                <summary>4.1. Mua theo thương hiệu</summary>
+                                <div class="body">
+                                    <p>Mỗi hãng có ưu/nhược và hệ sinh thái riêng. Xem bảo hành, trung tâm dịch vụ, cộng
+                                        đồng người dùng.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>4.2. Mua theo thiết kế</summary>
+                                <div class="body">
+                                    <p>Gaming/đồ hoạ: dày để tản tốt; mỏng nhẹ: di động cho văn phòng/sinh viên.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>4.3. Mua theo tính năng</summary>
+                                <div class="body">
+                                    <ul>
+                                        <li>Vân tay/IR: mở khoá nhanh</li>
+                                        <li>Camera 1080p: họp rõ nét</li>
+                                        <li>Màn cảm ứng/gập: ghi chú, ký</li>
+                                    </ul>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>4.4. Cấu hình gợi ý</summary>
+                                <div class="body">
+                                    <table class="spec">
+                                        <tbody>
+                                            <tr>
+                                                <th>Văn phòng</th>
+                                                <td>i5/R5, RAM 16GB, SSD 512GB, FHD chống chói</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Đồ hoạ</th>
+                                                <td>i7/R7 + GPU rời, RAM 16–32GB, SSD 1TB, màn 2K/OLED chuẩn màu</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Gaming</th>
+                                                <td>CPU/GPU mạnh, 120–240Hz, tản nhiệt tốt, SSD ≥ 512GB</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>4.5. Màn hình</summary>
+                                <div class="body">
+                                    <p>FHD đủ; 2K/4K cho chi tiết; IPS/OLED; phủ màu cao; độ sáng ≥ 300 nits; 120–240Hz
+                                        cho game.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>4.6. Cổng kết nối</summary>
+                                <div class="body">
+                                    <p>USB‑C/Thunderbolt, HDMI/DP, SD; Wi‑Fi 6/6E/7.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>4.7. Pin</summary>
+                                <div class="body">
+                                    <p>Quan sát Wh + cấu hình màn/CPU. Sạc PD 65–100W, củ GaN gọn.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>4.8. Bàn phím & touchpad</summary>
+                                <div class="body">
+                                    <p>Độ nảy/hành trình hợp lý, trackpad kính mượt; palm‑rest thoải mái.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>4.9. Phân khúc giá</summary>
+                                <div class="body">
+                                    <p>Đầu tư vào RAM/SSD & màn hình tốt trước; phụ kiện có thể nâng cấp sau.</p>
+                                </div>
+                            </details>
+                        </section>
+
+                        <!-- 5 -->
+                        <section id="p5" class="panel" aria-labelledby="t5">
+                            <h2>5. Chọn theo hệ điều hành</h2>
+                            <div class="proscons">
+                                <div class="pros">
+                                    <h4>Windows</h4>
+                                    <ul>
+                                        <li>Đa dạng mẫu & giá</li>
+                                        <li>Phần mềm phong phú</li>
+                                        <li>Phù hợp hầu hết nhu cầu</li>
+                                    </ul>
+                                </div>
+                                <div class="cons">
+                                    <h4>macOS</h4>
+                                    <ul>
+                                        <li>Hoàn thiện cao, pin trâu</li>
+                                        <li>Hiệu năng/độ ồn tốt</li>
+                                        <li>Hệ sinh thái Apple</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <details class="sub" open>
+                                <summary>5.1. Windows</summary>
+                                <div class="body">
+                                    <p>Nhiều lựa chọn từ bình dân đến cao cấp; dễ nâng cấp phần cứng.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>5.2. MacBook OS</summary>
+                                <div class="body">
+                                    <p>Mỏng nhẹ, hiệu năng ổn định, bảo mật cao; trải nghiệm trackpad/màn/loa xuất sắc.
+                                    </p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>5.3. ChromeOS</summary>
+                                <div class="body">
+                                    <p>Dễ dùng, an toàn, tích hợp Google; hợp tác vụ cơ bản với chi phí thấp.</p>
+                                </div>
+                            </details>
+                        </section>
+
+                        <!-- 6 -->
+                        <section id="p6" class="panel" aria-labelledby="t6">
+                            <h2>6. Chọn mua theo nhu cầu</h2>
+                            <details class="sub" open>
+                                <summary>6.1. Sinh viên, văn phòng</summary>
+                                <div class="body">
+                                    <ul>
+                                        <li>i3/R3→i5/R5; RAM 8–16GB; SSD 512GB</li>
+                                        <li>14" FHD chống chói; ≤ 1.5kg; pin 7–10h</li>
+                                        <li>USB‑C 65W; Wi‑Fi 6</li>
+                                    </ul>
+                                    <div class="chips"><span class="chip">Nhẹ</span><span class="chip">Bền
+                                            bỉ</span><span class="chip">Tiết kiệm</span></div>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>6.2. Đồ hoạ</summary>
+                                <div class="body">
+                                    <ul>
+                                        <li>i5+/R5+; GPU rời; RAM 16–32GB</li>
+                                        <li>Màn 2K/OLED, chuẩn màu cao</li>
+                                        <li>SSD 1TB; tản nhiệt tốt</li>
+                                    </ul>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>6.3. Gaming</summary>
+                                <div class="body">
+                                    <ul>
+                                        <li>CPU/GPU mạnh; 120–240Hz</li>
+                                        <li>Hệ thống tản lớn; âm thanh tốt</li>
+                                        <li>SSD ≥ 512GB</li>
+                                    </ul>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>6.4. Doanh nhân</summary>
+                                <div class="body">
+                                    <ul>
+                                        <li>Khung kim loại; bảo mật vân tay/IR</li>
+                                        <li>Nhiều cổng; webcam 1080p</li>
+                                        <li>Pin bền; sạc nhanh</li>
+                                    </ul>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>6.5. Mỏng nhẹ</summary>
+                                <div class="body">
+                                    <ul>
+                                        <li>≤ 1.3kg; thiết kế tinh tế</li>
+                                        <li>Hiệu năng ổn định; SSD nhanh</li>
+                                        <li>Pin 7–10h; sạc PD</li>
+                                    </ul>
+                                </div>
+                            </details>
+                        </section>
+
+                        <!-- 7 -->
+                        <section id="p7" class="panel" aria-labelledby="t7">
+                            <h2>7. Phân loại theo thương hiệu</h2>
+                            <details class="sub" open>
+                                <summary>7.1. MacBook</summary>
+                                <div class="body">
+                                    <p>Air & Pro – hoàn thiện cao cấp, hiệu năng/pin tốt, hệ sinh thái Apple.</p>
+                                    <div class="media-grid">
+                                        <div class="ratio ratio-16x9"><img
+                                                src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop"
+                                                alt="MacBook"></div>
+                                    </div>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>7.2. Dell</summary>
+                                <div class="body">
+                                    <p>Bền bỉ, đa dạng phân khúc; dịch vụ tốt.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>7.3. Asus</summary>
+                                <div class="body">
+                                    <p>Thiết kế trẻ trung; nhiều dòng sáng tạo.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>7.4. Microsoft Surface</summary>
+                                <div class="body">
+                                    <p>2‑in‑1 mượt, màn cảm ứng đẹp.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>7.5. LG Gram</summary>
+                                <div class="body">
+                                    <p>Siêu nhẹ; pin ổn; màn sắc nét.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>7.6. HP</summary>
+                                <div class="body">
+                                    <p>Uy tín; phù hợp nhiều nhu cầu.</p>
+                                </div>
+                            </details>
+                            <details class="sub" open>
+                                <summary>7.7. Acer</summary>
+                                <div class="body">
+                                    <p>Giá dễ tiếp cận; danh mục rộng.</p>
+                                </div>
+                            </details>
+                        </section>
+
+                        <!-- 8 -->
+                        <section id="p8" class="panel" aria-labelledby="t8">
+                            <h2>8. Kinh nghiệm bảo quản máy tính xách tay bền lâu hơn</h2>
+                            <ul>
+                                <li>Dùng túi chống sốc khi di chuyển; hạn chế va đập.</li>
+                                <li>Đặt máy trên bề mặt phẳng, thoáng; tránh nước/lửa.</li>
+                                <li>Vệ sinh màn hình bằng khăn mềm khô; tránh lực mạnh.</li>
+                                <li>Sạc khi còn ~10%; tránh để cạn kiệt thường xuyên.</li>
+                                <li>Vệ sinh bàn phím định kỳ; gõ nhẹ.</li>
+                                <li>Tránh link/file lạ; cài phần mềm bảo vệ.</li>
+                            </ul>
+                            <div class="media-grid">
+                                <div class="ratio ratio-16x9"><img
+                                        src="https://images.unsplash.com/photo-1527430253228-e93688616381?q=80&w=1200&auto=format&fit=crop"
+                                        alt="Vệ sinh bàn phím"></div>
+                                <div class="ratio ratio-16x9"><img
+                                        src="https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=1200&auto=format&fit=crop"
+                                        alt="Đặt máy nơi thoáng"></div>
+                                <div class="ratio ratio-16x9"><img
+                                        src="https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?q=80&w=1200&auto=format&fit=crop"
+                                        alt="Bảo quản khi di chuyển"></div>
+                            </div>
+                        </section>
+
+                        <!-- 9 -->
+                        <section id="p9" class="panel" aria-labelledby="t9">
+                            <h2>9. Mua laptop bao nhiêu tiền phù hợp?</h2>
+                            <p>Chọn theo nhu cầu để tối ưu chi phí:</p>
+                            <table class="spec">
+                                <tbody>
+                                    <tr>
+                                        <th>Sinh viên (~10 triệu)</th>
+                                        <td>Văn phòng cơ bản: i3/R3, RAM 8GB, SSD 256–512GB, FHD 60Hz.</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Văn phòng (10–15 triệu)</th>
+                                        <td>i5/R5, RAM 16GB, SSD 512GB, FHD/2K; pin 7–9h.</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Đồ hoạ/Gaming (>20 triệu)</th>
+                                        <td>i7/R7+, GPU rời, RAM 16–32GB, SSD 1TB, màn 2K/4K hoặc 120–240Hz.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="callout">Lưu ý: ưu tiên đầu tư RAM/SSD & màn hình tốt. Phụ kiện (chuột, bàn
+                                phím, dock) có thể nâng cấp sau.</div>
+                        </section>
+
+                        <!-- 10 -->
+                        <section id="p10" class="panel" aria-labelledby="t10">
+                            <h2>10. Mua laptop giá rẻ, trả góp 0%</h2>
+                            <p>Nhiều cửa hàng áp dụng trả góp 0% qua thẻ tín dụng hoặc công ty tài chính theo từng
+                                chương trình. Hãy kiểm tra điều kiện, phí ẩn và thời hạn trước khi ký.</p>
+                            <ul>
+                                <li>Chuẩn bị giấy tờ: CCCD/CMND, bằng lái/hộ khẩu/SHK (tuỳ bên cho vay).</li>
+                                <li>Chọn kỳ hạn phù hợp (3–12 tháng); tính tổng chi phí sở hữu.</li>
+                                <li>Giữ hoá đơn & bảo hành để được hỗ trợ nhanh khi cần.</li>
+                            </ul>
+                            <div class="ratio ratio-16x9"><img
+                                    src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=1400&auto=format&fit=crop"
+                                    alt="Hỗ trợ trả góp mua laptop"></div>
+                        </section>
+                    </main>
                 </div>
             </div>
-            <!-- Blogs End-->
+            <!-- nội dung end-->
 
-            <!-- Features Section Start -->
+                        <!-- Features Section Start -->
             <%- include('../layout/feature'); -%>
                 <!-- Features Section End -->
+
+            <!-- Câu hỏi thường gặp Start -->
+            <div class="container">
+                <div class="wrap">
+                    <h2 class="faq-title">Câu hỏi thường gặp</h2>
+
+                    <!-- 1. Cách chọn mua đúng chuẩn -->
+                    <details class="faq">
+                        <summary>
+                            <span class="q">Làm sao để chọn mua laptop đúng chuẩn?</span>
+                            <span class="caret" aria-hidden></span>
+                        </summary>
+                        <div class="faq__body">
+                            <p>Để chọn máy hợp nhu cầu và chi phí, bạn nên ưu tiên:</p>
+                            <ul>
+                                <li>Xác định <strong>nhu cầu chính</strong> (văn phòng, đồ hoạ, gaming, di động).</li>
+                                <li>Chọn <strong>CPU</strong> phù hợp (i5/R5 trở lên cho đa số người dùng).</li>
+                                <li><strong>RAM</strong> tối thiểu 8GB (khuyến nghị 16GB cho đa nhiệm).</li>
+                                <li><strong>SSD</strong> từ 512GB; 1TB nếu làm dự án lớn.</li>
+                                <li><strong>GPU rời</strong> khi cần render/game; tích hợp là đủ cho văn phòng.</li>
+                                <li>Kích thước, độ phân giải <strong>màn hình</strong> & thời lượng <strong>pin</strong>
+                                    mong muốn.</li>
+                                <li><strong>Cổng kết nối</strong> cần thiết: USB‑C/Thunderbolt, HDMI/DP, SD…</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <!-- 2. Bao nhiêu RAM là đủ -->
+                    <details class="faq">
+                        <summary>
+                            <span class="q">Nên chọn mua laptop bao nhiêu RAM là đủ?</span>
+                            <span class="caret" aria-hidden></span>
+                        </summary>
+                        <div class="faq__body">
+                            <ul>
+                                <li><strong>8GB</strong>: lướt web, Office, học trực tuyến.</li>
+                                <li><strong>16GB</strong>: đa nhiệm, lập trình cơ bản, chỉnh ảnh nhẹ.</li>
+                                <li><strong>16–32GB</strong>: đồ hoạ, dựng phim, máy ảo, dev nặng.</li>
+                            </ul>
+                            <p>Mẹo: ưu tiên máy có khe nâng cấp RAM (dual‑channel) để tối ưu hiệu năng.</p>
+                        </div>
+                    </details>
+
+                    <!-- 3. Sinh viên nên mua gì -->
+                    <details class="faq">
+                        <summary>
+                            <span class="q">Sinh viên nên mua laptop như thế nào?</span>
+                            <span class="caret" aria-hidden></span>
+                        </summary>
+                        <div class="faq__body">
+                            <ul>
+                                <li>CPU i5/R5, <strong>RAM 16GB</strong>, SSD 512GB.</li>
+                                <li>Màn hình 14" FHD chống chói; trọng lượng &lt; 1.5kg.</li>
+                                <li>Pin thực tế 7–10 giờ; sạc USB‑C 65W.</li>
+                                <li>Ngân sách tham khảo: 10–15 triệu tuỳ ngành học.</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <!-- 4. Thu cũ đổi mới (generic, không nêu tên hãng) -->
+                    <details class="faq">
+                        <summary>
+                            <span class="q">Có chương trình thu cũ đổi mới laptop không?</span>
+                            <span class="caret" aria-hidden></span>
+                        </summary>
+                        <div class="faq__body">
+                            <p>Nhiều cửa hàng có áp dụng <em>thu cũ đổi mới</em> tuỳ điều kiện máy và thời điểm. Bạn
+                                nên:</p>
+                            <ul>
+                                <li>Chuẩn bị hoá đơn/biên nhận, phụ kiện kèm theo.</li>
+                                <li>Sao lưu dữ liệu, đăng xuất tài khoản trước khi mang máy.</li>
+                                <li>Hỏi rõ cách định giá, mức hỗ trợ chênh lệch và hình thức trả góp (nếu có).</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <!-- 5. Trả góp & hồ sơ -->
+                    <details class="faq">
+                        <summary>
+                            <span class="q">Chính sách trả góp có hỗ trợ và hồ sơ thế nào?</span>
+                            <span class="caret" aria-hidden></span>
+                        </summary>
+                        <div class="faq__body">
+                            <p>Thông thường có các hình thức: qua thẻ tín dụng, công ty tài chính hoặc kỳ hạn ngân hàng.
+                            </p>
+                            <ul>
+                                <li>Ưu đãi lãi suất có thể 0% theo từng đợt khuyến mãi.</li>
+                                <li>Hồ sơ cơ bản: CCCD/CMND, bằng lái/SHK; thẻ tín dụng nếu trả góp qua thẻ.</li>
+                                <li>Kỳ hạn phổ biến: 3–6–12 tháng; có thể khác tuỳ đối tác.</li>
+                            </ul>
+                            <p class="note">Lưu ý: nội dung trên chỉ là mẫu tham khảo. Hãy cập nhật điều kiện thực tế
+                                tại cửa hàng/đơn vị của bạn.</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            <!-- Câu hỏi thường gặp end-->
+
+
 
                 <!-- === RÙA AI — chatbox === -->
                 <div id="aiTurtle" class="ai-turtle">
