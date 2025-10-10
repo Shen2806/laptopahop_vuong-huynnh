@@ -1,30 +1,22 @@
-// src/services/ai/answercheck.service.ts
-import OpenAI from "openai";
-import 'dotenv/config';
+import { LocalProvider } from './vendor/local';
+const provider = new LocalProvider();
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+export async function answerCheck(userMsg: string, context: string, answer: string) {
+    if (!answer || answer.length < 4) {
+        return { pass: false, revised: 'Mình chưa rõ ý bạn. Bạn cho mình **ngân sách + nhu cầu + hãng** nhé (vd: ASUS gaming ~20tr).' };
+    }
+    const SYS = `Bạn là bộ KIỂM DUYỆT câu trả lời cho trợ lý bán laptop.
+Trả về JSON {"pass": boolean, "revised": "..."}. Nếu câu trả lời không bám ngữ cảnh hoặc chưa hữu ích, hãy sửa ngắn gọn, không bịa.`;
 
-const CHECK_PROMPT = `
-Bạn là bộ kiểm tra câu trả lời.
-- Câu trả lời có trả lời trực tiếp câu hỏi không?
-- Có dùng đúng ngữ cảnh (context) đính kèm không?
-- Nếu thiếu thông tin, hãy đề nghị cách hỏi lại ngắn gọn.
-Trả JSON: { pass: boolean, revised?: string }.
-`;
-
-export async function answerCheck(question: string, context: string, answer: string) {
-    const sys = { role: "system" as const, content: CHECK_PROMPT };
-    const usr = { role: "user" as const, content: JSON.stringify({ question, context, answer }) };
-
-    const out = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [sys, usr],
-        temperature: 0,
-        response_format: { type: "json_object" }
-    });
+    const USER = `# USER\n${userMsg}\n\n# NGỮ CẢNH\n${context}\n\n# ANSWER\n${answer}`;
 
     try {
-        return JSON.parse(out.choices[0].message.content || "{}");
+        const { content } = await provider.chat([
+            { role: 'system', content: SYS },
+            { role: 'user', content: USER }
+        ], { temperature: 0.1 });
+        const o = JSON.parse(content || '{}');
+        return { pass: !!o.pass, revised: o.revised };
     } catch {
         return { pass: true };
     }

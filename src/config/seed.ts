@@ -50,7 +50,7 @@ const initDatabase = async () => {
 
     }
 
-    if (countProduct < 150) {
+    if (countProduct < 10) {
         // ===== CẤU HÌNH =====
         const factoryOptions = [
             { value: "APPLE", name: "Apple (MacBook)" },

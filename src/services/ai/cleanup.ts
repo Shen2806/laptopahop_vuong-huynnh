@@ -1,24 +1,11 @@
-// src/services/ai/cleanup.ts
-import { prisma } from "config/client";
+import { prisma } from 'config/client';
 
-export async function cleanupAiForUser(userId: number) {
-    await prisma.aiEmbedding.deleteMany({
-        where: {
-            OR: [{ message: { session: { userId } } }, { memory: { userId } }]
-        }
-    });
-    await prisma.aiChatMessage.deleteMany({ where: { session: { userId } } });
-    await prisma.aiMemory.deleteMany({ where: { userId } });
-    await prisma.aiChatSession.deleteMany({ where: { userId } });
-}
-
-export async function cleanupExpiredMemories() {
-    const expired = await prisma.aiMemory.findMany({
-        where: { expiresAt: { lt: new Date() } },
-        select: { id: true }
-    });
-    const ids = expired.map(m => m.id);
-    if (!ids.length) return;
-    await prisma.aiEmbedding.deleteMany({ where: { memoryId: { in: ids } } });
-    await prisma.aiMemory.deleteMany({ where: { id: { in: ids } } });
+export async function cleanupEphemeralMemories() {
+    const now = new Date();
+    const list = await prisma.aiMemory.findMany({ where: { type: 'EPHEMERAL', expiresAt: { lt: now } }, take: 500 });
+    for (const m of list) {
+        await prisma.aiEmbedding.deleteMany({ where: { memoryId: m.id } }).catch(() => { });
+        await prisma.aiMemory.delete({ where: { id: m.id } }).catch(() => { });
+    }
+    return { removed: list.length };
 }

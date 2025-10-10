@@ -555,7 +555,8 @@
                                         <li>Trọng lượng & thời lượng pin ổn?</li>
                                         <li>Bảo hành chính hãng, hậu mãi yên tâm?</li>
                                     </ul>
-                                    <a href="/terms" class="btn btn-outline-success w-100 rounded-pill">Đọc thêm điều khoản sử dụng</a>
+                                    <a href="/terms" class="btn btn-outline-success w-100 rounded-pill">Đọc thêm điều
+                                        khoản sử dụng</a>
                                 </div>
                             </div>
                         </div>
@@ -951,18 +952,22 @@
                                     const item = document.createElement('div'); item.className = 'ai-li';
 
                                     const title = document.createElement('div'); title.className = 'ai-li__title';
-                                    title.innerHTML = `<span class="ai-li__index">${idx + 1}.</span> <strong>${p.name}</strong>`;
+                                    // ✅ escape tên sản phẩm
+                                    title.innerHTML = `<span class="ai-li__index">${idx + 1}.</span> <strong>${escapeHtml(p.name || '')}</strong>`;
                                     item.appendChild(title);
 
-                                    if (p.specs || p.shortDesc) {
+                                    // ✅ escape specs/shortDesc
+                                    const specsText = p.specs || p.shortDesc || '';
+                                    if (specsText) {
                                         const spec = document.createElement('div'); spec.className = 'ai-li__row';
-                                        spec.innerHTML = `<span class="ai-li__label">Cấu hình:</span> ${p.specs || p.shortDesc}`;
+                                        spec.innerHTML = `<span class="ai-li__label">Cấu hình:</span> ${escapeHtml(specsText)}`;
                                         item.appendChild(spec);
                                     }
 
-                                    const priceLine = document.createElement('div'); priceLine.className = 'ai-li__row';
+                                    // ✅ escape price text
                                     const priceTxt = p.priceText || (((p.salePrice ?? p.price) || 0).toLocaleString('vi-VN') + '₫');
-                                    priceLine.innerHTML = `<span class="ai-li__label">Giá tham khảo:</span> ${priceTxt}`;
+                                    const priceLine = document.createElement('div'); priceLine.className = 'ai-li__row';
+                                    priceLine.innerHTML = `<span class="ai-li__label">Giá tham khảo:</span> ${escapeHtml(priceTxt)}`;
                                     item.appendChild(priceLine);
 
                                     const cta = document.createElement('div'); cta.className = 'ai-li__cta';
@@ -982,8 +987,24 @@
                             (function () {
                                 if (!!loadJSON(OPEN_KEY, false)) $card.style.display = 'block';
                                 const hist = loadJSON(histKey(), []);
-                                if (hist.length) { $body.innerHTML = ''; hist.forEach(it => { if (it.kind === 'text') appendMsg(it.role, it.text, { persist: false }); if (it.kind === 'products') appendProducts(it.products, { persist: false }); }); $body.scrollTop = $body.scrollHeight; }
+                                const TTL = 2 * 60 * 60 * 1000; // 2h
+                                const now = Date.now();
+
+                                if (hist.length) {
+                                    $body.innerHTML = '';
+                                    hist.forEach(it => {
+                                        // bỏ lịch sử quá hạn
+                                        if (it.t && now - it.t > TTL) return;
+
+                                        // ❌ không auto render product cards khi mở chat
+                                        if (it.kind === 'products' || it.kind === 'product-list') return;
+
+                                        if (it.kind === 'text') appendMsg(it.role, it.text, { persist: false });
+                                    });
+                                    $body.scrollTop = $body.scrollHeight;
+                                }
                             })();
+
 
                             async function sendMessage(text) {
                                 appendMsg('user', text);
@@ -995,9 +1016,25 @@
                                         credentials: 'same-origin',
                                         body: JSON.stringify({ message: text, sessionId, meta: { page: 'home_show', ts: Date.now() } })
                                     });
-                                    if (!res.ok) throw new Error('HTTP ' + res.status);
-                                    const data = await res.json().catch(() => ({}));
 
+                                    // luôn cố đọc JSON để lấy chi tiết lỗi nếu có
+                                    const payload = await res.json().catch(() => null);
+
+                                    if (!res.ok) {
+                                        // hiển thị chi tiết (nếu router trả về "detail" như mình gợi ý)
+                                        let msg = `Có lỗi máy chủ (${res.status}).`;
+                                        if (payload?.detail) msg += ` ${payload.detail}`;
+                                        appendMsg('assistant', msg);
+
+                                        // nếu session bị "CLOSED", reset để lần sau tạo session mới
+                                        if (res.status === 403 && payload?.message === 'session closed') {
+                                            sessionId = null;
+                                            sessionStorage.removeItem(SID_KEY);
+                                        }
+                                        return; // kết thúc nhánh lỗi
+                                    }
+
+                                    const data = payload || {};
                                     if (data?.sessionId && data.sessionId !== sessionId) {
                                         const oldKey = histKey(); sessionId = data.sessionId;
                                         sessionStorage.setItem(SID_KEY, String(sessionId));
@@ -1006,29 +1043,31 @@
 
                                     const hasProducts = Array.isArray(data.products) && data.products.length > 0;
                                     const reply = (typeof data.reply === 'string' ? data.reply.trim() : '');
+
                                     if (hasProducts) {
                                         if (data.format === 'list') appendProductList(data.products);
-                                        else appendProducts(data.products); // mặc định card
+                                        else appendProducts(data.products); // mặc định cards
                                     } else if (reply) {
                                         appendMsg('assistant', reply);
                                     } else {
                                         appendMsg('assistant', 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!');
                                     }
 
-
-                                    // render filters nếu server trả
                                     if (data?.activeFilters) {
                                         const chips = [];
                                         if (data.activeFilters.brand) chips.push('Hãng: ' + data.activeFilters.brand);
                                         if (data.activeFilters.target) chips.push('Nhu cầu: ' + data.activeFilters.target);
-                                        if (data.activeFilters.min || data.activeFilters.max) chips.push('Ngân sách: ' + ((data.activeFilters.min || 0) / 1e6) + '–' + (data.activeFilters.max ? (data.activeFilters.max / 1e6) : '∞') + 'tr');
+                                        if (data.activeFilters.min || data.activeFilters.max)
+                                            chips.push('Ngân sách: ' + ((data.activeFilters.min || 0) / 1e6) + '–' + (data.activeFilters.max ? (data.activeFilters.max / 1e6) : '∞') + 'tr');
                                         if (chips.length) renderChips(chips);
                                     }
-
                                     if (Array.isArray(data.suggestions) && data.suggestions.length) renderChips(data.suggestions);
+
                                 } catch (e) {
-                                    console.error(e); appendMsg('assistant', 'Có lỗi kết nối máy chủ. Vui lòng thử lại sau nhé.');
-                                } finally {
+                                    console.error(e);
+                                    appendMsg('assistant', 'Không kết nối được máy chủ. Bạn thử lại sau nhé.');
+                                }
+                                finally {
                                     $typing.style.display = 'none'; $send.disabled = false; $input.disabled = false; $input.focus();
                                 }
                             }
@@ -1044,13 +1083,6 @@
                             });
                         })();
                     </script>
-
-
-
-
-
-
-
 
 </body>
 

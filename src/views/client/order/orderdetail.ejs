@@ -140,26 +140,39 @@
                     <div class="card h-100">
                         <div class="card-header"><i class="bi bi-receipt me-2"></i>Tổng tiền</div>
                         <div class="card-body">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Tạm tính</span>
-                                <span class="price">
-                                    <%= subTotal.toLocaleString('vi-VN') %> ₫
-                                </span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Giảm giá</span>
-                                <span class="price text-danger">-<%= discountAmount.toLocaleString('vi-VN') %> ₫</span>
-                            </div>
-                            <hr />
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold">Tổng cộng</span>
-                                <span class="price fs-5 text-primary fw-bold">
-                                    <%= Math.max(0, total).toLocaleString('vi-VN') %> ₫
-                                </span>
-                            </div>
+                            <% const shipping=Number(order.shippingFee || 0); const mustPay=Math.max(0, (Number(subTotal
+                                || 0) - Number(discountAmount || 0)) + shipping); %>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Tạm tính</span>
+                                    <span class="price">
+                                        <%= Number(subTotal || 0).toLocaleString('vi-VN') %> ₫
+                                    </span>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Giảm giá</span>
+                                    <span class="price text-danger">-<%= Number(discountAmount ||
+                                            0).toLocaleString('vi-VN') %> ₫</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Phí vận chuyển</span>
+                                    <span class="price">+<%= shipping.toLocaleString('vi-VN') %> ₫</span>
+                                </div>
+
+                                <hr />
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Tổng cộng</span>
+                                    <span class="price fs-5 text-primary fw-bold">
+                                        <%= mustPay.toLocaleString('vi-VN') %> ₫
+                                    </span>
+                                </div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
             <!-- ===== Sản phẩm ===== -->

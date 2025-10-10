@@ -3,7 +3,6 @@ import { Router } from "express";
 import OpenAI from "openai";
 import { prisma } from "config/client";
 import 'dotenv/config';
-import { SYSTEM_PROMPT } from "config/aiPrompt";
 
 const router = Router();
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
@@ -250,9 +249,6 @@ router.post("/ai/chat", async (req, res) => {
         let reply = "";
         try {
             const history = await prisma.aiChatMessage.findMany({ where: { sessionId: session.id }, orderBy: { id: "asc" }, take: 14 });
-            const sys = { role: "system" as const, content: SYSTEM_PROMPT };
-            const msgs = [sys, ...history.map(m => ({ role: m.role.toLowerCase() as any, content: m.content }))]; // KHÔNG đẩy thêm message lần nữa
-            reply = await chatLLM(msgs, 2);
         } catch (e: any) {
             const list = await listByFilters(remembered, 5);
             if (list.length) {

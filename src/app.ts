@@ -20,7 +20,10 @@ import paymentRoutes from './routes/payment';
 import aiRoutes from "./routes/ai";
 import locationRoutes from './routes/location.routes';
 import { headerCartCount } from './middleware/headerCartCount';
+import aiTeach from './routes/ai.teach.router';
 const app = express();
+const aiRouter = require('./routes/ai.router').default;
+const aiAdmin = require('./routes/ai.admin.router').default;
 app.use(cookieParser());
 
 // config cors
@@ -69,9 +72,11 @@ const PORT = process.env.PORT || 8080;
 //configure web routes
 webRoutes(app);
 
-// api routes
-apiRoutes(app);
+// app.ts / index.ts
 
+app.use('/api', aiRouter);
+app.use('/api', aiAdmin);
+app.use('/api', aiTeach);
 // payment routes (VNPAY return/IPN)
 app.use('/payment', paymentRoutes);
 
