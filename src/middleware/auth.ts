@@ -7,7 +7,27 @@ import { getUserWithRoleById } from "services/client/auth.service";
 function wantJSON(req: Request) {
     return req.xhr || req.originalUrl.startsWith("/api");
 }
+// ✅ Cho phép: ADMIN + các role staff vào khu vực /admin
+const STAFF_OR_ADMIN = new Set([
+    "ADMIN",
+    "OPS_MANAGER",
+    "OPS_STAFF",
+    "SALES_SUPPORT",
+    "MARKETING_CONTENT",
+]);
 
+export const isAdminOrStaff = async (req: any, res: Response, next: NextFunction) => {
+    await ensureAuthenticated(req, res, async () => {
+        const roleName = String(req.user?.role?.name || req.user?.roleName || "").toUpperCase();
+        if (STAFF_OR_ADMIN.has(roleName)) return next();
+
+        // chặn khách (USER) truy cập /admin
+        const wantJSON = req.xhr || req.originalUrl.startsWith("/admin/api");
+        return wantJSON
+            ? res.status(403).json({ message: "Forbidden" })
+            : res.status(403).render("status/403.ejs");
+    });
+};
 // Đảm bảo đã đăng nhập: ưu tiên session (Passport), fallback JWT (cookie access_token)
 export const ensureAuthenticated = async (req: any, res: Response, next: NextFunction) => {
     // 1) Session

@@ -24,6 +24,8 @@ import aiTeach from './routes/ai.teach.router';
 const app = express();
 const aiRouter = require('./routes/ai.router').default;
 const aiAdmin = require('./routes/ai.admin.router').default;
+
+
 app.use(cookieParser());
 
 // config cors
@@ -71,6 +73,8 @@ app.use(headerCartCount); // phải đặt sau khi req.user đã có
 const PORT = process.env.PORT || 8080;
 //configure web routes
 webRoutes(app);
+// MOUNT API CHÍNH CỦA ỨNG DỤNG (có /api/add-product-to-cart, /api/buy-now)
+apiRoutes(app);
 
 // app.ts / index.ts
 

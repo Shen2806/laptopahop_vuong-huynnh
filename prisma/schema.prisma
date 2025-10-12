@@ -40,6 +40,16 @@ enum AiRole {
   SYSTEM
 }
 
+enum StaffStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum PermEffect {
+  ALLOW
+  DENY
+}
+
 model Session {
   id        String   @id
   sid       String   @unique
@@ -138,12 +148,62 @@ model User {
 }
 
 model Role {
-  id          Int    @id @default(autoincrement())
-  name        String @unique @db.VarChar(100)
-  description String @db.VarChar(255)
-  users       User[]
+  id              Int              @id @default(autoincrement())
+  name            String           @unique @db.VarChar(100)
+  description     String           @db.VarChar(255)
+  users           User[]
+  staff           Staff[] // đổi tên field: Staff[] -> staff[]
+  rolePermissions RolePermission[] // đổi tên field: RolePermission[] -> rolePermissions[]
 
   @@map("roles")
+}
+
+model Staff {
+  id       Int         @id @default(autoincrement())
+  fullName String
+  username String      @unique
+  phone    String?
+  address  String?
+  avatar   String?
+  password String?
+  status   StaffStatus @default(ACTIVE)
+  roleId   Int
+  role     Role        @relation(fields: [roleId], references: [id])
+
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  staffPermissions StaffPermission[] // đổi tên field: StaffPermission[] -> staffPermissions
+}
+
+model Permission {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  rolePermissions  RolePermission[] // đổi tên field: roleLinks -> rolePermissions
+  staffPermissions StaffPermission[] // đổi tên field: staffLinks -> staffPermissions
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+model StaffPermission {
+  id           Int        @id @default(autoincrement())
+  staffId      Int
+  permissionId Int
+  effect       PermEffect @default(ALLOW)
+
+  staff      Staff      @relation(fields: [staffId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([staffId, permissionId, effect])
+  @@index([staffId])
 }
 
 model Product {

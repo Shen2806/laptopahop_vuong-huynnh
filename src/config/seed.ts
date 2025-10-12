@@ -7,20 +7,137 @@ const initDatabase = async () => {
     const countRole = await prisma.role.count();
     const countProduct = await prisma.product.count();
 
-    if (countRole === 0) {
-        await prisma.role.createMany({
-            data: [
-                {
-                    name: "ADMIN",
-                    description: "Admin thì full quyền"
-                },
-                {
-                    name: "USER",
-                    description: "User thông thường"
-                },
-            ]
-        })
+    // 🔁 Thay thế khối seed role cũ
+    {
+        // helper: đảm bảo 1 role tồn tại (tạo nếu thiếu)
+        const ensureRole = (name: string, description: string) =>
+            prisma.role.upsert({
+                where: { name },      // name là unique
+                update: {},           // không sửa description nếu đã có (tránh ghi đè)
+                create: { name, description },
+            });
+        // ===== Seed PERMISSIONS & MAP ROLE =====
+        const PERMS = [
+            // Nhân sự & role
+            "staff.view", "staff.create", "staff.update", "staff.delete", "role.manage",
+            // Dashboard
+            "dashboard.view",
+            // Khách hàng
+            "customer.view", "customer.update",
+            // Sản phẩm & kho
+            "product.view", "product.create", "product.update", "product.delete",
+            "inventory.view", "inventory.adjust", "inventory.import", "inventory.export", "inventory.stocktake",
+            // Fulfillment/Đơn hàng/Vận đơn/Trả hàng
+            "order.view", "order.create", "order.update", "order.refund", "order.fulfill",
+            "fulfillment.pick", "fulfillment.pack", "fulfillment.label", "fulfillment.handover",
+            "shipment.view", "shipment.create", "shipment.assign", "shipment.update_status",
+            "returns.receive", "returns.inspect",
+            // Giao hàng (courier)
+            "delivery.view_assigned", "delivery.update_status", "delivery.pod_upload", "delivery.returns_pickup",
+            // Marketing & nội dung
+            "promo.view", "promo.create", "promo.update", "promo.delete",
+            "coupon.view", "coupon.create", "coupon.update", "coupon.delete",
+            "blog.view", "blog.create", "blog.update", "blog.delete",
+            // Hỗ trợ
+            "chat.view", "chat.reply", "qa.view", "qa.moderate",
+        ] as const;
+
+        const ensurePermission = (name: string, description?: string) =>
+            prisma.permission.upsert({
+                where: { name },
+                update: {},
+                create: { name, description },
+            });
+
+        await Promise.all(PERMS.map(p => ensurePermission(p)));
+
+        const roleByName = async (name: string) =>
+            prisma.role.findUnique({ where: { name } });
+
+        // Map role → perms
+        const MAP: Record<string, string[]> = {
+            ADMIN: ["*"],
+
+            OPS_MANAGER: [
+                "dashboard.view",
+                "product.view", "product.create", "product.update", "product.delete",
+                "inventory.view", "inventory.adjust", "inventory.import", "inventory.export", "inventory.stocktake",
+                "order.view", "order.fulfill",
+                "fulfillment.pick", "fulfillment.pack", "fulfillment.label", "fulfillment.handover",
+                "shipment.view", "shipment.create", "shipment.assign", "shipment.update_status",
+                "returns.receive", "returns.inspect",
+            ],
+
+            OPS_STAFF: [
+                "dashboard.view",
+                "product.view",
+                "inventory.view", "inventory.adjust",
+                "order.view", "order.fulfill",
+                "fulfillment.pick", "fulfillment.pack", "fulfillment.label", "fulfillment.handover",
+                "shipment.view",
+                "returns.receive",
+                "delivery.view_assigned", "delivery.update_status", "delivery.pod_upload", "delivery.returns_pickup",
+            ],
+
+            SALES_SUPPORT: [
+                "dashboard.view",
+                "order.view", "order.create", "order.update", "order.refund",
+                "customer.view", "customer.update",
+                "chat.view", "chat.reply", "qa.view", "qa.moderate",
+            ],
+
+            MARKETING_CONTENT: [
+                "dashboard.view",
+                "promo.view", "promo.create", "promo.update", "promo.delete",
+                "coupon.view", "coupon.create", "coupon.update", "coupon.delete",
+                "blog.view", "blog.create", "blog.update", "blog.delete",
+            ],
+
+            // USER (khách): không map trong admin
+        };
+
+        const linkRolePerms = async (roleName: string, permNames: string[]) => {
+            const role = await roleByName(roleName);
+            if (!role) return;
+            if (permNames.includes("*")) {
+                // ADMIN: gắn tất cả
+                const all = await prisma.permission.findMany();
+                await prisma.$transaction(
+                    all.map(p => prisma.rolePermission.upsert({
+                        where: { roleId_permissionId: { roleId: role.id, permissionId: p.id } },
+                        update: {},
+                        create: { roleId: role.id, permissionId: p.id },
+                    }))
+                );
+            } else {
+                const perms = await prisma.permission.findMany({ where: { name: { in: permNames } } });
+                await prisma.$transaction(
+                    perms.map(p => prisma.rolePermission.upsert({
+                        where: { roleId_permissionId: { roleId: role.id, permissionId: p.id } },
+                        update: {},
+                        create: { roleId: role.id, permissionId: p.id },
+                    }))
+                );
+            }
+        };
+
+        await linkRolePerms("ADMIN", MAP.ADMIN);
+        await linkRolePerms("OPS_MANAGER", MAP.OPS_MANAGER);
+        await linkRolePerms("OPS_STAFF", MAP.OPS_STAFF);
+        await linkRolePerms("SALES_SUPPORT", MAP.SALES_SUPPORT);
+        await linkRolePerms("MARKETING_CONTENT", MAP.MARKETING_CONTENT);
+
+        // 5 role staff + 1 role USER (khách) + ADMIN
+        await Promise.all([
+            ensureRole("ADMIN", "Admin thì full quyền"),
+            ensureRole("OPS_MANAGER", "Quản lý vận hành: kho + fulfill + vận đơn/đổi trả + giao hàng"),
+            ensureRole("OPS_STAFF", "Nhân viên vận hành kho/giao hàng: pick/pack/label/handover, cập nhật giao hàng"),
+            ensureRole("SALES_SUPPORT", "Bán hàng + CSKH: đơn hàng, khách hàng, chat, Q&A"),
+            ensureRole("MARKETING_CONTENT", "Khuyến mãi + mã giảm giá + blog"),
+            ensureRole("USER", "User thông thường (khách hàng)"),
+        ]);
     }
+
 
     if (countUser === 0) {
         const defaultPassword = await hashPassword("123456");

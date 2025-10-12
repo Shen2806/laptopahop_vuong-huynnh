@@ -127,66 +127,72 @@
     <div id="layoutSidenav_nav">
         <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
             <div class="sb-sidenav-menu">
-
                 <div class="nav">
                     <div class="sb-sidenav-menu-heading">Tính năng</div>
-                    <a class="nav-link" href="/admin">
+
+                    <a class="nav-link" href="/admin" data-perm="dashboard.view">
                         <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                         Dashboard
                     </a>
 
-                    <a class="nav-link" href="/admin/user">
-                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <!-- Nhóm Người dùng -->
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUser"
+                        aria-expanded="false" data-perm-any="staff.view,customer.view">
+                        <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                         Người dùng
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                     </a>
+                    <div class="collapse" id="collapseUser">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="/admin/staff" data-perm="staff.view">Quản lý nhân viên</a>
+                            <a class="nav-link" href="/admin/user" data-perm="customer.view">Quản lý khách hàng</a>
+                        </nav>
+                    </div>
 
                     <!-- Nhóm Sản phẩm -->
                     <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseProduct"
-                        aria-expanded="false">
+                        aria-expanded="false" data-perm-any="product.view,inventory.view">
                         <div class="sb-nav-link-icon"><i class="fas fa-box"></i></div>
                         Sản phẩm
                         <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                     </a>
                     <div class="collapse" id="collapseProduct">
                         <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="/admin/product">Danh sách sản phẩm</a>
-                            <a class="nav-link" href="/admin/inventory">Quản lý tồn kho</a>
+                            <a class="nav-link" href="/admin/product" data-perm="product.view">Danh sách sản phẩm</a>
+                            <a class="nav-link" href="/admin/inventory" data-perm="inventory.view">Quản lý tồn kho</a>
                         </nav>
                     </div>
 
-
-
-                    <a class="nav-link" href="/admin/order">
-                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <a class="nav-link" href="/admin/order" data-perm="order.view">
+                        <div class="sb-nav-link-icon"><i class="fas fa-clipboard-check"></i></div>
                         Đơn hàng
                     </a>
 
-                    <!-- <div class="sb-sidenav-menu-heading">Quản lý nội dung</div> -->
-                    <a class="nav-link" href="/admin/blog">
+                    <a class="nav-link" href="/admin/blog" data-perm="blog.view">
                         <div class="sb-nav-link-icon"><i class="fas fa-blog"></i></div>
                         Blog
                     </a>
 
-                    <!-- Mục khuyến mãi mới -->
-                    <a class="nav-link" href="/admin/promo">
+                    <a class="nav-link" href="/admin/promo" data-perm="promo.view">
                         <div class="sb-nav-link-icon"><i class="fas fa-tags"></i></div>
                         Khuyến mãi
                     </a>
-                    <!-- Mã giảm giá -->
-                    <a class="nav-link" href="/admin/coupon">
+
+                    <a class="nav-link" href="/admin/coupon" data-perm="coupon.view">
                         <div class="sb-nav-link-icon"><i class="fas fa-ticket-alt"></i></div>
                         Mã giảm giá
                     </a>
-                    <a class="nav-link" href="/admin/chat">
+
+                    <a class="nav-link" href="/admin/chat" data-perm="chat.view">
                         <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
                         Tin nhắn
                         <span id="adminChatBadgeNav" data-admin-badge="chat"
                             class="badge rounded-pill bg-danger ms-auto d-none">0</span>
-
                     </a>
                     <audio id="adminChatSound" src="/ring.wav" preload="auto"></audio>
-                    <a class="nav-link" href="/admin/qa">
-                        <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
+
+                    <a class="nav-link" href="/admin/qa" data-perm="qa.view">
+                        <div class="sb-nav-link-icon"><i class="fas fa-circle-question"></i></div>
                         Q&A sản phẩm
                         <span id="qaNotifyBadge" class="badge rounded-pill bg-danger ms-auto d-none">0</span>
                     </a>
@@ -203,11 +209,52 @@
             </div>
             <div class="sb-sidenav-footer">
                 <div class="small">Đăng nhập bởi:</div>
-                VuongHuynhIT-K3
+                <%= (user && user.username) || "Unknown" %>
             </div>
         </nav>
     </div>
+
     <script src="/socket.io/socket.io.js"></script>
+    <meta id="rbac-data" data-perms="<%= encodeURIComponent(JSON.stringify(perms || [])) %>"
+        data-role="<%= encodeURIComponent(String(roleName || '')) %>">
+
+    <!-- Inject perms/role từ server -->
+    <script>
+        (function () {
+            const meta = document.getElementById('rbac-data') || { dataset: {} };
+
+            // Giải mã dữ liệu từ server
+            let __perms = [];
+            try {
+                __perms = JSON.parse(decodeURIComponent(meta.dataset.perms || '%5B%5D')); // [] mặc định
+            } catch (_) { __perms = []; }
+            const __role = decodeURIComponent(meta.dataset.role || '');
+
+            // Expose nếu cần dùng nơi khác
+            window.__perms = __perms;
+            window.__role = __role;
+
+            const can = (p) =>
+                __perms.includes('*') ||
+                __perms.includes(p) ||
+                __perms.includes(p.split('.')[0] + '.*');
+
+            // Ẩn item theo data-perm
+            document.querySelectorAll('[data-perm]').forEach(el => {
+                const need = el.getAttribute('data-perm');
+                if (!can(need)) el.style.display = 'none';
+            });
+
+            // Ẩn nhóm nếu không có quyền bất kỳ
+            document.querySelectorAll('[data-perm-any]').forEach(el => {
+                const list = (el.getAttribute('data-perm-any') || '')
+                    .split(',').map(s => s.trim()).filter(Boolean);
+                if (!list.some(can)) el.style.display = 'none';
+            });
+        })();
+    </script>
+
+
     <!-- Tự động đánh dấu active menu -->
     <script>
         (function () {

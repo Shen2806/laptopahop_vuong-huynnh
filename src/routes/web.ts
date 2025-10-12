@@ -7,7 +7,7 @@ import { getCartPage, getCheckOutPage, getOrderDetailPage, getOrderHistoryPage, 
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
 import { getAboutUsPage, getContactPage, getLoginPage, getPrivacyPage, getReturnPage, getSuccessRedirectPage, getSupportPage, getTermPage, getWarrantyPage, postLogin, postLogout, postRegister, refreshToken } from 'controllers/client/auth.controller';
 import passport from 'passport';
-import { ensureAuthenticated, isAdmin, isLogin } from 'src/middleware/auth';
+import { ensureAuthenticated, isAdmin, isAdminOrStaff, isLogin } from 'src/middleware/auth';
 import multer from 'multer';
 import { prisma } from 'config/client';
 import { getAdminBlogPage, getAdminCreateBlogPage, getAdminEditBlogPage, postAdminCreateBlog, postAdminUpdateBlog, postDeleteBlog } from 'controllers/admin/blog.controller';
@@ -20,6 +20,10 @@ import { adminAnswerQuestionAPI, adminListQuestionsAPI, getAdminQAPage } from 'c
 import { getUserWithRoleById } from 'services/client/auth.service';
 import { adminInventoryAdjustAPI, adminInventoryListAPI, adminInventoryPage, adminInventorySetReorderAPI } from 'controllers/admin/inventory.controller';
 import { getComparePage } from 'controllers/client/compare.controller';
+import { getAdminStaffPage, getCreateStaffPage, getViewStaff, postCreateStaff, postDeleteStaff, postUpdateStaff } from 'controllers/admin/staff.controller';
+import { requirePerm } from 'src/middleware/requirePerm';
+import { exposePermsToView } from 'src/middleware/exposePermsToView';
+import { attachPermissions } from 'src/middleware/attachPermissions';
 
 const router = express.Router();
 
@@ -335,12 +339,15 @@ const webRoutes = (app: Express) => {
 
 
     // ====== ADMIN GUARD CHO TOÀN NHÁNH /admin ======
-    router.use('/admin', isAdmin);
-    // admin routes
-    router.get("/admin", getDashboardPage);
-    // Trang & API admin chat
-    router.get("/admin/chat", isAdmin, (req, res) => res.render("admin/chat/index.ejs"));
-    router.get("/admin/api/chat/sessions", isAdmin, async (req, res) => {
+    // ====== ADMIN GUARD CHO TOÀN NHÁNH /admin ======
+    router.use('/admin', isAdminOrStaff, attachPermissions, exposePermsToView);
+
+    // Dashboard
+    router.get("/admin", /* tuỳ bạn muốn requirePerm hay miễn */ getDashboardPage);
+
+    // Chat admin demo
+    router.get("/admin/chat", requirePerm("chat.view"), (req, res) => res.render("admin/chat/index.ejs"));
+    router.get("/admin/api/chat/sessions", requirePerm("chat.view"), async (req, res) => {
         const sessions = await prisma.chatSession.findMany({
             where: { status: "OPEN" },
             orderBy: { createdAt: "desc" },
@@ -357,13 +364,24 @@ const webRoutes = (app: Express) => {
 
     // cập nhật số lượng sắp hết hàng
     router.post("/admin/product/restock", postRestockProduct);
-    router.get("/admin/user", getAdminUserPage);
-    router.post("/admin/handle-create-user", fileUploadMiddleware("avatar"), postCreateUser);
-    router.get("/admin/create-user", getCreateUserPage);
-    router.post("/admin/delete-user/:id", postDeleteUser);
-    router.get("/admin/view-user/:id", getViewUser);
-    router.post("/admin/update-user", fileUploadMiddleware("avatar"), postUpdateUser);
 
+    // Users (khách hàng)
+    router.get("/admin/user", requirePerm("customer.view"), getAdminUserPage);
+    router.post("/admin/handle-create-user", requirePerm("customer.update"), fileUploadMiddleware("avatar"), postCreateUser);
+    router.get("/admin/create-user", requirePerm("customer.update"), getCreateUserPage);
+    router.post("/admin/delete-user/:id", requirePerm("customer.update"), postDeleteUser);
+    router.get("/admin/view-user/:id", requirePerm("customer.update"), getViewUser);
+    router.post("/admin/update-user", requirePerm("customer.update"), fileUploadMiddleware("avatar"), postUpdateUser);
+
+    // Staff (chỉ role có staff.* — ADMIN mặc định có "*")
+    router.get("/admin/staff", requirePerm("staff.view"), getAdminStaffPage);
+    router.get("/admin/create-staff", requirePerm("staff.create"), getCreateStaffPage);
+    router.post("/admin/handle-create-staff", requirePerm("staff.create"), fileUploadMiddleware("avatar"), postCreateStaff);
+    router.get("/admin/view-staff/:id", requirePerm("staff.update"), getViewStaff);
+    router.post("/admin/update-staff", requirePerm("staff.update"), fileUploadMiddleware("avatar"), postUpdateStaff);
+    router.post("/admin/delete-staff/:id", requirePerm("staff.delete"), postDeleteStaff);
+
+    // bên sản phẩm
     router.get("/admin/product", getAdminProductPage);
     router.get('/admin/create-product', getAdminCreateProductPage)
     router.post('/admin/create-product', fileUploadMiddleware("image", "images/product"), postAdminCreateProduct)
