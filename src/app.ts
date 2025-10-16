@@ -1,105 +1,110 @@
 /// <reference path="./types/index.d.ts" />
-import express from 'express';
-import 'dotenv/config'; // phải đứng trước mọi import khác
-import webRoutes from 'src/routes/web';
-import initDatabase from 'config/seed';
-import passport from 'passport';
-import configPassportLocal from 'src/middleware/passport.local';
-import session from 'express-session';
-import { PrismaSessionStore } from '@quixo3/prisma-session-store';
-import { PrismaClient } from '@prisma/client';
-import apiRoutes from './routes/api';
-import cors from "cors";
+import "dotenv/config";
+import express from "express";
+import session from "express-session";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import path from "path";
 import http from "http";
+import passport from "passport";
+import { PrismaClient } from "@prisma/client";
+import { PrismaSessionStore } from "@quixo3/prisma-session-store";
+
+import webRoutes from "src/routes/web";
+import apiRoutes from "./routes/api";
+import paymentRoutes from "./routes/payment";
+import aiRoutes from "./routes/ai";                // POST /api/ai/chat
+import aiAdmin from "./routes/ai.admin.router";    // /api/ai/admin/*
+import aiTeach from "./routes/ai.teach.router";    // /api/ai/admin/teach
+import aiWebLLMRouter from "./routes/ai.webllm.router"; // nếu có endpoint phụ cho WebLLM
+import locationRoutes from "./routes/location.routes";
+
+import configPassportLocal from "src/middleware/passport.local";
+import { headerCartCount } from "./middleware/headerCartCount";
+import initDatabase from "config/seed";
 import { initSocket } from "./socket";
 import "./middleware/passport.google";
 import "./middleware/passport.jwt";
-import path from "path";
-import paymentRoutes from './routes/payment';
-import aiRoutes from "./routes/ai";
-import locationRoutes from './routes/location.routes';
-import { headerCartCount } from './middleware/headerCartCount';
-import aiTeach from './routes/ai.teach.router';
+
 const app = express();
-const aiRouter = require('./routes/ai.router').default;
-const aiAdmin = require('./routes/ai.admin.router').default;
 
+// Nếu chạy sau proxy (Heroku/NGINX) thì bật:
+app.set("trust proxy", 1);
 
-app.use(cookieParser());
-
-// config cors
+// CORS
 app.use(cors({
-    origin: "http://localhost:8080", // hoặc domain frontend
+    origin: "http://localhost:8080",
     credentials: true
-}))
+}));
 
-// Set up EJS as the view engine
-app.set('view engine', 'ejs');
-app.set('views', __dirname + '/views');
-//configure body parser
-app.use(express.json());
+// Parsers
+app.use(cookieParser());
+app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
-//configure static files
-app.use(express.static('public'));
+
+// Static & Views
+app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
-// config session
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// Session
 app.use(session({
-    cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000 // ms
-    },
-    secret: 'a santa at nasa',
+    cookie: { maxAge: 7 * 24 * 60 * 60 * 1000 }, // 7 ngày
+    secret: process.env.SESSION_SECRET || "a santa at nasa",
     resave: false,
     saveUninitialized: false,
     store: new PrismaSessionStore(
         new PrismaClient(),
-        {
-            checkPeriod: 1 * 24 * 60 * 60 * 1000,  //ms
-            dbRecordIdIsSessionId: true,
-            dbRecordIdFunction: undefined,
-        })
+        { checkPeriod: 24 * 60 * 60 * 1000, dbRecordIdIsSessionId: true }
+    )
+}));
 
-}))
-// configure passport
+// Passport
 app.use(passport.initialize());
-app.use(passport.authenticate('session'));
+app.use(passport.authenticate("session"));
 configPassportLocal();
-// config global user
+
+// Expose user cho view
 app.use((req, res, next) => {
-    res.locals.user = req.user || null; // Pass user object to all views
+    res.locals.user = (req as any).user || null;
     next();
 });
-app.use(headerCartCount); // phải đặt sau khi req.user đã có
-const PORT = process.env.PORT || 8080;
-//configure web routes
+app.use(headerCartCount);
+
+// Web pages
 webRoutes(app);
-// MOUNT API CHÍNH CỦA ỨNG DỤNG (có /api/add-product-to-cart, /api/buy-now)
+
+// API chính (giỏ hàng, thanh toán nhanh…)
 apiRoutes(app);
 
-// app.ts / index.ts
+// ==== AI routers ====
+// Server LLM
+app.use("/api", aiRoutes);       // POST /api/ai/chat
+// Admin ops
+app.use("/api", aiAdmin);        // /api/ai/admin/*
+app.use("/api", aiTeach);        // /api/ai/admin/teach
+// (Tuỳ chọn) WebLLM endpoints nếu có -> gom về /ai/*
+app.use("/ai", aiWebLLMRouter);  // VD: GET /ai/webllm/*
 
-app.use('/api', aiRouter);
-app.use('/api', aiAdmin);
-app.use('/api', aiTeach);
-// payment routes (VNPAY return/IPN)
-app.use('/payment', paymentRoutes);
+// Payment callbacks
+app.use("/payment", paymentRoutes);
 
-app.use("/api", aiRoutes);
-
+// Địa lý
 app.use(locationRoutes);
 
-// seeding data
-initDatabase()
+// Seed DB (nếu cần)
+initDatabase();
 
-
-// handle 404 not found
-app.use((req, res) => {
+// 404
+app.use((_req, res) => {
     res.render("status/404.ejs");
-})
+});
+
+const PORT = Number(process.env.PORT || 8080);
 const server = http.createServer(app);
 initSocket(server);
 
 server.listen(PORT, () => {
     console.log(`My app is running on port : ${PORT}`);
 });
-
