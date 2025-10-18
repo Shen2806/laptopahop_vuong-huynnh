@@ -723,7 +723,6 @@ const postCancelOrder = async (req: Request, res: Response) => {
 const getOrderDetailPage = async (req: Request, res: Response) => {
     const user = (req as any).user;
     const id = Number(req.params.id);
-
     if (!user) return res.redirect("/login");
     if (!Number.isFinite(id)) return res.status(400).send("Mã đơn không hợp lệ");
 
@@ -731,10 +730,15 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
         where: { id, userId: user.id },
         include: {
             user: true,
-            province: true,   // <-- Tỉnh/Thành
-            district: true,   // <-- Quận/Huyện
-            ward: true,       // <-- Phường/Xã
+            province: true,
+            district: true,
+            ward: true,
             orderDetails: { include: { product: true } },
+
+            // Nếu bạn đã thêm relation trong Prisma:
+            // assignedShipper   Staff?  @relation(fields: [assignedShipperId], references: [id])
+            // => nhớ include để EJS đọc được:
+            assignedShipper: { select: { fullName: true, phone: true } } as any,
         },
     });
     if (!order) return res.status(404).render("status/404.ejs", { user });
@@ -743,11 +747,10 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
     const currentStep = canceled ? -1 : ORDER_STEPS.indexOf(order.status as $Enums.OrderStatus);
 
     const items = order.orderDetails || [];
-    const subTotal = items.reduce((sum: number, it: any) => sum + Number(it.price) * Number(it.quantity), 0);
+    const subTotal = items.reduce((s: number, it: any) => s + Number(it.price) * Number(it.quantity), 0);
     const discountAmount = Number(order.discountAmount || 0);
     const total = subTotal - discountAmount;
 
-    // Ghép địa chỉ hiển thị: ưu tiên street + ward + district + province; fallback receiverAddress
     const addressParts = [
         order.receiverStreet || null,
         order.ward?.name || null,
@@ -755,6 +758,31 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
         order.province?.name || null,
     ].filter(Boolean) as string[];
     const addressDisplay = addressParts.length ? addressParts.join(", ") : (order.receiverAddress || "—");
+
+    // ==== Lấy thông tin shipper (ưu tiên cache -> relation) ====
+    let shipperName: string | null =
+        (order as any).shipperNameCache ?? (order as any).shipperName ?? null;
+    let shipperPhone: string | null =
+        (order as any).shipperPhoneCache ?? (order as any).shipperPhone ?? null;
+
+    if (!shipperName || !shipperPhone) {
+        const relName = (order as any).assignedShipper?.fullName ?? null;
+        const relPhone = (order as any).assignedShipper?.phone ?? null;
+        shipperName = shipperName || relName;
+        shipperPhone = shipperPhone || relPhone;
+    }
+
+    // Log để kiểm tra nhanh nguyên nhân không hiện:
+    console.log("[OrderDetail]", {
+        id: order.id,
+        status: order.status,
+        assignedShipperId: (order as any).assignedShipperId,
+        shipperNameCache: (order as any).shipperNameCache,
+        shipperPhoneCache: (order as any).shipperPhoneCache,
+        relShipper: (order as any).assignedShipper,
+        resolvedName: shipperName,
+        resolvedPhone: shipperPhone,
+    });
 
     return res.render("client/order/orderdetail.ejs", {
         user,
@@ -767,9 +795,13 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
         STATUS_LABEL_VI,
         currentStep,
         canceled,
-        addressDisplay, // <-- dùng trong EJS để hiện địa chỉ đẹp
+        addressDisplay,
+        shipperName,
+        shipperPhone,
     });
 };
+
+
 
 const handleBuyNow = (req: Request, res: Response) => {
     const user: any = (req as any).user;

@@ -24,6 +24,7 @@ import { getAdminStaffPage, getCreateStaffPage, getViewStaff, postCreateStaff, p
 import { requirePerm } from 'src/middleware/requirePerm';
 import { exposePermsToView } from 'src/middleware/exposePermsToView';
 import { attachPermissions } from 'src/middleware/attachPermissions';
+import { assignShipper } from 'services/admin/staff.service';
 
 const router = express.Router();
 
@@ -417,6 +418,7 @@ const webRoutes = (app: Express) => {
     router.post("/admin/order/:id/confirm", postConfirmOrder);
     router.post("/admin/order/:id/cancel", postCancelOrderByAdmin);
     router.post("/admin/order/:id/status", postUpdateOrderStatus);
+    router.post("/admin/order/:id/assign-shipper", assignShipper);
     // app.use("/", isAdmin, router);
     // Admin chat
     router.get("/admin/chat", isAdmin, (req, res) => res.render("admin/chat/index.ejs"));

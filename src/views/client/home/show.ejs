@@ -1542,9 +1542,6 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                 ui.suggest?.querySelectorAll(".ai-chip").forEach(ch => ch.addEventListener("click", () => { ui.input.value = ch.getAttribute("data-q") || ""; ui.input.focus(); }));
                                 document.querySelectorAll(".chip[data-q]").forEach(ch => ch.addEventListener("click", () => { ui.card.style.display = "block"; ui.input.value = ch.getAttribute("data-q") || ""; setTimeout(() => ui.input.focus(), 60); }));
                             }
-
-                            // chào
-                            append("assistant", "Chào bạn! Rùa AI tư vấn theo **nhu cầu + ngân sách**. Ví dụ: “Gaming 18–22tr”, “Văn phòng nhẹ ≤ 15tr”.");
                         }
                     </script>
 
@@ -1682,11 +1679,16 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                 if (!$btn || !$card || !$form) return;
 
                                 /* storage keys */
-                                const SID_KEY = "AI_TURTLE_SID";
+
                                 const OPEN_KEY = "AI_TURTLE_OPEN";
                                 const HIST_PREFIX = "AI_TURTLE_HISTORY_";
-                                let sessionId = Number(sessionStorage.getItem(SID_KEY) || "") || null;
+                                const SID_KEY = "AI_TURTLE_SID";
+                                const SID_STORE = localStorage; // dùng localStorage để bền qua điều hướng
+                                const getSID = () => Number(SID_STORE.getItem(SID_KEY) || "") || null;
+                                const setSID = (id) => { try { SID_STORE.setItem(SID_KEY, String(id)); } catch { } };
+                                let sessionId = getSID();
                                 const histKey = () => HIST_PREFIX + (sessionId || "temp");
+
                                 const loadJSON = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f } catch { return f } };
                                 const saveJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { } };
                                 const migrateHistory = (oldK, newK) => { if (oldK === newK) return; const a = loadJSON(oldK, []), b = loadJSON(newK, []); if (a.length) saveJSON(newK, [...b, ...a].slice(-200)); try { localStorage.removeItem(oldK) } catch { } };
@@ -1853,6 +1855,11 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                 // rehydrate
                                 (function () {
                                     if (!!loadJSON(OPEN_KEY, false)) $card.style.display = 'block';
+                                    // nếu từng lưu ở 'temp' trước đó -> merge vào key hiện tại
+                                    const tempK = HIST_PREFIX + "temp";
+                                    const tempHist = loadJSON(tempK, []);
+                                    if (!getSID() && tempHist.length) saveJSON(histKey(), tempHist);
+
                                     const hist = loadJSON(histKey(), []);
                                     const TTL = 2 * 60 * 60 * 1000; // 2h
                                     const now = Date.now();
@@ -1869,10 +1876,33 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                             if (it.kind === 'text') appendMsg(it.role, it.text, { persist: false });
                                         });
                                         $body.scrollTop = $body.scrollHeight;
+                                    } else {
+                                        // local trống -> hỏi server lấy lại danh sách gần nhất
+                                        tryServerRehydrate();
                                     }
                                 })();
+                                // hỗ trợ back/forward cache: khi quay lại trang, đảm bảo rehydrate
+                                window.addEventListener('pageshow', (e) => {
+                                    if (!loadJSON(histKey(), []).length) tryServerRehydrate();
+                                });
+                                async function tryServerRehydrate() {
+                                    try {
+                                        const sid = sessionId || getSID();
+                                        if (!sid) return;
+                                        const res = await fetch(`/api/ai/session/${sid}/state`, { credentials: 'same-origin' });
+                                        const data = await res.json().catch(() => null);
+                                        if (!data) return;
 
-
+                                        // nếu lịch sử local trống thì render lại từ server
+                                        const h = loadJSON(histKey(), []);
+                                        if (!h.length) {
+                                            if (Array.isArray(data.products) && data.products.length) {
+                                                appendProducts(data.products);         // persist vào local luôn
+                                            }
+                                            if (data.reply) appendMsg('assistant', data.reply);
+                                        }
+                                    } catch { }
+                                }
                                 async function sendMessage(text) {
                                     appendMsg('user', text);
                                     $typing.style.display = 'block'; $send.disabled = true; $input.disabled = true;
@@ -1908,7 +1938,7 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                         if (data?.sessionId && data.sessionId !== sessionId) {
                                             const oldKey = histKey();
                                             sessionId = data.sessionId;
-                                            sessionStorage.setItem(SID_KEY, String(sessionId));
+                                            setSID(sessionId);
                                             const newKey = histKey();
                                             migrateHistory(oldKey, newKey);
                                         }

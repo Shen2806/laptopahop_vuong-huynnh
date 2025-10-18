@@ -315,6 +315,42 @@ const postDeletePromo = async (req: Request, res: Response) => {
     });
     res.redirect("/admin/promo");
 };
+// POST /admin/orders/:id/assign-shipper
+// body: { shipperId: number, setStatus?: 'SHIPPING' | 'OUT_FOR_DELIVERY' }
+const assignShipper = async (req: Request, res: Response) => {
+    const orderId = Number(req.params.id);
+    const shipperId = Number(req.body.shipperId);
+    const setStatus = req.body.setStatus as 'SHIPPING' | 'OUT_FOR_DELIVERY' | undefined;
+
+    const staff = await prisma.staff.findUnique({
+        where: { id: shipperId },
+        select: { id: true, fullName: true, phone: true },
+    });
+    if (!staff) return res.status(404).json({ error: "Không tìm thấy shipper" });
+
+    const data: any = {
+        assignedShipperId: staff.id,
+        shipperNameCache: staff.fullName,
+        shipperPhoneCache: staff.phone ?? null,
+    };
+    if (setStatus) data.status = setStatus;
+
+    const order = await prisma.order.update({
+        where: { id: orderId },
+        data,
+        select: { id: true, userId: true, status: true },
+    });
+
+    // tuỳ chọn: push thông báo
+    await prisma.notification.create({
+        data: {
+            userId: order.userId,
+            message: `Đơn #${order.id} đang giao bởi ${staff.fullName}${staff.phone ? ' - ' + staff.phone : ''}`,
+        },
+    });
+
+    return res.json({ ok: true, order });
+};
 
 export {
     getDashboardPage,
@@ -326,5 +362,6 @@ export {
     postRestockProduct,
     postCancelOrderByAdmin,
     getPromoPage, postAddPromo, postUpdatePromo, postDeletePromo,
-    postUpdateOrderStatus
+    postUpdateOrderStatus,
+    assignShipper
 };

@@ -174,4 +174,38 @@ async function applyCustomPerms(staffId: number, allow: string[], deny: string[]
     if (rows.length) {
         await prisma.staffPermission.createMany({ data: rows, skipDuplicates: true });
     }
+
+}
+export async function assignShipper(req, res, next) {
+    try {
+        const orderId = Number(req.params.id);
+        const shipperId = Number(req.body.shipperId); // id từ bảng Staff
+        // lấy thông tin staff
+        const staff = await prisma.staff.findUnique({
+            where: { id: shipperId },
+            select: { id: true, fullName: true, phone: true }
+        });
+        if (!staff) return res.status(404).json({ error: 'Không tìm thấy shipper' });
+
+        const order = await prisma.order.update({
+            where: { id: orderId },
+            data: {
+                status: 'OUT_FOR_DELIVERY', // hoặc 'SHIPPING' tùy quy ước của bạn
+                assignedShipperId: staff.id,
+                shipperNameCache: staff.fullName,
+                shipperPhoneCache: staff.phone ?? null
+            },
+            select: { id: true, userId: true }
+        });
+
+        // Gửi thông báo cho user (tuỳ chọn)
+        await prisma.notification.create({
+            data: {
+                userId: order.userId,
+                message: `Đơn #${order.id} đang giao bởi ${staff.fullName}${staff.phone ? ' - SĐT: ' + staff.phone : ''}`
+            }
+        });
+
+        res.json({ ok: true });
+    } catch (e) { next(e); }
 }

@@ -173,6 +173,7 @@ model Staff {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   staffPermissions StaffPermission[] // đổi tên field: StaffPermission[] -> staffPermissions
+  Order            Order[]
 }
 
 model Permission {
@@ -361,9 +362,14 @@ model Order {
 
   orderDetails OrderDetail[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now()) @updatedAt
+  assignedShipperId Int?
+  assignedShipper   Staff?   @relation(fields: [assignedShipperId], references: [id])
+  shipperNameCache  String?  @db.VarChar(255)
+  shipperPhoneCache String?  @db.VarChar(50)
 
+  @@index([assignedShipperId])
   @@index([receiverProvinceCode])
   @@index([receiverDistrictCode])
   @@index([receiverWardCode])
