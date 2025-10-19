@@ -576,7 +576,7 @@
                                                         </button>
                                                         <input type="text"
                                                             class="form-control form-control-sm text-center border-0"
-                                                            value="1">
+                                                            value="1" data-stock="<%= product.quantity %>">
                                                         <button
                                                             class="btn btn-sm btn-plus rounded-circle bg-light border">
                                                             <i class="fa fa-plus"></i>
@@ -586,8 +586,9 @@
 
                                                 <!-- Nút thêm giỏ + mua ngay -->
                                                 <form onsubmit="return false;">
-                                                    <input type="hidden" id="quantityDetail" name="quantity"
-                                                        value="1" />
+                                                    <input type="hidden" id="quantityDetail" name="quantity" value="1"
+                                                        data-stock="<%= product.quantity %>" />
+
                                                     <div class="cta-stack mt-2">
                                                         <button type="button" data-product-id="<%= product.id %>"
                                                             class="btnAddToCartDetail btn btn-primary rounded-pill w-100 py-2">
@@ -1783,55 +1784,7 @@
                             })();
                         </script>
 
-                        <!-- ai chat -->
-                        <!-- <script>
-                        (async function () {
-                            // tạo session 1 lần khi mở widget
-                            let aiSessionId = null;
-                            async function ensureSession() {
-                                if (aiSessionId) return aiSessionId;
-                                const res = await fetch("/api/ai/sessions", { method: "POST", credentials: "include" });
-                                const s = await res.json();
-                                aiSessionId = s.id;
-                                return aiSessionId;
-                            }
 
-                            async function sendAi(text) {
-                                const sid = await ensureSession();
-                                const res = await fetch("/api/ai/chat", {
-                                    method: "POST",
-                                    headers: { "Content-Type": "application/json" },
-                                    credentials: "include",
-                                    body: JSON.stringify({ sessionId: sid, message: text })
-                                });
-                                const data = await res.json();
-                                return data.answer;
-                            }
-
-                            // hook vào form gửi chat của bạn
-                            const form = document.getElementById("chatForm");
-                            const input = document.getElementById("chatInput");
-                            const body = document.getElementById("chatBody");
-
-                            function pushBubble(who, text) {
-                                const wrap = document.createElement("div");
-                                wrap.className = "mb-2 " + (who === "me" ? "text-end" : "");
-                                wrap.innerHTML = `<div class="d-inline-block px-3 py-2 rounded ${who === "me" ? "bg-primary text-white" : "bg-light"}">${text}</div>`;
-                                body.appendChild(wrap); body.scrollTop = body.scrollHeight;
-                            }
-
-                            form.addEventListener("submit", async (e) => {
-                                e.preventDefault();
-                                const q = (input.value || "").trim(); if (!q) return;
-                                pushBubble("me", q); input.value = "";
-                                pushBubble("ai", "Đang soạn...");
-                                const typing = body.lastElementChild;
-                                const a = await sendAi(q);
-                                typing.remove();
-                                pushBubble("ai", a);
-                            });
-                        })();
-                    </script> -->
 
                         <!-- đóng phiên chat -->
                         <script>

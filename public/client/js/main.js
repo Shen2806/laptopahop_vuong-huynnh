@@ -145,6 +145,22 @@
             }
         }
         const input = button.parent().parent().find('input');
+            // === Clamp theo tồn kho (toast, không alert) ===
+    (function clampByStock(){
+        const stock = Number(
+            input.attr('data-stock') ||
+            input.attr('data-cart-detail-stock') ||          // dùng chung nếu ở giỏ
+            $('#quantityDetail').attr('data-stock') || NaN   // fallback
+        );
+        if (Number.isFinite(stock) && newVal > stock) {
+            newVal = stock;
+            change = 0; // không cộng dồn tổng vì đã chạm trần
+            if (typeof toastErr === 'function') {
+                toastErr(`Số lượng vượt quá tồn kho. Chỉ còn ${stock} sản phẩm.`);
+            }
+        }
+    })();
+
         input.val(newVal);
 
         //set form index
@@ -213,6 +229,33 @@
             link.removeClass('active'); // Remove 'active' class if the href does not match
         }
     });
+
+    // Kẹp số lượng khi gõ tay (không đụng handler nút → không bị double)
+$(document).off('input.qtyClamp change.qtyClamp blur.qtyClamp', '.quantity input')
+.on('input.qtyClamp change.qtyClamp blur.qtyClamp', '.quantity input', function () {
+    const $input = $(this);
+    let val = Math.max(1, Number($input.val() || 1));
+
+    const stock = Number(
+        $input.attr('data-stock') ||
+        $input.attr('data-cart-detail-stock') ||
+        $('#quantityDetail').attr('data-stock') || NaN
+    );
+
+    if (Number.isFinite(stock) && val > stock) {
+        val = stock;
+        if (typeof toastErr === 'function') {
+            toastErr(`Số lượng vượt quá tồn kho. Chỉ còn ${stock} sản phẩm.`);
+        }
+    }
+
+    // set lại input hiển thị
+    $input.val(val);
+
+    // sync xuống input ẩn detail (để Add to Cart / Buy Now đọc đúng)
+    const $detail = $('#quantityDetail');
+    if ($detail.length) $detail.val(val);
+});
 
 /* =============== LỌC SẢN PHẨM =============== */
 $(document).off('click', '#btnFilter').on('click', '#btnFilter', function (event) {

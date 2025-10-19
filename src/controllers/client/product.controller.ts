@@ -720,9 +720,11 @@ const postCancelOrder = async (req: Request, res: Response) => {
 };
 
 // xem chi tiết đơn hàng ở phần trạng thái
+// xem chi tiết đơn hàng ở phần trạng thái
 const getOrderDetailPage = async (req: Request, res: Response) => {
     const user = (req as any).user;
     const id = Number(req.params.id);
+
     if (!user) return res.redirect("/login");
     if (!Number.isFinite(id)) return res.status(400).send("Mã đơn không hợp lệ");
 
@@ -734,10 +736,7 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
             district: true,
             ward: true,
             orderDetails: { include: { product: true } },
-
-            // Nếu bạn đã thêm relation trong Prisma:
-            // assignedShipper   Staff?  @relation(fields: [assignedShipperId], references: [id])
-            // => nhớ include để EJS đọc được:
+            // nếu đã migrate bước 1 thì dòng dưới sẽ hợp lệ
             assignedShipper: { select: { fullName: true, phone: true } } as any,
         },
     });
@@ -747,10 +746,11 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
     const currentStep = canceled ? -1 : ORDER_STEPS.indexOf(order.status as $Enums.OrderStatus);
 
     const items = order.orderDetails || [];
-    const subTotal = items.reduce((s: number, it: any) => s + Number(it.price) * Number(it.quantity), 0);
+    const subTotal = items.reduce((sum: number, it: any) => sum + Number(it.price) * Number(it.quantity), 0);
     const discountAmount = Number(order.discountAmount || 0);
     const total = subTotal - discountAmount;
 
+    // Địa chỉ hiển thị
     const addressParts = [
         order.receiverStreet || null,
         order.ward?.name || null,
@@ -759,27 +759,29 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
     ].filter(Boolean) as string[];
     const addressDisplay = addressParts.length ? addressParts.join(", ") : (order.receiverAddress || "—");
 
-    // ==== Lấy thông tin shipper (ưu tiên cache -> relation) ====
+    // ======= Resolve shipper (tên/SĐT) =======
+    // Ưu tiên cache -> quan hệ
     let shipperName: string | null =
         (order as any).shipperNameCache ?? (order as any).shipperName ?? null;
     let shipperPhone: string | null =
         (order as any).shipperPhoneCache ?? (order as any).shipperPhone ?? null;
 
     if (!shipperName || !shipperPhone) {
-        const relName = (order as any).assignedShipper?.fullName ?? null;
-        const relPhone = (order as any).assignedShipper?.phone ?? null;
-        shipperName = shipperName || relName;
-        shipperPhone = shipperPhone || relPhone;
+        const rel = (order as any).assignedShipper;
+        if (rel) {
+            shipperName = shipperName || rel.fullName || null;
+            shipperPhone = shipperPhone || rel.phone || null;
+        }
     }
 
-    // Log để kiểm tra nhanh nguyên nhân không hiện:
+    // Log để soi nhanh vì sao không hiện
     console.log("[OrderDetail]", {
         id: order.id,
         status: order.status,
         assignedShipperId: (order as any).assignedShipperId,
         shipperNameCache: (order as any).shipperNameCache,
         shipperPhoneCache: (order as any).shipperPhoneCache,
-        relShipper: (order as any).assignedShipper,
+        hasRelation: Boolean((order as any).assignedShipper),
         resolvedName: shipperName,
         resolvedPhone: shipperPhone,
     });
@@ -800,6 +802,7 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
         shipperPhone,
     });
 };
+
 
 
 

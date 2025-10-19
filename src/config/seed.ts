@@ -128,6 +128,7 @@ const initDatabase = async () => {
         await linkRolePerms("MARKETING_CONTENT", MAP.MARKETING_CONTENT);
 
         // 5 role staff + 1 role USER (khách) + ADMIN
+        // 1) Tạo/đảm bảo roles TỚI TRƯỚC
         await Promise.all([
             ensureRole("ADMIN", "Admin thì full quyền"),
             ensureRole("OPS_MANAGER", "Quản lý vận hành: kho + fulfill + vận đơn/đổi trả + giao hàng"),
@@ -136,6 +137,17 @@ const initDatabase = async () => {
             ensureRole("MARKETING_CONTENT", "Khuyến mãi + mã giảm giá + blog"),
             ensureRole("USER", "User thông thường (khách hàng)"),
         ]);
+
+        // 2) Tạo/đảm bảo permissions
+        await Promise.all(PERMS.map(p => ensurePermission(p)));
+
+        // 3) Gán permission cho role (map)
+        await linkRolePerms("ADMIN", MAP.ADMIN);
+        await linkRolePerms("OPS_MANAGER", MAP.OPS_MANAGER);
+        await linkRolePerms("OPS_STAFF", MAP.OPS_STAFF);
+        await linkRolePerms("SALES_SUPPORT", MAP.SALES_SUPPORT);
+        await linkRolePerms("MARKETING_CONTENT", MAP.MARKETING_CONTENT);
+
     }
 
 

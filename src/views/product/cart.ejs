@@ -390,7 +390,9 @@
                             <input type="text" class="form-control text-center border-0 fw-semibold cart-qty mx-1"
                               style="width:50px;" value="<%= cartDetail.quantity %>"
                               data-cart-detail-id="<%= cartDetail.id %>"
-                              data-cart-detail-price="<%= priceAfterDiscount %>" data-cart-detail-index="<%= i %>">
+                              data-cart-detail-price="<%= priceAfterDiscount %>" data-cart-detail-index="<%= i %>"
+                              data-cart-detail-stock="<%= cartDetail.product.quantity %>">
+
                             <button type="button" class="btn btn-outline-success btn-sm rounded-circle btn-plus"
                               data-index="<%= i %>">
                               <i class="fa fa-plus" style="color: #8BC34A;"></i>
@@ -586,7 +588,32 @@
         <!-- Cập nhật số lượng & tổng tiền (giữ logic, chỉ sync hidden field) -->
         <script>
           document.addEventListener("DOMContentLoaded", () => {
-            const formatVND = (n) => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n);
+            const formatVND = (n) =>
+              new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n);
+
+            // === KẸP THEO TỒN KHO + TOAST (không alert) ===
+            const clampByStock = (input, withToast = true) => {
+              let v = Math.max(1, parseInt(input.value) || 1);
+              const stockAttr = input.dataset.cartDetailStock;
+              const stock = stockAttr !== undefined ? parseInt(stockAttr) : NaN;
+
+              if (Number.isFinite(stock)) {
+                if (stock < 1) {
+                  // Hết hàng: vẫn để 1 cho dễ sửa/xoá, nhưng báo lỗi
+                  if (withToast && typeof window.toastErr === "function") {
+                    toastErr("Sản phẩm này đã hết hàng.");
+                  }
+                  v = 1;
+                } else if (v > stock) {
+                  v = stock;
+                  if (withToast && typeof window.toastErr === "function") {
+                    toastErr(`Số lượng vượt quá tồn kho. Chỉ còn ${stock} sản phẩm.`);
+                  }
+                }
+              }
+              input.value = v; // đồng bộ lại ô nhập
+              return v;
+            };
 
             const updateTotals = () => {
               let subtotal = 0;
@@ -595,7 +622,9 @@
                 const qtyInput = item.querySelector(".cart-qty");
                 const price = parseInt(qtyInput.dataset.cartDetailPrice) || 0;
                 const index = qtyInput.dataset.cartDetailIndex;
-                const quantity = Math.max(1, parseInt(qtyInput.value) || 1);
+
+                // KẸP ở đây nhưng không hiện toast (chỉ tính toán)
+                const quantity = clampByStock(qtyInput, /*withToast=*/false);
 
                 // Cập nhật hidden input TRONG #checkout-form theo index
                 const hiddenInForm = document.querySelector(
@@ -603,7 +632,7 @@
                 );
                 if (hiddenInForm) hiddenInForm.value = quantity;
 
-                // BỔ SUNG: đồng bộ field phẳng (parse chắc chắn trên server)
+                // Đồng bộ field phẳng (nếu server parse dạng mảng)
                 const flatQty = document.getElementById(`qty_flat_${index}`);
                 if (flatQty) flatQty.value = quantity;
 
@@ -621,20 +650,28 @@
               if (totEl) totEl.textContent = formatVND(subtotal);
             };
 
+            // Click +/- : tính, kẹp theo tồn, rồi cập nhật tổng
             document.querySelectorAll(".btn-plus, .btn-minus").forEach((btn) => {
               btn.addEventListener("click", () => {
                 const index = btn.dataset.index;
-                const qtyInput = document.querySelector(`.cart-qty[data-cart-detail-index="${index}"]`);
+                const qtyInput = document.querySelector(
+                  `.cart-qty[data-cart-detail-index="${index}"]`
+                );
                 let value = Math.max(1, parseInt(qtyInput.value) || 1);
-                value += btn.classList.contains("btn-plus") ? 1 : value > 1 ? -1 : 0;
+                value += btn.classList.contains("btn-plus") ? 1 : (value > 1 ? -1 : 0);
                 qtyInput.value = value;
+
+                // KẸP + TOAST khi người dùng thao tác
+                clampByStock(qtyInput, /*withToast=*/true);
+
                 updateTotals();
               });
             });
 
+            // Gõ tay: kẹp + toast
             document.querySelectorAll(".cart-qty").forEach((input) => {
               input.addEventListener("input", () => {
-                input.value = Math.max(1, parseInt(input.value) || 1);
+                clampByStock(input, /*withToast=*/true);
                 updateTotals();
               });
             });
@@ -642,6 +679,7 @@
             updateTotals();
           });
         </script>
+
 </body>
 
 </html>

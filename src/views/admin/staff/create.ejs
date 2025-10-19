@@ -382,8 +382,8 @@
                 });
 
                 // Load mặc định theo role (khi role thay đổi)
-                function applyRole(roleName) {
-                    const base = ROLEMAP[roleName] || [];
+                function applyRole(roleId) {
+                    const base = ROLEMAP[roleId] || [];
                     const baseSet = new Set(base);
                     allSwitches().forEach(sw => {
                         const key = sw.getAttribute('data-toggle');
@@ -391,25 +391,22 @@
                     });
                     roleHint.textContent = 'Quyền theo vai trò';
                 }
+
                 roleSel.addEventListener('change', () => {
-                    const rName = roleSel.options[roleSel.selectedIndex].text; // name hiển thị
-                    applyRole(rName);
+                    applyRole(roleSel.value);       // 👈 lấy roleId từ value
                 });
                 // init lần đầu
-                applyRole(roleSel.options[roleSel.selectedIndex].text);
+                applyRole(roleSel.value);
 
                 // Trước khi submit: tính ALLOW / DENY từ khác biệt với role
                 form.addEventListener('submit', (e) => {
-                    // base theo role
-                    const rName = roleSel.options[roleSel.selectedIndex].text;
-                    const base = new Set(ROLEMAP[rName] || []);
+                    const roleId = roleSel.value;                  // 👈 id
+                    const base = new Set(ROLEMAP[roleId] || []);
                     const now = new Set(getCheckedPerms().filter(Boolean));
 
-                    // allow = now - base, deny = base - now
                     const allow = [...now].filter(p => !base.has(p));
                     const deny = [...base].filter(p => !now.has(p));
 
-                    // clear hidden cũ
                     permHidden.innerHTML = '';
                     allow.forEach(p => {
                         const i = document.createElement('input');
@@ -422,6 +419,7 @@
                         permHidden.appendChild(i);
                     });
                 });
+
             })();
         </script>
 

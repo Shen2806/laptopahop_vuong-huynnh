@@ -34,5 +34,5 @@ export const requirePerm =
             if (req.xhr) return res.status(403).json({ ok: false, message: "Forbidden" });
             return res
                 .status(403)
-                .render("errors/403.ejs", { message: "Bạn không có quyền truy cập" });
+                .render("status/403.ejs", { message: "Bạn không có quyền truy cập" });
         };

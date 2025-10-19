@@ -25,6 +25,7 @@ import initDatabase from "config/seed";
 import { initSocket } from "./socket";
 import "./middleware/passport.google";
 import "./middleware/passport.jwt";
+import uploadRouter from './routes/upload';
 
 const app = express();
 
@@ -93,6 +94,8 @@ app.use("/payment", paymentRoutes);
 // Địa lý
 app.use(locationRoutes);
 
+// upload ảnh
+app.use('/api/upload', uploadRouter);
 // Seed DB (nếu cần)
 initDatabase();
 
