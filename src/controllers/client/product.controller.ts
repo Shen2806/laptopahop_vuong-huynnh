@@ -713,12 +713,27 @@ const postCancelOrder = async (req: Request, res: Response) => {
         });
 
         return res.json({ success: true, message: "Hủy đơn hàng thành công" });
-    } catch (err) {
-        console.error("Cancel order error:", err);
-        return res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại" });
-    }
-};
+    } catch (e: any) {
+        console.error("postPlaceOrder error:", e);
 
+        // Không phụ thuộc biến 'mode' trong scope:
+        const rawMode =
+            String((req as any).body?.mode ?? (req as any).query?.mode ?? "").toLowerCase();
+        const isBuyNow = rawMode === "buy" || Boolean((req as any).session?.buyNow);
+        const back = isBuyNow ? "/checkout?mode=buy" : "/checkout";
+
+        const msg =
+            typeof e?.message === "string" && e.message.includes("không đủ tồn kho")
+                ? e.message
+                : "Có lỗi hệ thống. Thử lại sau.";
+
+        const sess: any = (req as any).session || ((req as any).session = {});
+        sess.messages = [{ type: "danger", text: msg }];
+
+        return res.redirect(back);
+    }
+
+}
 // xem chi tiết đơn hàng ở phần trạng thái
 // xem chi tiết đơn hàng ở phần trạng thái
 const getOrderDetailPage = async (req: Request, res: Response) => {

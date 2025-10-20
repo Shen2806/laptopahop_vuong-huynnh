@@ -244,7 +244,7 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
         });
         const map = new Map(products.map(p => [p.id, p]));
 
-        // base: tổng tiền hàng sau KM từng SP
+        // Tính base để áp mã (pre-check cho UX sớm; chống race nằm ở transaction)
         let base = 0;
         for (const it of items) {
             const pid = fmtInt(it.productId);
@@ -255,13 +255,13 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
             base += unitAfterDiscount(p.price, p.discount || 0) * qty;
         }
 
-        // Tính phí ship trước
+        // Phí ship
         const shippingFee = calcShippingFee(pm, receiverProvinceCode, receiverDistrictCode);
 
         // Coupon
         let appliedCode: string | null = null;
-        let discountAmount = 0;      // giảm trên HÀNG HÓA (logic cũ)
-        let shippingDiscount = 0;    // giảm trên PHÍ SHIP (freeship)
+        let discountAmount = 0;
+        let shippingDiscount = 0;
 
         if (couponCode) {
             const coupon = await prisma.coupon.findUnique({ where: { code: couponCode } });
@@ -269,7 +269,6 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
             if (!valid) return { success: false, error: "Mã giảm giá không hợp lệ hoặc đã hết hạn." };
 
             if (coupon.freeShip) {
-                // freeship: áp trên phí ship, cần check minOrder nếu có
                 if ((coupon.minOrder ?? 0) > base) {
                     return { success: false, error: "Đơn chưa đạt ngưỡng áp mã freeship." };
                 }
@@ -277,7 +276,6 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
                 shippingDiscount = Math.min(shippingFee, cap);
                 appliedCode = coupon.code;
             } else {
-                // giảm % trên hàng hóa: giữ nguyên NGƯỠNG cũ của bạn (COUPON_THRESHOLD)
                 if (base < COUPON_THRESHOLD) return { success: false, error: "Đơn chưa đạt ngưỡng áp mã giảm giá." };
                 discountAmount = Math.round(base * Number(coupon!.discount) / 100);
                 appliedCode = coupon!.code;
@@ -286,111 +284,99 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
 
         const finalTotal = Math.max(0, base - discountAmount + shippingFee - shippingDiscount);
 
-        // Transaction: tạo order + details + trừ kho
-        const created = await prisma.$transaction(async (tx) => {
-            const order = await tx.order.create({
-                data: {
-                    userId,
-                    totalPrice: finalTotal,
-                    discountAmount,
-                    couponCode: appliedCode,
+        // Transaction: tạo order + details + TRỪ KHO có điều kiện (anti-oversell)
+        try {
+            const created = await prisma.$transaction(async (tx) => {
+                const order = await tx.order.create({
+                    data: {
+                        userId,
+                        totalPrice: finalTotal,
+                        discountAmount,
+                        couponCode: appliedCode,
 
-                    // NEW
-                    shippingFee,
-                    shippingDiscount,
+                        shippingFee,
+                        shippingDiscount,
 
-                    receiverAddress,
-                    receiverName,
-                    receiverPhone,
-                    receiverNote: receiverNote || "",
+                        receiverAddress,
+                        receiverName,
+                        receiverPhone,
+                        receiverNote: receiverNote || "",
 
-                    // Lưu code địa chỉ để hiển thị đẹp (client/admin)
-                    receiverProvinceCode,
-                    receiverDistrictCode,
-                    receiverWardCode,
-                    receiverStreet,
+                        receiverProvinceCode,
+                        receiverDistrictCode,
+                        receiverWardCode,
+                        receiverStreet,
 
-                    status: "PENDING",
-                    // GIỮ logic cũ: tạo mặc định COD/UNPAID, nếu ONLINE sẽ update sau ở controller
-                    paymentMethod: "COD",
-                    paymentStatus: "UNPAID",
-                },
-            });
-
-            for (const it of items) {
-                const pid = fmtInt(it.productId);
-                const qty = Math.max(1, fmtInt(it.quantity));
-                const p = map.get(pid)!;
-
-                const priceUnit = unitAfterDiscount(p.price, p.discount || 0);
-
-                // Check tồn kho lại trong transaction
-                const fresh = await tx.product.findUnique({
-                    where: { id: pid },
-                    select: { name: true, quantity: true },
+                        status: "PENDING",
+                        paymentMethod: "COD",
+                        paymentStatus: "UNPAID",
+                    },
                 });
-                if (!fresh || fmtInt(fresh.quantity) < qty) {
-                    throw new Error(`Sản phẩm "${fresh?.name || p.name}" không đủ tồn kho.`);
+
+                for (const it of items) {
+                    const pid = fmtInt(it.productId);
+                    const qty = Math.max(1, fmtInt(it.quantity));
+                    const p = map.get(pid)!;
+                    const priceUnit = unitAfterDiscount(p.price, p.discount || 0);
+
+                    // 🔒 Anti-oversell: chỉ trừ khi còn đủ tồn
+                    const updated = await tx.product.updateMany({
+                        where: { id: pid, quantity: { gte: qty } },
+                        data: { quantity: { decrement: qty } },
+                    });
+                    if (updated.count !== 1) {
+                        // Lỗi do có người khác vừa mua mất tồn
+                        throw new Error(`Sản phẩm "${p.name}" không đủ tồn kho.`);
+                    }
+
+                    await tx.orderDetail.create({
+                        data: { orderId: order.id, productId: pid, price: priceUnit, quantity: qty },
+                    });
                 }
 
-                await tx.orderDetail.create({
-                    data: { orderId: order.id, productId: pid, price: priceUnit, quantity: qty },
-                });
+                return order;
+            });
 
-                await tx.product.update({
-                    where: { id: pid },
-                    data: { quantity: { decrement: qty } },
-                });
-            }
-
-            return order;
-        });
-
-        return {
-            success: true,
-            orderId: created.id,
-            totalPrice: finalTotal,
-            discountAmount,
-            shippingFee,
-            shippingDiscount,
-        };
+            return {
+                success: true,
+                orderId: created.id,
+                totalPrice: finalTotal,
+                discountAmount,
+                shippingFee,
+                shippingDiscount,
+            };
+        } catch (e: any) {
+            // 👉 Trả lỗi thân thiện cho controller hiển thị
+            const msg = typeof e?.message === "string" && e.message.includes("không đủ tồn kho")
+                ? e.message
+                : "Hệ thống đang bận, vui lòng thử lại.";
+            return { success: false, error: msg };
+        }
     }
 
     // ========= CART MODE =========
-    // ========= CART MODE =========
     const cart = await prisma.cart.findFirst({
-        where: {
-            userId,
-            // CHỈ lấy cart có item (tránh vớ phải cart rỗng/cũ)
-            cartDetails: { some: {} },
-        },
-        // Ưu tiên cart mới nhất (không cần updatedAt)
+        where: { userId, cartDetails: { some: {} } },
         orderBy: { id: 'desc' },
         select: { id: true },
     });
     if (!cart) return { success: false, error: "Giỏ hàng trống." };
 
     const cartDetails = await prisma.cartDetail.findMany({
-        where: {
-            cartId: cart.id,
-            // Bỏ item qty <= 0 (nếu có)
-            quantity: { gt: 0 },
-        },
+        where: { cartId: cart.id, quantity: { gt: 0 } },
         include: { product: true },
     });
     if (cartDetails.length === 0) return { success: false, error: "Giỏ hàng trống." };
 
-    // base sau KM từng SP
+    // base sau KM
     let base = 0;
     for (const cd of cartDetails) {
         const unit = unitAfterDiscount(cd.product.price, cd.product.discount || 0);
         base += unit * fmtInt(cd.quantity);
     }
 
-    // ship
     const shippingFee = calcShippingFee(pm, receiverProvinceCode, receiverDistrictCode);
 
-    // Coupon
     let appliedCode: string | null = null;
     let discountAmount = 0;
     let shippingDiscount = 0;
@@ -416,76 +402,74 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
 
     const finalTotal = Math.max(0, base - discountAmount + shippingFee - shippingDiscount);
 
-    // Transaction: tạo order + trừ kho + clear cart
-    const order = await prisma.$transaction(async (tx) => {
-        // Check tồn kho tất cả item
-        for (const cd of cartDetails) {
-            const fresh = await tx.product.findUnique({
-                where: { id: cd.productId },
-                select: { name: true, quantity: true },
+    try {
+        const order = await prisma.$transaction(async (tx) => {
+            const created = await tx.order.create({
+                data: {
+                    userId,
+                    totalPrice: finalTotal,
+                    discountAmount,
+                    couponCode: appliedCode,
+
+                    shippingFee,
+                    shippingDiscount,
+
+                    receiverAddress,
+                    receiverName,
+                    receiverPhone,
+                    receiverNote: receiverNote || "",
+
+                    receiverProvinceCode,
+                    receiverDistrictCode,
+                    receiverWardCode,
+                    receiverStreet,
+
+                    status: "PENDING",
+                    paymentMethod: "COD",
+                    paymentStatus: "UNPAID",
+                },
             });
-            if (!fresh || fmtInt(fresh.quantity) < fmtInt(cd.quantity)) {
-                throw new Error(`Sản phẩm "${fresh?.name || cd.productId}" không đủ tồn kho.`);
+
+            // Lần lượt trừ kho có điều kiện – fail cái nào rollback toàn bộ
+            for (const cd of cartDetails) {
+                const qty = fmtInt(cd.quantity);
+                const unit = unitAfterDiscount(cd.product.price, cd.product.discount || 0);
+
+                const updated = await tx.product.updateMany({
+                    where: { id: cd.productId, quantity: { gte: qty } },
+                    data: { quantity: { decrement: qty } },
+                });
+                if (updated.count !== 1) {
+                    throw new Error(`Sản phẩm "${cd.product.name}" không đủ tồn kho.`);
+                }
+
+                await tx.orderDetail.create({
+                    data: { orderId: created.id, productId: cd.productId, price: unit, quantity: qty },
+                });
             }
-        }
 
-        const created = await tx.order.create({
-            data: {
-                userId,
-                totalPrice: finalTotal,
-                discountAmount,
-                couponCode: appliedCode,
+            await tx.cartDetail.deleteMany({ where: { cartId: cart.id } });
+            await tx.cart.update({ where: { id: cart.id }, data: { sum: 0 } });
 
-                // NEW
-                shippingFee,
-                shippingDiscount,
-
-                receiverAddress,
-                receiverName,
-                receiverPhone,
-                receiverNote: receiverNote || "",
-
-                receiverProvinceCode,
-                receiverDistrictCode,
-                receiverWardCode,
-                receiverStreet,
-
-                status: "PENDING",
-                paymentMethod: "COD",
-                paymentStatus: "UNPAID",
-            },
+            return created;
         });
 
-        for (const cd of cartDetails) {
-            const unit = unitAfterDiscount(cd.product.price, cd.product.discount || 0);
-            const qty = fmtInt(cd.quantity);
-
-            await tx.orderDetail.create({
-                data: { orderId: created.id, productId: cd.productId, price: unit, quantity: qty },
-            });
-
-            await tx.product.update({
-                where: { id: cd.productId },
-                data: { quantity: { decrement: qty } },
-            });
-        }
-
-        await tx.cartDetail.deleteMany({ where: { cartId: cart.id } });
-        await tx.cart.update({ where: { id: cart.id }, data: { sum: 0 } });
-
-        return created;
-    });
-
-    return {
-        success: true,
-        orderId: order.id,
-        totalPrice: finalTotal,
-        discountAmount,
-        shippingFee,
-        shippingDiscount,
-    };
-
+        return {
+            success: true,
+            orderId: order.id,
+            totalPrice: finalTotal,
+            discountAmount,
+            shippingFee,
+            shippingDiscount,
+        };
+    } catch (e: any) {
+        const msg = typeof e?.message === "string" && e.message.includes("không đủ tồn kho")
+            ? e.message
+            : "Hệ thống đang bận, vui lòng thử lại.";
+        return { success: false, error: msg };
+    }
 }
+
 
 /* =========================
    Misc queries
