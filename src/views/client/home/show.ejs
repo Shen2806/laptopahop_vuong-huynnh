@@ -82,12 +82,9 @@
                             <section class="mt-5">
                                 <h2 class="fire-title-wrapper ">
                                     <span class="fire-title ">
-                                        <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmJqeW0xZ2Nsc3o5Z245amhwdXozY3NlbGQyanFycXd3OG1ycG9ybSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KPVJXH61g2jHkdqZES/giphy.gif"
-                                            alt="fire" class="fire-gif"> <span>Sản phẩm khuyến
-                                            mãi</span> </span>
-                                    <video autoplay loop muted playsinline class="fire-bg">
-                                        <source src="https://i.imgur.com/J6J4pP6.mp4" type="video/mp4">
-                                    </video>
+                                        <span>Sản phẩm khuyến mãi</span>
+                                    </span>
+
                                 </h2>
                                 <!-- Swiper container -->
                                 <div class="swiper promo-swiper">
@@ -1154,10 +1151,6 @@
             </div>
             <!-- nội dung end-->
 
-                        <!-- Features Section Start -->
-            <%- include('../layout/feature'); -%>
-                <!-- Features Section End -->
-
             <!-- Câu hỏi thường gặp Start -->
             <div class="container">
                 <div class="wrap">
@@ -1257,353 +1250,351 @@
 
 
 
-                <!-- === RÙA AI — chatbox === -->
-                <div id="aiTurtle" class="ai-turtle">
-                    <button id="aiTurtleBtn" class="ai-turtle__btn" aria-label="Mở Rùa AI">
-                        <!-- Turtle SVG -->
-                        <span class="ai-pulse" aria-hidden="true"></span>
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M5 12c0-3.31 3.13-6 7-6s7 2.69 7 6-3.13 6-7 6-7-2.69-7-6Z" fill="#fff"
-                                opacity=".9" />
-                            <path d="M7 12h10M9 14.5h6" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
-                            <circle cx="9" cy="10" r="1" fill="#16a34a" />
-                            <circle cx="15" cy="10" r="1" fill="#16a34a" />
-                        </svg>
-                    </button>
+            <!-- === RÙA AI — chatbox === -->
+            <div id="aiTurtle" class="ai-turtle">
+                <button id="aiTurtleBtn" class="ai-turtle__btn" aria-label="Mở Rùa AI">
+                    <!-- Turtle SVG -->
+                    <span class="ai-pulse" aria-hidden="true"></span>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M5 12c0-3.31 3.13-6 7-6s7 2.69 7 6-3.13 6-7 6-7-2.69-7-6Z" fill="#fff" opacity=".9" />
+                        <path d="M7 12h10M9 14.5h6" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
+                        <circle cx="9" cy="10" r="1" fill="#16a34a" />
+                        <circle cx="15" cy="10" r="1" fill="#16a34a" />
+                    </svg>
+                </button>
 
-                    <div id="aiTurtleCard" class="ai-turtle__card ai-enter" role="dialog" aria-label="Rùa AI tư vấn">
-                        <div class="ai-chat__header">
-                            <div>
-                                <div class="ai-chat__title">Rùa AI tư vấn</div>
-                                <div class="ai-kicker">Hỏi gì về laptop cũng đáp 👋</div>
-                            </div>
-                            <button id="aiTurtleClose" class="ai-chat__close">Đóng</button>
+                <div id="aiTurtleCard" class="ai-turtle__card ai-enter" role="dialog" aria-label="Rùa AI tư vấn">
+                    <div class="ai-chat__header">
+                        <div>
+                            <div class="ai-chat__title">Rùa AI tư vấn</div>
+                            <div class="ai-kicker">Hỏi gì về laptop cũng đáp 👋</div>
                         </div>
+                        <button id="aiTurtleClose" class="ai-chat__close">Đóng</button>
+                    </div>
 
-                        <div id="aiChatBody" class="ai-chat__body">
-                            <div class="ai-msg ai-bot">
-                                <div class="ai-msg__bubble">Chào bạn! Mình có thể gợi ý laptop theo ngân sách, nhu cầu
-                                    (gaming, đồ họa, văn phòng), cân nặng… Bạn cứ hỏi nha.</div>
-                            </div>
-                            <div id="aiTyping" class="ai-typing">Rùa AI đang nhập…</div>
+                    <div id="aiChatBody" class="ai-chat__body">
+                        <div class="ai-msg ai-bot">
+                            <div class="ai-msg__bubble">Chào bạn! Mình có thể gợi ý laptop theo ngân sách, nhu cầu
+                                (gaming, đồ họa, văn phòng), cân nặng… Bạn cứ hỏi nha.</div>
                         </div>
+                        <div id="aiTyping" class="ai-typing">Rùa AI đang nhập…</div>
+                    </div>
 
-                        <div class="ai-suggest">
-                            <button class="ai-chip" data-q="Tư vấn laptop gaming tầm 20 triệu">Gaming ~20 triệu</button>
-                            <button class="ai-chip"
-                                data-q="Laptop văn phòng nhẹ dưới 1.3kg, pin tốt, giá 15-25 triệu">Văn phòng
-                                nhẹ</button>
-                            <button class="ai-chip" data-q="So sánh MacBook Air M1 và M2 để đi học">So sánh Mac</button>
-                            <button class="ai-chip" data-q="Máy dưới 12 triệu cho sinh viên IT, ưu tiên RAM 16GB">
-                                <=12tr cho SV</button>
-                        </div>
+                    <div class="ai-suggest">
+                        <button class="ai-chip" data-q="Tư vấn laptop gaming tầm 20 triệu">Gaming ~20 triệu</button>
+                        <button class="ai-chip" data-q="Laptop văn phòng nhẹ dưới 1.3kg, pin tốt, giá 15-25 triệu">Văn
+                            phòng
+                            nhẹ</button>
+                        <button class="ai-chip" data-q="So sánh MacBook Air M1 và M2 để đi học">So sánh Mac</button>
+                        <button class="ai-chip" data-q="Máy dưới 12 triệu cho sinh viên IT, ưu tiên RAM 16GB">
+                            <=12tr cho SV</button>
+                    </div>
 
-                        <div class="ai-chat__footer">
-                            <form id="aiForm" class="ai-input">
-                                <input id="aiInput"
-                                    placeholder="Nhập câu hỏi… (Enter để gửi, Shift+Enter xuống dòng)" />
-                                <button id="aiSend" type="submit">Gửi</button>
-                            </form>
-                        </div>
+                    <div class="ai-chat__footer">
+                        <form id="aiForm" class="ai-input">
+                            <input id="aiInput" placeholder="Nhập câu hỏi… (Enter để gửi, Shift+Enter xuống dòng)" />
+                            <button id="aiSend" type="submit">Gửi</button>
+                        </form>
                     </div>
                 </div>
+            </div>
 
 
-                <!-- Footer Start -->
-                <%- include('../layout/footer'); -%>
-                    <!-- Footer End -->
+            <!-- Footer Start -->
+            <%- include('../layout/footer'); -%>
+                <!-- Footer End -->
 
-                    <!-- Back to Top -->
-                    <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-                            class="fa fa-arrow-up"></i></a>
+                <!-- Back to Top -->
+                <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                        class="fa fa-arrow-up"></i></a>
 
-                    <!-- JavaScript Libraries -->
-                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-                    <script src="/client/lib/easing/easing.min.js"></script>
-                    <script src="/client/lib/waypoints/waypoints.min.js"></script>
-                    <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-                    <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+                <!-- JavaScript Libraries -->
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="/client/lib/easing/easing.min.js"></script>
+                <script src="/client/lib/waypoints/waypoints.min.js"></script>
+                <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+                <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
-                    <!-- Template Javascript -->
-                    <script src="/client/js/main.js"></script>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
-                        integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
-                        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+                <!-- Template Javascript -->
+                <script src="/client/js/main.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
+                    integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
+                    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 
-                    <script>
-                        var swiper = new Swiper('.promo-swiper', {
-                            loop: true,                 // vòng lặp vô hạn
-                            slidesPerView: 3,           // luôn hiển thị 3 sản phẩm
-                            slidesPerGroup: 1,          // mỗi lần trượt chỉ dịch 1 sản phẩm
-                            spaceBetween: 30,           // khoảng cách giữa các sản phẩm
-                            autoplay: {
-                                delay: 2000,
-                                disableOnInteraction: false, // không tắt khi user bấm
-                                stopOnLastSlide: false,      // không dừng ở cuối
-                            },
-                            navigation: {
-                                nextEl: '.swiper-button-next',
-                                prevEl: '.swiper-button-prev',
-                            },
-                            pagination: {
-                                el: '.swiper-pagination',
-                                clickable: true,
-                            },
-                        });
+                <script>
+                    var swiper = new Swiper('.promo-swiper', {
+                        loop: true,                 // vòng lặp vô hạn
+                        slidesPerView: 3,           // luôn hiển thị 3 sản phẩm
+                        slidesPerGroup: 1,          // mỗi lần trượt chỉ dịch 1 sản phẩm
+                        spaceBetween: 30,           // khoảng cách giữa các sản phẩm
+                        autoplay: {
+                            delay: 2000,
+                            disableOnInteraction: false, // không tắt khi user bấm
+                            stopOnLastSlide: false,      // không dừng ở cuối
+                        },
+                        navigation: {
+                            nextEl: '.swiper-button-next',
+                            prevEl: '.swiper-button-prev',
+                        },
+                        pagination: {
+                            el: '.swiper-pagination',
+                            clickable: true,
+                        },
+                    });
 
-                        /*tin tức công nghệ*/
-                        var newsSwiper = new Swiper(".news-swiper", {
-                            slidesPerView: 3,
-                            spaceBetween: 20,
-                            loop: true,
-                            autoplay: {
-                                delay: 2000,
-                                disableOnInteraction: false,
-                            },
-                            pagination: {
-                                el: ".news-swiper .swiper-pagination",
-                                clickable: true,
-                            },
-                            navigation: {
-                                nextEl: ".news-swiper .swiper-button-next",
-                                prevEl: ".news-swiper .swiper-button-prev",
-                            },
-                        });
-                    </script>
+                    /*tin tức công nghệ*/
+                    var newsSwiper = new Swiper(".news-swiper", {
+                        slidesPerView: 3,
+                        spaceBetween: 20,
+                        loop: true,
+                        autoplay: {
+                            delay: 2000,
+                            disableOnInteraction: false,
+                        },
+                        pagination: {
+                            el: ".news-swiper .swiper-pagination",
+                            clickable: true,
+                        },
+                        navigation: {
+                            nextEl: ".news-swiper .swiper-button-next",
+                            prevEl: ".news-swiper .swiper-button-prev",
+                        },
+                    });
+                </script>
 
-                    <script>
-                        /*animation*/
-                        // 1) Gán hiệu ứng cho phần tử theo selector (không cần sửa EJS)
-                        document.addEventListener('DOMContentLoaded', () => {
-                            const attachReveal = (selector, effect = 'fade-up', step = 0) => {
-                                const els = document.querySelectorAll(selector);
-                                els.forEach((el, i) => {
-                                    el.setAttribute('data-reveal', effect);
-                                    if (step) el.style.setProperty('--reveal-delay', (i * step) + 'ms');
-                                });
-                            };
-
-                            // Tiêu đề/section
-                            attachReveal('.fire-title-wrapper', 'fade-up', 0);
-                            attachReveal('#tech-news .d-flex', 'fade-up', 0); // header của tin tức
-                            attachReveal('.tab-class h1', 'fade-up', 0);
-
-                            // Cards các khu vực
-                            attachReveal('.promo-card', 'zoom-in', 80);  // sản phẩm khuyến mãi (trong swiper)
-                            attachReveal('.fruite-item', 'fade-up', 60);  // lưới sản phẩm nổi bật
-                            attachReveal('.recent-card', 'fade-up', 60);  // đã xem gần đây
-                            attachReveal('.news-card', 'fade-up', 80);  // bài viết
-
-                            // Nếu file feature có class .featurs-item -> cũng animate luôn
-                            attachReveal('.featurs-item', 'fade-up', 80);
-                        });
-
-                        // 2) Observer: khi vào viewport thì hiện ra & unobserve (chỉ hiện 1 lần)
-                        (function () {
-                            const io = new IntersectionObserver((entries, obs) => {
-                                entries.forEach(ent => {
-                                    if (ent.isIntersecting) {
-                                        ent.target.classList.add('is-visible');
-                                        obs.unobserve(ent.target);
-                                    }
-                                });
-                            }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
-
-                            const hydrate = () => {
-                                document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
-                            };
-
-                            if (document.readyState === 'loading') {
-                                document.addEventListener('DOMContentLoaded', hydrate);
-                            } else {
-                                hydrate();
-                            }
-                        })();
-                    </script>
-
-                    <!-- Rùa AI -->
-                    <script>
-                        (function () {
-                            const $btn = document.getElementById('aiTurtleBtn');
-                            const $card = document.getElementById('aiTurtleCard');
-                            const $close = document.getElementById('aiTurtleClose');
-                            const $body = document.getElementById('aiChatBody');
-                            const $form = document.getElementById('aiForm');
-                            const $input = document.getElementById('aiInput');
-                            const $send = document.getElementById('aiSend');
-                            const $typing = document.getElementById('aiTyping');
-                            const $chipsWrap = document.querySelector('.ai-suggest');
-                            if (!$btn || !$card || !$form) return;
-
-                            /* storage keys */
-                            const SID_KEY = "AI_TURTLE_SID";
-                            const OPEN_KEY = "AI_TURTLE_OPEN";
-                            const HIST_PREFIX = "AI_TURTLE_HISTORY_";
-                            let sessionId = Number(sessionStorage.getItem(SID_KEY) || "") || null;
-                            const histKey = () => HIST_PREFIX + (sessionId || "temp");
-                            const loadJSON = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f } catch { return f } };
-                            const saveJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { } };
-                            const migrateHistory = (oldK, newK) => { if (oldK === newK) return; const a = loadJSON(oldK, []), b = loadJSON(newK, []); if (a.length) saveJSON(newK, [...b, ...a].slice(-200)); try { localStorage.removeItem(oldK) } catch { } };
-
-                            /* UI */
-                            function openCard() { $card.style.display = 'block'; saveJSON(OPEN_KEY, true); setTimeout(() => $input?.focus(), 80); }
-                            function closeCard() { $card.style.display = 'none'; saveJSON(OPEN_KEY, false); }
-                            $btn.addEventListener('click', openCard);
-                            $close.addEventListener('click', closeCard);
-                            document.querySelectorAll('.ai-chip').forEach(ch => ch.addEventListener('click', () => { $input.value = ch.getAttribute('data-q') || ''; $input.focus(); }));
-
-                            const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-                            function safeFormat(text) { let s = escapeHtml(text || ''); s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); s = s.replace(/\n/g, '<br>'); s = s.replace(/(\/product\/\d{1,10})/g, '<a href="$1" class="text-primary fw-semibold">$1</a>'); return s; }
-
-                            function pushHist(entry) { const h = loadJSON(histKey(), []); h.push(entry); saveJSON(histKey(), h.slice(-200)); }
-
-                            function appendMsg(role, text, { persist = true } = {}) {
-                                const wrap = document.createElement('div'); wrap.className = 'ai-msg ' + (role === 'user' ? 'ai-user' : 'ai-bot');
-                                const b = document.createElement('div'); b.className = 'ai-msg__bubble';
-                                if (role === 'assistant') b.innerHTML = safeFormat(text); else b.textContent = text;
-                                wrap.appendChild(b); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
-                                if (persist) pushHist({ t: Date.now(), kind: 'text', role, text });
-                            }
-
-                            const currencyVND = n => { try { return Number(n || 0).toLocaleString('vi-VN') + '₫' } catch { return (n || 0) + '₫' } };
-                            function appendProducts(products, { persist = true } = {}) {
-                                if (!products || !products.length) return;
-                                const wrap = document.createElement('div'); wrap.className = 'ai-msg ai-bot';
-                                const bubble = document.createElement('div'); bubble.className = 'ai-msg__bubble';
-                                const row = document.createElement('div'); row.className = 'ai-products';
-                                products.forEach(p => {
-                                    const a = document.createElement('a'); a.className = 'ai-pcard'; a.href = p.href || ('/product/' + p.id); a.setAttribute('aria-label', p.name);
-                                    const img = document.createElement('img'); img.className = 'ai-pimg'; img.loading = 'lazy'; img.src = p.image || '/images/no-image.png'; img.alt = p.name;
-                                    const body = document.createElement('div'); body.className = 'ai-pbody';
-                                    const title = document.createElement('div'); title.className = 'ai-ptitle'; title.textContent = p.name;
-                                    const desc = document.createElement('div'); desc.className = 'ai-pdesc'; desc.textContent = p.shortDesc || '';
-                                    const priceRow = document.createElement('div'); priceRow.className = 'ai-price-row';
-                                    const sale = document.createElement('div'); sale.className = 'ai-sale'; sale.textContent = currencyVND(p.salePrice ?? p.price);
-                                    priceRow.appendChild(sale);
-                                    if (p.discount && Number(p.discount) > 0) { const base = document.createElement('div'); base.className = 'ai-base'; base.textContent = currencyVND(p.price); const badge = document.createElement('span'); badge.className = 'ai-badge'; badge.textContent = '-' + p.discount + '%'; priceRow.appendChild(base); priceRow.appendChild(badge); }
-                                    const btn = document.createElement('div'); btn.className = 'ai-pbtn'; btn.textContent = 'Xem chi tiết';
-                                    body.appendChild(title); if (p.shortDesc) body.appendChild(desc); body.appendChild(priceRow); body.appendChild(btn);
-                                    a.appendChild(img); a.appendChild(body); row.appendChild(a);
-                                });
-                                bubble.appendChild(row); wrap.appendChild(bubble); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
-                                if (persist) pushHist({ t: Date.now(), kind: 'products', products });
-                            }
-
-                            function renderChips(list) {
-                                if (!$chipsWrap || !Array.isArray(list) || !list.length) return;
-                                $chipsWrap.innerHTML = '';
-                                list.slice(0, 6).forEach(text => {
-                                    const btn = document.createElement('button'); btn.className = 'ai-chip'; btn.type = 'button'; btn.textContent = text; btn.setAttribute('data-q', text);
-                                    btn.addEventListener('click', () => { $input.value = text; $input.focus(); });
-                                    $chipsWrap.appendChild(btn);
-                                });
-                            }
-                            // ===== NEW: render dạng DANH SÁCH chi tiết + nút Xem chi tiết =====
-                            function appendProductList(products, { persist = true } = {}) {
-                                if (!products || !products.length) return;
-                                const wrap = document.createElement('div'); wrap.className = 'ai-msg ai-bot';
-                                const bubble = document.createElement('div'); bubble.className = 'ai-msg__bubble';
-
-                                const list = document.createElement('div'); list.className = 'ai-list';
-                                products.forEach((p, idx) => {
-                                    const item = document.createElement('div'); item.className = 'ai-li';
-
-                                    const title = document.createElement('div'); title.className = 'ai-li__title';
-                                    title.innerHTML = `<span class="ai-li__index">${idx + 1}.</span> <strong>${p.name}</strong>`;
-                                    item.appendChild(title);
-
-                                    if (p.specs || p.shortDesc) {
-                                        const spec = document.createElement('div'); spec.className = 'ai-li__row';
-                                        spec.innerHTML = `<span class="ai-li__label">Cấu hình:</span> ${p.specs || p.shortDesc}`;
-                                        item.appendChild(spec);
-                                    }
-
-                                    const priceLine = document.createElement('div'); priceLine.className = 'ai-li__row';
-                                    const priceTxt = p.priceText || (((p.salePrice ?? p.price) || 0).toLocaleString('vi-VN') + '₫');
-                                    priceLine.innerHTML = `<span class="ai-li__label">Giá tham khảo:</span> ${priceTxt}`;
-                                    item.appendChild(priceLine);
-
-                                    const cta = document.createElement('div'); cta.className = 'ai-li__cta';
-                                    const a = document.createElement('a'); a.href = p.href || ('/product/' + p.id);
-                                    a.className = 'ai-btn'; a.textContent = 'Xem chi tiết';
-                                    cta.appendChild(a); item.appendChild(cta);
-
-                                    list.appendChild(item);
-                                });
-
-                                bubble.appendChild(list); wrap.appendChild(bubble); $body.appendChild(wrap);
-                                $body.scrollTop = $body.scrollHeight;
-                                if (persist) pushHist({ t: Date.now(), kind: 'product-list', products });
-                            }
-
-                            // rehydrate
-                            (function () {
-                                if (!!loadJSON(OPEN_KEY, false)) $card.style.display = 'block';
-                                const hist = loadJSON(histKey(), []);
-                                if (hist.length) { $body.innerHTML = ''; hist.forEach(it => { if (it.kind === 'text') appendMsg(it.role, it.text, { persist: false }); if (it.kind === 'products') appendProducts(it.products, { persist: false }); }); $body.scrollTop = $body.scrollHeight; }
-                            })();
-
-                            async function sendMessage(text) {
-                                appendMsg('user', text);
-                                $typing.style.display = 'block'; $send.disabled = true; $input.disabled = true;
-                                try {
-                                    const res = await fetch('/api/ai/chat', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        credentials: 'same-origin',
-                                        body: JSON.stringify({ message: text, sessionId, meta: { page: 'home_show', ts: Date.now() } })
-                                    });
-                                    if (!res.ok) throw new Error('HTTP ' + res.status);
-                                    const data = await res.json().catch(() => ({}));
-
-                                    if (data?.sessionId && data.sessionId !== sessionId) {
-                                        const oldKey = histKey(); sessionId = data.sessionId;
-                                        sessionStorage.setItem(SID_KEY, String(sessionId));
-                                        const newKey = histKey(); migrateHistory(oldKey, newKey);
-                                    }
-
-                                    const hasProducts = Array.isArray(data.products) && data.products.length > 0;
-                                    const reply = (typeof data.reply === 'string' ? data.reply.trim() : '');
-                                    if (hasProducts) {
-                                        if (data.format === 'list') appendProductList(data.products);
-                                        else appendProducts(data.products); // mặc định card
-                                    } else if (reply) {
-                                        appendMsg('assistant', reply);
-                                    } else {
-                                        appendMsg('assistant', 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!');
-                                    }
-
-
-                                    // render filters nếu server trả
-                                    if (data?.activeFilters) {
-                                        const chips = [];
-                                        if (data.activeFilters.brand) chips.push('Hãng: ' + data.activeFilters.brand);
-                                        if (data.activeFilters.target) chips.push('Nhu cầu: ' + data.activeFilters.target);
-                                        if (data.activeFilters.min || data.activeFilters.max) chips.push('Ngân sách: ' + ((data.activeFilters.min || 0) / 1e6) + '–' + (data.activeFilters.max ? (data.activeFilters.max / 1e6) : '∞') + 'tr');
-                                        if (chips.length) renderChips(chips);
-                                    }
-
-                                    if (Array.isArray(data.suggestions) && data.suggestions.length) renderChips(data.suggestions);
-                                } catch (e) {
-                                    console.error(e); appendMsg('assistant', 'Có lỗi kết nối máy chủ. Vui lòng thử lại sau nhé.');
-                                } finally {
-                                    $typing.style.display = 'none'; $send.disabled = false; $input.disabled = false; $input.focus();
-                                }
-                            }
-
-
-                            $form.addEventListener('submit', e => { e.preventDefault(); const val = ($input.value || '').trim(); if (!val) return; $input.value = ''; sendMessage(val); });
-                            $input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $form.dispatchEvent(new Event('submit', { cancelable: true })); } });
-
-                            // clear local history when logout (bind all logout forms/links)
-                            document.querySelectorAll('form[action="/logout"], a[href="/logout"]').forEach(el => {
-                                el.addEventListener('click', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
-                                el.addEventListener('submit', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
+                <script>
+                    /*animation*/
+                    // 1) Gán hiệu ứng cho phần tử theo selector (không cần sửa EJS)
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const attachReveal = (selector, effect = 'fade-up', step = 0) => {
+                            const els = document.querySelectorAll(selector);
+                            els.forEach((el, i) => {
+                                el.setAttribute('data-reveal', effect);
+                                if (step) el.style.setProperty('--reveal-delay', (i * step) + 'ms');
                             });
+                        };
+
+                        // Tiêu đề/section
+                        attachReveal('.fire-title-wrapper', 'fade-up', 0);
+                        attachReveal('#tech-news .d-flex', 'fade-up', 0); // header của tin tức
+                        attachReveal('.tab-class h1', 'fade-up', 0);
+
+                        // Cards các khu vực
+                        attachReveal('.promo-card', 'zoom-in', 80);  // sản phẩm khuyến mãi (trong swiper)
+                        attachReveal('.fruite-item', 'fade-up', 60);  // lưới sản phẩm nổi bật
+                        attachReveal('.recent-card', 'fade-up', 60);  // đã xem gần đây
+                        attachReveal('.news-card', 'fade-up', 80);  // bài viết
+
+                        // Nếu file feature có class .featurs-item -> cũng animate luôn
+                        attachReveal('.featurs-item', 'fade-up', 80);
+                    });
+
+                    // 2) Observer: khi vào viewport thì hiện ra & unobserve (chỉ hiện 1 lần)
+                    (function () {
+                        const io = new IntersectionObserver((entries, obs) => {
+                            entries.forEach(ent => {
+                                if (ent.isIntersecting) {
+                                    ent.target.classList.add('is-visible');
+                                    obs.unobserve(ent.target);
+                                }
+                            });
+                        }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
+
+                        const hydrate = () => {
+                            document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+                        };
+
+                        if (document.readyState === 'loading') {
+                            document.addEventListener('DOMContentLoaded', hydrate);
+                        } else {
+                            hydrate();
+                        }
+                    })();
+                </script>
+
+                <!-- Rùa AI -->
+                <script>
+                    (function () {
+                        const $btn = document.getElementById('aiTurtleBtn');
+                        const $card = document.getElementById('aiTurtleCard');
+                        const $close = document.getElementById('aiTurtleClose');
+                        const $body = document.getElementById('aiChatBody');
+                        const $form = document.getElementById('aiForm');
+                        const $input = document.getElementById('aiInput');
+                        const $send = document.getElementById('aiSend');
+                        const $typing = document.getElementById('aiTyping');
+                        const $chipsWrap = document.querySelector('.ai-suggest');
+                        if (!$btn || !$card || !$form) return;
+
+                        /* storage keys */
+                        const SID_KEY = "AI_TURTLE_SID";
+                        const OPEN_KEY = "AI_TURTLE_OPEN";
+                        const HIST_PREFIX = "AI_TURTLE_HISTORY_";
+                        let sessionId = Number(sessionStorage.getItem(SID_KEY) || "") || null;
+                        const histKey = () => HIST_PREFIX + (sessionId || "temp");
+                        const loadJSON = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f } catch { return f } };
+                        const saveJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { } };
+                        const migrateHistory = (oldK, newK) => { if (oldK === newK) return; const a = loadJSON(oldK, []), b = loadJSON(newK, []); if (a.length) saveJSON(newK, [...b, ...a].slice(-200)); try { localStorage.removeItem(oldK) } catch { } };
+
+                        /* UI */
+                        function openCard() { $card.style.display = 'block'; saveJSON(OPEN_KEY, true); setTimeout(() => $input?.focus(), 80); }
+                        function closeCard() { $card.style.display = 'none'; saveJSON(OPEN_KEY, false); }
+                        $btn.addEventListener('click', openCard);
+                        $close.addEventListener('click', closeCard);
+                        document.querySelectorAll('.ai-chip').forEach(ch => ch.addEventListener('click', () => { $input.value = ch.getAttribute('data-q') || ''; $input.focus(); }));
+
+                        const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+                        function safeFormat(text) { let s = escapeHtml(text || ''); s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); s = s.replace(/\n/g, '<br>'); s = s.replace(/(\/product\/\d{1,10})/g, '<a href="$1" class="text-primary fw-semibold">$1</a>'); return s; }
+
+                        function pushHist(entry) { const h = loadJSON(histKey(), []); h.push(entry); saveJSON(histKey(), h.slice(-200)); }
+
+                        function appendMsg(role, text, { persist = true } = {}) {
+                            const wrap = document.createElement('div'); wrap.className = 'ai-msg ' + (role === 'user' ? 'ai-user' : 'ai-bot');
+                            const b = document.createElement('div'); b.className = 'ai-msg__bubble';
+                            if (role === 'assistant') b.innerHTML = safeFormat(text); else b.textContent = text;
+                            wrap.appendChild(b); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
+                            if (persist) pushHist({ t: Date.now(), kind: 'text', role, text });
+                        }
+
+                        const currencyVND = n => { try { return Number(n || 0).toLocaleString('vi-VN') + '₫' } catch { return (n || 0) + '₫' } };
+                        function appendProducts(products, { persist = true } = {}) {
+                            if (!products || !products.length) return;
+                            const wrap = document.createElement('div'); wrap.className = 'ai-msg ai-bot';
+                            const bubble = document.createElement('div'); bubble.className = 'ai-msg__bubble';
+                            const row = document.createElement('div'); row.className = 'ai-products';
+                            products.forEach(p => {
+                                const a = document.createElement('a'); a.className = 'ai-pcard'; a.href = p.href || ('/product/' + p.id); a.setAttribute('aria-label', p.name);
+                                const img = document.createElement('img'); img.className = 'ai-pimg'; img.loading = 'lazy'; img.src = p.image || '/images/no-image.png'; img.alt = p.name;
+                                const body = document.createElement('div'); body.className = 'ai-pbody';
+                                const title = document.createElement('div'); title.className = 'ai-ptitle'; title.textContent = p.name;
+                                const desc = document.createElement('div'); desc.className = 'ai-pdesc'; desc.textContent = p.shortDesc || '';
+                                const priceRow = document.createElement('div'); priceRow.className = 'ai-price-row';
+                                const sale = document.createElement('div'); sale.className = 'ai-sale'; sale.textContent = currencyVND(p.salePrice ?? p.price);
+                                priceRow.appendChild(sale);
+                                if (p.discount && Number(p.discount) > 0) { const base = document.createElement('div'); base.className = 'ai-base'; base.textContent = currencyVND(p.price); const badge = document.createElement('span'); badge.className = 'ai-badge'; badge.textContent = '-' + p.discount + '%'; priceRow.appendChild(base); priceRow.appendChild(badge); }
+                                const btn = document.createElement('div'); btn.className = 'ai-pbtn'; btn.textContent = 'Xem chi tiết';
+                                body.appendChild(title); if (p.shortDesc) body.appendChild(desc); body.appendChild(priceRow); body.appendChild(btn);
+                                a.appendChild(img); a.appendChild(body); row.appendChild(a);
+                            });
+                            bubble.appendChild(row); wrap.appendChild(bubble); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
+                            if (persist) pushHist({ t: Date.now(), kind: 'products', products });
+                        }
+
+                        function renderChips(list) {
+                            if (!$chipsWrap || !Array.isArray(list) || !list.length) return;
+                            $chipsWrap.innerHTML = '';
+                            list.slice(0, 6).forEach(text => {
+                                const btn = document.createElement('button'); btn.className = 'ai-chip'; btn.type = 'button'; btn.textContent = text; btn.setAttribute('data-q', text);
+                                btn.addEventListener('click', () => { $input.value = text; $input.focus(); });
+                                $chipsWrap.appendChild(btn);
+                            });
+                        }
+                        // ===== NEW: render dạng DANH SÁCH chi tiết + nút Xem chi tiết =====
+                        function appendProductList(products, { persist = true } = {}) {
+                            if (!products || !products.length) return;
+                            const wrap = document.createElement('div'); wrap.className = 'ai-msg ai-bot';
+                            const bubble = document.createElement('div'); bubble.className = 'ai-msg__bubble';
+
+                            const list = document.createElement('div'); list.className = 'ai-list';
+                            products.forEach((p, idx) => {
+                                const item = document.createElement('div'); item.className = 'ai-li';
+
+                                const title = document.createElement('div'); title.className = 'ai-li__title';
+                                title.innerHTML = `<span class="ai-li__index">${idx + 1}.</span> <strong>${p.name}</strong>`;
+                                item.appendChild(title);
+
+                                if (p.specs || p.shortDesc) {
+                                    const spec = document.createElement('div'); spec.className = 'ai-li__row';
+                                    spec.innerHTML = `<span class="ai-li__label">Cấu hình:</span> ${p.specs || p.shortDesc}`;
+                                    item.appendChild(spec);
+                                }
+
+                                const priceLine = document.createElement('div'); priceLine.className = 'ai-li__row';
+                                const priceTxt = p.priceText || (((p.salePrice ?? p.price) || 0).toLocaleString('vi-VN') + '₫');
+                                priceLine.innerHTML = `<span class="ai-li__label">Giá tham khảo:</span> ${priceTxt}`;
+                                item.appendChild(priceLine);
+
+                                const cta = document.createElement('div'); cta.className = 'ai-li__cta';
+                                const a = document.createElement('a'); a.href = p.href || ('/product/' + p.id);
+                                a.className = 'ai-btn'; a.textContent = 'Xem chi tiết';
+                                cta.appendChild(a); item.appendChild(cta);
+
+                                list.appendChild(item);
+                            });
+
+                            bubble.appendChild(list); wrap.appendChild(bubble); $body.appendChild(wrap);
+                            $body.scrollTop = $body.scrollHeight;
+                            if (persist) pushHist({ t: Date.now(), kind: 'product-list', products });
+                        }
+
+                        // rehydrate
+                        (function () {
+                            if (!!loadJSON(OPEN_KEY, false)) $card.style.display = 'block';
+                            const hist = loadJSON(histKey(), []);
+                            if (hist.length) { $body.innerHTML = ''; hist.forEach(it => { if (it.kind === 'text') appendMsg(it.role, it.text, { persist: false }); if (it.kind === 'products') appendProducts(it.products, { persist: false }); }); $body.scrollTop = $body.scrollHeight; }
                         })();
-                    </script>
+
+                        async function sendMessage(text) {
+                            appendMsg('user', text);
+                            $typing.style.display = 'block'; $send.disabled = true; $input.disabled = true;
+                            try {
+                                const res = await fetch('/api/ai/chat', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    credentials: 'same-origin',
+                                    body: JSON.stringify({ message: text, sessionId, meta: { page: 'home_show', ts: Date.now() } })
+                                });
+                                if (!res.ok) throw new Error('HTTP ' + res.status);
+                                const data = await res.json().catch(() => ({}));
+
+                                if (data?.sessionId && data.sessionId !== sessionId) {
+                                    const oldKey = histKey(); sessionId = data.sessionId;
+                                    sessionStorage.setItem(SID_KEY, String(sessionId));
+                                    const newKey = histKey(); migrateHistory(oldKey, newKey);
+                                }
+
+                                const hasProducts = Array.isArray(data.products) && data.products.length > 0;
+                                const reply = (typeof data.reply === 'string' ? data.reply.trim() : '');
+                                if (hasProducts) {
+                                    if (data.format === 'list') appendProductList(data.products);
+                                    else appendProducts(data.products); // mặc định card
+                                } else if (reply) {
+                                    appendMsg('assistant', reply);
+                                } else {
+                                    appendMsg('assistant', 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!');
+                                }
+
+
+                                // render filters nếu server trả
+                                if (data?.activeFilters) {
+                                    const chips = [];
+                                    if (data.activeFilters.brand) chips.push('Hãng: ' + data.activeFilters.brand);
+                                    if (data.activeFilters.target) chips.push('Nhu cầu: ' + data.activeFilters.target);
+                                    if (data.activeFilters.min || data.activeFilters.max) chips.push('Ngân sách: ' + ((data.activeFilters.min || 0) / 1e6) + '–' + (data.activeFilters.max ? (data.activeFilters.max / 1e6) : '∞') + 'tr');
+                                    if (chips.length) renderChips(chips);
+                                }
+
+                                if (Array.isArray(data.suggestions) && data.suggestions.length) renderChips(data.suggestions);
+                            } catch (e) {
+                                console.error(e); appendMsg('assistant', 'Có lỗi kết nối máy chủ. Vui lòng thử lại sau nhé.');
+                            } finally {
+                                $typing.style.display = 'none'; $send.disabled = false; $input.disabled = false; $input.focus();
+                            }
+                        }
+
+
+                        $form.addEventListener('submit', e => { e.preventDefault(); const val = ($input.value || '').trim(); if (!val) return; $input.value = ''; sendMessage(val); });
+                        $input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $form.dispatchEvent(new Event('submit', { cancelable: true })); } });
+
+                        // clear local history when logout (bind all logout forms/links)
+                        document.querySelectorAll('form[action="/logout"], a[href="/logout"]').forEach(el => {
+                            el.addEventListener('click', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
+                            el.addEventListener('submit', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
+                        });
+                    })();
+                </script>
 
 
 
