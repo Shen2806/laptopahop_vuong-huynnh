@@ -340,7 +340,6 @@ const webRoutes = (app: Express) => {
 
 
     // ====== ADMIN GUARD CHO TOÀN NHÁNH /admin ======
-    // ====== ADMIN GUARD CHO TOÀN NHÁNH /admin ======
     router.use('/admin', isAdminOrStaff, attachPermissions, exposePermsToView);
 
     // Dashboard

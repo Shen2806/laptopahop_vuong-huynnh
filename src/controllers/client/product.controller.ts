@@ -47,7 +47,7 @@ const getProductPage = async (req: Request, res: Response) => {
         prisma.product.findMany({
             where: { factory: product.factory, id: { not: product.id } },
             orderBy: { id: "desc" },
-            take: 16, // lấy dư rồi lọc 8 sp sau
+            take: 16,
         }),
         prisma.product.findMany({
             where: { id: { not: product.id }, price: { gte: min, lte: max } },
@@ -69,15 +69,12 @@ const getProductPage = async (req: Request, res: Response) => {
             return true;
         })
         .sort((a, b) => {
-            // cùng hãng lên trước
             if (a.__tag !== b.__tag) return a.__tag === "factory" ? -1 : 1;
-            // gần giá hơn lên trước
             if (a.__dist !== b.__dist) return a.__dist - b.__dist;
-            // phụ: id mới trước
             return b.id - a.id;
         })
         .slice(0, 8)
-        .map(({ __tag, __dist, ...rest }) => rest); // bỏ field phụ
+        .map(({ __tag, __dist, ...rest }) => rest);
 
     // 5) Rating cho danh sách tương tự
     const ids = combined.map((p) => p.id);
@@ -98,7 +95,7 @@ const getProductPage = async (req: Request, res: Response) => {
     }
 
     const makeStars = (avg: number) => {
-        const rounded = Math.round(avg * 2) / 2; // .5 step
+        const rounded = Math.round(avg * 2) / 2;
         const full = Math.floor(rounded);
         const half = rounded - full === 0.5 ? 1 : 0;
         const empty = 5 - full - half;
@@ -121,12 +118,35 @@ const getProductPage = async (req: Request, res: Response) => {
         };
     });
 
-    // 6) Render
+    // 6) 👉 Ghi cookie "recent_products" (tối đa 6 id, mới nhất lên đầu, không trùng)
+    const KEY = "recent_products";
+    const MAX = 6;
+    let recent: number[] = [];
+    try {
+        const raw = (req as any).cookies?.[KEY] || "[]";
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+            recent = parsed
+                .map((n: any) => Number(n))
+                .filter((n: any) => Number.isFinite(n));
+        }
+    } catch { }
+    recent = [product.id, ...recent.filter((x) => x !== product.id)].slice(0, MAX);
+    res.cookie(KEY, JSON.stringify(recent), {
+        httpOnly: false,   // có thể để true nếu muốn ẩn khỏi JS; ở đây giữ false cho đơn giản
+        sameSite: "lax",
+        secure: false,     // nếu chạy HTTPS khác origin, đặt true + sameSite: 'none'
+        path: "/",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 ngày
+    });
+
+    // 7) Render
     return res.render("product/detail.ejs", {
         product,
-        similarProducts, // <<< thêm biến này
+        similarProducts,
     });
 };
+
 
 const postAddProductToCart = async (req: Request, res: Response) => {
     const { id } = req.params;

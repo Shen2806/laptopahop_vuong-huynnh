@@ -27,16 +27,14 @@ function jaccardScore(qTokens: string[], name: string) {
 }
 
 /** parse "so sánh A vs B" | "so sanh A voi B" */
-function parseCompareNames(text: string): [string, string] | null {
-    const t = deaccent(text).trim();
-    const cleaned = t.replace(/^so\s*sanh(?:\s*san\s*pham)?\s*/, '').trim();
-    const parts = cleaned.split(/\s+(?:vs|v\/s|v\.s\.|voi|với|va|và)\s+/i);
-    if (parts.length === 2) {
-        const a = parts[0].trim(), b = parts[1].trim();
-        if (a && b) return [a, b];
-    }
-    return null;
+// thay parseCompareNames cũ bằng:
+function parseCompareNamesMulti(text: string): string[] {
+    const t = deaccent(text).replace(/^so\s*sanh(?:\s*san\s*pham)?\s*/, '').trim();
+    // tách bởi "vs", "với/vs", "và/," …
+    return t.split(/\s*(?:vs|v\/s|v\.s\.|voi|với|va|và|,)\s*/i)
+        .map(s => s.trim()).filter(Boolean).slice(0, 4);
 }
+
 function vnMil(n?: number) {
     if (!n && n !== 0) return '';
     return Math.round(n / 1_000_000) + 'tr';
@@ -841,64 +839,75 @@ export async function runTurtleAgent(params: {
 
     /* ===== A) SO SÁNH THEO TÊN (ưu tiên), nếu không có thì dùng danh sách trước (#) ===== */
     /* ===== A) SO SÁNH THEO TÊN (ưu tiên), nếu không có thì dùng danh sách trước (#) ===== */
+    function rowsForProduct(p: any) {
+        const blob = `${p.featureTags || ''} ${p.shortDesc || ''} ${p.detailDesc || ''}`.toUpperCase();
+        const gpu = extractGPU(blob) || (/\bIRIS\s?XE\b/.test(blob) ? 'Iris Xe' : '');
+        const screen = extractScreen(blob);
+        const weight = (p.weightKg ? p.weightKg + ' kg' : (p.weight || '—'));
+        return [
+            { label: 'CPU', value: p.cpu || '—' },
+            { label: 'GPU', value: gpu || '—' },
+            { label: 'RAM', value: (p.ramGB ? p.ramGB + 'GB' : '—') },
+            { label: 'SSD', value: (p.storageGB ? p.storageGB + 'GB' : '—') },
+            { label: 'Màn hình', value: screen || (p.screenSizeInch ? (p.screenSizeInch + '"') : '—') },
+            { label: 'Cân nặng', value: weight || '—' },
+            { label: 'Giá tham khảo', value: productPriceText(p) }
+        ];
+    }
+
     if (wantsCompare) {
-        // ƯU TIÊN: so sánh theo tên "A vs B"
-        const pair = parseCompareNames(message);
-        if (pair) {
-            const [qa, qb] = pair;
-            const pa = await findBestProductByText(qa);
-            const pb = await findBestProductByText(qb);
+        const names = parseCompareNamesMulti(message);
+        if (names.length >= 2) {
+            const found: any[] = [];
+            for (const q of names) {
+                const prod = await findBestProductByText(q);
+                if (prod) found.push(prod);
+            }
+            if (found.length >= 2) {
+                // chuẩn hóa items
+                const items = found.slice(0, 4).map(p => ({
+                    id: p.id,
+                    title: p.name,
+                    href: `/product/${p.id}`,
+                    rows: rowsForProduct(p)
+                }));
 
-            if (pa && pb) {
-
-                const diff = quickDiff(pa, pb);
-
-                // Kết luận “thông minh”
-                const ga = `${pa.featureTags || ''} ${pa.shortDesc || ''} ${pa.detailDesc || ''}`.toUpperCase();
-                const gb = `${pb.featureTags || ''} ${pb.shortDesc || ''} ${pb.detailDesc || ''}`.toUpperCase();
-                const hasDGPUA = /RTX|GTX|RX|ARC/.test(ga);
-                const hasDGPUB = /RTX|GTX|RX|ARC/.test(gb);
-                const scoreA = scoreProduct(pa), scoreB = scoreProduct(pb);
-
-                let winner = scoreA >= scoreB ? pa : pb;
-                let reason = scoreA === scoreB ? "hiệu năng tương đương" :
-                    (Math.abs(scoreA - scoreB) > 20 ? "hiệu năng tổng thể nhỉnh hơn" : "cấu hình nhỉnh hơn nhẹ");
-                if (hasDGPUA !== hasDGPUB) { winner = hasDGPUA ? pa : pb; reason = "GPU rời mạnh hơn → hợp **gaming/đồ hoạ**"; }
-
+                // chấm điểm, gợi ý
+                const ranked = [...found].map(p => ({ p, sc: scoreProduct(p) }))
+                    .sort((a, b) => b.sc - a.sc);
+                const best = ranked[0]?.p, second = ranked[1]?.p;
                 const conclusion =
-                    `**Kết luận:** Ưu tiên **${winner.name}** (${reason}). ` +
-                    `Nếu cần di chuyển nhiều/mỏng nhẹ, cân nhắc máy còn lại.`;
+                    best
+                        ? `**Ưu tiên hiệu năng/đồ họa** ⇒ chọn **${best.name}** (cấu hình mạnh hơn).` +
+                        (second ? ` Nếu ưu tiên **giá/di động/pin**, cân nhắc **${second.name}**.` : '')
+                        : '';
 
-                // Lưu để còn “chọn #1/#2”
-                await setSessionKV(session.id, "result.ids", JSON.stringify([pa.id, pb.id]));
+                // trả compare + gợi ý
+                await prisma.aiChatMessage.create({ data: { sessionId: session.id, role: "ASSISTANT", content: 'So sánh sản phẩm' } });
+                await setSessionKV(session.id, "result.ids", JSON.stringify(items.map(i => i.id)));
                 await setSessionKV(session.id, "result.format", "cards");
 
-                // 👉 trả thêm compare
                 return {
                     status: 200 as const,
                     body: {
                         sessionId: session.id,
-                        reply:
-                            `**So sánh nhanh:**
-- ${pa.name} — ${productSpecs(pa)} — ${productPriceText(pa)}
-- ${pb.name} — ${productSpecs(pb)} — ${productPriceText(pb)}
-**Khác biệt chính:** ${diff.length ? diff.join('; ') : 'hai máy khá tương đồng.'}
-${conclusion}`,
-                        format: "cards",
-                        products: [pa, pb].map(productDTO),
+                        reply: '',
+                        format: 'cards',
+                        products: [], // hiển thị bằng modal so sánh
                         compare: {
-                            left: { title: pa.name, rows: dictToRows(specDict(pa)), href: `/product/${pa.id}` },
-                            right: { title: pb.name, rows: dictToRows(specDict(pb)), href: `/product/${pb.id}` },
+                            labels: ['CPU', 'GPU', 'RAM', 'SSD', 'Màn hình', 'Cân nặng', 'Giá tham khảo'],
+                            items,
                             conclusion
                         },
                         activeFilters: remembered,
-                        suggestions: ["Chọn máy #1", "Chọn máy #2", "Chọn máy mạnh nhất"]
+                        suggestions: items.length === 2
+                            ? [`Chọn ${items[0].title}`, `Chọn ${items[1].title}`, "Chọn máy mạnh nhất"]
+                            : ["Chọn máy mạnh nhất", "Gợi ý theo ngân sách", "Xem thêm gaming"]
                     }
                 };
-
             }
-            // nếu 1 trong 2 không tìm thấy → rơi xuống fallback theo danh sách trước
         }
+
 
         // Fallback: so sánh theo số thứ tự từ danh sách trước (#1 vs #2 ...)
         const rawIds = await getSessionKV(session.id, "result.ids");

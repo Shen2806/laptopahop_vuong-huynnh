@@ -131,6 +131,160 @@
         .ai-c-concl ul {
             margin: 6px 0 0 16px;
         }
+
+        /* === Compare Modal === */
+        /* === Compare Modal 1–4 items === */
+        #aiCompareBackdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, .6);
+            display: none;
+            z-index: 9999
+        }
+
+        #aiCompareBackdrop .ai-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(1180px, 96vw);
+            max-height: 92vh;
+            background: #fff;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 22px 70px rgba(0, 0, 0, .35)
+        }
+
+        .ai-m-hd {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #eef2f7;
+            background: linear-gradient(180deg, #fafcff, #fff)
+        }
+
+        .ai-m-hd>div {
+            font-weight: 800;
+            font-size: 16px;
+            color: #0f172a
+        }
+
+        .ai-m-close {
+            border: 0;
+            background: #f1f5f9;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            line-height: 36px
+        }
+
+        .ai-m-close:hover {
+            background: #e2e8f0
+        }
+
+        .ai-m-bd {
+            padding: 10px 16px;
+            max-height: calc(92vh - 176px);
+            overflow: auto
+        }
+
+        /* Table-like grid: 1 cột nhãn + N cột sản phẩm */
+        .cmp-table {
+            display: grid;
+            row-gap: 8px;
+            column-gap: 10px
+        }
+
+        .cmp-th {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 10px 12px;
+            font-weight: 800;
+            color: #0f172a;
+            z-index: 1
+        }
+
+        .cmp-th.prod {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px
+        }
+
+        .cmp-td {
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #fafaf9;
+            color: #0f172a
+        }
+
+        .cmp-td.lbl {
+            background: #fff;
+            color: #64748b;
+            font-weight: 600
+        }
+
+        .cmp-td.val {
+            background: #fcfcfd;
+            border: 1px solid #eef2f7
+        }
+
+        .cmp-td.diff {
+            background: #fff5e5;
+            border-color: #fde68a
+        }
+
+        .cmp-row-sep {
+            height: 6px
+        }
+
+        /* footer */
+        .ai-m-ft {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 14px 20px;
+            border-top: 1px solid #eef2f7;
+            background: #fcfcfd
+        }
+
+        .ai-conclusion {
+            font-size: 14px;
+            line-height: 1.55;
+            color: #0f172a
+        }
+
+        .ai-btn {
+            display: inline-block;
+            border: 0;
+            border-radius: 10px;
+            background: #2563eb;
+            color: #fff;
+            padding: 10px 14px;
+            font-weight: 700;
+            text-decoration: none
+        }
+
+        .ai-btn:hover {
+            filter: brightness(1.05)
+        }
+
+        .ai-btn.outline {
+            background: #f1f5f9;
+            color: #0f172a
+        }
+
+        @media (max-width:760px) {
+            .cmp-label-col {
+                width: 120px !important
+            }
+        }
     </style>
 
 
@@ -1700,7 +1854,7 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                 $close.addEventListener('click', closeCard);
                                 document.querySelectorAll('.ai-chip').forEach(ch => ch.addEventListener('click', () => { $input.value = ch.getAttribute('data-q') || ''; $input.focus(); }));
 
-                                const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+                                // const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
                                 function safeFormat(text) { let s = escapeHtml(text || ''); s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); s = s.replace(/\n/g, '<br>'); s = s.replace(/(\/product\/\d{1,10})/g, '<a href="$1" class="text-primary fw-semibold">$1</a>'); return s; }
 
                                 function pushHist(entry) { const h = loadJSON(histKey(), []); h.push(entry); saveJSON(histKey(), h.slice(-200)); }
@@ -1800,16 +1954,108 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
 
                                     if (persist) pushHist({ t: Date.now(), kind: 'compare', compare: cmp });
                                 }
-
-                                function renderChips(list) {
-                                    if (!$chipsWrap || !Array.isArray(list) || !list.length) return;
-                                    $chipsWrap.innerHTML = '';
-                                    list.slice(0, 6).forEach(text => {
-                                        const btn = document.createElement('button'); btn.className = 'ai-chip'; btn.type = 'button'; btn.textContent = text; btn.setAttribute('data-q', text);
-                                        btn.addEventListener('click', () => { $input.value = text; $input.focus(); });
-                                        $chipsWrap.appendChild(btn);
-                                    });
+                                // ===== Compare Modal =====
+                                // ========== Compare Modal: up to 4 items ==========
+                                function ensureCompareModal4() {
+                                    let el = document.getElementById('aiCompareBackdrop');
+                                    if (el) return el;
+                                    el = document.createElement('div');
+                                    el.id = 'aiCompareBackdrop';
+                                    el.innerHTML = `
+    <div class="ai-modal" role="dialog" aria-modal="true" aria-label="So sánh sản phẩm">
+      <div class="ai-m-hd">
+        <div>So sánh sản phẩm</div>
+        <button class="ai-m-close" aria-label="Đóng">×</button>
+      </div>
+      <div class="ai-m-bd">
+        <div id="cmpTable" class="cmp-table"></div>
+      </div>
+      <div class="ai-m-ft">
+        <div class="ai-conclusion" id="cmpConclusion"></div>
+        <div class="ai-actions" id="cmpCTAs"></div>
+      </div>
+    </div>`;
+                                    document.body.appendChild(el);
+                                    el.addEventListener('click', e => { if (e.target === el) closeCompareModal4(); });
+                                    el.querySelector('.ai-m-close').addEventListener('click', closeCompareModal4);
+                                    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCompareModal4(); });
+                                    return el;
                                 }
+
+                                function closeCompareModal4() {
+                                    const el = document.getElementById('aiCompareBackdrop');
+                                    if (!el) return;
+                                    el.style.display = 'none';
+                                    document.body.style.overflow = '';
+                                }
+
+                                function escapeHtml(s) { return String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+                                function shorten(s, n = 26) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+
+                                /** cmp format:
+                                 * {
+                                 *   items: [{ title, href, rows: [{label, value}] } ... up to 4],
+                                 *   labels?: ["CPU","GPU","RAM","SSD","Màn hình","Giá tham khảo"],
+                                 *   conclusion?: "..."
+                                 * }
+                                 */
+                                function openCompareModal4(cmp) {
+                                    const wrap = ensureCompareModal4();
+                                    const table = wrap.querySelector('#cmpTable');
+                                    const items = (cmp?.items || []).slice(0, 4); // 1–4
+                                    if (!items.length) return;
+
+                                    // Lấy danh sách label (ưu tiên cmp.labels -> hàng của item[0] -> union)
+                                    let labels = Array.isArray(cmp.labels) && cmp.labels.length
+                                        ? cmp.labels
+                                        : (items[0]?.rows?.map(r => r.label) || []);
+                                    if (!labels.length) {
+                                        const set = new Set(); items.forEach(it => (it.rows || []).forEach(r => set.add(r.label)));
+                                        labels = [...set];
+                                    }
+
+                                    // cấu hình grid: 1 cột nhãn + N cột sản phẩm
+                                    const n = items.length;
+                                    table.style.gridTemplateColumns = `180px repeat(${n}, minmax(180px, 1fr))`;
+                                    table.innerHTML = '';
+
+                                    const append = (cls, html) => {
+                                        const d = document.createElement('div'); d.className = cls; d.innerHTML = html; table.appendChild(d);
+                                    };
+
+                                    // header
+                                    append('cmp-th cmp-label-col', 'Thông số');
+                                    items.forEach(it => append('cmp-th prod', escapeHtml(it.title || '')));
+
+                                    // body by labels
+                                    labels.forEach(lbl => {
+                                        // cột label
+                                        append('cmp-td lbl cmp-label-col', escapeHtml(lbl || ''));
+
+                                        // lấy value từng item + đánh dấu khác biệt (nếu không rỗng và không giống nhau)
+                                        const vals = items.map(it => {
+                                            const r = (it.rows || []).find(x => x.label === lbl);
+                                            return r?.value ? String(r.value) : '';
+                                        });
+                                        const allSame = vals.filter(v => v !== '').every(v => v === (vals.find(x => x !== '') || ''));
+
+                                        vals.forEach(v => append(`cmp-td val${allSame ? '' : ' diff'}`, escapeHtml(v)));
+                                    });
+
+                                    // CTA row
+                                    append('cmp-td lbl cmp-label-col', '');
+                                    items.forEach(it => {
+                                        append('cmp-td val', `<a class="ai-btn" href="${escapeHtml(it.href || '#')}" target="_blank" rel="noopener">Xem ${escapeHtml(shorten(it.title || 'sản phẩm'))}</a>`);
+                                    });
+
+                                    // Conclusion
+                                    wrap.querySelector('#cmpConclusion').innerHTML =
+                                        (cmp.conclusion || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+                                    wrap.style.display = 'block';
+                                    document.body.style.overflow = 'hidden';
+                                }
+
                                 // ===== NEW: render dạng DANH SÁCH chi tiết + nút Xem chi tiết =====
                                 function appendProductList(products, { persist = true } = {}) {
                                     if (!products || !products.length) return;
@@ -1903,9 +2149,32 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                         }
                                     } catch { }
                                 }
+
+
+                                /** Render chip gợi ý / chip filter ở chân chat */
+                                function renderChips(list) {
+                                    if (!$chipsWrap) return;
+                                    $chipsWrap.innerHTML = '';
+
+                                    if (!Array.isArray(list) || list.length === 0) return;
+
+                                    list.slice(0, 6).forEach(text => {
+                                        const btn = document.createElement('button');
+                                        btn.className = 'ai-chip';
+                                        btn.type = 'button';
+                                        btn.textContent = String(text);
+                                        btn.setAttribute('data-q', String(text));
+                                        btn.addEventListener('click', () => {
+                                            const $input = document.getElementById('aiInput');
+                                            if ($input) { $input.value = text; $input.focus(); }
+                                        });
+                                        $chipsWrap.appendChild(btn);
+                                    });
+                                }
                                 async function sendMessage(text) {
                                     appendMsg('user', text);
-                                    $typing.style.display = 'block'; $send.disabled = true; $input.disabled = true;
+                                    $typing.style.display = 'block';
+                                    $send.disabled = true; $input.disabled = true;
 
                                     try {
                                         const res = await fetch('/api/ai/chat', {
@@ -1915,81 +2184,64 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                             body: JSON.stringify({ message: text, sessionId, meta: { page: 'home_show', ts: Date.now() } })
                                         });
 
-                                        // luôn cố đọc JSON để lấy chi tiết lỗi nếu có
-                                        const payload = await res.json().catch(() => null);
+                                        const data = await res.json().catch(() => null);
 
                                         if (!res.ok) {
                                             let msg = `Có lỗi máy chủ (${res.status}).`;
-                                            if (payload?.detail) msg += ` ${payload.detail}`;
+                                            if (data?.detail) msg += ` ${data.detail}`;
                                             appendMsg('assistant', msg);
-
-                                            // nếu session bị "CLOSED", reset để lần sau tạo session mới
-                                            if (res.status === 403 && payload?.message === 'session closed') {
-                                                sessionId = null;
-                                                sessionStorage.removeItem(SID_KEY);
+                                            if (res.status === 403 && data?.message === 'session closed') {
+                                                sessionId = null; sessionStorage.removeItem(SID_KEY);
                                             }
                                             return;
                                         }
 
-                                        // ✅ từ đây mới có thể dùng data
-                                        const data = payload || {};
-
-                                        // đồng bộ sessionId mới (nếu có)
+                                        // cập nhật session
                                         if (data?.sessionId && data.sessionId !== sessionId) {
-                                            const oldKey = histKey();
-                                            sessionId = data.sessionId;
-                                            setSID(sessionId);
-                                            const newKey = histKey();
-                                            migrateHistory(oldKey, newKey);
+                                            const oldKey = histKey(); sessionId = data.sessionId;
+                                            sessionStorage.setItem(SID_KEY, String(sessionId));
+                                            const newKey = histKey(); migrateHistory(oldKey, newKey);
                                         }
 
-                                        // ✅ hiển thị bảng so sánh trước (nếu server trả về)
-                                        if (data.compare) {
-                                            appendCompare(data.compare);
+                                        // 🚀 mở modal so sánh 1–4 sp (nếu có)
+                                        if (data?.compare && Array.isArray(data.compare.items) && data.compare.items.length) {
+                                            openCompareModal4(data.compare);
                                         }
 
-                                        // hiển thị sản phẩm / tin nhắn
-                                        const hasProducts = Array.isArray(data.products) && data.products.length > 0;
-                                        const reply = (typeof data.reply === 'string' ? data.reply.trim() : '');
-                                        const hasCompare = data && data.compare;
+                                        // render danh sách / thẻ
+                                        const hasProducts = Array.isArray(data?.products) && data.products.length > 0;
+                                        const reply = (typeof data?.reply === 'string' ? data.reply.trim() : '');
 
-                                        // ✅ Nếu có so sánh thì render block so sánh trước
-                                        if (hasCompare) appendCompare(data.compare);
-
-                                        // ✅ Luôn in “lời dẫn” nếu có
-                                        if (reply) appendMsg('assistant', reply);
-
-                                        // ✅ Rồi mới render sản phẩm
                                         if (hasProducts) {
                                             if (data.format === 'list') appendProductList(data.products);
                                             else appendProducts(data.products);
-                                        } else if (!reply && !hasCompare) {
+                                        } else if (reply) {
+                                            appendMsg('assistant', reply);
+                                        } else if (!data?.compare) {
                                             appendMsg('assistant', 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!');
                                         }
 
-                                        // chips (filter + gợi ý)
+                                        // chips
                                         if (data?.activeFilters) {
                                             const chips = [];
                                             if (data.activeFilters.brand) chips.push('Hãng: ' + data.activeFilters.brand);
                                             if (data.activeFilters.target) chips.push('Nhu cầu: ' + data.activeFilters.target);
-                                            if (data.activeFilters.min || data.activeFilters.max) {
-                                                const minTr = (data.activeFilters.min || 0) / 1e6;
-                                                const maxTr = data.activeFilters.max ? (data.activeFilters.max / 1e6) : '∞';
-                                                chips.push('Ngân sách: ' + minTr + '–' + maxTr + 'tr');
-                                            }
+                                            if (data.activeFilters.min || data.activeFilters.max)
+                                                chips.push('Ngân sách: ' + ((data.activeFilters.min || 0) / 1e6) + '–' +
+                                                    (data.activeFilters.max ? (data.activeFilters.max / 1e6) : '∞') + 'tr');
                                             if (chips.length) renderChips(chips);
                                         }
-                                        if (Array.isArray(data.suggestions) && data.suggestions.length) {
-                                            renderChips(data.suggestions);
-                                        }
+                                        if (Array.isArray(data?.suggestions) && data.suggestions.length) renderChips(data.suggestions);
 
                                     } catch (e) {
                                         console.error(e);
                                         appendMsg('assistant', 'Không kết nối được máy chủ. Bạn thử lại sau nhé.');
                                     } finally {
-                                        $typing.style.display = 'none'; $send.disabled = false; $input.disabled = false; $input.focus();
+                                        $typing.style.display = 'none';
+                                        $send.disabled = false; $input.disabled = false; $input.focus();
                                     }
                                 }
+
 
 
                                 $form.addEventListener('submit', e => { e.preventDefault(); const val = ($input.value || '').trim(); if (!val) return; $input.value = ''; sendMessage(val); });
@@ -2002,6 +2254,16 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                 });
                             })();
                         </script>
+
+                        // reload trang hiển thị sản phẩm đã xem gần đây
+                        <script>
+                            window.addEventListener('pageshow', function (e) {
+                                var nav = performance.getEntriesByType && performance.getEntriesByType('navigation');
+                                var backForward = nav && nav[0] && nav[0].type === 'back_forward';
+                                if (e.persisted || backForward) location.reload();
+                            });
+                        </script>
+
 
 </body>
 
