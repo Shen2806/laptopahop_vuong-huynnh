@@ -7,22 +7,14 @@ export async function headerCartCount(req: Request, res: Response, next: NextFun
         let count = 0;
 
         if (user?.id) {
-            const cart = await prisma.cart.findFirst({
-                where: { userId: Number(user.id) },
-                orderBy: { id: "desc" },
-                select: { id: true },
+            // Nếu có cột status: dùng where: { cart: { userId: user.id, status: 'OPEN' } }
+            const agg = await prisma.cartDetail.aggregate({
+                where: { cart: { userId: Number(user.id) } },
+                _sum: { quantity: true },
             });
-
-            if (cart) {
-                const agg = await prisma.cartDetail.aggregate({
-                    where: { cartId: cart.id },
-                    _sum: { quantity: true },
-                });
-                count = Number(agg._sum.quantity || 0);
-            }
+            count = Number(agg._sum.quantity || 0);
         }
 
-        // gắn vào locals để mọi view dùng được
         res.locals.headerCartCount = count;
     } catch (e) {
         res.locals.headerCartCount = 0;
@@ -30,3 +22,4 @@ export async function headerCartCount(req: Request, res: Response, next: NextFun
         next();
     }
 }
+

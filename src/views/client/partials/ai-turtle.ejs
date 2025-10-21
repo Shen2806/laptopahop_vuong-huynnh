@@ -1,0 +1,43 @@
+<div id="aiTurtle" class="ai-turtle">
+    <button id="aiTurtleBtn" class="ai-turtle__btn" aria-label="Mở Rùa AI">
+        <span class="ai-pulse" aria-hidden="true"></span>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12c0-3.31 3.13-6 7-6s7 2.69 7 6-3.13 6-7 6-7-2.69-7-6Z" fill="#fff" opacity=".9" />
+            <path d="M7 12h10M9 14.5h6" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
+            <circle cx="9" cy="10" r="1" fill="#16a34a" />
+            <circle cx="15" cy="10" r="1" fill="#16a34a" />
+        </svg>
+    </button>
+
+    <div id="aiTurtleCard" class="ai-turtle__card" role="dialog" aria-label="Rùa AI tư vấn">
+        <div class="ai-chat__header">
+            <div>
+                <div class="ai-chat__title">Rùa AI tư vấn</div>
+                <div class="ai-kicker">Hỏi gì về laptop cũng đáp 👋</div>
+            </div>
+            <button id="aiTurtleClose" class="ai-chat__close">Đóng</button>
+        </div>
+
+        <div id="aiChatBody" class="ai-chat__body">
+            <div class="ai-msg ai-bot">
+            </div>
+            <div id="aiTyping" class="ai-typing">Rùa AI đang nhập…</div>
+        </div>
+
+        <div class="ai-suggest">
+            <button class="ai-chip" data-q="Tư vấn laptop gaming tầm 20 triệu">Gaming ~20 triệu</button>
+            <button class="ai-chip" data-q="Laptop văn phòng nhẹ dưới 1.3kg, pin tốt, giá 15-25 triệu">Văn phòng
+                nhẹ</button>
+            <button class="ai-chip" data-q="So sánh MacBook Air M1 và M2 để đi học">So sánh Mac</button>
+            <button class="ai-chip" data-q="Máy dưới 12 triệu cho sinh viên IT, ưu tiên RAM 16GB">
+                <=12tr cho SV</button>
+        </div>
+
+        <div class="ai-chat__footer">
+            <form id="aiForm" class="ai-input">
+                <input id="aiInput" placeholder="Nhập câu hỏi… (Enter để gửi, Shift+Enter xuống dòng)" />
+                <button id="aiSend" type="submit">Gửi</button>
+            </form>
+        </div>
+    </div>
+</div>

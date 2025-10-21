@@ -1,65 +1,64 @@
-// src/services/ai/retrieve.service.ts
-import { prisma } from "config/client";
-import { embed, cosine } from "./embedding.service";
-import { CohereClient } from "cohere-ai";
-import 'dotenv/config';
+import { prisma } from 'config/client';
+import { LocalProvider } from './vendor/local';
 
-const cohere = process.env.COHERE_API_KEY ? new CohereClient({ token: process.env.COHERE_API_KEY }) : null;
+const provider = new LocalProvider();
+
+function cosine(a: number[], b: number[]) {
+    let dot = 0, na = 0, nb = 0;
+    const n = Math.min(a.length, b.length);
+    for (let i = 0; i < n; i++) { const x = a[i], y = b[i]; dot += x * y; na += x * x; nb += y * y; }
+    const denom = Math.sqrt(na) * Math.sqrt(nb);
+    return denom ? dot / denom : 0;
+}
 
 export async function retrieveContext(opts: {
-    userId?: number;
-    sessionId?: number;
-    query: string;
-    topK?: number;
+    userId: number | null, sessionId: number, query: string, topK?: number
 }) {
-    const { userId, sessionId, query, topK = 12 } = opts;
+    const { userId, sessionId, query } = opts;
+    const topK = opts.topK ?? 8;
+    const { embedding: qvec } = await provider.embed(query);
 
-    const q = (await embed(query)).vector;
-
-    // Lấy memories theo phạm vi user/session
-    let where: any;
-    if (userId && sessionId) where = { OR: [{ userId }, { sessionId }] };
-    else if (userId) where = { userId };
-    else if (sessionId) where = { sessionId };
-
-    const mems = await prisma.aiMemory.findMany({
-        ...(where ? { where } : {}),
-        orderBy: { createdAt: "desc" },
-        take: 200
-    });
-    if (!mems.length) return [];
-
-    const ids = mems.map(m => m.id);
-    const embs = await prisma.aiEmbedding.findMany({
-        where: { memoryId: { in: ids } },
-        select: { memoryId: true, vector: true }
+    // Messages trong phiên
+    const msgEms = await prisma.aiEmbedding.findMany({
+        where: { messageId: { not: null }, message: { sessionId } },
+        include: { message: true }, orderBy: { id: 'desc' }, take: 400
     });
 
-    const scored = embs
-        .map(e => {
-            const v = Array.isArray(e.vector) ? (e.vector as number[]) : [];
-            const s = v.length ? cosine(q, v) : -1;
-            return { id: e.memoryId!, score: s };
-        })
-        .sort((a, b) => b.score - a.score)
-        .slice(0, Math.max(1, topK * 2));
+    // Memories: user, session, và KB toàn cục (userId=null & sessionId=null)
+    const memEms = await prisma.aiEmbedding.findMany({
+        where: {
+            memoryId: { not: null },
+            OR: [
+                { memory: { userId: userId ?? undefined } },
+                { memory: { sessionId } },
+                { memory: { userId: null, sessionId: null } }
+            ]
+        },
+        include: { memory: true }, orderBy: { id: 'desc' }, take: 1000
+    });
 
-    if (!scored.length) return [];
+    type Hit = { text: string; score: number; kind: 'message' | 'memory' };
+    const hits: Hit[] = [];
 
-    const scoredIds = new Set(scored.map(s => s.id));
-    const candidate = mems
-        .filter(m => scoredIds.has(m.id))
-        .map(m => ({ id: m.id, type: m.type, text: m.value, score: scored.find(s => s.id === m.id)?.score ?? 0 }));
+    for (const e of msgEms) {
+        const v = e.vector as unknown as number[];
+        const s = cosine(qvec, v);
+        hits.push({ text: e.message?.content || '', score: s + 0.01, kind: 'message' });
+    }
+    for (const e of memEms) {
+        const v = e.vector as unknown as number[];
+        const s = cosine(qvec, v);
+        let txt = e.memory?.value || '';
+        // khi push hit memory:
+        const k = e.memory?.key || '';
+        let bonus = 0;
+        if (k.startsWith('KB:CANONICAL:QA:')) bonus += 0.08;   // ưu tiên cao hơn
+        if (k.startsWith('KB:PRODUCT:')) bonus += 0.02;
 
-    if (cohere && candidate.length) {
-        const { results } = await cohere.rerank({
-            model: "rerank-multilingual-v3.0",
-            query,
-            documents: candidate.map(c => c.text),
-            topN: Math.min(topK, candidate.length),
-        });
-        return results.map(r => candidate[r.index]);
+        hits.push({ text: e.memory?.value || '', score: s + bonus, kind: 'memory' });
+
     }
 
-    return candidate.slice(0, topK);
+    hits.sort((a, b) => b.score - a.score);
+    return hits.slice(0, topK).map(h => ({ text: h.text, score: h.score, kind: h.kind }));
 }

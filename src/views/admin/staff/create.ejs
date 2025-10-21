@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Thêm nhân viên - LaptopShop</title>
+    <link href="/admin/css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/admin/css/staff/create.css">
+    <style>
+
+    </style>
+</head>
+
+<body class="sb-nav-fixed">
+    <%- include('../layout/header'); -%>
+        <div id="layoutSidenav">
+            <%- include('../layout/sidenav'); -%>
+
+                <div id="layoutSidenav_content">
+                    <main>
+                        <div class="container-fluid px-4">
+                            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+                                <h1 class="page-title h3"><i class="fa-solid fa-user-plus me-2"></i> Thêm nhân viên</h1>
+                                <a href="/admin/staff" class="btn btn-outline-light"><i
+                                        class="fa-solid fa-arrow-left"></i> Quay lại</a>
+                            </div>
+
+                            <div class="card glass mb-4">
+                                <div class="card-header"><i class="fa-solid fa-id-badge me-2"></i> Thông tin cơ bản
+                                </div>
+                                <div class="card-body">
+                                    <form id="staffForm" method="post" action="/admin/handle-create-staff"
+                                        enctype="multipart/form-data">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Họ tên</label>
+                                                <input name="fullName" class="form-control" required />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Email / Username</label>
+                                                <input name="username" type="email" class="form-control" required />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Mật khẩu</label>
+                                                <input name="password" type="password" class="form-control" />
+                                                <div class="form-text text-light-50">Để trống nếu bạn gửi thông tin đăng
+                                                    nhập sau.</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Điện thoại</label>
+                                                <input name="phone" class="form-control" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Địa chỉ</label>
+                                                <input name="address" class="form-control" />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Role</label>
+                                                <select name="role" id="roleSelect" class="form-select" required>
+                                                    <% roles.forEach(function(r){ %>
+                                                        <option value="<%= r.id %>">
+                                                            <%= r.name %>
+                                                        </option>
+                                                        <% }) %>
+                                                </select>
+                                                <div class="mt-1"><span class="badge-role" id="roleHint">Quyền theo vai
+                                                        trò</span></div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Trạng thái</label>
+                                                <select name="status" class="form-select">
+                                                    <option value="ACTIVE" selected>Đang hoạt động</option>
+                                                    <option value="INACTIVE">Tạm khoá</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Avatar</label>
+                                                <input type="file" name="avatar" class="form-control"
+                                                    accept="image/*" />
+                                            </div>
+                                        </div>
+
+                                        <hr class="my-4" />
+
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="m-0">Phân quyền (bật/tắt)</h5>
+                                            <div class="d-flex gap-2">
+                                                <input id="searchPerm" class="form-control form-control-sm searchbox"
+                                                    placeholder="Tìm quyền (vd: sản phẩm, đơn hàng, xem, sửa...)" />
+                                                <button type="button" id="btnCheckAll" class="btn btn-soft btn-sm">Bật
+                                                    tất cả</button>
+                                                <button type="button" id="btnUncheckAll" class="btn btn-soft btn-sm">Tắt
+                                                    tất cả</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- VÙNG PERMISSIONS -->
+                                        <div id="permContainer">
+                                            <% Object.keys(permGroups).sort().forEach(function(groupKey){ const
+                                                items=permGroups[groupKey]; const groupTitle=(VN_GROUP[groupKey] ||
+                                                groupKey.toUpperCase()); %>
+                                                <div class="mb-3 perm-group" data-group="<%= groupKey %>">
+                                                    <div class="group-header">
+                                                        <div class="fw-bold">
+                                                            <%= groupTitle %>
+                                                        </div>
+                                                        <div class="d-flex gap-2">
+                                                            <button type="button" class="btn btn-soft btn-sm"
+                                                                data-cmd="on" data-group="<%= groupKey %>">Bật
+                                                                nhóm</button>
+                                                            <button type="button" class="btn btn-soft btn-sm"
+                                                                data-cmd="off" data-group="<%= groupKey %>">Tắt
+                                                                nhóm</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="perm-grid">
+                                                        <% items.forEach(function(p){ const id='perm_' +
+                                                            p.replace(/[^a-z0-9]/gi,'_'); const parts=p.split('.');
+                                                            const res=parts[0]||''; const act=parts[1]||''; const
+                                                            resVN=(VN_GROUP[res] || res.toUpperCase()); const
+                                                            actVN=({view:"Xem", create:"Tạo", update:"Sửa",
+                                                            delete:"Xoá", manage:"Quản lý", edit:"Chỉnh sửa",
+                                                            refund:"Hoàn tiền"} )[act] || act.toUpperCase(); %>
+                                                            <label class="perm-item" data-perm="<%= p %>">
+                                                                <span class="switch off" data-toggle="<%= p %>">
+                                                                    <input type="checkbox" data-perm="<%= p %>" />
+                                                                    <span class="knob"></span>
+                                                                    <span class="txt on">ON</span>
+                                                                    <span class="txt off">OFF</span>
+                                                                </span>
+                                                                <span class="d-flex flex-column">
+                                                                    <span class="perm-name">
+                                                                        <%= resVN %>: <strong>
+                                                                                <%= actVN %>
+                                                                            </strong>
+                                                                    </span>
+                                                                    <span class="perm-help"><code><%= p %></code></span>
+                                                                </span>
+                                                            </label>
+                                                            <% }) %>
+                                                    </div>
+                                                </div>
+                                                <% }) %>
+                                        </div>
+
+                                        <!-- nơi nhét hidden inputs ALLOW/DENY -->
+                                        <div id="permHidden"></div>
+
+                                        <div class="mt-4 d-flex gap-2">
+                                            <a href="/admin/staff" class="btn btn-outline-secondary">Quay lại</a>
+                                            <button class="btn btn-primary btn-brand" type="submit">Tạo nhân
+                                                viên</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                    <%- include('../layout/footer'); -%>
+                </div>
+        </div>
+
+        <!-- nhúng dữ liệu rolePermMap & group an toàn -->
+        <meta id="rbac-data" data-rolemap="<%= encodeURIComponent(JSON.stringify(rolePermMap || {})) %>">
+
+        <script>
+            (function () {
+                const meta = document.getElementById('rbac-data');
+                let ROLEMAP = {};
+                try { ROLEMAP = JSON.parse(decodeURIComponent(meta.dataset.rolemap || '%7B%7D')); } catch { }
+                const form = document.getElementById('staffForm');
+                const roleSel = document.getElementById('roleSelect');
+                const roleHint = document.getElementById('roleHint');
+                const permHidden = document.getElementById('permHidden');
+                const searchBox = document.getElementById('searchPerm');
+
+                // ——— helpers ———
+                const allSwitches = () => Array.from(document.querySelectorAll('.switch[data-toggle]'));
+                const setSwitch = (sw, on) => {
+                    const input = sw.querySelector('input[type="checkbox"]');
+                    if (on) { sw.classList.add('on'); sw.classList.remove('off'); input.checked = true; }
+                    else { sw.classList.add('off'); sw.classList.remove('on'); input.checked = false; }
+                };
+                const getCheckedPerms = () =>
+                    allSwitches().filter(sw => sw.classList.contains('on')).map(sw => sw.getAttribute('data-toggle'));
+
+                // click toggle
+                document.querySelectorAll('.switch[data-toggle]').forEach(sw => {
+                    sw.addEventListener('click', (e) => {
+                        if (e.target.tagName === 'INPUT') return;
+                        const on = !sw.classList.contains('on');
+                        setSwitch(sw, on);
+                        roleHint.textContent = 'Tuỳ chỉnh từ vai trò';
+                    });
+                });
+
+                // Bật/Tắt theo group
+                document.querySelectorAll('[data-cmd]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const group = btn.getAttribute('data-group');
+                        const on = btn.getAttribute('data-cmd') === 'on';
+                        document.querySelectorAll(`.perm-group[data-group="${group}"] .switch[data-toggle]`).forEach(sw => setSwitch(sw, on));
+                        roleHint.textContent = 'Tuỳ chỉnh từ vai trò';
+                    });
+                });
+
+                // Chọn tất cả / Bỏ tất cả
+                document.getElementById('btnCheckAll').addEventListener('click', () => {
+                    allSwitches().forEach(sw => setSwitch(sw, true));
+                    roleHint.textContent = 'Tuỳ chỉnh từ vai trò';
+                });
+                document.getElementById('btnUncheckAll').addEventListener('click', () => {
+                    allSwitches().forEach(sw => setSwitch(sw, false));
+                    roleHint.textContent = 'Tuỳ chỉnh từ vai trò';
+                });
+
+                // Tìm kiếm
+                searchBox.addEventListener('input', () => {
+                    const q = searchBox.value.trim().toLowerCase();
+                    document.querySelectorAll('.perm-item').forEach(item => {
+                        const text = item.innerText.toLowerCase();
+                        const key = item.getAttribute('data-perm') || '';
+                        item.style.display = (text.includes(q) || key.includes(q)) ? '' : 'none';
+                    });
+                });
+
+                // Load mặc định theo role (khi role thay đổi)
+                function applyRole(roleId) {
+                    const base = ROLEMAP[roleId] || [];
+                    const baseSet = new Set(base);
+                    allSwitches().forEach(sw => {
+                        const key = sw.getAttribute('data-toggle');
+                        setSwitch(sw, baseSet.has(key));
+                    });
+                    roleHint.textContent = 'Quyền theo vai trò';
+                }
+
+                roleSel.addEventListener('change', () => {
+                    applyRole(roleSel.value);       // 👈 lấy roleId từ value
+                });
+                // init lần đầu
+                applyRole(roleSel.value);
+
+                // Trước khi submit: tính ALLOW / DENY từ khác biệt với role
+                form.addEventListener('submit', (e) => {
+                    const roleId = roleSel.value;                  // 👈 id
+                    const base = new Set(ROLEMAP[roleId] || []);
+                    const now = new Set(getCheckedPerms().filter(Boolean));
+
+                    const allow = [...now].filter(p => !base.has(p));
+                    const deny = [...base].filter(p => !now.has(p));
+
+                    permHidden.innerHTML = '';
+                    allow.forEach(p => {
+                        const i = document.createElement('input');
+                        i.type = 'hidden'; i.name = 'permsAllow[]'; i.value = p;
+                        permHidden.appendChild(i);
+                    });
+                    deny.forEach(p => {
+                        const i = document.createElement('input');
+                        i.type = 'hidden'; i.name = 'permsDeny[]'; i.value = p;
+                        permHidden.appendChild(i);
+                    });
+                });
+
+            })();
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+            crossorigin="anonymous"></script>
+        <script src="/admin/js/scripts.js"></script>
+</body>
+
+</html>

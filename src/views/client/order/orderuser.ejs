@@ -120,24 +120,36 @@
                                         </div>
 
                                         <!-- NHẮC ĐÁNH GIÁ: hiện khi đã giao và chưa đánh giá -->
-                                        <% const isDelivered=order.status==='DELIVERED' ; %>
-                                            <% const isReviewed=order.isReviewed===true; /* Đổi theo field của bạn nếu
-                                                khác */ %>
-                                                <% if (isDelivered && !isReviewed) { %>
-                                                    <div class="alert alert-success d-flex align-items-center justify-content-between mt-3 mb-0"
-                                                        role="alert">
-                                                        <div class="me-3">
-                                                            <i class="fas fa-star me-2"></i>
-                                                            Đơn hàng của bạn đã được giao. Hãy đánh giá để giúp chúng
-                                                            tôi phục vụ tốt hơn!
-                                                        </div>
-                                                        <!-- Đổi route này nếu bạn đánh giá theo từng sản phẩm -->
-                                                        <a href="/orders/<%= order.id %>/review"
-                                                            class="btn btn-outline-success btn-sm">
-                                                            Đánh giá ngay
-                                                        </a>
+                                        <% var isDelivered=(order.status==='DELIVERED' );var items=order.orderDetails ||
+                                            []; var first=items.length ? items[0] : null; var pid=first ?
+                                            (first.productId || (first.product ? first.product.id : null)) : null; var
+                                            reviewed=false; if (first && typeof first.hasReviewed !=='undefined' ) {
+                                            reviewed=!!first.hasReviewed; } else { reviewed=(order.isReviewed===true); }
+                                            %>
+
+                                            <% if (isDelivered && pid) { %>
+                                                <% if (reviewed) { %>
+                                                    <div class="alert alert-success mt-3 mb-0" role="alert">
+                                                        <i class="fas fa-check-circle me-2"></i>
+                                                        Cảm ơn bạn đã đánh giá!
                                                     </div>
-                                                    <% } %>
+                                                    <% } else { %>
+                                                        <div class="alert alert-success d-flex align-items-center justify-content-between mt-3 mb-0"
+                                                            role="alert">
+                                                            <div class="me-3">
+                                                                <i class="fas fa-star me-2"></i>
+                                                                Đơn hàng của bạn đã được giao. Hãy đánh giá để giúp
+                                                                chúng tôi phục vụ tốt hơn!
+                                                            </div>
+                                                            <a href="/product/<%= pid %>?review=1#reviewsSection"
+                                                                class="btn btn-outline-success btn-sm">
+                                                                Đánh giá ngay
+                                                            </a>
+                                                        </div>
+                                                        <% } %>
+                                                            <% } %>
+
+
                                     </div>
                                 </div>
                             </div>
@@ -204,6 +216,19 @@
                     new bootstrap.Toast(toastEl).show();
                     sessionStorage.setItem(shownKey, '1');
                 })();
+            </script>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    var url = new URL(window.location.href);
+                    var open = (url.searchParams.get('review') === '1') || (url.hash.indexOf('reviews') !== -1);
+                    if (open) {
+                        var acc = document.getElementById('accReviews');
+                        if (acc) acc.classList.add('show');
+                        var sec = document.getElementById('reviewsSection');
+                        if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
             </script>
 
 </body>

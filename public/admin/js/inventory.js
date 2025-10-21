@@ -1,10 +1,49 @@
 (function () {
+  // ===== 1) Danh sách hãng (theo bạn cung cấp) =====
+  const factoryOptions = [
+    { value: "APPLE",     name: "Apple (MacBook)" },
+    { value: "ASUS",      name: "Asus" },
+    { value: "LENOVO",    name: "Lenovo" },
+    { value: "DELL",      name: "Dell" },
+    { value: "LG",        name: "LG" },
+    { value: "ACER",      name: "Acer" },
+    { value: "HP",        name: "HP" },
+    { value: "MSI",       name: "MSI" },
+    { value: "GIGABYTE",  name: "Gigabyte" },
+    { value: "ALIENWARE", name: "Alienware" },
+  ];
+
+  // ===== 2) DOM gốc =====
   const $body   = document.getElementById('invBody');
   const $search = document.getElementById('invSearch');
   const $filter = document.getElementById('invFilter');
   const $reload = document.getElementById('invReload');
 
-  // Modal điều chỉnh
+  // ===== 3) Tạo control "Hãng" (không cần sửa EJS) =====
+  function ensureFactoryControl() {
+    const toolbar = $reload ? $reload.parentElement : null;
+    let $factory = document.getElementById('invFactory'); // nếu có sẵn thì dùng
+
+    if (!$factory && toolbar) {
+      $factory = document.createElement('select');
+      $factory.id = 'invFactory';
+      $factory.className = 'form-select';
+      $factory.style.width = '200px';
+
+      // build options từ factoryOptions
+      const opts = ['<option value="all">Tất cả hãng</option>'].concat(
+        factoryOptions.map(o => `<option value="${o.value}">${o.name}</option>`)
+      );
+      $factory.innerHTML = opts.join('');
+
+      // chèn trước invFilter
+      toolbar.insertBefore($factory, $filter || $reload);
+    }
+    return $factory;
+  }
+  const $factory = ensureFactoryControl();
+
+  // ===== 4) Modal điều chỉnh =====
   const adjustEl = document.getElementById('invAdjustModal');
   const adjustModal = new bootstrap.Modal(adjustEl);
   const $form = document.getElementById('invAdjustForm');
@@ -14,7 +53,7 @@
   const $qty  = document.getElementById('invQty');
   const $note = document.getElementById('invNote');
 
-  // Modal Sửa ngưỡng
+  // ===== 5) Modal sửa ngưỡng =====
   const reorderEl = document.getElementById('invReorderModal');
   const reorderModal = new bootstrap.Modal(reorderEl);
   const $rePid   = document.getElementById('reProductId');
@@ -22,8 +61,16 @@
   const $reLevel = document.getElementById('reLevel');
   const $reForm  = document.getElementById('reorderForm');
 
-  // Toast mini
-  function toast(title, body, tone) {
+  // ===== 6) State =====
+  const state = {
+    data: [],
+    search: '',
+    filter:  ($filter?.value  || 'all'), // all | oos | low
+    factory: ($factory?.value || 'all')  // all | APPLE | ASUS | ...
+  };
+
+  // ===== 7) Toast mini =====
+  function toast(title, body) {
     const wrap = document.createElement('div');
     wrap.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:99999';
     wrap.innerHTML = `
@@ -42,11 +89,59 @@
     return '<span class="badge bg-success">OK</span>';
   }
 
+  // ===== 8) Map/Detect brand trên từng record =====
+  // Ưu tiên code (APPLE/ASUS/...), fallback đoán theo tên sản phẩm nếu thiếu field.
+  const brandKeywords = {
+    APPLE:     ['apple','macbook'],
+    ASUS:      ['asus'],
+    LENOVO:    ['lenovo'],
+    DELL:      ['dell'],
+    LG:        ['lg'],
+    ACER:      ['acer'],
+    HP:        ['hp','hewlett packard'],
+    MSI:       ['msi'],
+    GIGABYTE:  ['gigabyte'],
+    ALIENWARE: ['alienware']
+  };
+
+  function getFactoryCode(r) {
+    // các field có thể có trong API của bạn:
+    let code =
+      (r?.factory) || (r?.brandCode) || (r?.brand?.code) || (r?.manufacturer?.code) ||
+      (typeof r?.brand === 'string' ? r.brand : null);
+
+    if (code) {
+      code = String(code).toUpperCase().trim();
+      if (factoryOptions.some(o => o.value === code)) return code;
+    }
+
+    // đoán theo tên sản phẩm
+    const name = String(r?.name || '').toLowerCase();
+    for (const [k, arr] of Object.entries(brandKeywords)) {
+      if (arr.some(word => name.includes(word))) return k;
+    }
+    return null; // không xác định
+  }
+
+  function getFactoryNameByCode(code) {
+    const f = factoryOptions.find(o => o.value === code);
+    return f ? f.name : 'Khác';
+  }
+
+  // ===== 9) Tạo 1 dòng HTML =====
   function rowHtml(r) {
+    const factoryCode = getFactoryCode(r);
+    const factoryName = factoryCode ? getFactoryNameByCode(factoryCode) : 'Khác';
+
+    const nameCell = `
+      <div class="fw-semibold">${r.name}</div>
+      <div class="small text-muted">Hãng: ${factoryName}</div>
+    `;
+
     return `
-      <tr data-id="${r.id}" data-name="${r.name}" data-reorder="${r.reorderLevel}">
+      <tr data-id="${r.id}" data-name="${r.name}" data-reorder="${r.reorderLevel || 0}" data-factory="${factoryCode || ''}">
         <td>${r.id}</td>
-        <td>${r.name}</td>
+        <td>${nameCell}</td>
         <td class="text-end">${r.onHand}</td>
         <td class="text-end">${r.available}</td>
         <td class="text-end">
@@ -62,38 +157,71 @@
     `;
   }
 
+  // ===== 10) Render + lọc =====
+  function applyAndRender() {
+    let items = [...state.data];
+
+    // search
+    if (state.search) {
+      const k = state.search;
+      items = items.filter(r => (r.name || '').toLowerCase().includes(k) || String(r.id||'').includes(k));
+    }
+
+    // filter tồn
+    items = items.filter(r => {
+      const onHand = Number(r.onHand ?? 0);
+      const reorder = Number(r.reorderLevel ?? 0);
+      if (state.filter === 'oos') return onHand <= 0 || r.status === 'OOS';
+      if (state.filter === 'low') return (onHand > 0 && onHand <= reorder) || r.status === 'LOW';
+      return true;
+    });
+
+    // filter Hãng
+    if (state.factory !== 'all') {
+      items = items.filter(r => getFactoryCode(r) === state.factory);
+    }
+
+    // render
+    if (!items.length) {
+      $body.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">Không có sản phẩm nào.</td></tr>`;
+      return;
+    }
+    $body.innerHTML = items.map(rowHtml).join('');
+  }
+
+  // ===== 11) Load dữ liệu từ server (giữ nguyên endpoint cũ) =====
   async function load() {
     const params = new URLSearchParams();
-    const s = ($search.value || '').trim();
+    const s = ($search?.value || '').trim();
     if (s) params.set('search', s);
-    params.set('filter', $filter.value || 'all');
+    params.set('filter', $filter?.value || 'all');
+
+    // Nếu server của bạn đã hỗ trợ lọc hãng, bạn có thể bật dòng dưới:
+    // if ($factory && $factory.value !== 'all') params.set('factory', $factory.value);
 
     try {
       const r = await fetch(`/admin/api/inventory?${params.toString()}`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const data = await r.json();
-
-      if (!Array.isArray(data) || data.length === 0) {
-        $body.innerHTML = `
-          <tr><td colspan="7" class="text-center text-muted py-4">Không có sản phẩm nào.</td></tr>`;
-        return;
-      }
-
-      $body.innerHTML = data.map(rowHtml).join('');
-    } catch (err) {
-      console.error('Load inventory error:', err);
-      $body.innerHTML = `
-        <tr><td colspan="7" class="text-center text-danger py-4">
-          Không tải được dữ liệu tồn kho.
-        </td></tr>`;
+      const arr = Array.isArray(data) ? data : (data.items || []);
+      state.data = arr;
+      applyAndRender();
+    } catch (e) {
+      console.error('Load inventory error:', e);
+      $body.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Không tải được dữ liệu tồn kho.</td></tr>`;
     }
   }
 
-  $reload.addEventListener('click', load);
-  $filter.addEventListener('change', load);
-  $search.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); load(); } });
+  // ===== 12) Sự kiện thanh công cụ =====
+  $reload?.addEventListener('click', load);
+  $filter?.addEventListener('change', e => { state.filter  = e.target.value;  applyAndRender(); });
+  $factory?.addEventListener('change', e => { state.factory = e.target.value; applyAndRender(); });
+  $search?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); state.search = ($search.value||'').trim().toLowerCase(); applyAndRender(); }
+  });
+  $search?.addEventListener('input', e => { state.search = (e.target.value||'').trim().toLowerCase(); });
 
-  // Delegation: Nhập / Xuất / Sửa ngưỡng
+  // ===== 13) Delegation: nhập/xuất/sửa ngưỡng =====
   document.addEventListener('click', (e) => {
     const tr = e.target.closest('tr[data-id]');
     if (!tr) return;
@@ -103,36 +231,23 @@
     const reorder = Number(tr.dataset.reorder || '0');
 
     if (e.target.closest('.inv-adjust-in')) {
-      $pid.value = String(id);
-      $pname.textContent = name;
-      $type.value = 'IN';
-      $qty.value = '';
-      $note.value = '';
-      adjustModal.show();
-      return;
+      $pid.value = String(id); $pname.textContent = name; $type.value = 'IN';
+      $qty.value = ''; $note.value = ''; adjustModal.show(); return;
     }
-
     if (e.target.closest('.inv-adjust-out')) {
-      $pid.value = String(id);
-      $pname.textContent = name;
-      $type.value = 'OUT';
-      $qty.value = '';
-      $note.value = '';
-      adjustModal.show();
-      return;
+      $pid.value = String(id); $pname.textContent = name; $type.value = 'OUT';
+      $qty.value = ''; $note.value = ''; adjustModal.show(); return;
     }
-
     if (e.target.closest('.inv-set-reorder')) {
-      $rePid.value = String(id);
-      $reName.textContent = name;
+      $rePid.value = String(id); $reName.textContent = name;
       $reLevel.value = isFinite(reorder) ? String(reorder) : '5';
-      reorderModal.show();
-      return;
+      reorderModal.show(); return;
     }
   });
 
-  // Submit điều chỉnh
-  $form.addEventListener('submit', async (e) => {
+  // ===== 14) Submit điều chỉnh =====
+  const $formEl = document.getElementById('invAdjustForm');
+  $formEl.addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = {
       productId: Number($pid.value),
@@ -140,61 +255,42 @@
       qty: Number($qty.value),
       note: $note.value || ''
     };
-    if (!Number.isFinite(payload.qty) || !payload.qty) {
-      toast('Lỗi', 'Số lượng không hợp lệ.', 'error');
-      return;
-    }
+    if (!Number.isFinite(payload.qty) || !payload.qty) { toast('Lỗi', 'Số lượng không hợp lệ.'); return; }
 
     const r = await fetch('/admin/api/inventory/adjust', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     const j = await r.json().catch(()=> ({}));
-    if (!r.ok) {
-      toast('Điều chỉnh thất bại', j.error || 'Không thể điều chỉnh.', 'error');
-      return;
-    }
-    adjustModal.hide();
-    toast('Thành công', 'Đã cập nhật tồn kho.', 'ok');
-    load();
+    if (!r.ok) { toast('Điều chỉnh thất bại', j.error || 'Không thể điều chỉnh.'); return; }
+    adjustModal.hide(); toast('Thành công', 'Đã cập nhật tồn kho.'); load();
   });
 
-  // Submit sửa ngưỡng
-  $reForm.addEventListener('submit', async (e) => {
+  // ===== 15) Submit sửa ngưỡng =====
+  const $reFormEl = document.getElementById('reorderForm');
+  $reFormEl.addEventListener('submit', async (e) => {
     e.preventDefault();
     const pid = Number($rePid.value);
     const level = Math.max(0, Number($reLevel.value) || 0);
-
     const r = await fetch('/admin/api/inventory/reorder', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ productId: pid, level })
     });
     const j = await r.json().catch(()=> ({}));
-
-    if (!r.ok) {
-      reorderModal.hide();
-      toast('Không cập nhật được', j.error || 'Cần migrate DB để có cột reorderLevel.', 'warn');
-      return;
-    }
-    reorderModal.hide();
-    toast('Đã cập nhật', `Ngưỡng cảnh báo mới: ${level}`, 'ok');
-    load();
+    if (!r.ok) { reorderModal.hide(); toast('Không cập nhật được', j.error || 'Cần migrate DB có cột reorderLevel.'); return; }
+    reorderModal.hide(); toast('Đã cập nhật', `Ngưỡng cảnh báo mới: ${level}`); load();
   });
 
-  // Socket inventory warnings
+  // ===== 16) Socket cảnh báo =====
   const socket = window.__adminSocket || (window.__adminSocket = io());
   socket.on('connect', () => socket.emit('join-admin-room'));
   socket.on('inventory:low', (p) => {
-    toast(p.status === 'OOS' ? 'Hết hàng!' : 'Tồn thấp!',
-      `#${p.productId} ${p.name}: còn ${p.quantity} (ngưỡng ${p.reorderLevel}).`);
+    toast(p.status === 'OOS' ? 'Hết hàng!' : 'Tồn thấp!', `#${p.productId} ${p.name}: còn ${p.quantity} (ngưỡng ${p.reorderLevel}).`);
   });
-  socket.on('inventory:low_stock', (p) => { // tương thích tên cũ
-    toast(p.quantity <= 0 ? 'Hết hàng!' : 'Tồn thấp!',
-      `#${p.productId} ${p.name}: còn ${p.onHand ?? p.quantity}.`);
+  socket.on('inventory:low_stock', (p) => {
+    toast((p.onHand ?? p.quantity) <= 0 ? 'Hết hàng!' : 'Tồn thấp!', `#${p.productId} ${p.name}: còn ${p.onHand ?? p.quantity}.`);
   });
 
-  // first load
+  // ===== 17) First load =====
   load();
 })();

@@ -21,7 +21,7 @@ const router = express.Router();
 
 const apiRoutes = (app: Express) => {
     // ------------------ Public routes ------------------
-    router.post("/add-product-to-cart", postAddProductToCartAPI);
+    router.post("/add-product-to-cart", checkValidJWT, postAddProductToCartAPI);
     router.post("/login", loginAPI);
     // router.post("/login", postLogin);
     router.post("/refresh", refreshToken);
@@ -44,6 +44,26 @@ const apiRoutes = (app: Express) => {
     router.post("/products/:id/questions", checkValidJWT, postProductQuestionAPI);
     // Q&A: admin trả lời
     router.post("/questions/:id/replies", checkValidJWT, postAdminReplyAPI);
+    router.get('/cart/count', checkValidJWT, async (req: any, res) => {
+        res.set('Cache-Control', 'no-store'); // 👈
+        const uid = Number(req.user?.id);
+        if (!uid) return res.status(401).json({ message: 'Unauthorized' });
+
+        const cart = await prisma.cart.findFirst({
+            where: { userId: uid /*, status: 'OPEN'*/ },
+            orderBy: { id: 'desc' },
+            select: { id: true }
+        });
+
+        let count = 0;
+        if (cart) {
+            const agg = await prisma.cartDetail.aggregate({
+                where: { cartId: cart.id }, _sum: { quantity: true }
+            });
+            count = Number(agg._sum.quantity || 0);
+        }
+        res.json({ ok: true, count });
+    });
 
     // 🔎 Search APIs
     app.get("/api/suggest", suggestProducts);

@@ -1,75 +1,54 @@
-// src/services/ai/memory.service.ts
-import OpenAI from "openai";
-import { prisma } from "config/client";
-import { upsertMemoryEmbedding } from "./embedding.service";
-import 'dotenv/config';
-import crypto from "crypto";
+import { prisma } from 'config/client';
+import { LocalProvider } from './vendor/local';
+import { upsertMemoryEmbedding } from './embedding.service';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const provider = new LocalProvider();
 
-const MEMORY_PROMPT = `
-Bạn là bộ lọc "trí nhớ" cho trợ lý. Từ hội thoại (history + user_msg + assistant_msg),
-hãy trích tối đa 0-3 FACT NGẮN, hữu ích cho tương lai (không trùng lặp, không riêng tư nhạy cảm).
-Mỗi item: {type:"PREFERENCE"|"FACT"|"EPHEMERAL", key:string, value:string, score:0..1}.
-Chỉ lưu khi score>0.6. Trả MẢNG JSON, không giải thích thêm.
+type Mem = { type: 'PREFERENCE' | 'FACT' | 'EPHEMERAL', key: string, value: string, score?: number, ttl_hours?: number };
+
+const SYS = `
+Bạn là module TRÍCH XUẤT KÝ ỨC cho chatbot bán laptop.
+Trả về duy nhất JSON:
+{"items":[{"type":"PREFERENCE|FACT|EPHEMERAL","key":"...", "value":"...", "score":0.5, "ttl_hours": 2}]}
+- PREFERENCE: sở thích (hãng, cân nặng, kích cỡ, ngân sách quen thuộc…)
+- FACT: dữ kiện bền vững (chuyên ngành, nghề…)
+- EPHEMERAL: tạm thời (filter lần này), cần ttl_hours.
+Không thêm chữ ngoài JSON.
 `;
 
-const PII_RE = /(\b\d{9,12}\b)|((\+?84|0)\d{9,10})|([\w.-]+@[\w.-]+\.[A-Za-z]{2,})/g;
-
-function sigMem(type: string, key: string, value: string) {
-    return crypto.createHash("sha256").update(`${type}\n${key}\n${value}`).digest("hex");
-}
-
-export async function maybeStoreMemories(opts: {
-    userId?: number;
-    sessionId: number;
-    historySnippet: string;
-    userMsg: string;
-    assistantMsg: string;
+export async function maybeStoreMemories(params: {
+    userId: number | null, sessionId: number, historySnippet: string, userMsg: string, assistantMsg: string
 }) {
-    const { userId, sessionId, historySnippet, userMsg, assistantMsg } = opts;
+    const { userId, sessionId, historySnippet, userMsg, assistantMsg } = params;
+    const prompt = `HỘI THOẠI:\n${historySnippet}\n\nUSER: ${userMsg}\nASSISTANT: ${assistantMsg}`;
 
-    const sys = { role: "system" as const, content: MEMORY_PROMPT };
-    const usr = { role: "user" as const, content: JSON.stringify({ history: historySnippet, user_msg: userMsg, assistant_msg: assistantMsg }) };
+    let obj: { items?: Mem[] } = {};
+    try {
+        const { content } = await provider.chat([
+            { role: 'system', content: SYS },
+            { role: 'user', content: prompt }
+        ], { temperature: 0.1 });
+        obj = JSON.parse(content || '{}');
+    } catch { }
 
-    const out = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [sys, usr],
-        temperature: 0.2,
-        response_format: { type: "json_object" }
-    });
-
-    let items: any[] = [];
-    try { items = JSON.parse(out.choices[0].message.content || "[]"); } catch { }
-    if (!Array.isArray(items)) return;
-
+    const items = Array.isArray(obj.items) ? obj.items : [];
     for (const it of items) {
-        const value = String(it?.value || "");
-        if (!value || (it.score ?? 0) < 0.6) continue;
-        if (PII_RE.test(value)) continue;
-
-        const type = String(it.type || "FACT");
-        const key = String(it.key || "auto");
-        const sig = sigMem(type, key, value);
-
-        const exist = await prisma.aiMemory.findFirst({ where: { sessionId, key: sig } });
-        if (exist) {
-            await prisma.aiMemory.update({
-                where: { id: exist.id },
-                data: { score: Math.min(1, Math.max(exist.score, Number(it.score || 0.6))), createdAt: new Date() }
-            });
-            continue;
-        }
+        const type = (it.type || 'EPHEMERAL') as Mem['type'];
+        const score = typeof it.score === 'number' ? it.score : (type === 'PREFERENCE' ? 0.8 : type === 'FACT' ? 0.7 : 0.5);
+        const ttlH = typeof it.ttl_hours === 'number' ? it.ttl_hours : (type === 'EPHEMERAL' ? 2 : undefined);
+        const expiresAt = ttlH ? new Date(Date.now() + ttlH * 3600 * 1000) : null;
 
         const mem = await prisma.aiMemory.create({
             data: {
-                userId, sessionId, type,
-                key: sig,
-                value,
-                score: Number(it.score || 0.6),
-                expiresAt: type === "EPHEMERAL" ? new Date(Date.now() + 7 * 24 * 3600 * 1000) : null
+                userId: userId ?? undefined,
+                sessionId,
+                type,
+                key: it.key?.slice(0, 255) || 'info',
+                value: it.value || '',
+                score,
+                expiresAt: expiresAt ?? undefined
             }
         });
-        await upsertMemoryEmbedding(mem.id, mem.value);
+        await upsertMemoryEmbedding(mem.id, `${mem.key}: ${mem.value}`);
     }
 }

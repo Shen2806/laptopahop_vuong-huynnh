@@ -47,13 +47,7 @@
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <link href="/client/css/home/show.css" rel="stylesheet">
-    <style>
-
-    </style>
-
 </head>
-
-
 <body>
 
     <!-- Spinner Start -->
@@ -82,9 +76,12 @@
                             <section class="mt-5">
                                 <h2 class="fire-title-wrapper ">
                                     <span class="fire-title ">
-                                        <span>Sản phẩm khuyến mãi</span>
-                                    </span>
-
+                                        <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcmJqeW0xZ2Nsc3o5Z245amhwdXozY3NlbGQyanFycXd3OG1ycG9ybSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KPVJXH61g2jHkdqZES/giphy.gif"
+                                            alt="fire" class="fire-gif"> <span>Sản phẩm khuyến
+                                            mãi</span> </span>
+                                    <video autoplay loop muted playsinline class="fire-bg">
+                                        <source src="https://i.imgur.com/J6J4pP6.mp4" type="video/mp4">
+                                    </video>
                                 </h2>
                                 <!-- Swiper container -->
                                 <div class="swiper promo-swiper">
@@ -1151,456 +1148,877 @@
             </div>
             <!-- nội dung end-->
 
-            <!-- Câu hỏi thường gặp Start -->
-            <div class="container">
-                <div class="wrap">
-                    <h2 class="faq-title">Câu hỏi thường gặp</h2>
+            <!-- Features Section Start -->
+            <%- include('../layout/feature'); -%>
+                <!-- Features Section End -->
 
-                    <!-- 1. Cách chọn mua đúng chuẩn -->
-                    <details class="faq">
-                        <summary>
-                            <span class="q">Làm sao để chọn mua laptop đúng chuẩn?</span>
-                            <span class="caret" aria-hidden></span>
-                        </summary>
-                        <div class="faq__body">
-                            <p>Để chọn máy hợp nhu cầu và chi phí, bạn nên ưu tiên:</p>
-                            <ul>
-                                <li>Xác định <strong>nhu cầu chính</strong> (văn phòng, đồ hoạ, gaming, di động).</li>
-                                <li>Chọn <strong>CPU</strong> phù hợp (i5/R5 trở lên cho đa số người dùng).</li>
-                                <li><strong>RAM</strong> tối thiểu 8GB (khuyến nghị 16GB cho đa nhiệm).</li>
-                                <li><strong>SSD</strong> từ 512GB; 1TB nếu làm dự án lớn.</li>
-                                <li><strong>GPU rời</strong> khi cần render/game; tích hợp là đủ cho văn phòng.</li>
-                                <li>Kích thước, độ phân giải <strong>màn hình</strong> & thời lượng <strong>pin</strong>
-                                    mong muốn.</li>
-                                <li><strong>Cổng kết nối</strong> cần thiết: USB‑C/Thunderbolt, HDMI/DP, SD…</li>
-                            </ul>
-                        </div>
-                    </details>
+                <!-- Câu hỏi thường gặp Start -->
+                <div class="container">
+                    <div class="wrap">
+                        <h2 class="faq-title">Câu hỏi thường gặp</h2>
 
-                    <!-- 2. Bao nhiêu RAM là đủ -->
-                    <details class="faq">
-                        <summary>
-                            <span class="q">Nên chọn mua laptop bao nhiêu RAM là đủ?</span>
-                            <span class="caret" aria-hidden></span>
-                        </summary>
-                        <div class="faq__body">
-                            <ul>
-                                <li><strong>8GB</strong>: lướt web, Office, học trực tuyến.</li>
-                                <li><strong>16GB</strong>: đa nhiệm, lập trình cơ bản, chỉnh ảnh nhẹ.</li>
-                                <li><strong>16–32GB</strong>: đồ hoạ, dựng phim, máy ảo, dev nặng.</li>
-                            </ul>
-                            <p>Mẹo: ưu tiên máy có khe nâng cấp RAM (dual‑channel) để tối ưu hiệu năng.</p>
-                        </div>
-                    </details>
+                        <!-- 1. Cách chọn mua đúng chuẩn -->
+                        <details class="faq">
+                            <summary>
+                                <span class="q">Làm sao để chọn mua laptop đúng chuẩn?</span>
+                                <span class="caret" aria-hidden></span>
+                            </summary>
+                            <div class="faq__body">
+                                <p>Để chọn máy hợp nhu cầu và chi phí, bạn nên ưu tiên:</p>
+                                <ul>
+                                    <li>Xác định <strong>nhu cầu chính</strong> (văn phòng, đồ hoạ, gaming, di động).
+                                    </li>
+                                    <li>Chọn <strong>CPU</strong> phù hợp (i5/R5 trở lên cho đa số người dùng).</li>
+                                    <li><strong>RAM</strong> tối thiểu 8GB (khuyến nghị 16GB cho đa nhiệm).</li>
+                                    <li><strong>SSD</strong> từ 512GB; 1TB nếu làm dự án lớn.</li>
+                                    <li><strong>GPU rời</strong> khi cần render/game; tích hợp là đủ cho văn phòng.</li>
+                                    <li>Kích thước, độ phân giải <strong>màn hình</strong> & thời lượng
+                                        <strong>pin</strong>
+                                        mong muốn.
+                                    </li>
+                                    <li><strong>Cổng kết nối</strong> cần thiết: USB‑C/Thunderbolt, HDMI/DP, SD…</li>
+                                </ul>
+                            </div>
+                        </details>
 
-                    <!-- 3. Sinh viên nên mua gì -->
-                    <details class="faq">
-                        <summary>
-                            <span class="q">Sinh viên nên mua laptop như thế nào?</span>
-                            <span class="caret" aria-hidden></span>
-                        </summary>
-                        <div class="faq__body">
-                            <ul>
-                                <li>CPU i5/R5, <strong>RAM 16GB</strong>, SSD 512GB.</li>
-                                <li>Màn hình 14" FHD chống chói; trọng lượng &lt; 1.5kg.</li>
-                                <li>Pin thực tế 7–10 giờ; sạc USB‑C 65W.</li>
-                                <li>Ngân sách tham khảo: 10–15 triệu tuỳ ngành học.</li>
-                            </ul>
-                        </div>
-                    </details>
+                        <!-- 2. Bao nhiêu RAM là đủ -->
+                        <details class="faq">
+                            <summary>
+                                <span class="q">Nên chọn mua laptop bao nhiêu RAM là đủ?</span>
+                                <span class="caret" aria-hidden></span>
+                            </summary>
+                            <div class="faq__body">
+                                <ul>
+                                    <li><strong>8GB</strong>: lướt web, Office, học trực tuyến.</li>
+                                    <li><strong>16GB</strong>: đa nhiệm, lập trình cơ bản, chỉnh ảnh nhẹ.</li>
+                                    <li><strong>16–32GB</strong>: đồ hoạ, dựng phim, máy ảo, dev nặng.</li>
+                                </ul>
+                                <p>Mẹo: ưu tiên máy có khe nâng cấp RAM (dual‑channel) để tối ưu hiệu năng.</p>
+                            </div>
+                        </details>
 
-                    <!-- 4. Thu cũ đổi mới (generic, không nêu tên hãng) -->
-                    <details class="faq">
-                        <summary>
-                            <span class="q">Có chương trình thu cũ đổi mới laptop không?</span>
-                            <span class="caret" aria-hidden></span>
-                        </summary>
-                        <div class="faq__body">
-                            <p>Nhiều cửa hàng có áp dụng <em>thu cũ đổi mới</em> tuỳ điều kiện máy và thời điểm. Bạn
-                                nên:</p>
-                            <ul>
-                                <li>Chuẩn bị hoá đơn/biên nhận, phụ kiện kèm theo.</li>
-                                <li>Sao lưu dữ liệu, đăng xuất tài khoản trước khi mang máy.</li>
-                                <li>Hỏi rõ cách định giá, mức hỗ trợ chênh lệch và hình thức trả góp (nếu có).</li>
-                            </ul>
-                        </div>
-                    </details>
+                        <!-- 3. Sinh viên nên mua gì -->
+                        <details class="faq">
+                            <summary>
+                                <span class="q">Sinh viên nên mua laptop như thế nào?</span>
+                                <span class="caret" aria-hidden></span>
+                            </summary>
+                            <div class="faq__body">
+                                <ul>
+                                    <li>CPU i5/R5, <strong>RAM 16GB</strong>, SSD 512GB.</li>
+                                    <li>Màn hình 14" FHD chống chói; trọng lượng &lt; 1.5kg.</li>
+                                    <li>Pin thực tế 7–10 giờ; sạc USB‑C 65W.</li>
+                                    <li>Ngân sách tham khảo: 10–15 triệu tuỳ ngành học.</li>
+                                </ul>
+                            </div>
+                        </details>
 
-                    <!-- 5. Trả góp & hồ sơ -->
-                    <details class="faq">
-                        <summary>
-                            <span class="q">Chính sách trả góp có hỗ trợ và hồ sơ thế nào?</span>
-                            <span class="caret" aria-hidden></span>
-                        </summary>
-                        <div class="faq__body">
-                            <p>Thông thường có các hình thức: qua thẻ tín dụng, công ty tài chính hoặc kỳ hạn ngân hàng.
-                            </p>
-                            <ul>
-                                <li>Ưu đãi lãi suất có thể 0% theo từng đợt khuyến mãi.</li>
-                                <li>Hồ sơ cơ bản: CCCD/CMND, bằng lái/SHK; thẻ tín dụng nếu trả góp qua thẻ.</li>
-                                <li>Kỳ hạn phổ biến: 3–6–12 tháng; có thể khác tuỳ đối tác.</li>
-                            </ul>
-                            <p class="note">Lưu ý: nội dung trên chỉ là mẫu tham khảo. Hãy cập nhật điều kiện thực tế
-                                tại cửa hàng/đơn vị của bạn.</p>
-                        </div>
-                    </details>
-                </div>
-            </div>
-            <!-- Câu hỏi thường gặp end-->
+                        <!-- 4. Thu cũ đổi mới (generic, không nêu tên hãng) -->
+                        <details class="faq">
+                            <summary>
+                                <span class="q">Có chương trình thu cũ đổi mới laptop không?</span>
+                                <span class="caret" aria-hidden></span>
+                            </summary>
+                            <div class="faq__body">
+                                <p>Nhiều cửa hàng có áp dụng <em>thu cũ đổi mới</em> tuỳ điều kiện máy và thời điểm. Bạn
+                                    nên:</p>
+                                <ul>
+                                    <li>Chuẩn bị hoá đơn/biên nhận, phụ kiện kèm theo.</li>
+                                    <li>Sao lưu dữ liệu, đăng xuất tài khoản trước khi mang máy.</li>
+                                    <li>Hỏi rõ cách định giá, mức hỗ trợ chênh lệch và hình thức trả góp (nếu có).</li>
+                                </ul>
+                            </div>
+                        </details>
 
-
-
-            <!-- === RÙA AI — chatbox === -->
-            <div id="aiTurtle" class="ai-turtle">
-                <button id="aiTurtleBtn" class="ai-turtle__btn" aria-label="Mở Rùa AI">
-                    <!-- Turtle SVG -->
-                    <span class="ai-pulse" aria-hidden="true"></span>
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M5 12c0-3.31 3.13-6 7-6s7 2.69 7 6-3.13 6-7 6-7-2.69-7-6Z" fill="#fff" opacity=".9" />
-                        <path d="M7 12h10M9 14.5h6" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" />
-                        <circle cx="9" cy="10" r="1" fill="#16a34a" />
-                        <circle cx="15" cy="10" r="1" fill="#16a34a" />
-                    </svg>
-                </button>
-
-                <div id="aiTurtleCard" class="ai-turtle__card ai-enter" role="dialog" aria-label="Rùa AI tư vấn">
-                    <div class="ai-chat__header">
-                        <div>
-                            <div class="ai-chat__title">Rùa AI tư vấn</div>
-                            <div class="ai-kicker">Hỏi gì về laptop cũng đáp 👋</div>
-                        </div>
-                        <button id="aiTurtleClose" class="ai-chat__close">Đóng</button>
-                    </div>
-
-                    <div id="aiChatBody" class="ai-chat__body">
-                        <div class="ai-msg ai-bot">
-                            <div class="ai-msg__bubble">Chào bạn! Mình có thể gợi ý laptop theo ngân sách, nhu cầu
-                                (gaming, đồ họa, văn phòng), cân nặng… Bạn cứ hỏi nha.</div>
-                        </div>
-                        <div id="aiTyping" class="ai-typing">Rùa AI đang nhập…</div>
-                    </div>
-
-                    <div class="ai-suggest">
-                        <button class="ai-chip" data-q="Tư vấn laptop gaming tầm 20 triệu">Gaming ~20 triệu</button>
-                        <button class="ai-chip" data-q="Laptop văn phòng nhẹ dưới 1.3kg, pin tốt, giá 15-25 triệu">Văn
-                            phòng
-                            nhẹ</button>
-                        <button class="ai-chip" data-q="So sánh MacBook Air M1 và M2 để đi học">So sánh Mac</button>
-                        <button class="ai-chip" data-q="Máy dưới 12 triệu cho sinh viên IT, ưu tiên RAM 16GB">
-                            <=12tr cho SV</button>
-                    </div>
-
-                    <div class="ai-chat__footer">
-                        <form id="aiForm" class="ai-input">
-                            <input id="aiInput" placeholder="Nhập câu hỏi… (Enter để gửi, Shift+Enter xuống dòng)" />
-                            <button id="aiSend" type="submit">Gửi</button>
-                        </form>
+                        <!-- 5. Trả góp & hồ sơ -->
+                        <details class="faq">
+                            <summary>
+                                <span class="q">Chính sách trả góp có hỗ trợ và hồ sơ thế nào?</span>
+                                <span class="caret" aria-hidden></span>
+                            </summary>
+                            <div class="faq__body">
+                                <p>Thông thường có các hình thức: qua thẻ tín dụng, công ty tài chính hoặc kỳ hạn ngân
+                                    hàng.
+                                </p>
+                                <ul>
+                                    <li>Ưu đãi lãi suất có thể 0% theo từng đợt khuyến mãi.</li>
+                                    <li>Hồ sơ cơ bản: CCCD/CMND, bằng lái/SHK; thẻ tín dụng nếu trả góp qua thẻ.</li>
+                                    <li>Kỳ hạn phổ biến: 3–6–12 tháng; có thể khác tuỳ đối tác.</li>
+                                </ul>
+                                <p class="note">Lưu ý: nội dung trên chỉ là mẫu tham khảo. Hãy cập nhật điều kiện thực
+                                    tế
+                                    tại cửa hàng/đơn vị của bạn.</p>
+                            </div>
+                        </details>
                     </div>
                 </div>
-            </div>
+                <!-- Câu hỏi thường gặp end-->
 
+                <%- include('../partials/ai-turtle'); -%>
 
-            <!-- Footer Start -->
-            <%- include('../layout/footer'); -%>
-                <!-- Footer End -->
+                    <!-- === RÙA AI — chatbox === -->
+                    <!-- Rùa AI – WebLLM (miễn phí, chạy client) -->
+                    <script type="module">
+                        import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
 
-                <!-- Back to Top -->
-                <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-                        class="fa fa-arrow-up"></i></a>
-
-                <!-- JavaScript Libraries -->
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-                <script src="/client/lib/easing/easing.min.js"></script>
-                <script src="/client/lib/waypoints/waypoints.min.js"></script>
-                <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-                <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
-
-                <!-- Template Javascript -->
-                <script src="/client/js/main.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
-                    integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
-                    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-                <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
-
-                <script>
-                    var swiper = new Swiper('.promo-swiper', {
-                        loop: true,                 // vòng lặp vô hạn
-                        slidesPerView: 3,           // luôn hiển thị 3 sản phẩm
-                        slidesPerGroup: 1,          // mỗi lần trượt chỉ dịch 1 sản phẩm
-                        spaceBetween: 30,           // khoảng cách giữa các sản phẩm
-                        autoplay: {
-                            delay: 2000,
-                            disableOnInteraction: false, // không tắt khi user bấm
-                            stopOnLastSlide: false,      // không dừng ở cuối
-                        },
-                        navigation: {
-                            nextEl: '.swiper-button-next',
-                            prevEl: '.swiper-button-prev',
-                        },
-                        pagination: {
-                            el: '.swiper-pagination',
-                            clickable: true,
-                        },
-                    });
-
-                    /*tin tức công nghệ*/
-                    var newsSwiper = new Swiper(".news-swiper", {
-                        slidesPerView: 3,
-                        spaceBetween: 20,
-                        loop: true,
-                        autoplay: {
-                            delay: 2000,
-                            disableOnInteraction: false,
-                        },
-                        pagination: {
-                            el: ".news-swiper .swiper-pagination",
-                            clickable: true,
-                        },
-                        navigation: {
-                            nextEl: ".news-swiper .swiper-button-next",
-                            prevEl: ".news-swiper .swiper-button-prev",
-                        },
-                    });
-                </script>
-
-                <script>
-                    /*animation*/
-                    // 1) Gán hiệu ứng cho phần tử theo selector (không cần sửa EJS)
-                    document.addEventListener('DOMContentLoaded', () => {
-                        const attachReveal = (selector, effect = 'fade-up', step = 0) => {
-                            const els = document.querySelectorAll(selector);
-                            els.forEach((el, i) => {
-                                el.setAttribute('data-reveal', effect);
-                                if (step) el.style.setProperty('--reveal-delay', (i * step) + 'ms');
-                            });
-                        };
-
-                        // Tiêu đề/section
-                        attachReveal('.fire-title-wrapper', 'fade-up', 0);
-                        attachReveal('#tech-news .d-flex', 'fade-up', 0); // header của tin tức
-                        attachReveal('.tab-class h1', 'fade-up', 0);
-
-                        // Cards các khu vực
-                        attachReveal('.promo-card', 'zoom-in', 80);  // sản phẩm khuyến mãi (trong swiper)
-                        attachReveal('.fruite-item', 'fade-up', 60);  // lưới sản phẩm nổi bật
-                        attachReveal('.recent-card', 'fade-up', 60);  // đã xem gần đây
-                        attachReveal('.news-card', 'fade-up', 80);  // bài viết
-
-                        // Nếu file feature có class .featurs-item -> cũng animate luôn
-                        attachReveal('.featurs-item', 'fade-up', 80);
-                    });
-
-                    // 2) Observer: khi vào viewport thì hiện ra & unobserve (chỉ hiện 1 lần)
-                    (function () {
-                        const io = new IntersectionObserver((entries, obs) => {
-                            entries.forEach(ent => {
-                                if (ent.isIntersecting) {
-                                    ent.target.classList.add('is-visible');
-                                    obs.unobserve(ent.target);
-                                }
-                            });
-                        }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
-
-                        const hydrate = () => {
-                            document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
-                        };
-
-                        if (document.readyState === 'loading') {
-                            document.addEventListener('DOMContentLoaded', hydrate);
+                        // ==== Guard: không gắn 2 lần ====
+                        if (window.__TURTLE_AI_ACTIVE__) {
+                            console.warn("Turtle AI already mounted");
                         } else {
-                            hydrate();
-                        }
-                    })();
-                </script>
+                            window.__TURTLE_AI_ACTIVE__ = true;
 
-                <!-- Rùa AI -->
-                <script>
-                    (function () {
-                        const $btn = document.getElementById('aiTurtleBtn');
-                        const $card = document.getElementById('aiTurtleCard');
-                        const $close = document.getElementById('aiTurtleClose');
-                        const $body = document.getElementById('aiChatBody');
-                        const $form = document.getElementById('aiForm');
-                        const $input = document.getElementById('aiInput');
-                        const $send = document.getElementById('aiSend');
-                        const $typing = document.getElementById('aiTyping');
-                        const $chipsWrap = document.querySelector('.ai-suggest');
-                        if (!$btn || !$card || !$form) return;
+                            const $ = (id) => document.getElementById(id);
+                            const ui = {
+                                btn: $("aiTurtleBtn"), card: $("aiTurtleCard"), close: $("aiTurtleClose"),
+                                body: $("aiChatBody"), form: $("aiForm"), input: $("aiInput"),
+                                send: $("aiSend"), typing: $("aiTyping"), suggest: document.querySelector(".ai-suggest"),
+                            };
 
-                        /* storage keys */
-                        const SID_KEY = "AI_TURTLE_SID";
-                        const OPEN_KEY = "AI_TURTLE_OPEN";
-                        const HIST_PREFIX = "AI_TURTLE_HISTORY_";
-                        let sessionId = Number(sessionStorage.getItem(SID_KEY) || "") || null;
-                        const histKey = () => HIST_PREFIX + (sessionId || "temp");
-                        const loadJSON = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f } catch { return f } };
-                        const saveJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { } };
-                        const migrateHistory = (oldK, newK) => { if (oldK === newK) return; const a = loadJSON(oldK, []), b = loadJSON(newK, []); if (a.length) saveJSON(newK, [...b, ...a].slice(-200)); try { localStorage.removeItem(oldK) } catch { } };
+                            // ====== Parser VN (mạnh hơn) ======
+                            const NEED_MAP = [
+                                { key: "GAMING", kws: ["gaming", "game", "chơi game", "gamer"] },
+                                { key: "OFFICE", kws: ["văn phòng", "office", "word", "excel"] },
+                                { key: "STUDENT_IT", kws: ["sinh viên it", "sv it", "lập trình", "code", "dev", "it"] },
+                                { key: "CREATOR", kws: ["đồ họa", "đồ hoạ", "thiết kế", "photoshop", "premiere", "edit", "dựng phim", "creator"] },
+                                { key: "MOBILE", kws: ["mỏng nhẹ", "nhẹ", "di chuyển", "portable", "ultrabook"] },
+                                { key: "BUSINESS", kws: ["doanh nhân", "bền bỉ", "bảo mật", "business"] },
+                            ];
+                            const deaccent = (s) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
-                        /* UI */
-                        function openCard() { $card.style.display = 'block'; saveJSON(OPEN_KEY, true); setTimeout(() => $input?.focus(), 80); }
-                        function closeCard() { $card.style.display = 'none'; saveJSON(OPEN_KEY, false); }
-                        $btn.addEventListener('click', openCard);
-                        $close.addEventListener('click', closeCard);
-                        document.querySelectorAll('.ai-chip').forEach(ch => ch.addEventListener('click', () => { $input.value = ch.getAttribute('data-q') || ''; $input.focus(); }));
+                            function detectNeed(s) {
+                                const t = deaccent(s);
+                                for (const g of NEED_MAP) if (g.kws.some(k => t.includes(deaccent(k)))) return g.key;
+                                return null;
+                            }
 
-                        const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-                        function safeFormat(text) { let s = escapeHtml(text || ''); s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); s = s.replace(/\n/g, '<br>'); s = s.replace(/(\/product\/\d{1,10})/g, '<a href="$1" class="text-primary fw-semibold">$1</a>'); return s; }
+                            // “20–25tr”, “từ 15 đến 20”, “~20tr”, “dưới 12”, “>= 18”, …
+                            function parseBudget(text) {
+                                const t = deaccent(text).replace(/\./g, '').replace(/,/g, '').trim();
+                                // range: 15-25 | 15–25 | 15—25 | tu 15 den 25 | từ 15 tới 25
+                                let m = t.match(/(\d{1,3})\s*(?:-|–|—|to|toi|den|d?n|t?i|t?o|t?i|t?u|tu|den|toi|den|t?oi|t?en|t?oi|t?oi|t?oi|toi|den|toi|den|toi|den|toi|den|toi|den|toi|den|toi|den|toi|den|toi|den|t?u|t?oi|den|toi|t?i|t?o|d?n|den|toi|t?i|toi|den)\s*(\d{1,3})\s*(?:tr|trieu|m)?/);
+                                if (m) return [+m[1] * 1e6, +m[2] * 1e6].sort((a, b) => a - b);
 
-                        function pushHist(entry) { const h = loadJSON(histKey(), []); h.push(entry); saveJSON(histKey(), h.slice(-200)); }
+                                // dưới X
+                                m = t.match(/(?:duoi|<|<=)\s*(\d{1,3})\s*(?:tr|trieu|m)?/);
+                                if (m) return [0, +m[1] * 1e6];
 
-                        function appendMsg(role, text, { persist = true } = {}) {
-                            const wrap = document.createElement('div'); wrap.className = 'ai-msg ' + (role === 'user' ? 'ai-user' : 'ai-bot');
-                            const b = document.createElement('div'); b.className = 'ai-msg__bubble';
-                            if (role === 'assistant') b.innerHTML = safeFormat(text); else b.textContent = text;
-                            wrap.appendChild(b); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
-                            if (persist) pushHist({ t: Date.now(), kind: 'text', role, text });
-                        }
+                                // trên X
+                                m = t.match(/(?:tren|>|>=)\s*(\d{1,3})\s*(?:tr|trieu|m)?/);
+                                if (m) { const x = +m[1] * 1e6; return [x, x + 9e12]; }
 
-                        const currencyVND = n => { try { return Number(n || 0).toLocaleString('vi-VN') + '₫' } catch { return (n || 0) + '₫' } };
-                        function appendProducts(products, { persist = true } = {}) {
-                            if (!products || !products.length) return;
-                            const wrap = document.createElement('div'); wrap.className = 'ai-msg ai-bot';
-                            const bubble = document.createElement('div'); bubble.className = 'ai-msg__bubble';
-                            const row = document.createElement('div'); row.className = 'ai-products';
-                            products.forEach(p => {
-                                const a = document.createElement('a'); a.className = 'ai-pcard'; a.href = p.href || ('/product/' + p.id); a.setAttribute('aria-label', p.name);
-                                const img = document.createElement('img'); img.className = 'ai-pimg'; img.loading = 'lazy'; img.src = p.image || '/images/no-image.png'; img.alt = p.name;
-                                const body = document.createElement('div'); body.className = 'ai-pbody';
-                                const title = document.createElement('div'); title.className = 'ai-ptitle'; title.textContent = p.name;
-                                const desc = document.createElement('div'); desc.className = 'ai-pdesc'; desc.textContent = p.shortDesc || '';
-                                const priceRow = document.createElement('div'); priceRow.className = 'ai-price-row';
-                                const sale = document.createElement('div'); sale.className = 'ai-sale'; sale.textContent = currencyVND(p.salePrice ?? p.price);
-                                priceRow.appendChild(sale);
-                                if (p.discount && Number(p.discount) > 0) { const base = document.createElement('div'); base.className = 'ai-base'; base.textContent = currencyVND(p.price); const badge = document.createElement('span'); badge.className = 'ai-badge'; badge.textContent = '-' + p.discount + '%'; priceRow.appendChild(base); priceRow.appendChild(badge); }
-                                const btn = document.createElement('div'); btn.className = 'ai-pbtn'; btn.textContent = 'Xem chi tiết';
-                                body.appendChild(title); if (p.shortDesc) body.appendChild(desc); body.appendChild(priceRow); body.appendChild(btn);
-                                a.appendChild(img); a.appendChild(body); row.appendChild(a);
-                            });
-                            bubble.appendChild(row); wrap.appendChild(bubble); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
-                            if (persist) pushHist({ t: Date.now(), kind: 'products', products });
-                        }
+                                // xấp xỉ / tầm / khoảng / ~20
+                                m = t.match(/(?:~|tam|khoang|xap xi)?\s*(\d{1,3})\s*(?:tr|trieu|m)?/);
+                                if (m) { const x = +m[1]; const pad = x >= 25 ? 5 : 3; return [(x - pad) * 1e6, (x + pad) * 1e6]; }
 
-                        function renderChips(list) {
-                            if (!$chipsWrap || !Array.isArray(list) || !list.length) return;
-                            $chipsWrap.innerHTML = '';
-                            list.slice(0, 6).forEach(text => {
-                                const btn = document.createElement('button'); btn.className = 'ai-chip'; btn.type = 'button'; btn.textContent = text; btn.setAttribute('data-q', text);
-                                btn.addEventListener('click', () => { $input.value = text; $input.focus(); });
-                                $chipsWrap.appendChild(btn);
-                            });
-                        }
-                        // ===== NEW: render dạng DANH SÁCH chi tiết + nút Xem chi tiết =====
-                        function appendProductList(products, { persist = true } = {}) {
-                            if (!products || !products.length) return;
-                            const wrap = document.createElement('div'); wrap.className = 'ai-msg ai-bot';
-                            const bubble = document.createElement('div'); bubble.className = 'ai-msg__bubble';
+                                return null;
+                            }
 
-                            const list = document.createElement('div'); list.className = 'ai-list';
-                            products.forEach((p, idx) => {
-                                const item = document.createElement('div'); item.className = 'ai-li';
+                            // ====== Prompt & Few-shot ======
+                            const SYSTEM_PROMPT = `
+Bạn là "Rùa AI" – trợ lý tư vấn laptop của cửa hàng.
+Nguyên tắc:
+1) Nếu đã có **nhu cầu** + **ngân sách** → Trả lời ngay, KHÔNG hỏi lại.
+2) Nếu thiếu 1 trong 2 → hỏi làm rõ đúng 1 tin ngắn (tối đa 2 câu).
+3) Trả lời tiếng Việt, ngắn gọn, có bullet và **Lời khuyên** ở cuối.
+4) Không bịa giá của cửa hàng; nếu cần ghi "(giá tham khảo thị trường)".
 
-                                const title = document.createElement('div'); title.className = 'ai-li__title';
-                                title.innerHTML = `<span class="ai-li__index">${idx + 1}.</span> <strong>${p.name}</strong>`;
-                                item.appendChild(title);
+Mặc định theo nhu cầu:
+- Gaming (~20±3tr): i5/R5 H, RAM 16GB, SSD ≥512GB, RTX 3050/4050, 15.6" 144Hz.
+- Văn phòng/di động: ≤1.3kg, pin ≥50Wh, sạc USB-C PD, RAM 16GB, SSD 512GB.
+- Đồ hoạ: i7/R7 + RTX 4060↑, RAM 16–32GB, màn 100% sRGB (IPS/OLED), SSD 1TB.
+- SV IT: i5/R5, RAM 16GB, SSD 512GB, đủ cổng (USB-C, HDMI), Wi-Fi 6.
 
-                                if (p.specs || p.shortDesc) {
-                                    const spec = document.createElement('div'); spec.className = 'ai-li__row';
-                                    spec.innerHTML = `<span class="ai-li__label">Cấu hình:</span> ${p.specs || p.shortDesc}`;
-                                    item.appendChild(spec);
+Khi đủ thông tin, xuất:
+Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y triệu):
+- **Gợi ý 1 (đặc tính)**: CPU … / GPU … / RAM … / SSD … / Màn …  Ưu: … • Nhược: …
+- **Gợi ý 2**: …
+- **Gợi ý 3**: …
+**Lời khuyên:** … (1–2 câu).
+  `.trim();
+
+                            const FEWSHOT = [
+                                { role: "user", content: "Tư vấn laptop gaming tầm 20 triệu" },
+                                {
+                                    role: "assistant", content:
+                                        `Gợi ý nhanh (giá tham khảo thị trường, ~17–23 triệu):
+- **Gợi ý 1 (cân bằng)**: i5-12500H / RTX 4050 / RAM 16GB / SSD 512GB / 15.6" 144Hz — Ưu: FPS ổn; Nhược: pin trung bình.
+- **Gợi ý 2 (mát & bền)**: R7-6800H / RTX 3060 / 16GB / 512GB / 15.6" 144Hz — Ưu: đa luồng khỏe; Nhược: GPU đời trước.
+- **Gợi ý 3 (ưu màn)**: i7-12700H / RTX 3050Ti / 16GB / 512GB / 15.6" 144Hz — Ưu: hiển thị đẹp; Nhược: GPU yếu hơn 4050.
+**Lời khuyên:** Ưu tiên RAM 16GB dual-channel, kiểm tra tản nhiệt & bảo hành.`
                                 }
+                            ];
 
-                                const priceLine = document.createElement('div'); priceLine.className = 'ai-li__row';
-                                const priceTxt = p.priceText || (((p.salePrice ?? p.price) || 0).toLocaleString('vi-VN') + '₫');
-                                priceLine.innerHTML = `<span class="ai-li__label">Giá tham khảo:</span> ${priceTxt}`;
-                                item.appendChild(priceLine);
+                            // ====== UI helpers ======
+                            const escapeHtml = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+                            const safeText = (s) => escapeHtml(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\n/g, "<br>");
+                            function append(role, text) {
+                                const row = document.createElement("div");
+                                row.className = "ai-msg " + (role === "user" ? "ai-user" : "ai-bot");
+                                const b = document.createElement("div"); b.className = "ai-msg__bubble";
+                                b.innerHTML = role === "assistant" ? safeText(text) : escapeHtml(text);
+                                row.appendChild(b); ui.body.appendChild(row); ui.body.scrollTop = ui.body.scrollHeight;
+                            }
 
-                                const cta = document.createElement('div'); cta.className = 'ai-li__cta';
-                                const a = document.createElement('a'); a.href = p.href || ('/product/' + p.id);
-                                a.className = 'ai-btn'; a.textContent = 'Xem chi tiết';
-                                cta.appendChild(a); item.appendChild(cta);
+                            // ====== Engine + state ======
+                            let engine = null, busy = false, askedOnce = false;
+                            let lastNeed = null, lastBudget = null; // nhớ theo phiên UI
+                            const base = [{ role: "system", content: SYSTEM_PROMPT }, ...FEWSHOT];
+                            const history = [...base];
 
-                                list.appendChild(item);
-                            });
-
-                            bubble.appendChild(list); wrap.appendChild(bubble); $body.appendChild(wrap);
-                            $body.scrollTop = $body.scrollHeight;
-                            if (persist) pushHist({ t: Date.now(), kind: 'product-list', products });
-                        }
-
-                        // rehydrate
-                        (function () {
-                            if (!!loadJSON(OPEN_KEY, false)) $card.style.display = 'block';
-                            const hist = loadJSON(histKey(), []);
-                            if (hist.length) { $body.innerHTML = ''; hist.forEach(it => { if (it.kind === 'text') appendMsg(it.role, it.text, { persist: false }); if (it.kind === 'products') appendProducts(it.products, { persist: false }); }); $body.scrollTop = $body.scrollHeight; }
-                        })();
-
-                        async function sendMessage(text) {
-                            appendMsg('user', text);
-                            $typing.style.display = 'block'; $send.disabled = true; $input.disabled = true;
-                            try {
-                                const res = await fetch('/api/ai/chat', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    credentials: 'same-origin',
-                                    body: JSON.stringify({ message: text, sessionId, meta: { page: 'home_show', ts: Date.now() } })
+                            async function ensureEngine() {
+                                if (engine) return engine;
+                                if (!("gpu" in navigator)) {
+                                    append("assistant", "Thiết bị chưa hỗ trợ WebGPU. Dùng Chrome/Edge mới để dùng chatbot miễn phí.");
+                                    throw new Error("No WebGPU");
+                                }
+                                append("assistant", "Đang tải mô hình lần đầu (~vài trăm MB) …");
+                                engine = await CreateMLCEngine({
+                                    model: "Llama-3-8B-Instruct-q4f16_1-MLC",
+                                    initProgressCallback(p) {
+                                        const last = ui.body.querySelector(".ai-msg.ai-bot:last-child .ai-msg__bubble");
+                                        if (last && p) last.textContent = `Đang tải mô hình… ${Math.round((p.progress || 0) * 100)}%`;
+                                    }
                                 });
-                                if (!res.ok) throw new Error('HTTP ' + res.status);
-                                const data = await res.json().catch(() => ({}));
+                                const last = ui.body.querySelector(".ai-msg.ai-bot:last-child .ai-msg__bubble");
+                                if (last) last.textContent = "Mình đã sẵn sàng. Bạn cần tư vấn như thế nào?";
+                                return engine;
+                            }
 
-                                if (data?.sessionId && data.sessionId !== sessionId) {
-                                    const oldKey = histKey(); sessionId = data.sessionId;
-                                    sessionStorage.setItem(SID_KEY, String(sessionId));
-                                    const newKey = histKey(); migrateHistory(oldKey, newKey);
+                            function buildPrompt(userText) {
+                                const need = detectNeed(userText) || lastNeed;
+                                const budget = parseBudget(userText) || lastBudget; // [min,max] VND
+
+                                const hasEnough = !!need && !!budget;
+                                if (need) lastNeed = need;
+                                if (budget) lastBudget = budget;
+
+                                let ctx = "";
+                                if (hasEnough) {
+                                    ctx = [
+                                        "[BỐI CẢNH CÓ CẤU TRÚC]",
+                                        `nhu_cau=${need}`,
+                                        `ngan_sach_vnd_min=${budget[0]}`,
+                                        `ngan_sach_vnd_max=${budget[1]}`,
+                                        "khong_hoi_lai=true",
+                                        "[/BỐI CẢNH CÓ CẤU TRÚC]"
+                                    ].join("\n");
                                 }
+                                const ask = hasEnough
+                                    ? "Dựa trên BỐI CẢNH CÓ CẤU TRÚC, hãy trả lời ngay theo mẫu."
+                                    : (!askedOnce
+                                        ? "Thiếu nhu cầu hoặc ngân sách. Hỏi lại đúng 1–2 câu ngắn (VNĐ), không vòng vo."
+                                        : // đã hỏi 1 lần rồi mà vẫn thiếu -> đưa gợi ý chung, không hỏi nữa
+                                        "Không đủ thông tin. Đưa gợi ý chung ngắn gọn theo từng nhu cầu phổ biến.");
 
-                                const hasProducts = Array.isArray(data.products) && data.products.length > 0;
-                                const reply = (typeof data.reply === 'string' ? data.reply.trim() : '');
-                                if (hasProducts) {
-                                    if (data.format === 'list') appendProductList(data.products);
-                                    else appendProducts(data.products); // mặc định card
-                                } else if (reply) {
-                                    appendMsg('assistant', reply);
-                                } else {
-                                    appendMsg('assistant', 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!');
-                                }
+                                return { hasEnough, prompt: `${ctx}\nNgười dùng: """${userText}"""\n${ask}` };
+                            }
 
+                            async function ask(userText) {
+                                if (!userText || busy) return;
+                                append("user", userText);
+                                ui.typing.style.display = "block"; ui.send.disabled = true; ui.input.disabled = true; busy = true;
+                                try {
+                                    const e = await ensureEngine();
+                                    const { hasEnough, prompt } = buildPrompt(userText);
 
-                                // render filters nếu server trả
-                                if (data?.activeFilters) {
-                                    const chips = [];
-                                    if (data.activeFilters.brand) chips.push('Hãng: ' + data.activeFilters.brand);
-                                    if (data.activeFilters.target) chips.push('Nhu cầu: ' + data.activeFilters.target);
-                                    if (data.activeFilters.min || data.activeFilters.max) chips.push('Ngân sách: ' + ((data.activeFilters.min || 0) / 1e6) + '–' + (data.activeFilters.max ? (data.activeFilters.max / 1e6) : '∞') + 'tr');
-                                    if (chips.length) renderChips(chips);
-                                }
+                                    let msgs;
+                                    if (hasEnough) {
+                                        askedOnce = false; // reset vì đã đủ
+                                        msgs = [{ role: "system", content: SYSTEM_PROMPT }, ...FEWSHOT, { role: "user", content: prompt }];
+                                    } else {
+                                        if (!askedOnce) askedOnce = true;
+                                        history.push({ role: "user", content: prompt });
+                                        msgs = history;
+                                    }
 
-                                if (Array.isArray(data.suggestions) && data.suggestions.length) renderChips(data.suggestions);
-                            } catch (e) {
-                                console.error(e); appendMsg('assistant', 'Có lỗi kết nối máy chủ. Vui lòng thử lại sau nhé.');
-                            } finally {
-                                $typing.style.display = 'none'; $send.disabled = false; $input.disabled = false; $input.focus();
+                                    const out = await e.chat.completions.create({
+                                        messages: msgs,
+                                        temperature: hasEnough ? 0.15 : 0.25,
+                                        top_p: 0.9, frequency_penalty: 0.2, presence_penalty: 0.0, max_tokens: 520
+                                    });
+                                    const reply = out?.choices?.[0]?.message?.content || "Xin lỗi, mình chưa trả lời được.";
+                                    if (!hasEnough) history.push({ role: "assistant", content: reply });
+                                    append("assistant", reply);
+                                } catch (err) { console.error(err); append("assistant", "Có lỗi khi xử lý trên trình duyệt. Bạn thử lại giúp mình nhé."); }
+                                finally { ui.typing.style.display = "none"; ui.send.disabled = false; ui.input.disabled = false; busy = false; ui.input.focus(); }
+                            }
+
+                            // ==== wiring UI ====
+                            if (ui.btn && ui.card && ui.form) {
+                                ui.btn.addEventListener("click", () => { ui.card.style.display = "block"; setTimeout(() => ui.input?.focus(), 100); });
+                                ui.close.addEventListener("click", () => { ui.card.style.display = "none"; });
+                                ui.form.addEventListener("submit", (e) => { e.preventDefault(); const v = (ui.input.value || "").trim(); if (!v) return; ui.input.value = ""; ask(v); });
+                                ui.input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ui.form.dispatchEvent(new Event("submit", { cancelable: true })); } });
+                                ui.suggest?.querySelectorAll(".ai-chip").forEach(ch => ch.addEventListener("click", () => { ui.input.value = ch.getAttribute("data-q") || ""; ui.input.focus(); }));
+                                document.querySelectorAll(".chip[data-q]").forEach(ch => ch.addEventListener("click", () => { ui.card.style.display = "block"; ui.input.value = ch.getAttribute("data-q") || ""; setTimeout(() => ui.input.focus(), 60); }));
                             }
                         }
-
-
-                        $form.addEventListener('submit', e => { e.preventDefault(); const val = ($input.value || '').trim(); if (!val) return; $input.value = ''; sendMessage(val); });
-                        $input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $form.dispatchEvent(new Event('submit', { cancelable: true })); } });
-
-                        // clear local history when logout (bind all logout forms/links)
-                        document.querySelectorAll('form[action="/logout"], a[href="/logout"]').forEach(el => {
-                            el.addEventListener('click', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
-                            el.addEventListener('submit', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
-                        });
-                    })();
-                </script>
+                    </script>
 
 
 
+                    <!-- Footer Start -->
+                    <%- include('../layout/footer'); -%>
+                        <!-- Footer End -->
+
+                        <!-- Back to Top -->
+                        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                                class="fa fa-arrow-up"></i></a>
+
+                        <!-- JavaScript Libraries -->
+                        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+                        <script
+                            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+                        <script src="/client/lib/easing/easing.min.js"></script>
+                        <script src="/client/lib/waypoints/waypoints.min.js"></script>
+                        <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+                        <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+
+                        <!-- Template Javascript -->
+                        <script src="/client/js/main.js"></script>
+                        <script
+                            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
+                            integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
+                            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                        <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+                        <script type="module" src="/client/ai/ai-turtle.js"></script>
+                        <script>
+                            var swiper = new Swiper('.promo-swiper', {
+                                loop: true,                 // vòng lặp vô hạn
+                                slidesPerView: 3,           // luôn hiển thị 3 sản phẩm
+                                slidesPerGroup: 1,          // mỗi lần trượt chỉ dịch 1 sản phẩm
+                                spaceBetween: 30,           // khoảng cách giữa các sản phẩm
+                                autoplay: {
+                                    delay: 2000,
+                                    disableOnInteraction: false, // không tắt khi user bấm
+                                    stopOnLastSlide: false,      // không dừng ở cuối
+                                },
+                                navigation: {
+                                    nextEl: '.swiper-button-next',
+                                    prevEl: '.swiper-button-prev',
+                                },
+                                pagination: {
+                                    el: '.swiper-pagination',
+                                    clickable: true,
+                                },
+                            });
+
+                            /*tin tức công nghệ*/
+                            var newsSwiper = new Swiper(".news-swiper", {
+                                slidesPerView: 3,
+                                spaceBetween: 20,
+                                loop: true,
+                                autoplay: {
+                                    delay: 2000,
+                                    disableOnInteraction: false,
+                                },
+                                pagination: {
+                                    el: ".news-swiper .swiper-pagination",
+                                    clickable: true,
+                                },
+                                navigation: {
+                                    nextEl: ".news-swiper .swiper-button-next",
+                                    prevEl: ".news-swiper .swiper-button-prev",
+                                },
+                            });
+                        </script>
+
+                        <script>
+                            /*animation*/
+                            // 1) Gán hiệu ứng cho phần tử theo selector (không cần sửa EJS)
+                            document.addEventListener('DOMContentLoaded', () => {
+                                const attachReveal = (selector, effect = 'fade-up', step = 0) => {
+                                    const els = document.querySelectorAll(selector);
+                                    els.forEach((el, i) => {
+                                        el.setAttribute('data-reveal', effect);
+                                        if (step) el.style.setProperty('--reveal-delay', (i * step) + 'ms');
+                                    });
+                                };
+
+                                // Tiêu đề/section
+                                attachReveal('.fire-title-wrapper', 'fade-up', 0);
+                                attachReveal('#tech-news .d-flex', 'fade-up', 0); // header của tin tức
+                                attachReveal('.tab-class h1', 'fade-up', 0);
+
+                                // Cards các khu vực
+                                attachReveal('.promo-card', 'zoom-in', 80);  // sản phẩm khuyến mãi (trong swiper)
+                                attachReveal('.fruite-item', 'fade-up', 60);  // lưới sản phẩm nổi bật
+                                attachReveal('.recent-card', 'fade-up', 60);  // đã xem gần đây
+                                attachReveal('.news-card', 'fade-up', 80);  // bài viết
+
+                                // Nếu file feature có class .featurs-item -> cũng animate luôn
+                                attachReveal('.featurs-item', 'fade-up', 80);
+                            });
+
+                            // 2) Observer: khi vào viewport thì hiện ra & unobserve (chỉ hiện 1 lần)
+                            (function () {
+                                const io = new IntersectionObserver((entries, obs) => {
+                                    entries.forEach(ent => {
+                                        if (ent.isIntersecting) {
+                                            ent.target.classList.add('is-visible');
+                                            obs.unobserve(ent.target);
+                                        }
+                                    });
+                                }, { threshold: 0.12, rootMargin: '0px 0px -5% 0px' });
+
+                                const hydrate = () => {
+                                    document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+                                };
+
+                                if (document.readyState === 'loading') {
+                                    document.addEventListener('DOMContentLoaded', hydrate);
+                                } else {
+                                    hydrate();
+                                }
+                            })();
+                        </script>
+
+                        <!-- Rùa AI -->
+                        <script>
+                            (function () {
+                                if (window.__TURTLE_AI_ACTIVE__) return;
+                                const $btn = document.getElementById('aiTurtleBtn');
+                                const $card = document.getElementById('aiTurtleCard');
+                                const $close = document.getElementById('aiTurtleClose');
+                                const $body = document.getElementById('aiChatBody');
+                                const $form = document.getElementById('aiForm');
+                                const $input = document.getElementById('aiInput');
+                                const $send = document.getElementById('aiSend');
+                                const $typing = document.getElementById('aiTyping');
+                                const $chipsWrap = document.querySelector('.ai-suggest');
+                                if (!$btn || !$card || !$form) return;
+
+                                /* storage keys */
+
+                                const OPEN_KEY = "AI_TURTLE_OPEN";
+                                const HIST_PREFIX = "AI_TURTLE_HISTORY_";
+                                const SID_KEY = "AI_TURTLE_SID";
+                                const SID_STORE = localStorage; // dùng localStorage để bền qua điều hướng
+                                const getSID = () => Number(SID_STORE.getItem(SID_KEY) || "") || null;
+                                const setSID = (id) => { try { SID_STORE.setItem(SID_KEY, String(id)); } catch { } };
+                                let sessionId = getSID();
+                                const histKey = () => HIST_PREFIX + (sessionId || "temp");
+
+                                const loadJSON = (k, f) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f } catch { return f } };
+                                const saveJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { } };
+                                const migrateHistory = (oldK, newK) => { if (oldK === newK) return; const a = loadJSON(oldK, []), b = loadJSON(newK, []); if (a.length) saveJSON(newK, [...b, ...a].slice(-200)); try { localStorage.removeItem(oldK) } catch { } };
+
+                                /* UI */
+                                function openCard() { $card.style.display = 'block'; saveJSON(OPEN_KEY, true); setTimeout(() => $input?.focus(), 80); }
+                                function closeCard() { $card.style.display = 'none'; saveJSON(OPEN_KEY, false); }
+                                $btn.addEventListener('click', openCard);
+                                $close.addEventListener('click', closeCard);
+                                document.querySelectorAll('.ai-chip').forEach(ch => ch.addEventListener('click', () => { $input.value = ch.getAttribute('data-q') || ''; $input.focus(); }));
+
+                                // const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+                                function safeFormat(text) { let s = escapeHtml(text || ''); s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); s = s.replace(/\n/g, '<br>'); s = s.replace(/(\/product\/\d{1,10})/g, '<a href="$1" class="text-primary fw-semibold">$1</a>'); return s; }
+
+                                function pushHist(entry) { const h = loadJSON(histKey(), []); h.push(entry); saveJSON(histKey(), h.slice(-200)); }
+
+                                function appendMsg(role, text, { persist = true } = {}) {
+                                    const wrap = document.createElement('div'); wrap.className = 'ai-msg ' + (role === 'user' ? 'ai-user' : 'ai-bot');
+                                    const b = document.createElement('div'); b.className = 'ai-msg__bubble';
+                                    if (role === 'assistant') b.innerHTML = safeFormat(text); else b.textContent = text;
+                                    wrap.appendChild(b); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
+                                    if (persist) pushHist({ t: Date.now(), kind: 'text', role, text });
+                                }
+
+                                const currencyVND = n => { try { return Number(n || 0).toLocaleString('vi-VN') + '₫' } catch { return (n || 0) + '₫' } };
+                                function appendProducts(products, { persist = true } = {}) {
+                                    if (!products || !products.length) return;
+                                    const wrap = document.createElement('div'); wrap.className = 'ai-msg ai-bot';
+                                    const bubble = document.createElement('div'); bubble.className = 'ai-msg__bubble';
+                                    const row = document.createElement('div'); row.className = 'ai-products';
+                                    products.forEach(p => {
+                                        const a = document.createElement('a'); a.className = 'ai-pcard'; a.href = p.href || ('/product/' + p.id); a.setAttribute('aria-label', p.name);
+                                        const img = document.createElement('img'); img.className = 'ai-pimg'; img.loading = 'lazy'; img.src = p.image || '/images/no-image.png'; img.alt = p.name;
+                                        const body = document.createElement('div'); body.className = 'ai-pbody';
+                                        const title = document.createElement('div'); title.className = 'ai-ptitle'; title.textContent = p.name;
+                                        const desc = document.createElement('div'); desc.className = 'ai-pdesc'; desc.textContent = p.shortDesc || '';
+                                        const priceRow = document.createElement('div'); priceRow.className = 'ai-price-row';
+                                        const sale = document.createElement('div'); sale.className = 'ai-sale'; sale.textContent = currencyVND(p.salePrice ?? p.price);
+                                        priceRow.appendChild(sale);
+                                        if (p.discount && Number(p.discount) > 0) { const base = document.createElement('div'); base.className = 'ai-base'; base.textContent = currencyVND(p.price); const badge = document.createElement('span'); badge.className = 'ai-badge'; badge.textContent = '-' + p.discount + '%'; priceRow.appendChild(base); priceRow.appendChild(badge); }
+                                        const btn = document.createElement('div'); btn.className = 'ai-pbtn'; btn.textContent = 'Xem chi tiết';
+                                        body.appendChild(title); if (p.shortDesc) body.appendChild(desc); body.appendChild(priceRow); body.appendChild(btn);
+                                        a.appendChild(img); a.appendChild(body); row.appendChild(a);
+                                    });
+                                    bubble.appendChild(row); wrap.appendChild(bubble); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
+                                    if (persist) pushHist({ t: Date.now(), kind: 'products', products });
+                                }
+                                function appendCompare(cmp, { persist = true } = {}) {
+                                    if (!cmp) return;
+
+                                    const wrap = document.createElement('div');
+                                    wrap.className = 'ai-msg ai-bot';
+                                    const bubble = document.createElement('div');
+                                    bubble.className = 'ai-msg__bubble';
+
+                                    const box = document.createElement('div');
+                                    box.className = 'ai-compare';
+
+                                    const col = (side) => {
+                                        const c = document.createElement('div'); c.className = 'ai-c-col';
+                                        const title = document.createElement('div'); title.className = 'ai-c-title'; title.textContent = side.title || '';
+                                        const dl = document.createElement('div'); dl.className = 'ai-c-specs';
+
+                                        (side.rows || []).forEach(r => {
+                                            const row = document.createElement('div'); row.className = 'ai-c-row';
+                                            const k = document.createElement('div'); k.className = 'ai-c-k'; k.textContent = r.label;
+                                            const v = document.createElement('div'); v.className = 'ai-c-v'; v.textContent = r.value;
+                                            row.appendChild(k); row.appendChild(v); dl.appendChild(row);
+                                        });
+
+                                        const a = document.createElement('a'); a.className = 'ai-btn'; a.href = side.href || '#'; a.textContent = 'Xem chi tiết';
+                                        c.appendChild(title); c.appendChild(dl); c.appendChild(a);
+                                        return c;
+                                    };
+
+                                    const leftCol = col(cmp.left || {});
+                                    const rightCol = col(cmp.right || {});
+
+                                    // Tô cột thắng (nếu backend gửi winner = 'left' | 'right' hoặc isWinner)
+                                    if (cmp.winner === 'left' || cmp.left?.isWinner) leftCol.classList.add('ai-c-col--winner');
+                                    if (cmp.winner === 'right' || cmp.right?.isWinner) rightCol.classList.add('ai-c-col--winner');
+
+                                    box.appendChild(leftCol);
+                                    const vs = document.createElement('div'); vs.className = 'ai-c-vs'; vs.textContent = 'VS';
+                                    box.appendChild(vs);
+                                    box.appendChild(rightCol);
+
+                                    const concl = document.createElement('div'); concl.className = 'ai-c-concl';
+                                    // Hỗ trợ cả conclusion là string hoặc {text, tips[]}
+                                    let conclHTML = '';
+                                    if (typeof cmp.conclusion === 'string') {
+                                        conclHTML = cmp.conclusion.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                                    } else if (cmp.conclusion && cmp.conclusion.text) {
+                                        conclHTML = cmp.conclusion.text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                                        if (Array.isArray(cmp.conclusion.tips) && cmp.conclusion.tips.length) {
+                                            conclHTML += '<ul>' + cmp.conclusion.tips.map(x => `<li>${x}</li>`).join('') + '</ul>';
+                                        }
+                                    } else {
+                                        // fallback gợi ý chung
+                                        conclHTML = 'Nếu ưu tiên hiệu năng/FPS hãy chọn máy có **CPU/GPU mạnh hơn**. Nếu cần di động, ưu tiên **mỏng nhẹ & pin**.';
+                                    }
+                                    concl.innerHTML = conclHTML;
+
+                                    bubble.appendChild(box);
+                                    bubble.appendChild(concl);
+                                    wrap.appendChild(bubble);
+                                    $body.appendChild(wrap);
+                                    $body.scrollTop = $body.scrollHeight;
+
+                                    if (persist) pushHist({ t: Date.now(), kind: 'compare', compare: cmp });
+                                }
+                                // ===== Compare Modal =====
+                                // ========== Compare Modal: up to 4 items ==========
+                                function ensureCompareModal4() {
+                                    let el = document.getElementById('aiCompareBackdrop');
+                                    if (el) return el;
+                                    el = document.createElement('div');
+                                    el.id = 'aiCompareBackdrop';
+                                    el.innerHTML = `
+    <div class="ai-modal" role="dialog" aria-modal="true" aria-label="So sánh sản phẩm">
+      <div class="ai-m-hd">
+        <div>So sánh sản phẩm</div>
+        <button class="ai-m-close" aria-label="Đóng">×</button>
+      </div>
+      <div class="ai-m-bd">
+        <div id="cmpTable" class="cmp-table"></div>
+      </div>
+      <div class="ai-m-ft">
+        <div class="ai-conclusion" id="cmpConclusion"></div>
+        <div class="ai-actions" id="cmpCTAs"></div>
+      </div>
+    </div>`;
+                                    document.body.appendChild(el);
+                                    el.addEventListener('click', e => { if (e.target === el) closeCompareModal4(); });
+                                    el.querySelector('.ai-m-close').addEventListener('click', closeCompareModal4);
+                                    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCompareModal4(); });
+                                    return el;
+                                }
+
+                                function closeCompareModal4() {
+                                    const el = document.getElementById('aiCompareBackdrop');
+                                    if (!el) return;
+                                    el.style.display = 'none';
+                                    document.body.style.overflow = '';
+                                }
+
+                                function escapeHtml(s) { return String(s || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+                                function shorten(s, n = 26) { s = String(s || ''); return s.length > n ? s.slice(0, n - 1) + '…' : s; }
+
+                                /** cmp format:
+                                 * {
+                                 *   items: [{ title, href, rows: [{label, value}] } ... up to 4],
+                                 *   labels?: ["CPU","GPU","RAM","SSD","Màn hình","Giá tham khảo"],
+                                 *   conclusion?: "..."
+                                 * }
+                                 */
+                                function openCompareModal4(cmp) {
+                                    const wrap = ensureCompareModal4();
+                                    const table = wrap.querySelector('#cmpTable');
+                                    const items = (cmp?.items || []).slice(0, 4); // 1–4
+                                    if (!items.length) return;
+
+                                    // Lấy danh sách label (ưu tiên cmp.labels -> hàng của item[0] -> union)
+                                    let labels = Array.isArray(cmp.labels) && cmp.labels.length
+                                        ? cmp.labels
+                                        : (items[0]?.rows?.map(r => r.label) || []);
+                                    if (!labels.length) {
+                                        const set = new Set(); items.forEach(it => (it.rows || []).forEach(r => set.add(r.label)));
+                                        labels = [...set];
+                                    }
+
+                                    // cấu hình grid: 1 cột nhãn + N cột sản phẩm
+                                    const n = items.length;
+                                    table.style.gridTemplateColumns = `180px repeat(${n}, minmax(180px, 1fr))`;
+                                    table.innerHTML = '';
+
+                                    const append = (cls, html) => {
+                                        const d = document.createElement('div'); d.className = cls; d.innerHTML = html; table.appendChild(d);
+                                    };
+
+                                    // header
+                                    append('cmp-th cmp-label-col', 'Thông số');
+                                    items.forEach(it => append('cmp-th prod', escapeHtml(it.title || '')));
+
+                                    // body by labels
+                                    labels.forEach(lbl => {
+                                        // cột label
+                                        append('cmp-td lbl cmp-label-col', escapeHtml(lbl || ''));
+
+                                        // lấy value từng item + đánh dấu khác biệt (nếu không rỗng và không giống nhau)
+                                        const vals = items.map(it => {
+                                            const r = (it.rows || []).find(x => x.label === lbl);
+                                            return r?.value ? String(r.value) : '';
+                                        });
+                                        const allSame = vals.filter(v => v !== '').every(v => v === (vals.find(x => x !== '') || ''));
+
+                                        vals.forEach(v => append(`cmp-td val${allSame ? '' : ' diff'}`, escapeHtml(v)));
+                                    });
+
+                                    // CTA row
+                                    append('cmp-td lbl cmp-label-col', '');
+                                    items.forEach(it => {
+                                        append('cmp-td val', `<a class="ai-btn" href="${escapeHtml(it.href || '#')}" target="_blank" rel="noopener">Xem ${escapeHtml(shorten(it.title || 'sản phẩm'))}</a>`);
+                                    });
+
+                                    // Conclusion
+                                    wrap.querySelector('#cmpConclusion').innerHTML =
+                                        (cmp.conclusion || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+                                    wrap.style.display = 'block';
+                                    document.body.style.overflow = 'hidden';
+                                }
+
+                                // ===== NEW: render dạng DANH SÁCH chi tiết + nút Xem chi tiết =====
+                                function appendProductList(products, { persist = true } = {}) {
+                                    if (!products || !products.length) return;
+                                    const wrap = document.createElement('div'); wrap.className = 'ai-msg ai-bot';
+                                    const bubble = document.createElement('div'); bubble.className = 'ai-msg__bubble';
+
+                                    const list = document.createElement('div'); list.className = 'ai-list';
+                                    products.forEach((p, idx) => {
+                                        const item = document.createElement('div'); item.className = 'ai-li';
+
+                                        const title = document.createElement('div'); title.className = 'ai-li__title';
+                                        // ✅ escape tên sản phẩm
+                                        title.innerHTML = `<span class="ai-li__index">${idx + 1}.</span> <strong>${escapeHtml(p.name || '')}</strong>`;
+                                        item.appendChild(title);
+
+                                        // ✅ escape specs/shortDesc
+                                        const specsText = p.specs || p.shortDesc || '';
+                                        if (specsText) {
+                                            const spec = document.createElement('div'); spec.className = 'ai-li__row';
+                                            spec.innerHTML = `<span class="ai-li__label">Cấu hình:</span> ${escapeHtml(specsText)}`;
+                                            item.appendChild(spec);
+                                        }
+
+                                        // ✅ escape price text
+                                        const priceTxt = p.priceText || (((p.salePrice ?? p.price) || 0).toLocaleString('vi-VN') + '₫');
+                                        const priceLine = document.createElement('div'); priceLine.className = 'ai-li__row';
+                                        priceLine.innerHTML = `<span class="ai-li__label">Giá tham khảo:</span> ${escapeHtml(priceTxt)}`;
+                                        item.appendChild(priceLine);
+
+                                        const cta = document.createElement('div'); cta.className = 'ai-li__cta';
+                                        const a = document.createElement('a'); a.href = p.href || ('/product/' + p.id);
+                                        a.className = 'ai-btn'; a.textContent = 'Xem chi tiết';
+                                        cta.appendChild(a); item.appendChild(cta);
+
+                                        list.appendChild(item);
+                                    });
+
+                                    bubble.appendChild(list); wrap.appendChild(bubble); $body.appendChild(wrap);
+                                    $body.scrollTop = $body.scrollHeight;
+                                    if (persist) pushHist({ t: Date.now(), kind: 'product-list', products });
+                                }
+
+                                // rehydrate
+                                (function () {
+                                    if (!!loadJSON(OPEN_KEY, false)) $card.style.display = 'block';
+                                    // nếu từng lưu ở 'temp' trước đó -> merge vào key hiện tại
+                                    const tempK = HIST_PREFIX + "temp";
+                                    const tempHist = loadJSON(tempK, []);
+                                    if (!getSID() && tempHist.length) saveJSON(histKey(), tempHist);
+
+                                    const hist = loadJSON(histKey(), []);
+                                    const TTL = 2 * 60 * 60 * 1000; // 2h
+                                    const now = Date.now();
+
+                                    if (hist.length) {
+                                        $body.innerHTML = '';
+                                        hist.forEach(it => {
+                                            // bỏ lịch sử quá hạn
+                                            if (it.t && now - it.t > TTL) return;
+
+                                            // ❌ không auto render product cards khi mở chat
+                                            if (it.kind === 'products' || it.kind === 'product-list') return;
+
+                                            if (it.kind === 'text') appendMsg(it.role, it.text, { persist: false });
+                                        });
+                                        $body.scrollTop = $body.scrollHeight;
+                                    } else {
+                                        // local trống -> hỏi server lấy lại danh sách gần nhất
+                                        tryServerRehydrate();
+                                    }
+                                })();
+                                // hỗ trợ back/forward cache: khi quay lại trang, đảm bảo rehydrate
+                                window.addEventListener('pageshow', (e) => {
+                                    if (!loadJSON(histKey(), []).length) tryServerRehydrate();
+                                });
+                                async function tryServerRehydrate() {
+                                    try {
+                                        const sid = sessionId || getSID();
+                                        if (!sid) return;
+                                        const res = await fetch(`/api/ai/session/${sid}/state`, { credentials: 'same-origin' });
+                                        const data = await res.json().catch(() => null);
+                                        if (!data) return;
+
+                                        // nếu lịch sử local trống thì render lại từ server
+                                        const h = loadJSON(histKey(), []);
+                                        if (!h.length) {
+                                            if (Array.isArray(data.products) && data.products.length) {
+                                                appendProducts(data.products);         // persist vào local luôn
+                                            }
+                                            if (data.reply) appendMsg('assistant', data.reply);
+                                        }
+                                    } catch { }
+                                }
+
+
+                                /** Render chip gợi ý / chip filter ở chân chat */
+                                function renderChips(list) {
+                                    if (!$chipsWrap) return;
+                                    $chipsWrap.innerHTML = '';
+
+                                    if (!Array.isArray(list) || list.length === 0) return;
+
+                                    list.slice(0, 6).forEach(text => {
+                                        const btn = document.createElement('button');
+                                        btn.className = 'ai-chip';
+                                        btn.type = 'button';
+                                        btn.textContent = String(text);
+                                        btn.setAttribute('data-q', String(text));
+                                        btn.addEventListener('click', () => {
+                                            const $input = document.getElementById('aiInput');
+                                            if ($input) { $input.value = text; $input.focus(); }
+                                        });
+                                        $chipsWrap.appendChild(btn);
+                                    });
+                                }
+                                async function sendMessage(text) {
+                                    appendMsg('user', text);
+                                    $typing.style.display = 'block';
+                                    $send.disabled = true; $input.disabled = true;
+
+                                    try {
+                                        const res = await fetch('/api/ai/chat', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            credentials: 'same-origin',
+                                            body: JSON.stringify({ message: text, sessionId, meta: { page: 'home_show', ts: Date.now() } })
+                                        });
+
+                                        const data = await res.json().catch(() => null);
+
+                                        if (!res.ok) {
+                                            let msg = `Có lỗi máy chủ (${res.status}).`;
+                                            if (data?.detail) msg += ` ${data.detail}`;
+                                            appendMsg('assistant', msg);
+                                            if (res.status === 403 && data?.message === 'session closed') {
+                                                sessionId = null; sessionStorage.removeItem(SID_KEY);
+                                            }
+                                            return;
+                                        }
+
+                                        // cập nhật session
+                                        if (data?.sessionId && data.sessionId !== sessionId) {
+                                            const oldKey = histKey(); sessionId = data.sessionId;
+                                            sessionStorage.setItem(SID_KEY, String(sessionId));
+                                            const newKey = histKey(); migrateHistory(oldKey, newKey);
+                                        }
+
+                                        // 🚀 mở modal so sánh 1–4 sp (nếu có)
+                                        if (data?.compare && Array.isArray(data.compare.items) && data.compare.items.length) {
+                                            openCompareModal4(data.compare);
+                                        }
+
+                                        // render danh sách / thẻ
+                                        const hasProducts = Array.isArray(data?.products) && data.products.length > 0;
+                                        const reply = (typeof data?.reply === 'string' ? data.reply.trim() : '');
+
+                                        if (hasProducts) {
+                                            if (data.format === 'list') appendProductList(data.products);
+                                            else appendProducts(data.products);
+                                        } else if (reply) {
+                                            appendMsg('assistant', reply);
+                                        } else if (!data?.compare) {
+                                            appendMsg('assistant', 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!');
+                                        }
+
+                                        // chips
+                                        if (data?.activeFilters) {
+                                            const chips = [];
+                                            if (data.activeFilters.brand) chips.push('Hãng: ' + data.activeFilters.brand);
+                                            if (data.activeFilters.target) chips.push('Nhu cầu: ' + data.activeFilters.target);
+                                            if (data.activeFilters.min || data.activeFilters.max)
+                                                chips.push('Ngân sách: ' + ((data.activeFilters.min || 0) / 1e6) + '–' +
+                                                    (data.activeFilters.max ? (data.activeFilters.max / 1e6) : '∞') + 'tr');
+                                            if (chips.length) renderChips(chips);
+                                        }
+                                        if (Array.isArray(data?.suggestions) && data.suggestions.length) renderChips(data.suggestions);
+
+                                    } catch (e) {
+                                        console.error(e);
+                                        appendMsg('assistant', 'Không kết nối được máy chủ. Bạn thử lại sau nhé.');
+                                    } finally {
+                                        $typing.style.display = 'none';
+                                        $send.disabled = false; $input.disabled = false; $input.focus();
+                                    }
+                                }
 
 
 
+                                $form.addEventListener('submit', e => { e.preventDefault(); const val = ($input.value || '').trim(); if (!val) return; $input.value = ''; sendMessage(val); });
+                                $input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $form.dispatchEvent(new Event('submit', { cancelable: true })); } });
+
+                                // clear local history when logout (bind all logout forms/links)
+                                document.querySelectorAll('form[action="/logout"], a[href="/logout"]').forEach(el => {
+                                    el.addEventListener('click', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
+                                    el.addEventListener('submit', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
+                                });
+                            })();
+                        </script>
+
+                        // reload trang hiển thị sản phẩm đã xem gần đây
+                        <script>
+                            window.addEventListener('pageshow', function (e) {
+                                var nav = performance.getEntriesByType && performance.getEntriesByType('navigation');
+                                var backForward = nav && nav[0] && nav[0].type === 'back_forward';
+                                if (e.persisted || backForward) location.reload();
+                            });
+                        </script>
 
 
 </body>

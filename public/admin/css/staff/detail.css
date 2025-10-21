@@ -1,0 +1,36 @@
+ :root {
+     --brand: #4f8cff;
+     --glass: rgba(255, 255, 255, .06);
+     --glass-bd: rgba(255, 255, 255, .10);
+ }
+
+ body.sb-nav-fixed {
+     background: radial-gradient(1200px 800px at 10% 10%, #10172a 0%, #0a0f1f 45%, #080c18 100%) fixed;
+ }
+
+ .page-title {
+     color: #eef2ff;
+     font-weight: 800;
+ }
+
+ .btn-brand {
+     background: linear-gradient(135deg, rgba(79, 140, 255, .8), rgba(139, 92, 246, .7));
+     border: 1px solid rgba(255, 255, 255, .15);
+     color: #fff;
+     border-radius: 12px;
+ }
+
+ .card.glass {
+     border: 1px solid var(--glass-bd);
+     border-radius: 18px;
+     background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+     color: #e8ecff;
+     box-shadow: 0 10px 26px rgba(0, 0, 0, .25);
+ }
+
+ .card.glass .card-header {
+     background: transparent;
+     color: #cbd5ff;
+     font-weight: 700;
+     border-bottom: 1px solid var(--glass-bd);
+ }

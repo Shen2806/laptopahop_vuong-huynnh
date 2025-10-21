@@ -47,7 +47,7 @@ const getProductPage = async (req: Request, res: Response) => {
         prisma.product.findMany({
             where: { factory: product.factory, id: { not: product.id } },
             orderBy: { id: "desc" },
-            take: 16, // lấy dư rồi lọc 8 sp sau
+            take: 16,
         }),
         prisma.product.findMany({
             where: { id: { not: product.id }, price: { gte: min, lte: max } },
@@ -69,15 +69,12 @@ const getProductPage = async (req: Request, res: Response) => {
             return true;
         })
         .sort((a, b) => {
-            // cùng hãng lên trước
             if (a.__tag !== b.__tag) return a.__tag === "factory" ? -1 : 1;
-            // gần giá hơn lên trước
             if (a.__dist !== b.__dist) return a.__dist - b.__dist;
-            // phụ: id mới trước
             return b.id - a.id;
         })
         .slice(0, 8)
-        .map(({ __tag, __dist, ...rest }) => rest); // bỏ field phụ
+        .map(({ __tag, __dist, ...rest }) => rest);
 
     // 5) Rating cho danh sách tương tự
     const ids = combined.map((p) => p.id);
@@ -98,7 +95,7 @@ const getProductPage = async (req: Request, res: Response) => {
     }
 
     const makeStars = (avg: number) => {
-        const rounded = Math.round(avg * 2) / 2; // .5 step
+        const rounded = Math.round(avg * 2) / 2;
         const full = Math.floor(rounded);
         const half = rounded - full === 0.5 ? 1 : 0;
         const empty = 5 - full - half;
@@ -121,12 +118,35 @@ const getProductPage = async (req: Request, res: Response) => {
         };
     });
 
-    // 6) Render
+    // 6) 👉 Ghi cookie "recent_products" (tối đa 6 id, mới nhất lên đầu, không trùng)
+    const KEY = "recent_products";
+    const MAX = 6;
+    let recent: number[] = [];
+    try {
+        const raw = (req as any).cookies?.[KEY] || "[]";
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+            recent = parsed
+                .map((n: any) => Number(n))
+                .filter((n: any) => Number.isFinite(n));
+        }
+    } catch { }
+    recent = [product.id, ...recent.filter((x) => x !== product.id)].slice(0, MAX);
+    res.cookie(KEY, JSON.stringify(recent), {
+        httpOnly: false,   // có thể để true nếu muốn ẩn khỏi JS; ở đây giữ false cho đơn giản
+        sameSite: "lax",
+        secure: false,     // nếu chạy HTTPS khác origin, đặt true + sameSite: 'none'
+        path: "/",
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 ngày
+    });
+
+    // 7) Render
     return res.render("product/detail.ejs", {
         product,
-        similarProducts, // <<< thêm biến này
+        similarProducts,
     });
 };
+
 
 const postAddProductToCart = async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -713,12 +733,28 @@ const postCancelOrder = async (req: Request, res: Response) => {
         });
 
         return res.json({ success: true, message: "Hủy đơn hàng thành công" });
-    } catch (err) {
-        console.error("Cancel order error:", err);
-        return res.status(500).json({ message: "Có lỗi xảy ra, vui lòng thử lại" });
-    }
-};
+    } catch (e: any) {
+        console.error("postPlaceOrder error:", e);
 
+        // Không phụ thuộc biến 'mode' trong scope:
+        const rawMode =
+            String((req as any).body?.mode ?? (req as any).query?.mode ?? "").toLowerCase();
+        const isBuyNow = rawMode === "buy" || Boolean((req as any).session?.buyNow);
+        const back = isBuyNow ? "/checkout?mode=buy" : "/checkout";
+
+        const msg =
+            typeof e?.message === "string" && e.message.includes("không đủ tồn kho")
+                ? e.message
+                : "Có lỗi hệ thống. Thử lại sau.";
+
+        const sess: any = (req as any).session || ((req as any).session = {});
+        sess.messages = [{ type: "danger", text: msg }];
+
+        return res.redirect(back);
+    }
+
+}
+// xem chi tiết đơn hàng ở phần trạng thái
 // xem chi tiết đơn hàng ở phần trạng thái
 const getOrderDetailPage = async (req: Request, res: Response) => {
     const user = (req as any).user;
@@ -731,10 +767,12 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
         where: { id, userId: user.id },
         include: {
             user: true,
-            province: true,   // <-- Tỉnh/Thành
-            district: true,   // <-- Quận/Huyện
-            ward: true,       // <-- Phường/Xã
+            province: true,
+            district: true,
+            ward: true,
             orderDetails: { include: { product: true } },
+            // nếu đã migrate bước 1 thì dòng dưới sẽ hợp lệ
+            assignedShipper: { select: { fullName: true, phone: true } } as any,
         },
     });
     if (!order) return res.status(404).render("status/404.ejs", { user });
@@ -747,7 +785,7 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
     const discountAmount = Number(order.discountAmount || 0);
     const total = subTotal - discountAmount;
 
-    // Ghép địa chỉ hiển thị: ưu tiên street + ward + district + province; fallback receiverAddress
+    // Địa chỉ hiển thị
     const addressParts = [
         order.receiverStreet || null,
         order.ward?.name || null,
@@ -755,6 +793,33 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
         order.province?.name || null,
     ].filter(Boolean) as string[];
     const addressDisplay = addressParts.length ? addressParts.join(", ") : (order.receiverAddress || "—");
+
+    // ======= Resolve shipper (tên/SĐT) =======
+    // Ưu tiên cache -> quan hệ
+    let shipperName: string | null =
+        (order as any).shipperNameCache ?? (order as any).shipperName ?? null;
+    let shipperPhone: string | null =
+        (order as any).shipperPhoneCache ?? (order as any).shipperPhone ?? null;
+
+    if (!shipperName || !shipperPhone) {
+        const rel = (order as any).assignedShipper;
+        if (rel) {
+            shipperName = shipperName || rel.fullName || null;
+            shipperPhone = shipperPhone || rel.phone || null;
+        }
+    }
+
+    // Log để soi nhanh vì sao không hiện
+    console.log("[OrderDetail]", {
+        id: order.id,
+        status: order.status,
+        assignedShipperId: (order as any).assignedShipperId,
+        shipperNameCache: (order as any).shipperNameCache,
+        shipperPhoneCache: (order as any).shipperPhoneCache,
+        hasRelation: Boolean((order as any).assignedShipper),
+        resolvedName: shipperName,
+        resolvedPhone: shipperPhone,
+    });
 
     return res.render("client/order/orderdetail.ejs", {
         user,
@@ -767,9 +832,14 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
         STATUS_LABEL_VI,
         currentStep,
         canceled,
-        addressDisplay, // <-- dùng trong EJS để hiện địa chỉ đẹp
+        addressDisplay,
+        shipperName,
+        shipperPhone,
     });
 };
+
+
+
 
 const handleBuyNow = (req: Request, res: Response) => {
     const user: any = (req as any).user;

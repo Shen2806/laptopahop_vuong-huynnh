@@ -1,0 +1,89 @@
+:root {
+    --brand: #4f8cff;
+    --glass: rgba(255, 255, 255, .06);
+    --glass-bd: rgba(255, 255, 255, .10);
+}
+
+body.sb-nav-fixed {
+    background: radial-gradient(1200px 800px at 10% 10%, #10172a 0%, #0a0f1f 45%, #080c18 100%) fixed;
+}
+
+.page-title {
+    color: #eef2ff;
+    font-weight: 800;
+    letter-spacing: .2px;
+}
+
+.card.glass {
+    border: 1px solid var(--glass-bd);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+    color: #e8ecff;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .25);
+}
+
+.card.glass .card-header {
+    background: transparent;
+    color: #c3c7d4;
+    font-weight: 700;
+    border-bottom: 1px solid var(--glass-bd);
+}
+
+.form-label {
+    color: #edeef2;
+    font-weight: 500;
+}
+
+.form-control,
+.form-select {
+    background: rgba(255, 255, 255, .06);
+    color: #bfc1cc;
+    border: 1px solid var(--glass-bd);
+    border-radius: 12px;
+}
+
+.form-control:focus,
+.form-select:focus {
+    color: #893737;
+    background: rgba(255, 255, 255, .09);
+    border-color: rgba(79, 140, 255, .4);
+    box-shadow: none;
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, rgba(79, 140, 255, .8), rgba(139, 92, 246, .7));
+    border: 1px solid rgba(255, 255, 255, .15);
+    color: #7d2e2e;
+    border-radius: 12px;
+}
+
+.btn-primary-custom:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    border-radius: 12px;
+}
+
+#avatarPreview {
+    max-height: 250px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-bd);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, .25);
+}
+
+.breadcrumb {
+    background: transparent;
+}
+
+.breadcrumb a {
+    color: #cbd5ff;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}

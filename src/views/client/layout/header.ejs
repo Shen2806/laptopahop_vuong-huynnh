@@ -115,18 +115,17 @@
                             <!-- Giỏ hàng -->
                             <a href="/cart" class="position-relative me-3" aria-label="Giỏ hàng">
                                 <i class="fa fa-shopping-bag fa-2x"></i>
-                                <span
+                                <span id="sumCartBadge"
                                     class="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
-                                    id="sumCart" style="top:-5px; left:15px; height:20px; min-width:20px;">
-                                    <!-- mới: ưu tiên headerCartCount; fallback user.sumCart để không vỡ trang cũ -->
+                                    style="top:-5px; left:15px; height:20px; min-width:20px;">
                                     <% const _cnt=(typeof headerCartCount !=='undefined' ? headerCartCount :
                                         (user?.sumCart ?? 0)); %>
-                                        <span ... id="sumCart" ...>
-                                            <%= _cnt> 9 ? '9+' : _cnt %>
-                                        </span>
-
+                                        <b class="js-sumCart">
+                                            <%= (_cnt> 9 ? '9+' : _cnt) %>
+                                        </b>
                                 </span>
                             </a>
+
 
                             <!-- User -->
                             <% if (user) { %>

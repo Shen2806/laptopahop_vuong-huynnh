@@ -538,42 +538,81 @@ const postCancelOrderByUser = async (req: Request, res: Response) => {
 
 const getUserOrders = async (req: Request, res: Response) => {
     try {
-        const userId = req.user.id; // lấy từ passport
+        const userId = (req as any).user.id; // lấy từ passport
 
         // Lấy tất cả đơn theo thời gian tạo (mới nhất trước) để giữ thứ tự gốc cho "others"
         const allOrders = await prisma.order.findMany({
             where: { userId },
             include: {
                 orderDetails: {
-                    include: { product: true }, // cần có relation product trong OrderDetail
+                    // cần productId và product để render
+                    select: {
+                        id: true,
+                        productId: true,
+                        quantity: true,
+                        price: true,
+                        product: { select: { id: true, name: true, image: true } },
+                    },
                 },
             },
             orderBy: { createdAt: "desc" },
         });
+
+        // --- BỔ SUNG: gắn cờ đã đánh giá cho từng item ---
+        // Gom tất cả productId xuất hiện trong các đơn
+        const productIds: number[] = [];
+        for (const o of allOrders) {
+            for (const it of o.orderDetails) {
+                const pid = it.productId ?? it.product?.id;
+                if (pid) productIds.push(pid);
+            }
+        }
+        const uniqProductIds = Array.from(new Set(productIds));
+
+        // Lấy các productId mà user đã review
+        let reviewedSet = new Set<number>();
+        if (uniqProductIds.length) {
+            const reviewed = await prisma.review.findMany({
+                where: { userId, productId: { in: uniqProductIds } },
+                select: { productId: true },
+            });
+            reviewedSet = new Set(reviewed.map(r => r.productId));
+        }
+
+        // Gắn hasReviewed vào từng orderDetail
+        const ordersWithFlags = allOrders.map(o => ({
+            ...o,
+            orderDetails: o.orderDetails.map(it => {
+                const pid = it.productId ?? it.product?.id ?? 0;
+                return { ...it, hasReviewed: reviewedSet.has(pid) };
+            }),
+        }));
 
         // Helper: thời điểm ưu tiên để sort trong nhóm DELIVERED
         const getSortTime = (o: any) =>
             new Date(o.deliveredAt ?? o.updatedAt ?? o.createdAt).getTime();
 
         // 1) Nhóm DELIVERED và sort "mới nhất trước"
-        const delivered = allOrders
-            .filter((o) => o.status === "DELIVERED")
+        const delivered = ordersWithFlags
+            .filter(o => o.status === "DELIVERED")
             .sort((a, b) => getSortTime(b) - getSortTime(a));
 
         // 2) Các đơn còn lại: giữ nguyên thứ tự đã fetch (createdAt desc)
-        const others = allOrders.filter((o) => o.status !== "DELIVERED");
+        const others = ordersWithFlags.filter(o => o.status !== "DELIVERED");
 
         // 3) Ghép lại: DELIVERED trước, sau đó đến các trạng thái khác
         const sortedOrders = [...delivered, ...others];
 
-        // Render ra view
-        res.render("client/order/orderuser.ejs", { user: req.user, orders: sortedOrders });
+        // Render ra view (KHÔNG đổi các biến truyền xuống)
+        res.render("client/order/orderuser.ejs", {
+            user: (req as any).user,
+            orders: sortedOrders,
+        });
     } catch (err) {
         console.error("Lỗi lấy đơn hàng:", err);
         res.status(500).send("Có lỗi xảy ra khi tải đơn hàng");
     }
 };
-
 
 
 const SALT_ROUNDS = 10;
