@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed:locations": "ts-node prisma/seed-locations.ts",
     "fetch:vn": "ts-node prisma/fetch-vn-locations.ts",
-    "build": "tsc",
-    "start": "node -r tsconfig-paths/register --enable-source-maps dist/app.js",
+    "build": "tsc && tsc-alias",
+    "start": "node --enable-source-maps dist/app.js",
     "dev": "nodemon",
     "start:debug": "nodemon --inspect=9229 -e ts,tsx --exec node -r ts-node/register -r tsconfig-paths/register ./src/app.ts",
     "postinstall": "prisma generate"

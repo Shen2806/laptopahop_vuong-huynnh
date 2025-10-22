@@ -7,9 +7,6 @@
     "skipLibCheck": true,
     "rootDir": "src",
     "outDir": "dist",
-    "types": [
-      "node"
-    ],
     "baseUrl": ".",
     "paths": {
       "src/*": [
@@ -18,19 +15,22 @@
       "config/*": [
         "./src/config/*"
       ],
+      "routes/*": [
+        "./src/routes/*"
+      ],
       "controllers/*": [
         "./src/controllers/*"
       ],
       "models/*": [
         "./src/models/*"
       ],
-      "routes/*": [
-        "./src/routes/*"
-      ], // <— CHỈNH: nếu thư mục là 'routes'
       "services/*": [
         "./src/services/*"
       ]
     },
+    "types": [
+      "node"
+    ],
     "typeRoots": [
       "./node_modules/@types",
       "./types"
