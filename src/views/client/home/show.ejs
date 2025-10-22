@@ -48,6 +48,7 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <link href="/client/css/home/show.css" rel="stylesheet">
 </head>
+
 <body>
 
     <!-- Spinner Start -->
@@ -1482,6 +1483,7 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
                         <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
                         <script type="module" src="/client/ai/ai-turtle.js"></script>
+
                         <script>
                             var swiper = new Swiper('.promo-swiper', {
                                 loop: true,                 // vòng lặp vô hạn
@@ -1611,18 +1613,35 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                 document.querySelectorAll('.ai-chip').forEach(ch => ch.addEventListener('click', () => { $input.value = ch.getAttribute('data-q') || ''; $input.focus(); }));
 
                                 // const escapeHtml = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-                                function safeFormat(text) { let s = escapeHtml(text || ''); s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); s = s.replace(/\n/g, '<br>'); s = s.replace(/(\/product\/\d{1,10})/g, '<a href="$1" class="text-primary fw-semibold">$1</a>'); return s; }
+                                function safeFormat(text) {
+                                    let s = escapeHtml(text || '');
+                                    s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+                                    s = s.replace(/\n/g, '<br>');
+                                    s = s.replace(/(\/product\/\d{1,10})/g, '<a href="$1" class="text-primary fw-semibold">$1</a>');
+                                    return s;
+                                }
 
                                 function pushHist(entry) { const h = loadJSON(histKey(), []); h.push(entry); saveJSON(histKey(), h.slice(-200)); }
+                                function isGreetingText(t) {
+                                    const s = (t || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+                                    // các pattern chào mở đầu của bạn
+                                    return /(chao ban|xin chao|rua ai co the goi y|minh day)/i.test(s);
+                                }
 
+                                function hasShownGreeting() {
+                                    const h = loadJSON(histKey(), []);
+                                    return h.some(it => it.kind === 'text' && it.role === 'assistant' && isGreetingText(it.text));
+                                }
                                 function appendMsg(role, text, { persist = true } = {}) {
+                                    if (role === 'assistant' && isGreetingText(text) && hasShownGreeting()) {
+                                        return;
+                                    }
                                     const wrap = document.createElement('div'); wrap.className = 'ai-msg ' + (role === 'user' ? 'ai-user' : 'ai-bot');
                                     const b = document.createElement('div'); b.className = 'ai-msg__bubble';
                                     if (role === 'assistant') b.innerHTML = safeFormat(text); else b.textContent = text;
                                     wrap.appendChild(b); $body.appendChild(wrap); $body.scrollTop = $body.scrollHeight;
                                     if (persist) pushHist({ t: Date.now(), kind: 'text', role, text });
                                 }
-
                                 const currencyVND = n => { try { return Number(n || 0).toLocaleString('vi-VN') + '₫' } catch { return (n || 0) + '₫' } };
                                 function appendProducts(products, { persist = true } = {}) {
                                     if (!products || !products.length) return;
@@ -1855,38 +1874,50 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                 }
 
                                 // rehydrate
+                                // rehydrate
                                 (function () {
                                     if (!!loadJSON(OPEN_KEY, false)) $card.style.display = 'block';
-                                    // nếu từng lưu ở 'temp' trước đó -> merge vào key hiện tại
+                                    // merge lịch sử tạm nếu có
                                     const tempK = HIST_PREFIX + "temp";
                                     const tempHist = loadJSON(tempK, []);
                                     if (!getSID() && tempHist.length) saveJSON(histKey(), tempHist);
 
                                     const hist = loadJSON(histKey(), []);
-                                    const TTL = 2 * 60 * 60 * 1000; // 2h
+                                    const TTL = null; // ✅ giữ vô thời hạn đến khi logout
                                     const now = Date.now();
 
                                     if (hist.length) {
                                         $body.innerHTML = '';
+                                        let lastProducts = null, lastList = null, lastCompare = null;
                                         hist.forEach(it => {
-                                            // bỏ lịch sử quá hạn
-                                            if (it.t && now - it.t > TTL) return;
-
-                                            // ❌ không auto render product cards khi mở chat
-                                            if (it.kind === 'products' || it.kind === 'product-list') return;
-
-                                            if (it.kind === 'text') appendMsg(it.role, it.text, { persist: false });
+                                            if (TTL && it.t && now - it.t > TTL) return;
+                                            if (it.kind === 'text') {
+                                                appendMsg(it.role, it.text, { persist: false });
+                                            } else if (it.kind === 'products') {
+                                                lastProducts = it.products;
+                                            } else if (it.kind === 'product-list') {
+                                                lastList = it.products;
+                                            } else if (it.kind === 'compare') {
+                                                lastCompare = it.compare;
+                                            }
                                         });
+                                        // ✅ render block kết quả gần nhất
+                                        if (lastCompare) appendCompare(lastCompare, { persist: false });
+                                        else if (lastList) appendProductList(lastList, { persist: false });
+                                        else if (lastProducts) appendProducts(lastProducts, { persist: false });
+
                                         $body.scrollTop = $body.scrollHeight;
                                     } else {
                                         // local trống -> hỏi server lấy lại danh sách gần nhất
                                         tryServerRehydrate();
                                     }
                                 })();
+
                                 // hỗ trợ back/forward cache: khi quay lại trang, đảm bảo rehydrate
                                 window.addEventListener('pageshow', (e) => {
                                     if (!loadJSON(histKey(), []).length) tryServerRehydrate();
                                 });
+                                // ⭐ changed: câu chữ rehydrate thân thiện hơn
                                 async function tryServerRehydrate() {
                                     try {
                                         const sid = sessionId || getSID();
@@ -1895,13 +1926,21 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                         const data = await res.json().catch(() => null);
                                         if (!data) return;
 
-                                        // nếu lịch sử local trống thì render lại từ server
                                         const h = loadJSON(histKey(), []);
                                         if (!h.length) {
-                                            if (Array.isArray(data.products) && data.products.length) {
-                                                appendProducts(data.products);         // persist vào local luôn
+                                            const hasProducts = Array.isArray(data.products) && data.products.length > 0;
+                                            if (hasProducts) {
+                                                if (data.format === 'list') appendProductList(data.products);
+                                                else appendProducts(data.products);
                                             }
-                                            if (data.reply) appendMsg('assistant', data.reply);
+                                            // chỉ chèn lời chào nếu chưa từng chào và hiện chưa có kết quả nào cả
+                                            if (data.reply) {
+                                                if (!(isGreetingText(data.reply) && hasShownGreeting())) {
+                                                    appendMsg('assistant', data.reply);
+                                                }
+                                            } else if (!hasShownGreeting() && !hasProducts) {
+                                                appendMsg('assistant', 'Bạn có thể nhắn “liệt kê laptop …” hoặc “gửi 5 mẫu ASUS ~20tr”, mình gửi ngay nhé!');
+                                            }
                                         }
                                     } catch { }
                                 }
@@ -1947,7 +1986,7 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                             if (data?.detail) msg += ` ${data.detail}`;
                                             appendMsg('assistant', msg);
                                             if (res.status === 403 && data?.message === 'session closed') {
-                                                sessionId = null; sessionStorage.removeItem(SID_KEY);
+                                                sessionId = null; SID_STORE.removeItem(SID_KEY);
                                             }
                                             return;
                                         }
@@ -1955,7 +1994,7 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                         // cập nhật session
                                         if (data?.sessionId && data.sessionId !== sessionId) {
                                             const oldKey = histKey(); sessionId = data.sessionId;
-                                            sessionStorage.setItem(SID_KEY, String(sessionId));
+                                            setSID(sessionId);
                                             const newKey = histKey(); migrateHistory(oldKey, newKey);
                                         }
 
@@ -1968,13 +2007,16 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                         const hasProducts = Array.isArray(data?.products) && data.products.length > 0;
                                         const reply = (typeof data?.reply === 'string' ? data.reply.trim() : '');
 
+                                        // ✅ Luôn in lời mở đầu trước
+                                        if (reply) {
+                                            appendMsg('assistant', reply);
+                                        }
+                                        // ✅ Rồi gửi sản phẩm ngay sau đó (nếu có)
                                         if (hasProducts) {
                                             if (data.format === 'list') appendProductList(data.products);
                                             else appendProducts(data.products);
-                                        } else if (reply) {
-                                            appendMsg('assistant', reply);
-                                        } else if (!data?.compare) {
-                                            appendMsg('assistant', 'Xin lỗi, mình chưa hiểu. Bạn thử diễn đạt khác giúp mình nhé!');
+                                        } else if (!reply && !data?.compare) {
+                                            appendMsg('assistant', 'Mình chưa hiểu ý bạn. Bạn thử “liệt kê …” hoặc “gửi 5 mẫu …” nhé, mình gửi ngay.');
                                         }
 
                                         // chips
@@ -2005,20 +2047,30 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
 
                                 // clear local history when logout (bind all logout forms/links)
                                 document.querySelectorAll('form[action="/logout"], a[href="/logout"]').forEach(el => {
-                                    el.addEventListener('click', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
-                                    el.addEventListener('submit', () => { try { sessionStorage.removeItem('AI_TURTLE_SID'); localStorage.removeItem('AI_TURTLE_OPEN'); Object.keys(localStorage).forEach(k => { if (k.startsWith('AI_TURTLE_HISTORY_')) localStorage.removeItem(k); }); } catch { } });
+                                    const clearAll = () => {
+                                        try {
+                                            SID_STORE.removeItem(SID_KEY);              // ✅ xoá SID trong localStorage
+                                            localStorage.removeItem(OPEN_KEY);          // đóng card
+                                            Object.keys(localStorage).forEach(k => {
+                                                if (k.startsWith(HIST_PREFIX)) localStorage.removeItem(k); // xoá hết lịch sử
+                                            });
+                                        } catch { }
+                                    };
+                                    el.addEventListener('click', clearAll);
+                                    el.addEventListener('submit', clearAll);
                                 });
+
                             })();
                         </script>
 
                         // reload trang hiển thị sản phẩm đã xem gần đây
-                        <script>
+                        <!-- <script>
                             window.addEventListener('pageshow', function (e) {
                                 var nav = performance.getEntriesByType && performance.getEntriesByType('navigation');
                                 var backForward = nav && nav[0] && nav[0].type === 'back_forward';
                                 if (e.persisted || backForward) location.reload();
                             });
-                        </script>
+                        </script> -->
 
 
 </body>

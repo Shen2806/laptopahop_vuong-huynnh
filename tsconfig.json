@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "esModuleInterop": true,
-    "target": "es6",
+    "target": "ES2020",
     "sourceMap": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "dist",
     "rootDir": "src",
+    "outDir": "dist",
     "baseUrl": ".",
     "paths": {
+      "src/*": [
+        "./src/*"
+      ],
       "config/*": [
         "./src/config/*"
       ],
@@ -19,15 +22,18 @@
         "./src/models/*"
       ],
       "routes/*": [
-        "./src/routers/*"
-      ],
+        "./src/routes/*"
+      ], // <— CHỈNH: nếu thư mục là 'routes'
       "services/*": [
         "./src/services/*"
-      ],
-      "typeRoots": [
-        "./node_modules/@types",
-        "./types"
       ]
-    }
-  }
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ]
+  },
+  "include": [
+    "src"
+  ]
 }

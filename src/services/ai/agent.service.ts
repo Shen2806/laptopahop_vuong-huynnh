@@ -11,6 +11,36 @@ import { polishVietnamese } from './style.service';
 
 const provider = new LocalProvider();
 
+/* =================== Etiquette & Laptop Cheatsheet =================== */
+
+// Văn phong: xưng "mình – bạn", thân thiện, không khoa trương
+const STYLE_GUIDE_VI = `
+- Ngắn gọn, thân thiện; xưng "mình – bạn".
+- Luôn có câu mở đầu tích cực trước khi liệt kê sản phẩm.
+- Không hứa suông. Không bịa thông số: thiếu thì nói "không rõ".
+- Dùng đơn vị đúng chuẩn: GB, TB, Hz, inch, kg, Wh, "₫".
+- Sau khi gợi ý, luôn kèm 1–2 lối rẽ: "cần mỏng nhẹ", "ưu tiên pin", "so sánh 1–1".
+- Tôn trọng lựa chọn của khách; gợi ý nâng/giảm cấu hình tùy ngân sách.
+`;
+
+// Sổ tay tư vấn laptop (cốt lõi, ổn định theo thời gian)
+const LAPTOP_CHEATSHEET = `
+• CPU: U/P tiết kiệm điện cho văn phòng; H/HX cho gaming/đồ họa. Ưu tiên i5/R5 trở lên; i7/R7 cho gaming/creator.
+• GPU: iGPU < RTX 3050 < 4050 (6GB) < 4060 (8GB) < 4070+. VRAM quan trọng cho dựng phim/3D.
+• RAM: 16GB là "mốc an tâm" cho gaming/IT/đồ họa; ưu tiên dual-channel; 8GB chỉ nên cho văn phòng cơ bản.
+• SSD: 512GB phổ biến; 1TB nếu edit video/đồ họa nhiều.
+• Màn hình: 144Hz+ cho gaming; 2K/4K & 100% sRGB/DCI-P3 cho đồ họa; OLED đẹp nhưng lưu ý PWM/burn-in ở mức vừa phải.
+• Cân nặng: <1.3kg mỏng nhẹ; 1.3–1.5kg di chuyển ổn; 1.5–1.8kg trung bình; >1.8kg nặng.
+• Pin (Wh): 50Wh cơ bản; 70–80Wh tốt cho di chuyển.
+• Tản nhiệt & độ ồn: quan trọng với gaming/HX; ưu tiên 2 quạt/ống đồng lớn.
+• Cổng: USB-C PD/Thunderbolt 4 cho văn phòng/doanh nhân; LAN/HDMI full-size cho game/stream.
+• Khuyến nghị nhanh:
+  - Gaming 20–30tr: i5/R5 H + RTX 4050, RAM 16GB, SSD 512GB, 144Hz.
+  - Văn phòng mỏng nhẹ: i5/R5 U/P, 16GB RAM, <1.3–1.4kg, pin 50–70Wh.
+  - Đồ họa: i7/R7 H + RTX 4060, RAM 16–32GB, màn 2K/100% sRGB.
+  - IT/lập trình: ưu tiên CPU đa nhân + RAM 16–32GB, SSD 1TB nếu chạy nhiều container/VM.
+`;
+
 // ====== Fuzzy find by name ======
 // bỏ các từ vô nghĩa khi match tên
 const STOPWORDS = new Set(["laptop", "may", "may tinh", "san pham", "product", "máy", "sản", "phẩm"]);
@@ -27,12 +57,16 @@ function jaccardScore(qTokens: string[], name: string) {
 }
 
 /** parse "so sánh A vs B" | "so sanh A voi B" */
-// thay parseCompareNames cũ bằng:
 function parseCompareNamesMulti(text: string): string[] {
     const t = deaccent(text).replace(/^so\s*sanh(?:\s*san\s*pham)?\s*/, '').trim();
-    // tách bởi "vs", "với/vs", "và/," …
     return t.split(/\s*(?:vs|v\/s|v\.s\.|voi|với|va|và|,)\s*/i)
         .map(s => s.trim()).filter(Boolean).slice(0, 4);
+}
+
+// ⭐ changed: nhận diện số lượng mong muốn: “gửi 5 mẫu”, “cho mình 3 máy”…
+function parseWantedCount(text: string) {
+    const m = text.match(/(\d{1,2})\s*(?:m[ãa]u|m[áa]y|con|options?)/i);
+    return m ? Math.min(12, Math.max(1, parseInt(m[1], 10))) : undefined;
 }
 
 function vnMil(n?: number) {
@@ -68,15 +102,43 @@ async function buildLeadText(
 ) {
     const desc = describeFilters(f);
     const count = products.length;
-    let lead = `Mình đã lọc theo **${desc}** và chọn ra ${count} mẫu đáng cân nhắc.`;
+    // ⭐ changed: giọng “thân thiện” + chủ động “gửi ngay”
+    let lead = `Mình lọc nhanh theo **${desc}** và gửi bạn ${count} lựa chọn đáng cân nhắc.`;
     if (reason) lead += ` *(${reason})*`;
     if (count >= 2) {
-        lead += ` Bạn xem nhanh rồi mình có thể tinh chỉnh thêm theo cân nặng, pin, màu sắc hoặc so sánh 1–1 nhé.`;
+        lead += ` Bạn xem qua, mình tinh chỉnh tiếp theo cân nặng, pin, màu hoặc so sánh 1–1 nhé.`;
     } else if (count === 1) {
         const p = products[0];
-        lead += ` Máy nổi bật nhất hiện khớp là **${p.name}** (${p.specs}). Giá tham khảo: ${p.priceText}.`;
+        lead += ` Mẫu khớp nhất hiện có là **${p.name}** (${p.specs}). Giá tham khảo: ${p.priceText}.`;
     }
-    return polishVietnamese(lead, { persona: 'tu-van' });
+    // Giữ văn phong lịch sự
+    lead += `\n\n*Tip nhanh:* nếu bạn ưu tiên **mỏng nhẹ/pin** mình sẽ lọc lại khác với **FPS/hiệu năng** nhé.`; return polishVietnamese(lead + "", { persona: 'tu-van' });
+}
+
+function fmtMil(n?: number) { return typeof n === 'number' ? Math.round(n / 1e6) + 'tr' : ''; }
+function targetLabel(t?: string) {
+    if (!t) return '';
+    return t === 'GAMING' ? 'cho nhu cầu gaming'
+        : t === 'MONG-NHE' ? 'mỏng nhẹ/di chuyển'
+            : t === 'SINHVIEN-VANPHONG' ? 'văn phòng/sinh viên'
+                : t === 'THIET-KE-DO-HOA' ? 'đồ họa'
+                    : t === 'DOANH-NHAN' ? 'doanh nhân'
+                        : '';
+}
+function buildIntro(f: { brand?: string | string[], series?: string[], target?: string, min?: number, max?: number }, count: number) {
+    const parts: string[] = [];
+    if (f.brand) parts.push(Array.isArray(f.brand) ? f.brand.join('/') : f.brand);
+    if (Array.isArray((f as any).series) && (f as any).series.length) parts.push((f as any).series.join('/'));
+    const tLabel = targetLabel(f.target);
+    if (tLabel) parts.push(tLabel);
+
+    const who = parts.length ? `các mẫu **${parts.join(' • ')}**` : 'các mẫu phù hợp';
+    const price =
+        typeof f.min === 'number' || typeof f.max === 'number'
+            ? ` trong tầm **${fmtMil(f.min)}${f.min && f.max ? '–' : ''}${fmtMil(f.max)}**`
+            : '';
+
+    return `Mình đã lọc được **${count}** ${who}${price}. Bên dưới là danh sách sắp xếp theo hiệu năng/giá – bạn tham khảo nhanh nhé:`;
 }
 
 function specDict(p: any) {
@@ -123,7 +185,6 @@ function cpuRank(cpu = "") {
 
 function gpuRankFromText(blob = "") {
     const s = blob.toUpperCase();
-    // Ưu tiên RTX > RX > GTX > iGPU
     const rtx = s.match(/RTX\s?-?\s?(\d{3,4})/);
     if (rtx) return 10000 + parseInt(rtx[1], 10);
     const rx = s.match(/\bRX\s?-?\s?(\d{3,4})\b/);
@@ -154,7 +215,6 @@ function mobilityRank(p: any) {
     let score = 0;
     const w = weightFromText(`${b}`, (p.weightKg as number | undefined));
     if (typeof w === "number") {
-        // nhẹ hơn điểm cao hơn
         if (w <= 1.1) score += 100;
         else if (w <= 1.3) score += 80;
         else if (w <= 1.5) score += 60;
@@ -162,7 +222,7 @@ function mobilityRank(p: any) {
         else score += 20;
     }
     if (/M[OÕ]NG|NH[EẸ]|ULTRABOOK|MOBILE|DI CHUYEN/i.test(b)) score += 20;
-    if (/\b(50|56|60|70|80|90|100)\s?WH\b/i.test(b)) score += 10; // pin lớn
+    if (/\b(50|56|60|70|80|90|100)\s?WH\b/i.test(b)) score += 10;
     return score; // 0–~130
 }
 
@@ -186,8 +246,7 @@ function buildCompareReport(a: any, b: any) {
     const dispA = screenRank(ba), dispB = screenRank(bb);
     const mobA = mobilityRank(a), mobB = mobilityRank(b);
 
-    // điểm mục đích
-    const gamingA = gpuA * 1.0 + cpuA * 4; // GPU áp đảo, CPU vẫn quan trọng
+    const gamingA = gpuA * 1.0 + cpuA * 4;
     const gamingB = gpuB * 1.0 + cpuB * 4;
     const creatorA = gpuA * 0.9 + dispA * 6 + cpuA * 3;
     const creatorB = gpuB * 0.9 + dispB * 6 + cpuB * 3;
@@ -205,7 +264,6 @@ function buildCompareReport(a: any, b: any) {
         it: pick(itA, itB),
     };
 
-    // Kết luận tổng: ưu tiên gaming/creator trước, rồi IT, rồi office
     const scoreTotA = gamingA * 1.0 + creatorA * 0.9 + itA * 0.6 + officeA * 0.4 + scoreProduct(a);
     const scoreTotB = gamingB * 1.0 + creatorB * 0.9 + itB * 0.6 + officeB * 0.4 + scoreProduct(b);
     const winner = scoreTotA >= scoreTotB ? 'A' : 'B';
@@ -255,9 +313,6 @@ function preferredBrandFromText(text: string) {
     return brandFromText(text).canonical;
 }
 
-/** Trả về top-K ứng viên {p, score} theo văn bản truy vấn.
- *  Không dùng `mode: 'insensitive'`, rely vào collation DB + chấm điểm ở app.
- */
 async function findTopKProductsByText(q: string, k = 3) {
     const toks = toTokens(q).filter(t => !STOPWORDS.has(t) && t.length >= 2);
     if (!toks.length) return [];
@@ -265,18 +320,15 @@ async function findTopKProductsByText(q: string, k = 3) {
     const brandPref = preferredBrandFromText(q);
     const whereBrand: any = brandPref ? { factory: brandPref } : {};
 
-    // Xây OR cho name/short/detail (KHÔNG có `mode`)
     const orName = toks.map(t => ({ name: { contains: t } }));
     const orShort = toks.map(t => ({ shortDesc: { contains: t } }));
     const orDetail = toks.map(t => ({ detailDesc: { contains: t } }));
 
-    // Lấy rộng theo OR, ưu tiên ràng brand trước
     let cand = await prisma.product.findMany({
         where: { ...whereBrand, OR: [...orName, ...orShort, ...orDetail] },
         take: 200
     });
 
-    // Fallback: bỏ ràng brand nếu chưa có ứng viên
     if (!cand.length && brandPref) {
         cand = await prisma.product.findMany({
             where: { OR: [...orName, ...orShort, ...orDetail] },
@@ -286,17 +338,14 @@ async function findTopKProductsByText(q: string, k = 3) {
 
     if (!cand.length) return [];
 
-    // Chấm điểm: jaccard trên (name+short+detail) + bonus brand + bonus có số hiệu trong tên
     const qNums = toTokens(q).filter(t => /^\d/.test(t));
     const out = cand.map(p => {
         const blob = `${p.name || ""} ${p.shortDesc || ""} ${p.detailDesc || ""}`;
         let s = jaccardScore(toks, blob);
         if (brandPref && p.factory === brandPref) s += 0.05;
-
         const nameToks = new Set(toTokens(p.name || ""));
         let numHit = 0; for (const n of qNums) if (nameToks.has(n)) numHit++;
         s += Math.min(0.1, numHit * 0.03);
-
         return { p, score: s };
     }).sort((a, b) => b.score - a.score);
 
@@ -312,23 +361,14 @@ const BRAND_CANONICALS = [
 ] as const;
 
 const BRAND_ALIASES: Record<string, string> = {
-    // ASUS
     ROG: "ASUS", TUF: "ASUS", ZENBOOK: "ASUS", VIVOBOOK: "ASUS",
-    // GIGABYTE
     AORUS: "GIGABYTE", AERO: "GIGABYTE",
-    // LENOVO
     LEGION: "LENOVO", THINKPAD: "LENOVO", IDEAPAD: "LENOVO", YOGA: "LENOVO", LOQ: "LENOVO",
-    // HP
     OMEN: "HP", VICTUS: "HP", PAVILION: "HP", ELITEBOOK: "HP",
-    // ACER
     PREDATOR: "ACER", NITRO: "ACER", SWIFT: "ACER", ASPIRE: "ACER",
-    // MSI
     PRESTIGE: "MSI", MODERN: "MSI", KATANA: "MSI", STEALTH: "MSI",
-    // DELL
     XPS: "DELL", INSPIRON: "DELL", VOSTRO: "DELL", LATITUDE: "DELL",
-    // LG
     GRAM: "LG",
-    // APPLE
     "MACBOOK": "APPLE", "MACBOOK AIR": "APPLE", "MACBOOK PRO": "APPLE"
 };
 
@@ -344,6 +384,10 @@ function brandFromText(text: string): { canonical?: string; aliasLabel?: string 
 // ===== intents =====
 const WANT_COMPARE_RE = /(so s[áa]nh|so\s*sanh|compare)/i;
 const PICK_INDEX_RE = /(ch[oọ]n|l[ấa]y|lựa|pick)\s*(?:m[aá]y|con)?\s*(?:s[oố]|#)?\s*(\d{1,2})/i;
+
+// ⭐ changed: mở rộng “liệt kê/gợi ý/danh sách/model” + nhận “gửi sản phẩm”/“send”
+const WANT_SEND_RE = /(g(?:ư|u)i)\s*(?:cho\s*m[iì]nh\s*)?(?:s[aả]n\s*ph[aẩ]m|m[áa]y|m[ãa]u|options?)/i;
+const WANT_LIST_RE = /(li[eê]̣t kê|g[ơ]̣i [yý]|danh\s*s[aá]ch|recommend|gợi ý|dòng|model|show)/i;
 
 // ===== session KV (kết quả lần trước) =====
 async function setSessionKV(sessionId: number, key: string, value: string, ttlHours = 2) {
@@ -363,6 +407,14 @@ function isGreetingOrSmallTalk(text: string) {
     if (t.length <= 3) return true; // "hi", "ok", "alo"
     return /\b(alo|a lo|hello|hi|chao|xin chao|yo|co ai|test|ping|e|ê|aloha)\b/.test(t);
 }
+function isThanks(text: string) {
+    const t = deaccent(String(text || ''));
+    return /\b(cam on|cảm ơn|thanks|thank you|tks)\b/i.test(t);
+}
+function isBye(text: string) {
+    const t = deaccent(String(text || ''));
+    return /\b(tam biet|bye|goodbye|hen gap|see you)\b/i.test(t);
+}
 
 function finalPrice(p: any) {
     const base = +p.price || 0;
@@ -373,9 +425,10 @@ function extractGPU(blob: string) {
     const m = blob.match(rx);
     return m ? m[0].replace(/\s+/g, ' ').trim() : '';
 }
+// ⭐ changed: robust hơn cho kích thước màn và biến thể “-inch”
 function extractScreen(blob: string) {
-    const size = blob.match(/\b(13|14|15\.6|16|17|18)(?:\"| inch|-inch)?\b/i)?.[0]?.replace(/-inch/i, ' inch');
-    const hz = blob.match(/\b(120|144|165|240|360)hz\b/i)?.[0]?.toUpperCase();
+    const size = blob.match(/\b(13(?:\.\d)?|14(?:\.\d)?|15(?:\.6)?|16(?:\.\d)?|17(?:\.\d)?|18)(?:\"|[ -]?inch)?\b/i)?.[0]?.replace(/-inch/i, ' inch');
+    const hz = blob.match(/\b(120|144|165|240|360)\s?hz\b/i)?.[0]?.toUpperCase();
     const res = blob.match(/\b(FHD|QHD|UHD|2K|4K|OLED|RETINA)\b/i)?.[0]?.toUpperCase();
     return [size, res, hz].filter(Boolean).join(' ');
 }
@@ -414,7 +467,6 @@ function productDTO(p: any) {
 function scoreByTarget(p: any, target?: string) {
     const B = `${p.featureTags || ""} ${p.shortDesc || ""} ${p.detailDesc || ""}`.toUpperCase();
 
-    // CPU
     const cpuStr = (p.cpu || "").toUpperCase();
     let cpu =
         /I9|R9/.test(cpuStr) ? 900 :
@@ -424,7 +476,6 @@ function scoreByTarget(p: any, target?: string) {
     const cgen = cpuStr.match(/(\d{3,5})/);
     if (cgen) cpu += Math.min(200, Math.floor(parseInt(cgen[1], 10) / 10));
 
-    // GPU
     let gpu = 0;
     const gm = B.match(/\b(RTX|GTX)\s?-?\s?(\d{3,4})\b/);
     if (gm) {
@@ -436,14 +487,13 @@ function scoreByTarget(p: any, target?: string) {
         gpu = 100;
     }
 
-    // Màn hình & di động
     let scr = 0;
     if (/QHD|2K|3K|4K|UHD|RETINA|OLED/.test(B)) scr += 50;
 
     const hasHighHz = /\b(120|144|165|240|360)\s?HZ\b/.test(B);
     if (hasHighHz) {
-        if (target === "GAMING") gpu += 100;   // high refresh quan trọng cho gaming
-        else scr += 10;                         // các mục đích khác cộng ít vào "screen"
+        if (target === "GAMING") gpu += 100;
+        else scr += 10;
     }
 
     const wMatch = B.match(/(\d+(?:\.\d+)?)\s?KG/);
@@ -466,14 +516,11 @@ function scoreByTarget(p: any, target?: string) {
     }
 }
 
-
 function scoreProduct(p: any, target?: string) {
     return scoreByTarget(p, target);
 }
 
-
-// target rộng: bắt cả "dòng gaming", "chơi game", "card rời"...
-// mục đích: gaming, sinh viên - văn phòng, mỏng nhẹ, doanh nhân, thiết kế đồ hoạ
+// target rộng
 function detectSegmentWide(t: string) {
     t = (t || "").toLowerCase();
     if (/(gaming|dòng\s*gaming|chơi\s*game|fps|144hz|rtx|gtx|card\s*rời)/i.test(t)) return "GAMING";
@@ -484,13 +531,12 @@ function detectSegmentWide(t: string) {
     return undefined;
 }
 
-// ===== chip commands / quick intents =====
+// ==== Quick intents & commands ====
 const SHOW_CARDS_RE = /(hi[eê]n thi(?:̣)?\s*d[ạa]ng\s*th[eê]|d[ạa]ng\s*th[eê]|view\s*cards?)/i;
 const SHOW_LIST_RE = /(hi[eê]n thi(?:̣)?\s*d[ạa]ng\s*danh\s*s[aá]ch|danh\s*s[aá]ch|view\s*list)/i;
 const COMPARE_OTHER_RE = /(so\s*s[áa]nh\s*v[ơo]i\s*m[aá]y\s*kh[aá]c)/i;
 const FILTER_LT_RE = /(?:lọc|loc)\s*(?:theo)?\s*<\s*(\d{1,3})\s*(?:tr|tri[eê]u|m)?/i;
 
-// re-show last results with chosen format
 async function showLastResults(sessionId: number, format: 'cards' | 'list') {
     const raw = await getSessionKV(sessionId, "result.ids");
     if (!raw) return null;
@@ -501,10 +547,8 @@ async function showLastResults(sessionId: number, format: 'cards' | 'list') {
     await setSessionKV(sessionId, "result.format", format);
     return { products, format };
 }
-/* ---------- so sánh theo tên (fuzzy) ---------- */
 
-
-// parse.ts
+// ===== parse.ts =====
 const VN_NUM_WORDS: Record<string, number> = {
     "mười": 10, "mươi": 10, "một": 1, "hai": 2, "ba": 3, "bốn": 4, "tư": 4, "năm": 5, "sáu": 6, "bảy": 7, "tám": 8, "chín": 9, "mười một": 11, "mười hai": 12,
     "mười ba": 13, "mười bốn": 14, "mười lăm": 15, "mười sáu": 16, "mười bảy": 17, "mười tám": 18, "mười chín": 19, "hai mươi": 20, "ba mươi": 30
@@ -512,22 +556,23 @@ const VN_NUM_WORDS: Record<string, number> = {
 function viWordToNumber(t: string) {
     t = t.toLowerCase();
     const k = Object.keys(VN_NUM_WORDS).sort((a, b) => b.length - a.length);
-    for (const w of k) if (t.includes(w)) return VN_NUM_WORDS[w] * 1_000_000; // “hai mươi (triệu)”
+    for (const w of k) if (t.includes(w)) return VN_NUM_WORDS[w] * 1_000_000;
     return undefined;
 }
 
 export function parseBudgetVi(text: string) {
-    const t = text.toLowerCase().replace(/[,\.](?=\d{3}\b)/g, ""); // 20.000.000
+    const t = deaccent(text).toLowerCase().replace(/[,\.](?=\d{3}\b)/g, "");
+
     // range: 18-22tr | 18 đến 22tr | 18~22tr
-    let m = t.match(/(\d+(?:[.,]\d+)?)\s*(?:tr|triệu|m)\s*(?:-|–|to|đến|den|~)\s*(\d+(?:[.,]\d+)?)/i);
+    let m = t.match(/(\d+(?:[.,]\d+)?)\s*(?:tr|trieu|m)\s*(?:-|–|to|den|~|đến)\s*(\d+(?:[.,]\d+)?)/i);
     if (m) return { min: +m[1] * 1_000_000, max: +m[2] * 1_000_000 };
 
     // single around: ~20tr | tầm 20tr | khoảng 20tr
-    m = t.match(/(?:~|≈|tầm|tam|khoảng|khoang|cỡ|co)\s*(\d+(?:[.,]\d+)?)\s*(?:tr|triệu|m)\b/i);
+    m = t.match(/(?:~|≈|tam|tầm|khoang|khoảng|co|cỡ)\s*(\d+(?:[.,]\d+)?)\s*(?:tr|trieu|m)\b/i);
     if (m) { const v = +m[1] * 1_000_000; const widen = Math.round(v * 0.2); return { min: v - widen, max: v + widen }; }
 
-    // single strict: 20tr | 20 triệu | 20m
-    m = t.match(/\b(\d+(?:[.,]\d+)?)\s*(?:tr|triệu|m)\b/i);
+    // single strict: 20tr | 20 trieu | 20m
+    m = t.match(/\b(\d+(?:[.,]\d+)?)\s*(?:tr|trieu|m)\b/i);
     if (m) { const v = +m[1] * 1_000_000; return { min: Math.max(0, v - 3_000_000), max: v + 3_000_000 }; }
 
     // words: “hai mươi triệu”
@@ -536,25 +581,109 @@ export function parseBudgetVi(text: string) {
 
     return {};
 }
+
+// Có nhắc tới ngân sách không (dù parser chưa ra số)?
+function hasBudgetCue(text: string) {
+    const t = deaccent(String(text || '')).toLowerCase();
+    return /(\d+\s*(tr|trieu|m)\b)|(~|≈|tam|tầm|khoang|khoảng|duoi|dưới|tren|trên|<=|>=|<|>|gia|giá|ngan sach|ngân sách)/i.test(t);
+}
+
+// Follow-up chỉ đổi hãng? (ví dụ: "còn MSI thì sao", "DELL thì sao", "thử ASUS")
+// -> true khi có brand mới, có cue "còn/thế/đổi/thử", và KHÔNG nêu lại ngân sách/nhu cầu
+function isBrandOnlyFollowUp(text: string) {
+    const t = deaccent(text);
+    const cue = /\b(con|the|th[eê]|doi sang|thu|thủ|thử|sang)\b/.test(t);
+    const { canonical } = brandFromText(text);
+    const hasNewBudget = !!parseBudgetVi(text).min || !!parseBudgetVi(text).max || hasBudgetCue(text);
+    const hasNewTarget = !!detectSegmentWide(text);
+    return !!canonical && cue && !hasNewBudget && !hasNewTarget;
+}
+
+/**
+ * Hợp nhất filter cho LƯỢT HIỆN TẠI.
+ * - Brand/target/budget trong câu mới luôn ưu tiên.
+ * - Nếu đổi brand:
+ *    + carryOnBrandChange = true  -> GIỮ target + budget cũ (follow-up kiểu "còn MSI thì sao")
+ *    + false (mặc định)          -> KHÔNG kéo target/budget cũ (tránh dính rác)
+ */
+function mergeFiltersForThisTurn(
+    parsed: { brand?: string | string[]; target?: string; minBudget?: number; maxBudget?: number },
+    remembered: { brand?: string | string[]; target?: string; min?: number; max?: number },
+    message: string,
+    carryOnBrandChange = false
+) {
+    const out: any = {};
+    const brandChanged = !!parsed.brand && parsed.brand !== remembered.brand;
+
+    // brand
+    if (parsed.brand) out.brand = parsed.brand;
+    else if (remembered.brand) out.brand = remembered.brand;
+
+    // target
+    if (parsed.target) out.target = parsed.target;
+    else if (!brandChanged || carryOnBrandChange) out.target = remembered.target;
+
+    // budget
+    if (typeof parsed.minBudget === 'number' || typeof parsed.maxBudget === 'number') {
+        if (typeof parsed.minBudget === 'number') out.min = parsed.minBudget;
+        if (typeof parsed.maxBudget === 'number') out.max = parsed.maxBudget;
+    } else if (hasBudgetCue(message)) {
+        delete out.min; delete out.max;
+    } else if (!brandChanged || carryOnBrandChange) {
+        if (typeof remembered.min === 'number') out.min = remembered.min;
+        if (typeof remembered.max === 'number') out.max = remembered.max;
+    }
+
+    return out as { brand?: string | string[]; target?: string; min?: number; max?: number };
+}
+
+
+
+/** Ưu tiên filter của câu hiện tại; nếu có cue ngân sách mà không parse ra số -> bỏ min/max cũ */
+function effectiveFilters(
+    parsed: { brand?: string | string[]; target?: string; minBudget?: number; maxBudget?: number },
+    remembered: { brand?: string | string[]; target?: string; min?: number; max?: number },
+    message: string
+) {
+    const eff: any = { ...remembered };
+    if (parsed.brand) eff.brand = parsed.brand;
+    if (parsed.target) eff.target = parsed.target;
+
+    if (typeof parsed.minBudget === 'number' || typeof parsed.maxBudget === 'number') {
+        if (typeof parsed.minBudget === 'number') eff.min = parsed.minBudget; else delete eff.min;
+        if (typeof parsed.maxBudget === 'number') eff.max = parsed.maxBudget; else delete eff.max;
+    } else if (hasBudgetCue(message)) {
+        delete eff.min;
+        delete eff.max;
+    }
+    return eff as { brand?: string | string[]; target?: string; min?: number; max?: number };
+}
+
+function parseTakeVi(text: string) {
+    // liệt kê 3 sản phẩm | gửi 4 mẫu | list 5 sp
+    const t = deaccent(text).toLowerCase();
+    const m = t.match(/(?:liet ke|goi y|gui|list|cho toi|cho minh)\s*(\d{1,2})\s*(?:mau|mau|sp|san pham)/i);
+    return m ? Math.max(1, Math.min(12, +m[1])) : undefined;
+}
 // ==== Ý định & bộ lọc từ câu người dùng ====
-const WANT_LIST_RE = /(li[eê]̣t kê|g[ơ]̣i [yý]|danh\s*s[aá]ch|recommend|gợi ý|dòng|model)/i;
 const WANT_STRONGEST_RE = /(mạnh|mạnh|best|khủng|cao\s*nhất|đỉnh)/i;
 
 function parseFilters(text: string) {
     const { canonical: brand } = brandFromText(text);
     const target = detectSegmentWide(text);
-    const { min, max } = parseBudgetVi(text); // bạn đã có hàm này
+    const { min, max } = parseBudgetVi(text);
+    // ⭐ changed: wantList bật khi “gửi sản phẩm/send” hoặc các từ khoá “liệt kê/gợi ý…”
+    const wantList = WANT_LIST_RE.test(text) || WANT_SEND_RE.test(text);
+    const wantStrongest = WANT_STRONGEST_RE.test(text);
     return {
         brand,
         target,
         minBudget: typeof min === 'number' ? min : undefined,
         maxBudget: typeof max === 'number' ? max : undefined,
-        wantList: WANT_LIST_RE.test(text),
-        wantStrongest: WANT_STRONGEST_RE.test(text)
+        wantList,
+        wantStrongest
     };
 }
-
-
 
 export async function setEphemeralFilter(
     sessionId: number,
@@ -638,10 +767,9 @@ async function smartSearch(
     const haveMin = typeof f.min === "number";
     const haveMax = typeof f.max === "number";
     if (haveMin || haveMax) {
-        // nếu chỉ có max: ước min = max*0.8; nếu chỉ có min: ước max = min*1.2
         const min0 = haveMin ? (f.min as number) : Math.max(0, Math.round((f.max as number) * 0.8));
         const max0 = haveMax ? (f.max as number) : Math.round((f.min as number) * 1.2);
-        const span = Math.max(1, Math.round((max0 - min0) * 0.2)); // thêm buffer tối thiểu 1 VND để tránh 0
+        const span = Math.max(1, Math.round((max0 - min0) * 0.2));
         const widened = { min: Math.max(0, min0 - span), max: max0 + span };
 
         list = await listByFilters({ ...f, ...widened }, take);
@@ -702,11 +830,20 @@ async function pickStrongest(f: { brand?: string | string[]; target?: string; mi
     for (let i = 1; i < list.length; i++) { const sc = scoreProduct(list[i]); if (sc > bestScore) { best = list[i]; bestScore = sc; } }
     return { best, score: bestScore, count: list.length };
 }
+async function saveLastContext(sessionId: number, f: any, list: any[]) {
+    try {
+        if (!Array.isArray(list) || !list.length) return;
+        const best = list.reduce((a, b) => (scoreProduct(b, f.target) > scoreProduct(a, f.target) ? b : a), list[0]);
+        await setSessionKV(sessionId, "last.filters", JSON.stringify(f));
+        await setSessionKV(sessionId, "last.bestId", String(best?.id || ""));
+        await setSessionKV(sessionId, "last.brand", Array.isArray(f.brand) ? (f.brand[0] || "") : (f.brand || ""));
+    } catch { }
+}
+
 async function findBestProductByText(q: string) {
     const toks = toTokens(q).filter(t => !STOPWORDS.has(t));
     if (!toks.length) return null;
 
-    // nếu nhận ra hãng thì lọc theo factory để đỡ nhiễu
     const { canonical: fac } = brandFromText(q);
     const whereBase: any = fac ? { factory: fac } : {};
 
@@ -719,7 +856,6 @@ async function findBestProductByText(q: string) {
         take: 60
     });
 
-    // nếu siết theo hãng mà không ra → nới lỏng bỏ hãng
     if (!cand.length && fac) {
         cand = await prisma.product.findMany({
             where: { OR: [...orName, ...orShort, ...orDetail] },
@@ -739,6 +875,7 @@ async function findBestProductByText(q: string) {
 
 /* ======================= Agent Decision Prompt ======================= */
 
+// ⭐ changed: bổ sung quy tắc “gửi sản phẩm/send/cho mình mẫu … ⇒ search ngay”
 const SYS_AGENT = `Bạn là RÙA AI – tư vấn laptop bằng tiếng Việt cho website.
 Chỉ được xuất MỘT DÒNG JSON đúng schema:
 {"action":"search|strongest|reply",
@@ -751,7 +888,7 @@ Chỉ được xuất MỘT DÒNG JSON đúng schema:
 
 QUY TẮC:
 - Nếu người dùng CHÀO HỎI/không có ý định mua (thiếu hãng/nhu cầu/ngân sách), bắt buộc {"action":"reply"}: hỏi lại gọn. KHÔNG dùng "search"/"strongest".
-- “liệt kê/gợi ý/danh sách/dòng/model/recommend” ⇒ {"action":"search"}.
+- “liệt kê/gợi ý/danh sách/dòng/model/recommend/gửi sản phẩm/send/cho mình mẫu” ⇒ {"action":"search"}.
 - “mạnh nhất/đỉnh nhất/best/khủng nhất” ⇒ {"action":"strongest"}.
 - Ngân sách "~20tr", "dưới 15tr", "10-15tr" ⇒ set min/max (VND).
 - Nhu cầu "gaming/văn phòng/mỏng nhẹ/đồ họa/doanh nhân" ⇒ map "target".
@@ -765,7 +902,7 @@ export async function runTurtleAgent(params: {
     userId: number | null, clientSessionId?: number, message: string
 }) {
     const { userId, clientSessionId, message } = params;
-
+    const takeWanted = parseTakeVi(message);
     // 1) Session
     let session = clientSessionId
         ? await prisma.aiChatSession.findFirst({ where: userId ? { id: clientSessionId, userId } : { id: clientSessionId } })
@@ -778,7 +915,10 @@ export async function runTurtleAgent(params: {
     await upsertMessageEmbedding(u.id, u.content);
 
     // 3) Parse/remember filters (mới)
+    // 3) Parse/remember filters (mới)
     const { brand, target, minBudget, maxBudget, wantList, wantStrongest } = parseFilters(message);
+
+    // ghi nhớ tạm nếu có
     if (brand) await setEphemeralFilter(session.id, "filter.brand", Array.isArray(brand) ? JSON.stringify(brand) : brand);
     if (target) await setEphemeralFilter(session.id, "filter.target", target);
     if (typeof minBudget === "number" || typeof maxBudget === "number") {
@@ -786,58 +926,63 @@ export async function runTurtleAgent(params: {
     }
 
     const remembered = await getSessionFilters(session.id);
-    if (brand) remembered.brand = brand;
-    if (target) remembered.target = target;
-    if (typeof minBudget === "number") remembered.min = minBudget;
-    if (typeof maxBudget === "number") remembered.max = maxBudget;
 
-    const hasIntent =
-        !!(remembered.brand || remembered.target || remembered.min || remembered.max || wantList || wantStrongest);
+    const eff = mergeFiltersForThisTurn({ brand, target, minBudget, maxBudget }, remembered, message, isBrandOnlyFollowUp(message));
 
+    // nếu câu hiện tại có brand/target/budget mới -> dọn list cũ để khỏi lạc đề
+    if (brand || target || typeof minBudget === 'number' || typeof maxBudget === 'number') {
+        await setSessionKV(session.id, "result.ids", JSON.stringify([]));
+    }
+
+    // Dùng eff thay cho remembered ở các biến/return
+    const hasIntent = !!(eff.brand || eff.target || eff.min || eff.max || wantList || wantStrongest);
     const bf = brandFromText(message);
     const brandOnlyIntent = !!bf.canonical && !target && !minBudget && !maxBudget && !wantList && !wantStrongest;
+
 
     const wantsCompare = WANT_COMPARE_RE.test(message);
     const pickIndex = PICK_INDEX_RE.exec(message);
 
-    // ===== Brand-only: trả list nhanh theo hãng, lưu IDs
+    // ===== Brand-only: ⭐ changed – gửi danh sách ngay, không hỏi xác nhận =====
     if (brandOnlyIntent) {
         const brands = [bf.canonical as string];
-        const count = await prisma.product.count({ where: { factory: { in: brands } } });
-        const top = await listByFilters({ brand: brands }, 3);
+        const kWanted = parseWantedCount(message) || 6;
+        // lấy list theo hãng và các filter đã nhớ (nếu có min/max/target đã lưu)
+        const { list, reason } = await smartSearch({ brand: brands, target: remembered.target, min: remembered.min, max: remembered.max }, kWanted);
+        const products = list.map(productDTO);
+        const top = await listByFilters({ brand: brands }, takeWanted ?? 3);
 
         let reply: string;
-        const label = brands.join('/');
-
-        if (count > 0) {
-            reply = `Có nhé! Hiện shop đang có **${count} mẫu ${label}**. Bạn cần **gaming/văn phòng** và **tầm giá** khoảng bao nhiêu?`;
+        if (products.length) {
+            reply = await buildLeadText({ brand: brands, target: remembered.target, min: remembered.min, max: remembered.max }, products, reason);
+            const ids = products.map(p => p.id);
+            await setSessionKV(session.id, "result.ids", JSON.stringify(ids));
+            await setSessionKV(session.id, "result.format", "list");
         } else {
-            reply = `Hiện chưa có mẫu **${label}** trong kho. Bạn muốn xem **dòng tương đương** (ví dụ Dell/ASUS/MSI) không?`;
+            const count = await prisma.product.count({ where: { factory: { in: brands } } });
+            reply = count > 0
+                ? `Mình chưa khớp đúng tiêu chí, mình có thể **mở rộng ±20% ngân sách** hoặc gợi ý **dòng gần nhất** trong hãng ${brands.join('/')} nhé.`
+                : `Hiện chưa có mẫu **${brands.join('/')}** trong shop. Bạn muốn xem **dòng tương đương** (ví dụ Dell/ASUS/MSI) không?`;
         }
 
-        const ids = top.map(p => p.id);
-        await setSessionKV(session.id, "result.ids", JSON.stringify(ids));
-        await setSessionKV(session.id, "result.format", top.length ? "list" : "cards");
-
-        await prisma.aiChatMessage.create({ data: { sessionId: session.id, role: "ASSISTANT", content: reply } });
+        await prisma.aiChatMessage.create({ data: { sessionId: session.id, role: "ASSISTANT", content: products.length ? 'Gợi ý sản phẩm' : reply } });
         await prisma.aiChatSession.update({ where: { id: session.id }, data: { lastUsedAt: new Date() } });
 
         return {
             status: 200 as const,
             body: {
                 sessionId: session.id,
-                reply,
-                format: top.length ? "list" as const : undefined,
-                products: top.map(productDTO),
-                activeFilters: { brand: brands },
-                suggestions: top.length
-                    ? ["Chọn máy mạnh nhất", "Gaming ~20tr", "Văn phòng mỏng nhẹ"]
+                reply, // luôn có lead thân thiện
+                format: products.length ? "list" as const : undefined,
+                products,
+                activeFilters: { brand: brands, target: remembered.target, min: remembered.min, max: remembered.max },
+                suggestions: products.length
+                    ? ["Chọn máy mạnh nhất", "Hiển thị dạng thẻ", "So sánh #1 với #2"]
                     : ["Xem Dell tương đương", "Xem ASUS tương đương", "Tư vấn theo ngân sách"]
             }
         };
     }
 
-    /* ===== A) SO SÁNH THEO TÊN (ưu tiên), nếu không có thì dùng danh sách trước (#) ===== */
     /* ===== A) SO SÁNH THEO TÊN (ưu tiên), nếu không có thì dùng danh sách trước (#) ===== */
     function rowsForProduct(p: any) {
         const blob = `${p.featureTags || ''} ${p.shortDesc || ''} ${p.detailDesc || ''}`.toUpperCase();
@@ -864,7 +1009,6 @@ export async function runTurtleAgent(params: {
                 if (prod) found.push(prod);
             }
             if (found.length >= 2) {
-                // chuẩn hóa items
                 const items = found.slice(0, 4).map(p => ({
                     id: p.id,
                     title: p.name,
@@ -872,17 +1016,14 @@ export async function runTurtleAgent(params: {
                     rows: rowsForProduct(p)
                 }));
 
-                // chấm điểm, gợi ý
                 const ranked = [...found].map(p => ({ p, sc: scoreProduct(p) }))
                     .sort((a, b) => b.sc - a.sc);
                 const best = ranked[0]?.p, second = ranked[1]?.p;
                 const conclusion =
                     best
-                        ? `**Ưu tiên hiệu năng/đồ họa** ⇒ chọn **${best.name}** (cấu hình mạnh hơn).` +
-                        (second ? ` Nếu ưu tiên **giá/di động/pin**, cân nhắc **${second.name}**.` : '')
+                        ? `**Ưu tiên hiệu năng/đồ họa** ⇒ chọn **${best.name}**.`
                         : '';
 
-                // trả compare + gợi ý
                 await prisma.aiChatMessage.create({ data: { sessionId: session.id, role: "ASSISTANT", content: 'So sánh sản phẩm' } });
                 await setSessionKV(session.id, "result.ids", JSON.stringify(items.map(i => i.id)));
                 await setSessionKV(session.id, "result.format", "cards");
@@ -891,9 +1032,9 @@ export async function runTurtleAgent(params: {
                     status: 200 as const,
                     body: {
                         sessionId: session.id,
-                        reply: '',
+                        reply: 'Mình so sánh nhanh hai mẫu bạn vừa chọn nhé:',
                         format: 'cards',
-                        products: [], // hiển thị bằng modal so sánh
+                        products: [],
                         compare: {
                             labels: ['CPU', 'GPU', 'RAM', 'SSD', 'Màn hình', 'Cân nặng', 'Giá tham khảo'],
                             items,
@@ -907,7 +1048,6 @@ export async function runTurtleAgent(params: {
                 };
             }
         }
-
 
         // Fallback: so sánh theo số thứ tự từ danh sách trước (#1 vs #2 ...)
         const rawIds = await getSessionKV(session.id, "result.ids");
@@ -947,8 +1087,6 @@ export async function runTurtleAgent(params: {
         }
         // nếu không có danh sách trước → tiếp tục flow bình thường
     }
-
-
 
     /* ===== B) chọn máy số N từ danh sách trước ===== */
     if (pickIndex) {
@@ -990,11 +1128,12 @@ export async function runTurtleAgent(params: {
 
                 await prisma.aiChatMessage.create({ data: { sessionId: session.id, role: "ASSISTANT", content: `Máy mạnh nhất trong danh sách vừa rồi: ${best.name}` } });
                 await prisma.aiChatSession.update({ where: { id: session.id }, data: { lastUsedAt: new Date() } });
+                const friendly = await buildLeadText(remembered, [productDTO(best)], "Máy mạnh nhất trong danh sách vừa rồi");
                 return {
                     status: 200 as const,
                     body: {
                         sessionId: session.id,
-                        reply: "",
+                        reply: friendly,
                         format: "cards",
                         products: [productDTO(best)],
                         activeFilters: remembered,
@@ -1004,6 +1143,7 @@ export async function runTurtleAgent(params: {
             }
         }
     }
+
     // ==== Quick commands (dùng lại kết quả gần nhất) ====
     if (SHOW_CARDS_RE.test(message)) {
         const last = await showLastResults(session.id, "cards");
@@ -1012,7 +1152,7 @@ export async function runTurtleAgent(params: {
                 status: 200 as const,
                 body: {
                     sessionId: session.id,
-                    reply: "",
+                    reply: "Mình mở lại danh sách bạn vừa xem nhé:",
                     format: "cards",
                     products: last.products,
                     activeFilters: remembered,
@@ -1024,7 +1164,7 @@ export async function runTurtleAgent(params: {
                 status: 200 as const,
                 body: {
                     sessionId: session.id,
-                    reply: "Chưa có danh sách để hiển thị. Bạn thử nói “liệt kê laptop …” trước nhé.",
+                    reply: "Hiện chưa có danh sách sẵn. Bạn thử nói “liệt kê laptop …” nhé, mình gửi ngay.",
                     format: undefined,
                     products: [],
                     activeFilters: remembered,
@@ -1041,7 +1181,7 @@ export async function runTurtleAgent(params: {
                 status: 200 as const,
                 body: {
                     sessionId: session.id,
-                    reply: "",
+                    reply: "Mình mở lại danh sách bạn vừa xem nhé:",
                     format: "list",
                     products: last.products,
                     activeFilters: remembered,
@@ -1053,7 +1193,7 @@ export async function runTurtleAgent(params: {
                 status: 200 as const,
                 body: {
                     sessionId: session.id,
-                    reply: "Chưa có danh sách để hiển thị. Bạn thử “liệt kê …” trước nhé.",
+                    reply: "Chưa có danh sách để hiển thị. Bạn bảo mình “liệt kê …” là mình gửi liền nha.",
                     format: undefined,
                     products: [],
                     activeFilters: remembered,
@@ -1083,7 +1223,7 @@ export async function runTurtleAgent(params: {
                 status: 200 as const,
                 body: {
                     sessionId: session.id,
-                    reply: "Chưa có danh sách để so sánh. Bạn thử “liệt kê laptop …” trước nhé.",
+                    reply: "Chưa có danh sách để so sánh. Bạn thử “liệt kê laptop …” nhé, mình gửi ngay.",
                     format: undefined,
                     products: [],
                     activeFilters: remembered,
@@ -1100,6 +1240,10 @@ export async function runTurtleAgent(params: {
         const f2 = { ...remembered, max };
         const list = await listByFilters(f2, 6);
         const products = list.map(productDTO);
+        let lead = "";
+        if (products.length) {
+            lead = await buildLeadText(f2, products);
+        }
         if (products.length) {
             const ids = products.map(p => p.id);
             await setSessionKV(session.id, "result.ids", JSON.stringify(ids));
@@ -1109,7 +1253,7 @@ export async function runTurtleAgent(params: {
             status: 200 as const,
             body: {
                 sessionId: session.id,
-                reply: products.length ? "" : "Hiện chưa khớp. Bạn thử tăng ngân sách hoặc đổi hãng/nhu cầu nhé.",
+                reply: products.length ? lead : "Chưa khớp theo tiêu chí này. Bạn thử tăng ngân sách hoặc đổi hãng/nhu cầu nhé.",
                 format: products.length ? "list" : undefined,
                 products,
                 activeFilters: { ...remembered, max },
@@ -1127,12 +1271,31 @@ export async function runTurtleAgent(params: {
     const context = [
         session.summary ? `# TÓM TẮT: ${session.summary}` : '',
         memories.length ? `# GỢI NHỚ:\n- ${memories.map(m => m.text).join('\n- ')}` : '',
-        `# FILTER: ${JSON.stringify(remembered)}`
+        `# FILTER: ${JSON.stringify(remembered)}`,
+        `# PHONG CÁCH:\n${STYLE_GUIDE_VI}`,
+        `# KINH NGHIỆM LAPTOP:\n${LAPTOP_CHEATSHEET}`
     ].filter(Boolean).join('\n\n');
+    // Lời cảm ơn → đáp lịch sự, gợi mở nhẹ
+    if (isThanks(message)) {
+        const reply = 'Rất vui được hỗ trợ bạn! Nếu cần mình có thể so sánh 1–1, lọc theo cân nặng/pin hoặc set ngân sách chi tiết hơn nhé.';
+        const a = await prisma.aiChatMessage.create({ data: { sessionId: session.id, role: "ASSISTANT", content: reply } });
+        await upsertMessageEmbedding(a.id, a.content);
+        await prisma.aiChatSession.update({ where: { id: session.id }, data: { lastUsedAt: new Date() } });
+        return { status: 200 as const, body: { sessionId: session.id, reply, format: undefined, products: [], activeFilters: {}, suggestions: ["So sánh 1–1", "Máy mỏng nhẹ < 1.3kg", "Gaming ~20tr"] } };
+    }
 
-    // 5) Greeting → hỏi gọn
+    // Tạm biệt → chốt lịch sự
+    if (isBye(message)) {
+        const reply = 'Chúc bạn chọn được chiếc máy ưng ý! Khi cần gợi ý mới, nhắn “liệt kê …” là mình gửi ngay.';
+        const a = await prisma.aiChatMessage.create({ data: { sessionId: session.id, role: "ASSISTANT", content: reply } });
+        await upsertMessageEmbedding(a.id, a.content);
+        await prisma.aiChatSession.update({ where: { id: session.id }, data: { lastUsedAt: new Date() } });
+        return { status: 200 as const, body: { sessionId: session.id, reply, format: undefined, products: [], activeFilters: {}, suggestions: ["Gợi ý gaming", "Văn phòng mỏng nhẹ", "Theo hãng bạn thích"] } };
+    }
+
+    // 5) Greeting → hỏi gọn (thân thiện hơn)
     if (!hasIntent && isGreetingOrSmallTalk(message)) {
-        const reply = 'Mình đây 👋 Bạn cho mình **ngân sách + nhu cầu + hãng** (vd: "ASUS gaming ~20tr", "mỏng nhẹ < 15tr") để mình lọc máy phù hợp nhé.';
+        const reply = 'Hello 👋 Bạn cứ nhắn **hãng + nhu cầu + ngân sách** (vd: "ASUS gaming ~20tr", "mỏng nhẹ < 15tr"). Mình lọc và gửi danh sách ngay cho bạn nhé.';
         const a = await prisma.aiChatMessage.create({ data: { sessionId: session.id, role: "ASSISTANT", content: reply } });
         await upsertMessageEmbedding(a.id, a.content);
         await prisma.aiChatSession.update({ where: { id: session.id }, data: { lastUsedAt: new Date() } });
@@ -1176,10 +1339,34 @@ export async function runTurtleAgent(params: {
     let products: any[] = [];
     let format: 'cards' | 'list' | undefined = decision.format;
     const f = { ...remembered, ...(decision.filters || {}) };
-    const needStrict = !!(f.brand && f.target); // user đã nói rõ "HP văn phòng" → strict
+
+    // ⭐ changed: nếu người dùng nói “gửi … 5 mẫu” → tôn trọng số lượng yêu cầu
+    const kWanted = parseWantedCount(message) || (decision.action === 'search' ? 6 : 12);
+
+    const needStrict = !!(f.brand && f.target);
+    // Nếu message có số “X tr” mà f vẫn min/max rất nhỏ (do dính session cũ) → thay bằng parse lần nữa
+    const msg = deaccent(message);
+    const blunt = msg.match(/\b(\d{1,3})\s*(tr|trieu|m)\b/i);
+    if (blunt) {
+        const v = parseInt(blunt[1], 10) * 1_000_000;
+        const span = Math.round(v * 0.15); // ±15%
+        f.min = Math.max(0, v - span);
+        f.max = v + span;
+    }
+    {
+        const blunt = deaccent(message).match(/\b(\d{1,3})\s*(tr|trieu|m)\b/i);
+        if (blunt) {
+            const v = parseInt(blunt[1], 10) * 1_000_000;
+            const span = Math.round(v * 0.15);
+            f.min = Math.max(0, v - span);
+            f.max = v + span;
+        }
+    }
     const searchFn = needStrict ? smartSearchStrict : smartSearch;
+
     if (decision.action === 'strongest') {
-        const { list, reason } = await searchFn(f, 12);
+        const { list, reason } = await searchFn(f, takeWanted ?? 12);
+        await saveLastContext(session.id, f, list);
         const best = list.length ? list.reduce((acc, cur) =>
             (scoreProduct(cur, f.target) > scoreProduct(acc, f.target) ? cur : acc), list[0]) : null;
         if (best) {
@@ -1188,7 +1375,8 @@ export async function runTurtleAgent(params: {
             reply = await buildLeadText(f, products, reason);
         }
     } else if (decision.action === 'search') {
-        const { list, reason } = await searchFn(f, 6);
+        const { list, reason } = await searchFn(f, takeWanted ?? 6);
+        await saveLastContext(session.id, f, list);
         products = list.map(productDTO);
         if (!format) format = 'list';
         if (products.length) reply = await buildLeadText(f, products, reason);
@@ -1202,7 +1390,7 @@ export async function runTurtleAgent(params: {
         const brandLabel = Array.isArray(f.brand) ? f.brand.join('/') : f.brand;
         const budgetText = (typeof f.min === "number" || typeof f.max === "number")
             ? `${(f.min ?? 0) / 1e6}–${typeof f.max === 'number' ? f.max / 1e6 : "∞"}tr` : "bạn đưa";
-        reply = `Chưa có mẫu **${brandLabel} / ${humanTarget(f.target)}** đúng **tầm giá ${budgetText}** trong kho.
+        reply = `Chưa có mẫu **${brandLabel} / ${humanTarget(f.target)}** đúng **tầm giá ${budgetText}** trong shop.
 Bạn muốn **mở rộng ±20% ngân sách** hoặc **giữ ${brandLabel} nhưng đổi tầm giá** không?`;
         return {
             status: 200 as const,
@@ -1221,13 +1409,14 @@ Bạn muốn **mở rộng ±20% ngân sách** hoặc **giữ ${brandLabel} như
         };
     }
 
-
-
+    // >>> thêm ngay trước mục 8):
+    if (!reply && products.length) {
+        const introRaw = buildIntro(f as any, products.length);
+        reply = await polishVietnamese(introRaw, { persona: 'than-thien' });
+    }
 
     // 8) LLM answer (khi không có products/reply)
-    // === SAVE REPLY / FALLBACK ===
     if (!reply && products.length === 0) {
-        // đã có đủ hãng + mục đích -> KHÔNG gọi LLM để tránh bịa
         const needStrictHere = (typeof needStrict !== 'undefined') ? needStrict : !!(f?.brand && f?.target);
 
         if (needStrictHere) {
@@ -1239,14 +1428,12 @@ Bạn muốn **mở rộng ±20% ngân sách** hoặc **giữ ${brandLabel} như
                     : 'bạn đưa';
 
             reply =
-                `Chưa có mẫu **${brandLabel} / ${targetLabel}** đúng **tầm giá ${budgetText}** trong kho. ` +
+                `Chưa có mẫu **${brandLabel} / ${targetLabel}** đúng **tầm giá ${budgetText}** trong shop. ` +
                 `Bạn muốn mình **mở rộng ±20% ngân sách** hoặc **giữ ${targetLabel} nhưng xem hãng tương đương** không?`;
 
-            // mượt tiếng Việt
             reply = await polishVietnamese(reply, { persona: 'tu-van' });
 
         } else {
-            // chưa đủ hãng/mục đích -> cho LLM trả lời ngắn gọn
             const msgs: ChatMessage[] = [
                 { role: 'system', content: `Bạn là trợ lý bán laptop, trả lời ngắn gọn, không bịa.\n\n${context}` },
                 ...history,
@@ -1260,7 +1447,6 @@ Bạn muốn **mở rộng ±20% ngân sách** hoặc **giữ ${brandLabel} như
             reply = await polishVietnamese(reply, { persona: 'tu-van' });
         }
 
-        // lưu message + embedding + memory (giống cũ)
         const a = await prisma.aiChatMessage.create({
             data: { sessionId: session.id, role: "ASSISTANT", content: reply }
         });
@@ -1276,7 +1462,6 @@ Bạn muốn **mở rộng ±20% ngân sách** hoặc **giữ ${brandLabel} như
         });
 
     } else {
-        // có products hoặc đã có reply -> lưu "Gợi ý sản phẩm" như trước
         const a = await prisma.aiChatMessage.create({
             data: { sessionId: session.id, role: "ASSISTANT", content: (products.length ? 'Gợi ý sản phẩm' : reply) }
         });
