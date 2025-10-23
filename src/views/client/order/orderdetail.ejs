@@ -118,18 +118,62 @@
 
                         <% if (_phoneDial) { %>
                             <div class="d-flex gap-2">
-                                <a class="btn btn-primary btn-sm" href="tel:<%= _phoneDial %>">
-                                    <i class="bi bi-telephone me-1"></i>Gọi ngay
-                                </a>
-                                <a class="btn btn-outline-primary btn-sm" href="sms:<%= _phoneDial %>">
-                                    <i class="bi bi-chat-dots me-1"></i>Nhắn tin
-                                </a>
-                                <button class="btn btn-outline-secondary btn-sm copy-phone" type="button"
+                                <!-- Nút gọi nhanh: ưu tiên mở tel: -->
+                                <button class="btn btn-primary btn-sm js-call-now" type="button"
                                     data-phone="<%= _phoneDial %>">
-                                    <i class="bi bi-clipboard me-1"></i>Sao chép số
+                                    <i class="bi bi-telephone me-1"></i>Gọi ngay
                                 </button>
+
+                                <!-- Menu phương án khác -->
+                                <div class="dropdown">
+                                    <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        Tùy chọn gọi
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" href="tel:<%= _phoneDial %>">
+                                                Dùng ứng dụng mặc định (tel:)
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="callto:<%= _phoneDial %>">
+                                                Gọi qua Skype/Linphone (callto:)
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item js-copy-phone" type="button"
+                                                data-phone="<%= _phoneDial %>">
+                                                Sao chép số
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <% const wa=_phoneDial.replace(/^\+/, '' ).replace(/\D/g,''); %>
+                                                <a class="dropdown-item" href="https://wa.me/<%= wa %>" target="_blank"
+                                                    rel="noopener">
+                                                    Mở WhatsApp chat
+                                                </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Gợi ý nếu hệ thống chưa có app gọi -->
+                            <div id="callHelp" class="alert alert-secondary py-2 px-3 mt-2 d-none"
+                                style="max-width:520px;">
+                                Không thấy ứng dụng gọi mở ra? Hãy chọn một trong các cách sau:
+                                <ul class="mb-0">
+                                    <li>Mở bằng <code>callto:</code> (Skype/Linphone): <a
+                                            href="callto:<%= _phoneDial %>">nhấn vào đây</a></li>
+                                    <li>Đặt ứng dụng mặc định cho <code>tel:</code> trong Windows (Phone
+                                        Link/Skype/Linphone).</li>
+                                </ul>
                             </div>
                             <% } %>
+
                     </div>
                     <% } %>
 
@@ -330,6 +374,49 @@
                     }
                 });
             </script>
+
+            // Script gọi điện
+            <script>
+                (function () {
+                    // Bấm "Gọi ngay": thử mở tel:, nếu không có handler thì hiện gợi ý
+                    document.addEventListener('click', function (e) {
+                        const btn = e.target.closest('.js-call-now');
+                        if (!btn) return;
+                        const phone = btn.getAttribute('data-phone') || '';
+                        if (!phone) return;
+
+                        // Cách ổn định trên desktop: tạo iframe ẩn để trigger protocol
+                        const telUrl = 'tel:' + phone;
+                        const iframe = document.createElement('iframe');
+                        iframe.style.display = 'none';
+                        iframe.src = telUrl;
+                        document.body.appendChild(iframe);
+
+                        // Nếu sau ~1.2s trang vẫn "đứng yên" => đoán là không có app handle -> hiện gợi ý
+                        // (Không hoàn hảo nhưng đủ UX tốt)
+                        setTimeout(function () {
+                            try { document.body.removeChild(iframe); } catch { }
+                            const help = document.getElementById('callHelp');
+                            if (help) help.classList.remove('d-none');
+                        }, 1200);
+                    });
+
+                    // Sao chép số nhanh
+                    document.addEventListener('click', function (e) {
+                        const btn = e.target.closest('.js-copy-phone');
+                        if (!btn) return;
+                        const phone = btn.getAttribute('data-phone') || '';
+                        if (!phone) return;
+
+                        navigator.clipboard.writeText(phone).then(function () {
+                            // Bạn có thể thay bằng toast của bạn
+                            btn.textContent = 'Đã sao chép';
+                            setTimeout(() => (btn.textContent = 'Sao chép số'), 1500);
+                        });
+                    });
+                })();
+            </script>
+
 </body>
 
 </html>

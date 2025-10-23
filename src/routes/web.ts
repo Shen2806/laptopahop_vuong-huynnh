@@ -24,7 +24,9 @@ import { getAdminStaffPage, getCreateStaffPage, getViewStaff, postCreateStaff, p
 import { requirePerm } from 'src/middleware/requirePerm';
 import { exposePermsToView } from 'src/middleware/exposePermsToView';
 import { attachPermissions } from 'src/middleware/attachPermissions';
-import { assignShipper } from 'services/admin/staff.service';
+import * as OrderCtl from 'src/controllers/admin/order.controller';
+import { assignShipperToOrder } from 'src/services/admin/staff.service';
+
 
 const router = express.Router();
 
@@ -411,13 +413,27 @@ const webRoutes = (app: Express) => {
     router.get("/admin/coupon/delete/:id", deleteCoupon);
 
 
-    router.get("/admin/order", getAdminOrderPage);
-    router.get("/admin/order/:id", getAdminOrderDetailPage);
-    // xác nhận trạng thái đơn hàng
-    router.post("/admin/order/:id/confirm", postConfirmOrder);
-    router.post("/admin/order/:id/cancel", postCancelOrderByAdmin);
-    router.post("/admin/order/:id/status", postUpdateOrderStatus);
-    router.post("/admin/order/:id/assign-shipper", assignShipper);
+    // ===== Orders (theo role logic mới) =====
+    // List: mọi staff có 'order.view' (OPS_STAFF sẽ chỉ thấy đơn của mình)
+    router.get("/admin/order", requirePerm("order.view"), OrderCtl.getOrderList);
+
+    // Detail: mọi staff có 'order.view' (OPS_STAFF chỉ vào được đơn của chính họ)
+    router.get("/admin/order/:id", requirePerm("order.view"), OrderCtl.getOrderDetail);
+
+    // Đổi trạng thái:
+    // - OPS_MANAGER chỉ được PENDING->CONFIRMED, CONFIRMED->SHIPPING (các case khác bị chặn trong controller)
+    // - OPS_STAFF chỉ được OUT_FOR_DELIVERY->DELIVERED và phải là đơn được giao cho mình
+    router.post("/admin/order/:id/status", OrderCtl.postUpdateOrderStatus);
+
+    // Hủy đơn: để chặt chẽ bạn có thể giữ quyền 'order.update' (ADMIN/SALES_SUPPORT)
+    router.post("/admin/order/:id/cancel", requirePerm("order.update"), OrderCtl.postCancelOrder);
+
+    // Bàn giao shipper (OPS_MANAGER): đẩy đơn sang OUT_FOR_DELIVERY + gán shipper
+    router.post("/admin/order/:id/assign-shipper", requirePerm("shipment.assign"), OrderCtl.postAssignShipper);
+
+    // OPS_STAFF xác nhận đã giao (chỉ đơn của chính mình, trạng thái OUT_FOR_DELIVERY)
+    router.post("/admin/order/:id/mark-delivered", requirePerm("delivery.update_status"), OrderCtl.postMarkDelivered);
+
     // app.use("/", isAdmin, router);
     // Admin chat
     router.get("/admin/chat", isAdmin, (req, res) => res.render("admin/chat/index.ejs"));

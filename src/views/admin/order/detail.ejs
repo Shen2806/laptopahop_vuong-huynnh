@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <link rel="stylesheet" href="/admin/css/order/detail.css">
+
 <head>
     <meta charset="utf-8">
     <title>Chi tiết đơn hàng - LaptopShop</title>
@@ -11,7 +12,7 @@
 
     <!-- POLISH: đồng bộ theme -->
     <style>
-        
+
     </style>
 </head>
 
@@ -91,7 +92,7 @@
                                                 </p>
                                                 <p><strong>Phí vận chuyển:</strong>
                                                     <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                        currency: 'VND' }) .format(Number(order.shippingFee || 0)) %>
+                                                        currency: 'VND' }).format(Number(order.shippingFee || 0)) %>
                                                 </p>
                                                 <p><strong>Tổng tiền:</strong>
                                                     <%= new Intl.NumberFormat('vi-VN', {style:'currency',
@@ -107,7 +108,13 @@
                                                     <%= new Intl.NumberFormat('vi-VN', {style:'currency',
                                                         currency:'VND'}).format(grandTotal) %>
                                                 </p>
-
+                                                <p><strong>Nhân viên giao: </strong>
+                                                    <%= order.shipperNameCache ? order.shipperNameCache : "-" %>
+                                                        <% if (order.shipperPhoneCache){ %>
+                                                            <small class="text-muted"> — <%= order.shipperPhoneCache %>
+                                                                    </small>
+                                                            <% } %>
+                                                </p>
 
                                                 <p><strong>Ghi chú khách:</strong>
                                                     <%= order.receiverNote || "-" %>
@@ -130,7 +137,6 @@
                                             <p><strong>Địa chỉ:</strong>
                                                 <i class="fa fa-map-marker-alt me-1"></i>
                                                 <%= addressDisplay %>
-
                                             </p>
                                         </div>
                                     </div>
@@ -164,21 +170,21 @@
                                                             <%= orderDetail.product.name %>
                                                         </a>
                                                     </td>
-                                                    <% const discountPrice=orderDetail.product.discount>0
+                                                    <% const discountPrice=orderDetail.product.discount> 0
                                                         ? Math.round(orderDetail.product.price * (100 -
                                                         orderDetail.product.discount) / 100)
                                                         : orderDetail.product.price; %>
                                                         <td>
-                                                            <%= new
-                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountPrice)
+                                                            <%= new Intl.NumberFormat('vi-VN',
+                                                                {style:'currency',currency:'VND'}).format(discountPrice)
                                                                 %>
                                                         </td>
                                                         <td>
                                                             <%= orderDetail.quantity %>
                                                         </td>
                                                         <td>
-                                                            <%= new
-                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountPrice
+                                                            <%= new Intl.NumberFormat('vi-VN',
+                                                                {style:'currency',currency:'VND'}).format(discountPrice
                                                                 * orderDetail.quantity) %>
                                                         </td>
                                                 </tr>
@@ -189,7 +195,7 @@
                             </div>
 
                             <!-- Hành động admin -->
-                            <% if(order.status !=='DELIVERED' && order.status !=='CANCELED' ){ %>
+                            <% if (order.status !=='DELIVERED' && order.status !=='CANCELED' ) { %>
                                 <div class="mb-4 d-flex flex-wrap gap-2 align-items-end">
                                     <% if ((allowedNext || []).length> 0) { %>
                                         <form action="/admin/order/<%= order.id %>/status" method="post"
@@ -246,7 +252,44 @@
                                 </div>
                                 <% } %>
 
-                        </div>
+                                    <!-- Chỉ OPS_MANAGER: BÀN GIAO cho OPS_STAFF (CHỈ khi đang SHIPPING) -->
+                                    <% if (typeof auth !=='undefined' && auth.isOpsManager && order.status==='SHIPPING'
+                                        ) { %>
+                                        <form action="/admin/order/<%= order.id %>/assign-shipper" method="post"
+                                            class="d-flex gap-2 align-items-end">
+                                            <div>
+                                                <label class="form-label mb-1 text-light">Bàn giao vận chuyển</label>
+                                                <select name="shipperId" class="form-select" required>
+                                                    <option value="" disabled selected>-- Chọn nhân viên giao hàng --
+                                                    </option>
+                                                    <% (shippers || []).forEach(function(s){ %>
+                                                        <option value="<%= s.id %>" <%=(order.assignedShipperId===s.id
+                                                            ? 'selected' : '' ) %>>
+                                                            <%= s.fullName %>
+                                                                <%= s.phone ? (' - ' + s.phone) : '' %>
+                                        </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success mt-auto">
+                                <i class="fas fa-handshake"></i> Bàn giao
+                            </button>
+                        </form>
+                    <% } %>
+
+                    <!-- Chỉ OPS_STAFF: xác nhận đã giao (đơn của chính mình) -->
+                    <% if (typeof auth !== ' undefined' && auth.isOpsStaff && order.status==='OUT_FOR_DELIVERY' &&
+                                                                    auth.meStaffId===order.assignedShipperId) { %>
+                                                                    <form
+                                                                        action="/admin/order/<%= order.id %>/mark-delivered"
+                                                                        method="post" class="ms-0 mt-3">
+                                                                        <button type="submit" class="btn btn-success">
+                                                                            <i class="fa fa-check"></i> Xác nhận đã giao
+                                                                        </button>
+                                                                    </form>
+                                                                    <% } %>
+
+                                            </div>
                     </main>
                     <%- include('../layout/footer'); -%>
                 </div>
