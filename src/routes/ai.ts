@@ -5,6 +5,9 @@ import "dotenv/config";
 
 const router = Router();
 
+// helper sleep
+const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
+
 router.post("/ai/chat", async (req: Request, res: Response) => {
     try {
         let message = "";
@@ -13,28 +16,31 @@ router.post("/ai/chat", async (req: Request, res: Response) => {
         if (typeof req.body === "string") {
             message = req.body.trim();
         } else if (req.body) {
-            if (typeof req.body.message === "string") {
-                message = String(req.body.message).trim();
-            }
-            if (req.body.sessionId) clientSessionId = Number(req.body.sessionId);
-        }
-
-        if (!message) {
-            return res.json({
-                reply:
-                    'Bạn cho mình **ngân sách + nhu cầu + hãng** nhé (vd: "ASUS gaming ~20tr", "mỏng nhẹ dưới 15tr").',
-                products: [],
-                suggestions: ["Tư vấn theo ngân sách", "Gợi ý gaming", "Máy mỏng nhẹ < 1.3kg"],
-            });
+            message = (req.body.message || "").trim();
+            clientSessionId = Number(req.body.sessionId) || undefined;
         }
 
         const userId = (req as any)?.user?.id ?? null;
 
+        const t0 = Date.now();
         const { status, body } = await runTurtleAgent({
             userId,
             clientSessionId,
             message,
         });
+        const inferMs = Date.now() - t0;
+
+        // Delay cấu hình: ENV ưu tiên, sau đó cho phép client ghi đè qua body.delayMs
+        const REPLY_DELAY_MS =
+            Number(process.env.AI_REPLY_DELAY_MS ?? 0) ||
+            Number((req.body && req.body.delayMs) || 0);
+
+        if (REPLY_DELAY_MS > 0) {
+            await sleep(REPLY_DELAY_MS);
+        }
+
+        // Gắn latency đo được (nếu muốn)
+        (body as any)._latency = { inferMs, addedDelayMs: REPLY_DELAY_MS };
 
         return res.status(status).json(body);
     } catch (e: any) {

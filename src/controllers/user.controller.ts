@@ -252,14 +252,13 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         }
     }
 
-    // ===== Giá: hỗ trợ nhiều khoảng (CSV) theo format controller đang dùng: "min-max", "min+", "<=max", ">=min"
+    // ===== Giá (hỗ trợ nhiều token)
     const priceTokens = parseCsv(price);
     if (priceTokens.length) {
         const OR: any[] = [];
         for (const token of priceTokens) {
             const s = token.trim();
 
-            // "min-max"
             const range = s.match(/^(\d+)?\s*-\s*(\d+)?$/);
             if (range) {
                 const min = range[1] ? parseInt(range[1], 10) : null;
@@ -270,19 +269,16 @@ const getProductFilterPage = async (req: Request, res: Response) => {
                 OR.push({ price: cond });
                 continue;
             }
-            // "min+"
             const minPlus = s.match(/^(\d+)\+$/);
             if (minPlus) {
                 OR.push({ price: { gte: parseInt(minPlus[1], 10) } });
                 continue;
             }
-            // "<=max"
             const lte = s.match(/^<=?\s*(\d+)$/);
             if (lte) {
                 OR.push({ price: { lte: parseInt(lte[1], 10) } });
                 continue;
             }
-            // ">=min"
             const gte = s.match(/^>=?\s*(\d+)$/);
             if (gte) {
                 OR.push({ price: { gte: parseInt(gte[1], 10) } });
@@ -292,41 +288,23 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         if (OR.length) AND.push({ OR });
     }
 
-    // ======== Các filter mới ========
-
-    // CPU (CSV token, ví dụ: I3,I5,I7,RYZEN5,M1,M2,M3...)
+    // ===== Các filter mới
     const cpus = parseCsv(cpu);
     if (cpus.length) {
         AND.push({
-            OR: cpus.map((c: string) => ({
-                cpu: { contains: c }, // ví dụ "i5", "ryzen 7", "m2"
-            })),
+            OR: cpus.map((c: string) => ({ cpu: { contains: c } })),
         });
     }
 
-    // RAM (CSV số GB: 8,16,32...)
-    const rams = parseCsv(ram)
-        .map((n: string) => parseInt(n, 10))
-        .filter((n: number) => Number.isFinite(n));
-    if (rams.length) {
-        AND.push({ ramGB: { in: rams } });
-    }
+    const rams = parseCsv(ram).map((n: string) => parseInt(n, 10)).filter(Number.isFinite);
+    if (rams.length) AND.push({ ramGB: { in: rams } });
 
-    // STORAGE (CSV GB: 256,512,1024...) — tuỳ chọn: nếu bạn muốn filter theo loại, thêm param storageType
-    const storages = parseCsv(storage)
-        .map((n: string) => parseInt(n, 10))
-        .filter((n: number) => Number.isFinite(n));
-    if (storages.length) {
-        AND.push({ storageGB: { in: storages } });
-    }
+    const storages = parseCsv(storage).map((n: string) => parseInt(n, 10)).filter(Number.isFinite);
+    if (storages.length) AND.push({ storageGB: { in: storages } });
 
-    // RESOLUTION (CSV: FHD,QHD,4K)
     const resos = parseCsv(reso);
-    if (resos.length) {
-        AND.push({ screenResolution: { in: resos } });
-    }
+    if (resos.length) AND.push({ screenResolution: { in: resos } });
 
-    // SCREEN SIZE bucket (CSV: "13-14","15-16","17-18")
     const screens = parseCsv(screen);
     if (screens.length) {
         const OR: any[] = [];
@@ -343,19 +321,16 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         if (OR.length) AND.push({ OR });
     }
 
-    // FEATURES (CSV tokens: TOUCH,2IN1,TB4,FP,WEBCAM1080...)
     const features = parseCsv(feature).map((s) => s.toUpperCase());
     if (features.length) {
         AND.push({
-            OR: features.map((f) => ({
-                featureTags: { contains: `|${f}|` }, // an toàn do có delimiter
-            })),
+            OR: features.map((f) => ({ featureTags: { contains: `|${f}|` } })),
         });
     }
 
     if (AND.length) where.AND = AND;
 
-    // ===== Sắp xếp: hỗ trợ cả "gia-tang-dan/gia-giam-dan" và "price_asc/price_desc"
+    // ===== Sắp xếp
     let orderBy: any = { id: "desc" as const };
     switch (String(sort).toLowerCase()) {
         case "price_asc":
@@ -377,18 +352,13 @@ const getProductFilterPage = async (req: Request, res: Response) => {
     // ===== Query
     const skip = (currentPage - 1) * pageSize;
     const [products, totalCount] = await prisma.$transaction([
-        prisma.product.findMany({
-            where,
-            orderBy,
-            skip,
-            take: pageSize,
-        }),
+        prisma.product.findMany({ where, orderBy, skip, take: pageSize }),
         prisma.product.count({ where }),
     ]);
 
     const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
-    // ===== Ratings (giữ nguyên logic của bạn)
+    // ===== Ratings
     const ids = products.map((p) => Number(p.id)).filter(Number.isFinite);
     type ReviewRow = { productId: number; rating: number };
     const reviews: ReviewRow[] = ids.length
@@ -421,13 +391,23 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         const a = agg[p.id];
         const count = a?.count ?? 0;
         const avg = count ? a!.sum / count : 0;
-        return {
-            ...p,
-            ratingAvg: avg,
-            ratingCount: count,
-            starsArr: makeStars(avg),
-        };
+        return { ...p, ratingAvg: avg, ratingCount: count, starsArr: makeStars(avg) };
     });
+
+    // ===== NEW: build query-string KHÔNG gồm page để gắn vào link phân trang
+    const { page: _p, ...rest } = req.query as any;
+    const sp = new URLSearchParams();
+    for (const [k, v] of Object.entries(rest)) {
+        if (v == null || v === "") continue;
+        if (Array.isArray(v)) {
+            v.forEach((x) => {
+                if (x != null && String(x).trim() !== "") sp.append(k, String(x));
+            });
+        } else {
+            sp.append(k, String(v));
+        }
+    }
+    const qsNoPage = sp.toString(); // ví dụ: "factory=ASUS&cpu=i5&price=10000000-15000000"
 
     return res.render("product/filter.ejs", {
         products: productsWithRating,
@@ -447,8 +427,10 @@ const getProductFilterPage = async (req: Request, res: Response) => {
         ],
         precheckedFactories,
         q,
+        qsNoPage, // <-- thêm biến này để view dùng khi render phân trang
     });
 };
+
 
 
 const getRegisterPage = async (req: Request, res: Response) => {

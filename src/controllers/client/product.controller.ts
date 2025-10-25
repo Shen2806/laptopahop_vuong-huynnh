@@ -771,7 +771,7 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
             district: true,
             ward: true,
             orderDetails: { include: { product: true } },
-            // nếu đã migrate quan hệ thì dòng dưới sẽ chạy OK
+            // nếu đã migrate bước 1 thì dòng dưới sẽ hợp lệ
             assignedShipper: { select: { fullName: true, phone: true } } as any,
         },
     });
@@ -795,7 +795,7 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
     const addressDisplay = addressParts.length ? addressParts.join(", ") : (order.receiverAddress || "—");
 
     // ======= Resolve shipper (tên/SĐT) =======
-    // Ưu tiên cache -> quan hệ -> (fallback) query staff theo assignedShipperId
+    // Ưu tiên cache -> quan hệ
     let shipperName: string | null =
         (order as any).shipperNameCache ?? (order as any).shipperName ?? null;
     let shipperPhone: string | null =
@@ -806,18 +806,6 @@ const getOrderDetailPage = async (req: Request, res: Response) => {
         if (rel) {
             shipperName = shipperName || rel.fullName || null;
             shipperPhone = shipperPhone || rel.phone || null;
-        }
-    }
-
-    // ✅ Fallback cuối cùng: vẫn lôi được shipper dù chưa migrate relation
-    if ((!shipperName || !shipperPhone) && (order as any).assignedShipperId) {
-        const staff = await prisma.staff.findUnique({
-            where: { id: (order as any).assignedShipperId },
-            select: { fullName: true, phone: true },
-        });
-        if (staff) {
-            shipperName = shipperName || staff.fullName || null;
-            shipperPhone = shipperPhone || staff.phone || null;
         }
     }
 

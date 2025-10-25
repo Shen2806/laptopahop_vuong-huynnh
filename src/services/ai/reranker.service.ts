@@ -74,3 +74,23 @@ export async function rerank(
     scored.sort((a, b) => b.rscore - a.rscore);
     return scored.slice(0, topK);
 }
+
+export function rerankLocal(
+    query: string,
+    docs: RerankDoc[],
+    topK = 8
+): RerankScored[] {
+    if (!Array.isArray(docs) || docs.length === 0) return [];
+    const tq = tok(query);
+    const qv = tfHashEmbed(query, 256);
+    const scored = docs.map((d) => {
+        const dt = tok(d.text || "");
+        const dv = tfHashEmbed(d.text || "", 256);
+        const sJac = jaccard(tq, dt);
+        const sCos = cosine(qv, dv);
+        const rscore = 0.6 * sJac + 0.4 * sCos;
+        return { ...d, rscore };
+    });
+    scored.sort((a, b) => b.rscore - a.rscore);
+    return scored.slice(0, topK);
+}

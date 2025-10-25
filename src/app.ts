@@ -17,7 +17,6 @@ import paymentRoutes from "./routes/payment";
 import aiRoutes from "./routes/ai";
 import aiAdmin from "./routes/ai.admin.router";
 import aiTeach from "./routes/ai.teach.router";
-import aiWebLLMRouter from "./routes/ai.webllm.router";
 import locationRoutes from "./routes/location.routes";
 
 import configPassportLocal from "src/middleware/passport.local";
@@ -83,7 +82,6 @@ apiRoutes(app);
 app.use("/api", aiRoutes);
 app.use("/api", aiAdmin);
 app.use("/api", aiTeach);
-app.use("/ai", aiWebLLMRouter);
 app.use(locationRoutes);
 app.use("/api/upload", uploadRouter);
 

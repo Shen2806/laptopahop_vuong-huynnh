@@ -849,74 +849,78 @@
                                             </div>
                                         </div>
                                         <% }); %>
+                                            <% // Helper tạo link phân trang, giữ nguyên các filter hiện có (qsNoPage)
+                                                function linkPage(p) { var q=(typeof qsNoPage !=='undefined' &&
+                                                qsNoPage) ? ('?' + qsNoPage + '&page=' + p) : ('?page=' + p);
+    return ' /products' + q; } %>
 
-                                            <!-- Pagination -->
-                                            <% if (products && products.length) { %>
-                                                <% var _page=parseInt((typeof page !=='undefined' ? page : 1), 10) || 1;
-                                                    var _total=parseInt((typeof totalPages !=='undefined' ? totalPages :
-                                                    1), 10) || 1; var _pagination=[]; function _pushRange(a, b) { for
-                                                    (var i=a; i <=b; i++) { _pagination.push(i); } } if (_total> 1) {
-                                                    if (_total <= 7) { _pushRange(1, _total); } else if (_page <=3) {
-                                                        _pushRange(1, 4); _pagination.push('...');
-                                                        _pagination.push(_total); } else if (_page>= _total - 2) {
-                                                        _pagination.push(1);
-                                                        _pagination.push('...');
-                                                        _pushRange(_total - 3, _total);
-                                                        } else {
-                                                        _pagination.push(1);
-                                                        _pagination.push('...');
-                                                        _pagination.push(_page - 1);
-                                                        _pagination.push(_page);
-                                                        _pagination.push(_page + 1);
-                                                        _pagination.push('...');
-                                                        _pagination.push(_total);
-                                                        }
-                                                        }
-                                                        %>
 
-                                                        <% if (_pagination.length) { %>
-                                                            <ul class="pagination d-flex justify-content-center mt-4">
-                                                                <!-- Previous -->
-                                                                <li
-                                                                    class="<%= (_page === 1 ? 'disabled page-item' : 'page-item') %>">
-                                                                    <a class="page-link"
-                                                                        href="/products?page=<%= (_page > 1 ? (_page - 1) : 1) %>"
-                                                                        aria-label="Previous">
-                                                                        <span aria-hidden="true">&laquo;</span>
-                                                                    </a>
-                                                                </li>
+                                                <!-- Pagination -->
+                                                <% if (products && products.length) { %>
+                                                    <% var _page=parseInt((typeof page !=='undefined' ? page : 1), 10)
+                                                        || 1; var _total=parseInt((typeof totalPages !=='undefined' ?
+                                                        totalPages : 1), 10) || 1; var _pagination=[]; function
+                                                        _pushRange(a, b) { for (var i=a; i <=b; i++) {
+                                                        _pagination.push(i); } } if (_total> 1) {
+                                                        if (_total <= 7) { _pushRange(1, _total); } else if (_page <=3)
+                                                            { _pushRange(1, 4); _pagination.push('...');
+                                                            _pagination.push(_total); } else if (_page>= _total - 2) {
+                                                            _pagination.push(1);
+                                                            _pagination.push('...');
+                                                            _pushRange(_total - 3, _total);
+                                                            } else {
+                                                            _pagination.push(1);
+                                                            _pagination.push('...');
+                                                            _pagination.push(_page - 1);
+                                                            _pagination.push(_page);
+                                                            _pagination.push(_page + 1);
+                                                            _pagination.push('...');
+                                                            _pagination.push(_total);
+                                                            }
+                                                            }
+                                                            %>
 
-                                                                <% for (var k=0; k < _pagination.length; k++) { var
-                                                                    p=_pagination[k]; %>
-                                                                    <% if (p==='...' ) { %>
-                                                                        <li class="page-item disabled"><span
-                                                                                class="page-link">...</span></li>
-                                                                        <% } else { %>
-                                                                            <li class="page-item">
-                                                                                <a class="page-link <%= (_page === p ? 'active' : '') %>"
-                                                                                    href="/products?page=<%= p %>">
-                                                                                    <%= p %>
-                                                                                </a>
-                                                                            </li>
-                                                                            <% } %>
+                                                            <% if (_pagination.length) { %>
+                                                                <ul
+                                                                    class="pagination pager d-flex justify-content-center mt-4">
+                                                                    <!-- Previous -->
+                                                                    <li
+                                                                        class="<%= (_page === 1 ? 'disabled page-item' : 'page-item') %>">
+                                                                        <a class="page-link"
+                                                                            href="<%= linkPage(_page > 1 ? (_page - 1) : 1) %>"
+                                                                            aria-label="Previous">
+                                                                    </li>
+
+                                                                    <% for (var k=0; k<_pagination.length; k++) { var
+                                                                        p=_pagination[k]; %>
+                                                                        <% if (p==='...' ) { %>
+                                                                            <li class="page-item disabled"><span
+                                                                                    class="page-link">...</span></li>
+                                                                            <% } else { %>
+                                                                                <li class="page-item">
+                                                                                    <a class="page-link <%= (_page === p ? 'active' : '') %>"
+                                                                                        href="<%= linkPage(p) %>">
+
+                                                                                </li>
                                                                                 <% } %>
+                                                                                    <% } %>
 
-                                                                                    <!-- Next -->
-                                                                                    <li
-                                                                                        class="<%= (_page === _total ? 'disabled page-item' : 'page-item') %>">
-                                                                                        <a class="page-link"
-                                                                                            href="/products?page=<%= (_page < _total ? (_page + 1) : _total) %>"
-                                                                                            aria-label="Next">
-                                                                                            <span
-                                                                                                aria-hidden="true">&raquo;</span>
-                                                                                        </a>
-                                                                                    </li>
-                                                            </ul>
-                                                            <% } %>
-                                                                <% } else { %>
-                                                                    <div class="text-center py-5">Không tồn tại sản phẩm
-                                                                        này!</div>
-                                                                    <% } %>
+                                                                                        <!-- Next -->
+                                                                                        <li
+                                                                                            class="<%= (_page === _total ? 'disabled page-item' : 'page-item') %>">
+                                                                                            <a class="page-link"
+                                                                                                href="<%= linkPage(_page < _total ? (_page + 1) : _total) %>"
+                                                                                                aria-label="Next">
+
+                                                                                        </li>
+
+                                                                </ul>
+                                                                <% } %>
+                                                                    <% } else { %>
+                                                                        <div class="text-center py-5">Không tồn tại sản
+                                                                            phẩm
+                                                                            này!</div>
+                                                                        <% } %>
                                 </div>
                             </section>
 
@@ -1046,7 +1050,71 @@
                     })();
                 </script>
 
+                <!--  phân trang -->
+                <script>
+                    (function () {
+                        const $ = (sel, ctx = document) => ctx.querySelector(sel);
+                        const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
+                        function appendMulti(sp, name, values) {
+                            values.forEach(v => sp.append(name, v));
+                        }
+
+                        function getCheckedValues(container) {
+                            return $$('.form-check-input:checked', container).map(el => el.value);
+                        }
+
+                        const btn = document.getElementById('btnFilter');
+                        if (!btn) return;
+
+                        btn.addEventListener('click', function () {
+                            const sp = new URLSearchParams();
+
+                            // Hãng (factoryFilter)
+                            const factoryBox = document.getElementById('factoryFilter');
+                            if (factoryBox) appendMulti(sp, 'factory', getCheckedValues(factoryBox));
+
+                            // Mục đích
+                            const targetBox = document.getElementById('targetFilter');
+                            if (targetBox) appendMulti(sp, 'target', getCheckedValues(targetBox));
+
+                            // Giá
+                            const priceBox = document.getElementById('priceFilter');
+                            if (priceBox) appendMulti(sp, 'price', getCheckedValues(priceBox));
+
+                            // CPU
+                            const cpuBox = document.getElementById('cpuFilter');
+                            if (cpuBox) appendMulti(sp, 'cpu', getCheckedValues(cpuBox));
+
+                            // RAM
+                            const ramBox = document.getElementById('ramFilter');
+                            if (ramBox) appendMulti(sp, 'ram', getCheckedValues(ramBox));
+
+                            // Storage
+                            const stBox = document.getElementById('storageFilter');
+                            if (stBox) appendMulti(sp, 'storage', getCheckedValues(stBox));
+
+                            // Độ phân giải
+                            const resBox = document.getElementById('resFilter');
+                            if (resBox) appendMulti(sp, 'res', getCheckedValues(resBox));
+
+                            // Kích thước màn
+                            const scBox = document.getElementById('screenFilter');
+                            if (scBox) appendMulti(sp, 'screen', getCheckedValues(scBox));
+
+                            // Sort (radio)
+                            const sortChecked = $('#sortFilter input[name="radio-sort"]:checked');
+                            if (sortChecked) sp.set('sort', sortChecked.value);
+
+                            // Luôn quay về trang 1 khi đổi bộ lọc
+                            sp.set('page', '1');
+
+                            // Điều hướng
+                            const url = '/products?' + sp.toString();
+                            window.location.href = url;
+                        });
+                    })();
+                </script>
 
 </body>
 
