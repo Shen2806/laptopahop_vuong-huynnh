@@ -1,0 +1,15 @@
+{
+    "version": 2,
+    "buildCommand": "npm run vercel-build",
+    "functions": {
+        "api/index.cjs": {
+            "runtime": "nodejs20.x"
+        }
+    },
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.cjs"
+        }
+    ]
+}

@@ -107,3 +107,5 @@ server.listen(PORT, "0.0.0.0", () => {
 server.keepAliveTimeout = 120000;
 // @ts-ignore
 server.headersTimeout = 121000;
+
+module.exports = (req, res) => app(req, res);

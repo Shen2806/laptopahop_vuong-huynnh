@@ -4,6 +4,7 @@
   "description": "nodepro-minhvuong",
   "main": "dist/app.js",
   "scripts": {
+    "vercel-build": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed:locations": "ts-node prisma/seed-locations.ts",
     "fetch:vn": "ts-node prisma/fetch-vn-locations.ts",
