@@ -11,7 +11,7 @@ import passport from "passport";
 import { PrismaClient } from "@prisma/client";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 
-import webRoutes from "src/routes/web";
+import webRoutes from "./routes/web.js";
 import apiRoutes from "./routes/api";
 import paymentRoutes from "./routes/payment";
 import aiRoutes from "./routes/ai";
@@ -19,7 +19,7 @@ import aiAdmin from "./routes/ai.admin.router";
 import aiTeach from "./routes/ai.teach.router";
 import locationRoutes from "./routes/location.routes";
 
-import configPassportLocal from "src/middleware/passport.local";
+import configPassportLocal from "./middleware/passport.local";
 import { headerCartCount } from "./middleware/headerCartCount";
 import initDatabase from "config/seed";
 import { initSocket } from "./socket";
