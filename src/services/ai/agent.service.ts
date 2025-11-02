@@ -102,17 +102,14 @@ async function buildLeadText(
 ) {
     const desc = describeFilters(f);
     const count = products.length;
-    // ⭐ changed: giọng “thân thiện” + chủ động “gửi ngay”
+    const hasBudget = typeof f.min === 'number' || typeof f.max === 'number';
     let lead = `Mình lọc nhanh theo **${desc}** và gửi bạn ${count} lựa chọn đáng cân nhắc.`;
-    if (reason) lead += ` *(${reason})*`;
-    if (count >= 2) {
-        lead += ` Bạn xem qua, mình tinh chỉnh tiếp theo cân nặng, pin, màu hoặc so sánh 1–1 nhé.`;
-    } else if (count === 1) {
-        const p = products[0];
-        lead += ` Mẫu khớp nhất hiện có là **${p.name}** (${p.specs}). Giá tham khảo: ${p.priceText}.`;
+    if (!hasBudget) {
+        lead += ` Vì bạn chưa nêu ngân sách, mình chọn các mẫu **tiêu biểu ở nhiều tầm giá** để bạn dễ so sánh.`;
     }
-    // Giữ văn phong lịch sự
-    lead += `\n\n*Tip nhanh:* nếu bạn ưu tiên **mỏng nhẹ/pin** mình sẽ lọc lại khác với **FPS/hiệu năng** nhé.`; return polishVietnamese(lead + "", { persona: 'tu-van' });
+
+    // Đảm bảo văn phong mượt trước khi trả ra ngoài
+    return polishVietnamese(lead, { persona: 'tu-van' });
 }
 
 function fmtMil(n?: number) { return typeof n === 'number' ? Math.round(n / 1e6) + 'tr' : ''; }
@@ -132,13 +129,13 @@ function buildIntro(f: { brand?: string | string[], series?: string[], target?: 
     const tLabel = targetLabel(f.target);
     if (tLabel) parts.push(tLabel);
 
-    const who = parts.length ? `các mẫu **${parts.join(' • ')}**` : 'các mẫu phù hợp';
+    const who = parts.length ? `**${parts.join(' • ')}**` : 'các mẫu phù hợp';
     const price =
         typeof f.min === 'number' || typeof f.max === 'number'
             ? ` trong tầm **${fmtMil(f.min)}${f.min && f.max ? '–' : ''}${fmtMil(f.max)}**`
             : '';
 
-    return `Mình đã lọc được **${count}** ${who}${price}. Bên dưới là danh sách sắp xếp theo hiệu năng/giá – bạn tham khảo nhanh nhé:`;
+    return `Mình đã lọc được **${count}** mẫu ${who}${price}. Dưới đây là danh sách theo tiêu chí hiệu năng/giá để bạn tham khảo nhanh:`;
 }
 
 function specDict(p: any) {
@@ -285,10 +282,10 @@ function buildCompareReport(a: any, b: any) {
     }
 
     const recUse =
-        `- Gaming: chọn **${picks.gaming}**\n` +
-        `- Đồ hoạ/dựng phim: chọn **${picks.creator}**\n` +
-        `- Văn phòng/di chuyển nhiều: chọn **${picks.office}**\n` +
-        `- Sinh viên IT/lập trình: chọn **${picks.it}**`;
+        `- **Gaming:** chọn **${picks.gaming}**\n` +
+        `- **Đồ hoạ/dựng phim:** chọn **${picks.creator}**\n` +
+        `- **Văn phòng/di chuyển nhiều:** chọn **${picks.office}**\n` +
+        `- **Sinh viên IT/lập trình:** chọn **${picks.it}**`;
 
     const reply =
         `**So sánh chi tiết**
@@ -304,7 +301,8 @@ function buildCompareReport(a: any, b: any) {
 **Nên chọn gì theo mục đích**
 ${recUse}
 
-**Kết luận nhanh:** nên chọn **${winner === 'A' ? ('#1 ' + a.name) : ('#2 ' + b.name)}** (${recWhy.slice(0, 3).join(', ') || 'tổng thể tốt hơn'}).`;
+ **Kết luận nhanh:** Ưu tiên **${winner === 'A' ? ('#1 ' + a.name) : ('#2 ' + b.name)}** ` +
+        `(${recWhy.slice(0, 3).join(', ') || 'hiệu năng/tổng thể tốt hơn'}).`
 
     return { reply, winner, picks };
 }
@@ -520,16 +518,17 @@ function scoreProduct(p: any, target?: string) {
     return scoreByTarget(p, target);
 }
 
-// target rộng
+// target rộng (case- & accent-insensitive)
 function detectSegmentWide(t: string) {
-    t = (t || "").toLowerCase();
-    if (/(gaming|dòng\s*gaming|chơi\s*game|fps|144hz|rtx|gtx|card\s*rời)/i.test(t)) return "GAMING";
-    if (/(sinh\s*viên|văn\s*phòng|office|học|excel|word)/i.test(t)) return "SINHVIEN-VANPHONG";
-    if (/(mỏng|nh[eẹ]|di\s*động|portable|<\s*1\.?3?kg)/i.test(t)) return "MONG-NHE";
-    if (/(doanh\s*nhân|business|bảo\s*mật|vân\s*tay|smartcard)/i.test(t)) return "DOANH-NHAN";
-    if (/(đồ\s*ho[aạ]|thi[eê]́t\s*k[eê]|photoshop|premiere|lightroom|render|color\s*accurate)/i.test(t)) return "THIET-KE-DO-HOA";
+    const s = deaccent(String(t || "")).toLowerCase();
+    if (/(gaming|dong gaming|choi game|fps|144hz|rtx|gtx|card roi)/.test(s)) return "GAMING";
+    if (/(sinh vien|van phong|office|hoc|excel|word)/.test(s)) return "SINHVIEN-VANPHONG";
+    if (/(mong|nhe|di dong|portable|<\s*1\.?3?kg)/.test(s)) return "MONG-NHE";
+    if (/(doanh nhan|business|bao mat|van tay|smartcard)/.test(s)) return "DOANH-NHAN";
+    if (/(do hoa|thiet ke|photoshop|premiere|lightroom|render|color\s*accurate)/.test(s)) return "THIET-KE-DO-HOA";
     return undefined;
 }
+
 
 // ==== Quick intents & commands ====
 const SHOW_CARDS_RE = /(hi[eê]n thi(?:̣)?\s*d[ạa]ng\s*th[eê]|d[ạa]ng\s*th[eê]|view\s*cards?)/i;
@@ -926,9 +925,20 @@ export async function runTurtleAgent(params: {
     }
 
     const remembered = await getSessionFilters(session.id);
-
+    if (target) {
+        // target mới đã rõ ràng ⇒ không dùng target cũ
+        // (tránh case "ASUS gaming" mà bị lôi target DOANH-NHAN đang nhớ)
+        (remembered as any).target = undefined; // hoặc: delete (remembered as any).target;
+    }
     const eff = mergeFiltersForThisTurn({ brand, target, minBudget, maxBudget }, remembered, message, isBrandOnlyFollowUp(message));
-
+    // NEW: nếu user không nhắc ngân sách lần này → bỏ min/max đang nhớ
+    const noBudgetThisMsg = (typeof minBudget !== 'number' && typeof maxBudget !== 'number' && !hasBudgetCue(message));
+    let filtersForAction = { ...eff };
+    if (noBudgetThisMsg && (wantList || wantStrongest || brand || target || parseTakeVi(message))) {
+        // ép override để không “thừa kế” min/max cũ
+        (filtersForAction as any).min = undefined;
+        (filtersForAction as any).max = undefined;
+    }
     // nếu câu hiện tại có brand/target/budget mới -> dọn list cũ để khỏi lạc đề
     if (brand || target || typeof minBudget === 'number' || typeof maxBudget === 'number') {
         await setSessionKV(session.id, "result.ids", JSON.stringify([]));
@@ -947,8 +957,13 @@ export async function runTurtleAgent(params: {
     if (brandOnlyIntent) {
         const brands = [bf.canonical as string];
         const kWanted = parseWantedCount(message) || 6;
+        // NEW: nếu câu này không nói đến ngân sách → bỏ min/max đang nhớ
+        const baseFilters = { brand: brands, target: remembered.target, min: remembered.min, max: remembered.max };
+        if (!hasBudgetCue(message)) { delete (baseFilters as any).min; delete (baseFilters as any).max; }
+
+        const { list, reason } = await smartSearch(baseFilters, kWanted);
         // lấy list theo hãng và các filter đã nhớ (nếu có min/max/target đã lưu)
-        const { list, reason } = await smartSearch({ brand: brands, target: remembered.target, min: remembered.min, max: remembered.max }, kWanted);
+        // const { list, reason } = await smartSearch({ brand: brands, target: remembered.target, min: remembered.min, max: remembered.max }, kWanted);
         const products = list.map(productDTO);
         const top = await listByFilters({ brand: brands }, takeWanted ?? 3);
 
@@ -1339,7 +1354,9 @@ export async function runTurtleAgent(params: {
     let products: any[] = [];
     let format: 'cards' | 'list' | undefined = decision.format;
     const f = { ...remembered, ...(decision.filters || {}) };
-
+    // nếu min/max trong decision là undefined → giữ nguyên undefined để không lọc theo giá
+    if ('min' in (decision.filters || {})) (f as any).min = (decision.filters as any).min;
+    if ('max' in (decision.filters || {})) (f as any).max = (decision.filters as any).max;
     // ⭐ changed: nếu người dùng nói “gửi … 5 mẫu” → tôn trọng số lượng yêu cầu
     const kWanted = parseWantedCount(message) || (decision.action === 'search' ? 6 : 12);
 
@@ -1353,15 +1370,7 @@ export async function runTurtleAgent(params: {
         f.min = Math.max(0, v - span);
         f.max = v + span;
     }
-    {
-        const blunt = deaccent(message).match(/\b(\d{1,3})\s*(tr|trieu|m)\b/i);
-        if (blunt) {
-            const v = parseInt(blunt[1], 10) * 1_000_000;
-            const span = Math.round(v * 0.15);
-            f.min = Math.max(0, v - span);
-            f.max = v + span;
-        }
-    }
+
     const searchFn = needStrict ? smartSearchStrict : smartSearch;
 
     if (decision.action === 'strongest') {

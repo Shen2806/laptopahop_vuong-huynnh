@@ -113,7 +113,7 @@ function agentJSON(userText: string) {
     };
 }
 
-function polishVN(raw: string) {
+export function polishVN(raw: string) {
     const s = (raw || "").trim();
     if (!s) return s;
     const lines = s.split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
