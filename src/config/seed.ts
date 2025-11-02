@@ -451,7 +451,7 @@ const initDatabase = async () => {
 
 
     if (countRole !== 0 && countUser !== 0 && countProduct !== 0) {
-        console.log(">>> ALREADY INIT DATA...");
+        console.log(">>> Dữ liệu đã được tạo !...");
     }
 }
 

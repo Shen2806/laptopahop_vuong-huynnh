@@ -11,7 +11,7 @@ import passport from "passport";
 import { PrismaClient } from "@prisma/client";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 
-import webRoutes from "./routes/web.js";
+import webRoutes from "./routes/web";
 import apiRoutes from "./routes/api";
 import paymentRoutes from "./routes/payment";
 import aiRoutes from "./routes/ai";
