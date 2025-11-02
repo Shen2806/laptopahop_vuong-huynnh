@@ -1483,7 +1483,7 @@ Bạn muốn **mở rộng ±20% ngân sách** hoặc **giữ ${brandLabel} như
         ? decision.suggestions
         : (products.length
             ? ["Chọn máy mạnh nhất", "Hiển thị dạng thẻ", "Lọc theo < 20tr"]
-            : ["Tư vấn theo ngân sách", "Gợi ý gaming", "Máy mỏng nhẹ < 1.3kg"]);
+            : ["Tư vấn theo ngân sách", "Gợi ý gaming"]);
 
     return {
         status: 200 as const,
