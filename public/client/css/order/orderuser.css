@@ -1,190 +1,341 @@
+/* =========================
+   Order User (clean, fixed)
+   ========================= */
 
-        .order-card {
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            border: 1px solid #eee;
-        }
-
-        .order-card:hover {
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-            transform: translateY(-2px);
-        }
-
-        .order-header {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .order-badge {
-            font-size: 0.9rem;
-            border-radius: 8px;
-            padding: 6px 12px;
-        }
-
-        .order-total {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #e74c3c;
-        }
-
-        .order-products table {
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .order-products th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
-
-        .breadcrumb {
-            background: transparent;
-            margin-bottom: 0;
-        }
-
-        /* ================== PRO LOOK (no logic change) ================== */
-:root{
-  --brand:#8BC34A;
-  --brand-700:#57B212;
-  --ink:#0f172a;
-  --muted:#586174;
-  --line:#e6e9ef;
-  --card:#ffffff;
-  --soft:#f7f9fc;
-  --shadow:0 12px 28px rgba(2,6,23,.06);
-  --shadow-lg:0 18px 40px rgba(2,6,23,.08);
+/* Tokens */
+:root {
+  --brand: #8BC34A;
+  --brand-700: #57B212;
+  --ink: #0f172a;
+  --muted: #586174;
+  --line: #e6e9ef;
+  --card: #ffffff;
+  --soft: #f7f9fc;
+  --shadow: 0 12px 28px rgba(2, 6, 23, .06);
+  --shadow-lg: 0 18px 40px rgba(2, 6, 23, .08);
 }
 
-/* Breadcrumb tinh gọn */
-.breadcrumb{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:.65rem .9rem;
-  margin-bottom:1.1rem;
+/* Breadcrumb */
+.breadcrumb {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: .65rem .9rem;
+  margin-bottom: 1.1rem;
   box-shadow: var(--shadow);
 }
-.breadcrumb .breadcrumb-item a{ color:#0ea5e9; text-decoration:none; }
-.breadcrumb .breadcrumb-item a:hover{ text-decoration:underline; }
 
-/* Title trang */
-h2 .fa-shopping-bag{ color:var(--brand-700)!important; }
+.breadcrumb .breadcrumb-item a {
+  color: #0ea5e9;
+  text-decoration: none;
+}
 
-/* ============ Card đơn hàng ============ */
-.order-card{
-  border:1px solid #eef2f7;
-  border-radius:16px;
-  background:var(--card);
-  overflow:hidden;
+.breadcrumb .breadcrumb-item a:hover {
+  text-decoration: underline;
+}
+
+/* Title icon */
+h2 .fa-shopping-bag {
+  color: var(--brand-700) !important;
+}
+
+/* ================= Card đơn hàng ================= */
+.order-card {
+  position: relative;
+  border: 1px solid #eef2f7;
+  border-radius: 16px;
+  background: var(--card);
+  overflow: hidden;
   box-shadow: var(--shadow);
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
-.order-card:hover{
+
+.order-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
-  border-color: rgba(139,195,74,.45);
-}
-.order-card .card-body{ padding:1.15rem 1.25rem 1rem; }
-
-.order-header{
-  display:flex; align-items:center; gap:.55rem;
-  font-weight:800; color:var(--ink);
-  letter-spacing:.2px;
-}
-.order-header::before{
-  content:""; width:8px; height:8px; border-radius:999px;
-  background:var(--brand); display:inline-block;
+  border-color: rgba(139, 195, 74, .45);
 }
 
-/* Meta + Tổng tiền */
-.order-card p{ margin-bottom:.3rem; color:var(--muted); }
-.order-card p b{ color:var(--ink); }
-.order-total{ font-weight:900; color:#ef4444; }
-
-/* ============ Badge trạng thái (giữ class BS, làm đẹp thôi) ============ */
-.order-card .badge{
-  border-radius:999px;
-  padding:.42rem .75rem;
-  font-weight:800;
-  letter-spacing:.2px;
-  border:1px solid transparent;
-  box-shadow: 0 1px 0 rgba(0,0,0,.03) inset;
-}
-.order-card .badge.bg-warning{ 
-  background:linear-gradient(180deg,#fef3c7,#fde68a);
-  color:#92400e; border-color:#fcd34d;
-}
-.order-card .badge.bg-info{ 
-  background:linear-gradient(180deg,#e0f2fe,#bae6fd);
-  color:#075985; border-color:#93c5fd;
-}
-.order-card .badge.bg-primary{ 
-  background:linear-gradient(180deg,#e1e9ff,#c7d2fe);
-  color:#1e3a8a; border-color:#a5b4fc;
-}
-.order-card .badge.bg-secondary{ 
-  background:linear-gradient(180deg,#f3f4f6,#e5e7eb);
-  color:#374151; border-color:#d1d5db;
-}
-.order-card .badge.bg-success{ 
-  background:linear-gradient(180deg,#dcfce7,#bbf7d0);
-  color:#166534; border-color:#86efac;
-}
-.order-card .badge.bg-danger{ 
-  background:linear-gradient(180deg,#fee2e2,#fecaca);
-  color:#991b1b; border-color:#fca5a5;
+.order-card .card-body {
+  padding: 1.15rem 1.25rem 1rem;
 }
 
-/* ============ Bảng sản phẩm ============ */
-.order-products .table{
-  margin:0;
+/* Header: tiêu đề + badge */
+.order-header {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: .2px;
+  margin: 0;
+}
+
+.order-header::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--brand);
+  display: inline-block;
+}
+
+/* Nhóm header + badge nằm 1 hàng, luôn căn giữa theo chiều dọc */
+.order-card .d-flex.justify-content-between.align-items-center {
+  gap: .75rem;
+  flex-wrap: wrap;
+  /* tránh vỡ hàng khi hẹp */
+}
+
+/* Meta */
+.order-card p {
+  margin-bottom: .35rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.order-card p b {
+  color: var(--ink);
+}
+
+/* Tổng tiền nổi bật nhưng KHÔNG đè layout */
+.order-total {
+  font-weight: 900;
+  color: #ef4444;
+  white-space: nowrap;
+}
+
+/* Badge trạng thái (giữ class BS, chỉ làm đẹp) */
+.order-card .badge {
+  border-radius: 999px;
+  padding: .42rem .75rem;
+  font-weight: 800;
+  letter-spacing: .2px;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .03) inset;
+  white-space: nowrap;
+  /* tránh xuống dòng như ảnh lỗi */
+}
+
+.order-card .badge.bg-warning {
+  background: linear-gradient(180deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
+.order-card .badge.bg-info {
+  background: linear-gradient(180deg, #e0f2fe, #bae6fd);
+  color: #075985;
+  border-color: #93c5fd;
+}
+
+.order-card .badge.bg-primary {
+  background: linear-gradient(180deg, #e1e9ff, #c7d2fe);
+  color: #1e3a8a;
+  border-color: #a5b4fc;
+}
+
+.order-card .badge.bg-secondary {
+  background: linear-gradient(180deg, #f3f4f6, #e5e7eb);
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.order-card .badge.bg-success {
+  background: linear-gradient(180deg, #dcfce7, #bbf7d0);
+  color: #166534;
+  border-color: #86efac;
+}
+
+.order-card .badge.bg-danger {
+  background: linear-gradient(180deg, #fee2e2, #fecaca);
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+/* ================= Bảng sản phẩm ================= */
+.order-products .table {
+  margin: 0;
   border-color: var(--line);
 }
-.order-products thead th{
-  background:#f9fafb;
-  color:#334155;
-  font-weight:800;
-  border-bottom:1px solid var(--line);
+
+.order-products thead th {
+  background: #f9fafb;
+  color: #334155;
+  font-weight: 800;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
 }
-.order-products tbody tr{
+
+.order-products tbody tr {
   transition: background .12s ease;
-  border-top:1px dashed var(--line);
+  border-top: 1px dashed var(--line);
 }
-.order-products tbody tr:first-child{
-  border-top:0;
+
+.order-products tbody tr:first-child {
+  border-top: 0;
 }
-.order-products tbody tr:hover{
-  background:#fbfbfc;
+
+.order-products tbody tr:hover {
+  background: #fbfbfc;
 }
-.order-products img{
-  border-radius:12px;
-  box-shadow: 0 3px 10px rgba(15,23,42,.08);
+
+/* Ảnh sản phẩm đồng nhất, không vỡ tỉ lệ */
+.order-products img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, .08);
+}
+
+/* Ô số lượng/giá căn giữa/phải cho đẹp */
+.order-products td.text-center {
+  vertical-align: middle;
+}
+
+.order-products td.text-end {
+  vertical-align: middle;
 }
 
 /* Nút quay lại */
-.btn-success.btn-lg{
-  border-radius:999px;
-  padding:.85rem 1.3rem;
-  font-weight:800;
+.btn-success.btn-lg {
+  border-radius: 999px;
+  padding: .85rem 1.3rem;
+  font-weight: 800;
 }
 
-/* ============ Empty state đẹp ============ */
-.alert-info{
-  background: linear-gradient(180deg,#f0f9ff 0%, #ecfeff 100%);
-  border:1px solid #bae6fd;
-  color:#075985;
-  border-radius:16px;
+/* Empty state */
+.alert-info {
+  background: linear-gradient(180deg, #f0f9ff 0%, #ecfeff 100%);
+  border: 1px solid #bae6fd;
+  color: #075985;
+  border-radius: 16px;
   box-shadow: var(--shadow);
 }
 
 /* Khoảng cách nhóm orders */
-.row.g-4 > [class*="col-"]{ scroll-margin-top: 90px; }
+.row.g-4>[class*="col-"] {
+  scroll-margin-top: 90px;
+}
 
-/* ============ Responsive ============ */
-/* Trên mobile, giữ table-responsive để kéo ngang (tránh biến tấu khó đọc) */
-@media (max-width: 575.98px){
-  .order-card .card-body{ padding:1rem; }
-  .order-products .table{ font-size:.95rem; }
-  .order-products img{ width:54px; height:54px; }
+/* ================= Responsive ================= */
+@media (max-width: 767.98px) {
+  .order-card .card-body {
+    padding: 1rem;
+  }
+
+  /* Đặt badge xuống dòng riêng khi hẹp để khỏi đè tổng tiền */
+  .order-card .d-flex.justify-content-between.align-items-center {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-products .table {
+    font-size: .95rem;
+  }
+
+  .order-products img {
+    width: 54px;
+    height: 54px;
+  }
+
+  .order-total {
+    font-size: 1rem;
+  }
+}
+
+/* ==== Căn đều header trong box & cố định Tổng tiền ở góc phải ==== */
+.order-card .card-body {
+  position: relative;
+  /* để ghim tổng tiền trong card */
+  padding-right: 200px;
+  /* chừa chỗ cho tổng tiền bên phải */
+}
+
+/* Tổng tiền: nằm cố định góc phải trên của box */
+.order-card .order-total {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  margin: 0;
+  font-weight: 900;
+  /* giữ màu bạn đang dùng; nếu muốn xanh như ảnh thì mở dòng dưới */
+  /* color:#16a34a; */
+  white-space: nowrap;
+}
+
+/* Hàng trên cùng: đừng "kéo giãn hai đầu" nữa để khỏi lệch bố cục */
+.order-card .d-flex.justify-content-between.align-items-center {
+  justify-content: flex-start !important;
+  /* thay vì space-between */
+  gap: 12px;
+  flex-wrap: wrap;
+  /* hẹp thì tự xuống hàng */
+}
+
+/* Badge, nút tròn không phá layout */
+.order-card .badge {
+  white-space: nowrap;
+}
+
+.order-card .btn.rounded-circle {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ==== Bảng sản phẩm: đường biên & padding đều mép box ==== */
+.order-products {
+  margin-top: .5rem;
+  border-top: 1px dashed #e6e9ef;
+}
+
+.order-products .table {
+  margin: 0;
+  border-color: #e6e9ef;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.order-products thead th,
+.order-products tbody td {
+  padding: 14px 16px;
+  /* đều hai bên trái/phải */
+  vertical-align: middle;
+}
+
+.order-products thead th:first-child,
+.order-products tbody td:first-child {
+  padding-left: 18px;
+}
+
+.order-products thead th:last-child,
+.order-products tbody td:last-child {
+  padding-right: 18px;
+}
+
+/* Ảnh sp đồng nhất, không xô lệch hàng */
+.order-products img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, .08);
+}
+
+/* ==== Responsive: mobile thả tổng tiền xuống dưới cho không chật ==== */
+@media (max-width: 991.98px) {
+  .order-card .card-body {
+    padding-right: 1.25rem;
+  }
+
+  .order-card .order-total {
+    position: static;
+    margin-top: .25rem;
+  }
 }

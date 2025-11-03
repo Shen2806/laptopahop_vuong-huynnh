@@ -1383,6 +1383,13 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                 const last = ui.body.querySelector(".ai-msg.ai-bot:last-child .ai-msg__bubble");
                                 if (last) last.textContent = "Mình đã sẵn sàng. Bạn cần tư vấn như thế nào?";
                                 return engine;
+                                const typingOn = () => {
+                                    ui.typing.style.display = "block";
+                                    ui.body.appendChild(ui.typing);        // luôn là phần tử cuối
+                                    ui.body.scrollTop = ui.body.scrollHeight;
+                                };
+                                const typingOff = () => { ui.typing.style.display = "none"; };
+
                             }
 
                             function buildPrompt(userText) {
@@ -1417,7 +1424,8 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                             async function ask(userText) {
                                 if (!userText || busy) return;
                                 append("user", userText);
-                                ui.typing.style.display = "block"; ui.send.disabled = true; ui.input.disabled = true; busy = true;
+                                typingOn(); ui.send.disabled = true; ui.input.disabled = true; busy = true;
+                                const startAt = Date.now(); // ✅ bấm giờ
                                 try {
                                     const e = await ensureEngine();
                                     const { hasEnough, prompt } = buildPrompt(userText);
@@ -1439,9 +1447,16 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                     });
                                     const reply = out?.choices?.[0]?.message?.content || "Xin lỗi, mình chưa trả lời được.";
                                     if (!hasEnough) history.push({ role: "assistant", content: reply });
+
+                                    // ✅ đảm bảo tối thiểu 2–3 giây
+                                    const MIN = 2000, MAX = 3000;
+                                    const target = MIN + Math.floor(Math.random() * (MAX - MIN));
+                                    const elapsed = Date.now() - startAt;
+                                    const wait = Math.max(0, target - elapsed);
+                                    if (wait) await new Promise(r => setTimeout(r, wait));
                                     append("assistant", reply);
                                 } catch (err) { console.error(err); append("assistant", "Có lỗi khi xử lý trên trình duyệt. Bạn thử lại giúp mình nhé."); }
-                                finally { ui.typing.style.display = "none"; ui.send.disabled = false; ui.input.disabled = false; busy = false; ui.input.focus(); }
+                                finally { typingOff(); ui.send.disabled = false; ui.input.disabled = false; busy = false; ui.input.focus(); }
                             }
 
                             // ==== wiring UI ====
@@ -1588,6 +1603,12 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                 const $send = document.getElementById('aiSend');
                                 const $typing = document.getElementById('aiTyping');
                                 const $chipsWrap = document.querySelector('.ai-suggest');
+                                function typingOn() {
+                                    $typing.style.display = 'block';
+                                    $body.appendChild($typing);            // luôn là phần tử cuối
+                                    $body.scrollTop = $body.scrollHeight;
+                                }
+                                function typingOff() { $typing.style.display = 'none'; }
                                 if (!$btn || !$card || !$form) return;
 
                                 /* storage keys */
@@ -1967,10 +1988,28 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                     });
                                 }
                                 async function sendMessage(text) {
-                                    appendMsg('user', text);
-                                    $typing.style.display = 'block';
-                                    $send.disabled = true; $input.disabled = true;
+                                    function deaccentLower(s) { return (s || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim(); }
 
+                                    // câu chào/ý định chung, không có tín hiệu kỹ thuật (hãng/số/linh kiện)
+                                    function shouldSoftReset(text) {
+                                        const t = deaccentLower(text);
+                                        const isShort = t.length <= 36;
+                                        const greet = /(xin chao|chao|hello|hi|alo|ad oi|chao shop)/.test(t);
+                                        const askGeneral = /(tu van|goi y|can tu van|nhan tu van|ho tro)/.test(t);
+                                        const hasNumbers = /\d/.test(t);
+                                        const hasSignals =
+                                            /(msi|asus|acer|lenovo|dell|hp|apple|mac|ryzen|intel|gaming|van phong|do hoa|sinh vien|creator|business|ultrabook|4050|4060|4070|3050|3060)/.test(t);
+                                        return (greet || askGeneral) && !hasNumbers && !hasSignals && isShort;
+                                    }
+
+                                    // giữ dòng “đang nhập” luôn ở cuối (nếu bạn chưa thêm)
+                                    function typingOn() { $typing.style.display = 'block'; $body.appendChild($typing); $body.scrollTop = $body.scrollHeight; }
+                                    function typingOff() { $typing.style.display = 'none'; }
+
+                                    appendMsg('user', text);
+                                    typingOn();
+                                    $send.disabled = true; $input.disabled = true;
+                                    const startAt = Date.now(); // ✅ bấm giờ
                                     try {
                                         const res = await fetch('/api/ai/chat', {
                                             method: 'POST',
@@ -1998,7 +2037,14 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                             const newKey = histKey(); migrateHistory(oldKey, newKey);
                                         }
 
-                                        // 🚀 mở modal so sánh 1–4 sp (nếu có)
+                                        // ✅ đảm bảo tối thiểu 2–3 giây trước khi hiển thị bất kỳ kết quả nào
+                                        const MIN = 2000, MAX = 3000;
+                                        const target = MIN + Math.floor(Math.random() * (MAX - MIN));
+                                        const elapsed = Date.now() - startAt;
+                                        const wait = Math.max(0, target - elapsed);
+                                        if (wait) await new Promise(r => setTimeout(r, wait));
+
+                                        // 🚀 mở modal so sánh (nếu có) — hiển thị sau khi đã đợi tối thiểu
                                         if (data?.compare && Array.isArray(data.compare.items) && data.compare.items.length) {
                                             openCompareModal4(data.compare);
                                         }
@@ -2035,7 +2081,7 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
                                         console.error(e);
                                         appendMsg('assistant', 'Không kết nối được máy chủ. Bạn thử lại sau nhé.');
                                     } finally {
-                                        $typing.style.display = 'none';
+                                        typingOff();
                                         $send.disabled = false; $input.disabled = false; $input.focus();
                                     }
                                 }

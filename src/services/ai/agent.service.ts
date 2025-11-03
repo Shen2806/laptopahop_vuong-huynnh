@@ -671,8 +671,8 @@ function parseFilters(text: string) {
     const { canonical: brand } = brandFromText(text);
     const target = detectSegmentWide(text);
     const { min, max } = parseBudgetVi(text);
-    // ⭐ changed: wantList bật khi “gửi sản phẩm/send” hoặc các từ khoá “liệt kê/gợi ý…”
-    const wantList = WANT_LIST_RE.test(text) || WANT_SEND_RE.test(text);
+    // ⭐ Update: xem “cho mình 3 máy/3 mẫu” cũng là yêu cầu liệt kê
+    const wantList = WANT_LIST_RE.test(text) || WANT_SEND_RE.test(text) || !!parseWantedCount(text);
     const wantStrongest = WANT_STRONGEST_RE.test(text);
     return {
         brand,
@@ -925,11 +925,6 @@ export async function runTurtleAgent(params: {
     }
 
     const remembered = await getSessionFilters(session.id);
-    if (target) {
-        // target mới đã rõ ràng ⇒ không dùng target cũ
-        // (tránh case "ASUS gaming" mà bị lôi target DOANH-NHAN đang nhớ)
-        (remembered as any).target = undefined; // hoặc: delete (remembered as any).target;
-    }
     const eff = mergeFiltersForThisTurn({ brand, target, minBudget, maxBudget }, remembered, message, isBrandOnlyFollowUp(message));
     // NEW: nếu user không nhắc ngân sách lần này → bỏ min/max đang nhớ
     const noBudgetThisMsg = (typeof minBudget !== 'number' && typeof maxBudget !== 'number' && !hasBudgetCue(message));
@@ -945,7 +940,8 @@ export async function runTurtleAgent(params: {
     }
 
     // Dùng eff thay cho remembered ở các biến/return
-    const hasIntent = !!(eff.brand || eff.target || eff.min || eff.max || wantList || wantStrongest);
+    const wantsCount = parseWantedCount(message);
+    const hasIntent = !!(eff.brand || eff.target || eff.min || eff.max || wantList || wantStrongest || wantsCount);
     const bf = brandFromText(message);
     const brandOnlyIntent = !!bf.canonical && !target && !minBudget && !maxBudget && !wantList && !wantStrongest;
 
@@ -1286,7 +1282,8 @@ export async function runTurtleAgent(params: {
     const context = [
         session.summary ? `# TÓM TẮT: ${session.summary}` : '',
         memories.length ? `# GỢI NHỚ:\n- ${memories.map(m => m.text).join('\n- ')}` : '',
-        `# FILTER: ${JSON.stringify(remembered)}`,
+        // ⭐ Dùng filter hiệu lực của câu hiện tại (đã bỏ min/max cũ nếu cần)
+        `# FILTER: ${JSON.stringify(filtersForAction)}`,
         `# PHONG CÁCH:\n${STYLE_GUIDE_VI}`,
         `# KINH NGHIỆM LAPTOP:\n${LAPTOP_CHEATSHEET}`
     ].filter(Boolean).join('\n\n');
@@ -1322,8 +1319,8 @@ export async function runTurtleAgent(params: {
 
     // 6) Agent decide
     let decision: any = null;
-    if (wantStrongest) decision = { action: 'strongest', filters: remembered, format: 'cards' };
-    else if (wantList) decision = { action: 'search', filters: remembered, format: 'list' };
+    if (wantStrongest) decision = { action: 'strongest', filters: filtersForAction, format: 'cards' };
+    else if (wantList || wantsCount) decision = { action: 'search', filters: filtersForAction, format: 'list' };
     else {
         try {
             const { content } = await provider.chat([
@@ -1353,12 +1350,13 @@ export async function runTurtleAgent(params: {
     let reply = '';
     let products: any[] = [];
     let format: 'cards' | 'list' | undefined = decision.format;
-    const f = { ...remembered, ...(decision.filters || {}) };
+    // ⭐ Base filter phải là filtersForAction (đã xử lý override/bỏ ngân sách cũ)
+    const f = { ...filtersForAction, ...(decision.filters || {}) };
     // nếu min/max trong decision là undefined → giữ nguyên undefined để không lọc theo giá
     if ('min' in (decision.filters || {})) (f as any).min = (decision.filters as any).min;
     if ('max' in (decision.filters || {})) (f as any).max = (decision.filters as any).max;
-    // ⭐ changed: nếu người dùng nói “gửi … 5 mẫu” → tôn trọng số lượng yêu cầu
-    const kWanted = parseWantedCount(message) || (decision.action === 'search' ? 6 : 12);
+    // ⭐ Tôn trọng số lượng: “liệt kê 3 sp” hoặc “cho mình 3 máy”
+    const desiredK = parseWantedCount(message) ?? parseTakeVi(message) ?? (decision.action === 'search' ? 6 : 12);
 
     const needStrict = !!(f.brand && f.target);
     // Nếu message có số “X tr” mà f vẫn min/max rất nhỏ (do dính session cũ) → thay bằng parse lần nữa
@@ -1374,7 +1372,7 @@ export async function runTurtleAgent(params: {
     const searchFn = needStrict ? smartSearchStrict : smartSearch;
 
     if (decision.action === 'strongest') {
-        const { list, reason } = await searchFn(f, takeWanted ?? 12);
+        const { list, reason } = await searchFn(f, desiredK);
         await saveLastContext(session.id, f, list);
         const best = list.length ? list.reduce((acc, cur) =>
             (scoreProduct(cur, f.target) > scoreProduct(acc, f.target) ? cur : acc), list[0]) : null;
@@ -1384,7 +1382,7 @@ export async function runTurtleAgent(params: {
             reply = await buildLeadText(f, products, reason);
         }
     } else if (decision.action === 'search') {
-        const { list, reason } = await searchFn(f, takeWanted ?? 6);
+        const { list, reason } = await searchFn(f, desiredK);
         await saveLastContext(session.id, f, list);
         products = list.map(productDTO);
         if (!format) format = 'list';
