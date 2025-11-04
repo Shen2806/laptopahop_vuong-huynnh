@@ -929,6 +929,12 @@ export async function runTurtleAgent(params: {
     // NEW: nếu user không nhắc ngân sách lần này → bỏ min/max đang nhớ
     const noBudgetThisMsg = (typeof minBudget !== 'number' && typeof maxBudget !== 'number' && !hasBudgetCue(message));
     let filtersForAction = { ...eff };
+    // Lời chào/small talk: không dùng filter cũ cho lượt này
+    const isGreet = isGreetingOrSmallTalk(message);
+    if (isGreet) {
+        filtersForAction = {};
+    }
+
     if (noBudgetThisMsg && (wantList || wantStrongest || brand || target || parseTakeVi(message))) {
         // ép override để không “thừa kế” min/max cũ
         (filtersForAction as any).min = undefined;
@@ -941,7 +947,17 @@ export async function runTurtleAgent(params: {
 
     // Dùng eff thay cho remembered ở các biến/return
     const wantsCount = parseWantedCount(message);
-    const hasIntent = !!(eff.brand || eff.target || eff.min || eff.max || wantList || wantStrongest || wantsCount);
+    // Intent phải đến từ tin nhắn hiện tại, không dùng filter nhớ từ phiên trước
+    const hasIntent = !!(
+        brand ||
+        target ||
+        typeof minBudget === 'number' ||
+        typeof maxBudget === 'number' ||
+        wantList ||
+        wantStrongest ||
+        wantsCount
+    );
+
     const bf = brandFromText(message);
     const brandOnlyIntent = !!bf.canonical && !target && !minBudget && !maxBudget && !wantList && !wantStrongest;
 

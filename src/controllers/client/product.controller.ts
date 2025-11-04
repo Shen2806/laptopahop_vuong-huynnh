@@ -298,6 +298,8 @@ async function getActiveCartId(userId: number) {
     return c?.id ?? null;
 }
 
+const ORDER_CAP = 150_000_000; // 150 triệu: giới hạn thanh toán online / đơn
+
 const postHandleCartToCheckOut = async (req: Request, res: Response) => {
     const user: any = (req as any).user;
     if (!user) return res.redirect("/login");
@@ -337,10 +339,13 @@ const postHandleCartToCheckOut = async (req: Request, res: Response) => {
             }
         }
 
-        // Helper function to calculate price after discount
+        // Helper: tính đơn giá sau giảm
         const unitAfterDiscount = (price: number, discount: number) => {
             return discount > 0 ? Math.round(price * (100 - discount) / 100) : price;
         };
+
+        // === NEW: sẽ dùng để quyết định có vượt CAP không sau khi transaction xong
+        let computedSum = 0;
 
         await prisma.$transaction(async (tx) => {
             const activeCartId = cartIdFromBody || (await getActiveCartId(Number(user.id)));
@@ -358,26 +363,38 @@ const postHandleCartToCheckOut = async (req: Request, res: Response) => {
                 await tx.cartDetail.update({ where: { id }, data: { quantity: qty } });
             }
 
-            // (tuỳ bạn dùng) cập nhật lại sum
+            // Cập nhật lại sum
             const details = await tx.cartDetail.findMany({
                 where: { cartId: activeCartId },
                 include: { product: { select: { price: true, discount: true } } },
             });
-            const sum = details.reduce((s, d) =>
+
+            computedSum = details.reduce((s, d) =>
                 s + unitAfterDiscount(d.product.price, d.product.discount || 0) * d.quantity, 0);
-            await tx.cart.update({ where: { id: activeCartId }, data: { sum } });
+
+            await tx.cart.update({ where: { id: activeCartId }, data: { sum: computedSum } });
         });
 
-        // QUAN TRỌNG: sang flow giỏ → xoá vé Mua ngay còn tồn trong session
+        // QUAN TRỌNG: sang flow giỏ → xoá vé Mua ngay còn tồn trong session (GIỮ NGUYÊN)
         if ((req as any).session) (req as any).session.buyNow = undefined;
 
-        // Ép mode=cart để GET /checkout tôn trọng
+        // === NEW: chặn qua checkout nếu vượt 150 triệu; trả về /cart để hiện modal thông báo
+        if (computedSum > ORDER_CAP) {
+            const qs = new URLSearchParams({
+                overCap: "1",
+                total: String(computedSum)
+            }).toString();
+            return res.redirect(`/cart?${qs}`);
+        }
+
+        // Ép mode=cart để GET /checkout tôn trọng (GIỮ NGUYÊN)
         return res.redirect("/checkout?mode=cart");
     } catch (e) {
         console.error("handleCartToCheckout error:", e);
         return res.redirect("/cart");
     }
 };
+
 
 const toInt = (v: any) => {
     const n = Number(v);

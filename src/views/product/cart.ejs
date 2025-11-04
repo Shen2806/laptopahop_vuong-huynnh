@@ -503,6 +503,44 @@
 
         </div>
         <!-- Cart Page End -->
+        <!-- Over-cap Modal -->
+        <div class="modal fade" id="overCapModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Đơn vượt giới hạn thanh toán online</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+              </div>
+
+              <div class="modal-body">
+                <p>Đơn của bạn có tổng <span id="ocm-total" class="fw-bold"></span>, vượt quá
+                  <strong>150.000.000₫</strong>.</p>
+                <p>Vui lòng đến <strong>cửa hàng</strong> để giao dịch trực tiếp hoặc liên hệ hỗ trợ.</p>
+
+                <!-- Thông tin cửa hàng cố định -->
+                <div class="border rounded p-3 bg-light">
+                  <div class="fw-semibold">LaptopShop Gò Vấp</div>
+                  <div class="small text-muted">99 ABC, Thống Nhất, Gò Vấp</div>
+                  <div class="small">Điện thoại: <a href="tel:0999887744">0999 887 744</a></div>
+                  <div class="mt-2 d-flex gap-2">
+                    <!-- Link chỉ đường Google Maps cho đúng địa chỉ trên -->
+                    <a class="btn btn-sm btn-primary"
+                      href="https://www.google.com/maps/search/?api=1&query=99%20ABC%2C%20Th%E1%BB%91ng%20Nh%E1%BA%A5t%2C%20G%C3%B2%20V%E1%BA%A5p"
+                      target="_blank" rel="noopener">Chỉ đường</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="tel:0999887744">Gọi</a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer: bỏ nút 'Xem tất cả cửa hàng', giữ nút gọi hỗ trợ nếu bạn thích -->
+              <div class="modal-footer d-flex flex-column gap-2">
+                <a href="tel:0999887744" class="btn btn-outline-secondary w-100">Gọi hỗ trợ 0999 887 744</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
 
         <!-- Footer Start -->
         <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
@@ -679,6 +717,26 @@
             updateTotals();
           });
         </script>
+        <!-- Kiểm tra over-cap khi submit checkout đơn hàng vượt quá 150tr -->
+        <script>
+          document.addEventListener('DOMContentLoaded', () => {
+            const p = new URLSearchParams(location.search);
+            if (p.get('overCap') === '1') {
+              const total = Number(p.get('total') || '0');
+              const el = document.getElementById('overCapModal');
+              const totalEl = document.getElementById('ocm-total');
+              if (totalEl) totalEl.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total);
+              if (el && window.bootstrap?.Modal) {
+                new bootstrap.Modal(el).show();
+              } else {
+                alert('Đơn vượt 150.000.000₫. Vui lòng giao dịch trực tiếp tại cửa hàng.');
+              }
+              // Xoá query đẹp URL (tuỳ chọn):
+              history.replaceState(null, '', location.pathname);
+            }
+          });
+        </script>
+
 
 </body>
 
