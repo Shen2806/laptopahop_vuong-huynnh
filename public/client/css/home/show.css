@@ -2120,7 +2120,7 @@ body {
 }
 
 .ai-pimg {
-  height: 128px;
+  height: 228px;
   object-fit: cover;
 }
 
@@ -2244,4 +2244,144 @@ body {
   .ai-msg__bubble {
     max-width: 92%;
   }
+}
+
+/* === Home pagination: style giống hình 2 === */
+:root {
+  --pg-text: #0f766e;
+  /* teal */
+  --pg-border: rgba(15, 118, 110, .25);
+  --pg-border-hover: rgba(15, 118, 110, .45);
+  --pg-shadow: 0 2px 10px rgba(15, 118, 110, .06);
+  --pg-shadow-hover: 0 6px 16px rgba(15, 118, 110, .12);
+}
+
+.pagination.home-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.pagination.home-pager .page-item {
+  display: inline-flex;
+}
+
+.pagination.home-pager .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  min-width: 40px;
+  border-radius: 12px !important;
+  background: #fff !important;
+  /* nền trắng */
+  border: 1px solid var(--pg-border) !important;
+  /* viền xanh nhạt */
+  color: var(--pg-text) !important;
+  /* chữ teal */
+  box-shadow: var(--pg-shadow);
+  text-decoration: none;
+}
+
+/* Hover */
+.pagination.home-pager .page-link:hover {
+  background: #fff !important;
+  border-color: var(--pg-border-hover) !important;
+  box-shadow: var(--pg-shadow-hover);
+}
+
+/* Active – KHÔNG còn xanh dương */
+.pagination.home-pager .page-item.active .page-link,
+.pagination.home-pager .page-link.active {
+  background: #fff !important;
+  color: var(--pg-text) !important;
+  border-color: var(--pg-border-hover) !important;
+  font-weight: 700;
+}
+
+/* Disabled */
+.pagination.home-pager .page-item.disabled .page-link {
+  background: #fff !important;
+  color: rgba(15, 118, 110, .45) !important;
+  border-color: rgba(15, 118, 110, .20) !important;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+/* Dấu “…” */
+.pagination.home-pager .page-ellipsis {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(15, 118, 110, .65) !important;
+  padding: 0 6px;
+  min-width: 0;
+}
+
+/* Màu chủ đạo có thể đổi cho hợp brand */
+:root {
+  --pg-primary: #0f766e;
+  /* teal */
+  --pg-primary-hover: #0c5f59;
+  /* đậm hơn khi hover */
+  --pg-shadow-strong: 0 10px 24px rgba(15, 118, 110, .25);
+}
+
+/* Các nút mặc định */
+.pagination.home-pager .page-link,
+.pagination.pager .page-link {
+  background: #fff !important;
+  border: 1px solid rgba(15, 118, 110, .25) !important;
+  color: #0f766e !important;
+  border-radius: 12px !important;
+  min-width: 40px;
+  padding: 8px 12px;
+  font-weight: 600;
+  transition: .15s ease;
+}
+
+/* ======= ACTIVE : tô đậm, chữ trắng ======= */
+.pagination.home-pager .page-item.active .page-link,
+.pagination.pager .page-item.active .page-link {
+  background: var(--pg-primary) !important;
+  color: #fff !important;
+  border-color: var(--pg-primary) !important;
+  box-shadow: var(--pg-shadow-strong);
+  transform: translateY(-1px);
+}
+
+/* Hover trên active */
+.pagination.home-pager .page-item.active .page-link:hover,
+.pagination.pager .page-item.active .page-link:hover {
+  background: var(--pg-primary-hover) !important;
+  border-color: var(--pg-primary-hover) !important;
+}
+
+/* Hover trên nút thường */
+.pagination.home-pager .page-link:hover,
+.pagination.pager .page-link:hover {
+  border-color: rgba(15, 118, 110, .45) !important;
+  box-shadow: 0 6px 16px rgba(15, 118, 110, .12);
+}
+
+/* Disabled */
+.pagination.home-pager .page-item.disabled .page-link,
+.pagination.pager .page-item.disabled .page-link {
+  background: #fff !important;
+  color: rgba(15, 118, 110, .45) !important;
+  border-color: rgba(15, 118, 110, .20) !important;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+/* Dấu “…” */
+.pagination.home-pager .page-ellipsis,
+.pagination.pager .page-ellipsis {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(15, 118, 110, .65) !important;
+  padding: 0 6px;
+  min-width: 0;
 }

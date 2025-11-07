@@ -396,73 +396,57 @@
                                 </div>
                             </aside>
                             <!-- FILTER MODAL (Bootstrap 5) -->
-                            <div class="modal fade filter-modal" id="filterModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal fade filter-modal" id="filterModal" tabindex="-1" aria-hidden="true"
+                                data-ajax="false">
                                 <div class="modal-dialog modal-xl modal-dialog-centered">
                                     <div class="modal-content border-0 rounded-4">
                                         <div class="modal-header border-0 pb-0">
-                                            <h5 class="modal-title fw-bold"><i class="bi bi-funnel me-2"></i> Bộ lọc
-                                                nâng
-                                                cao</h5>
+                                            <h5 class="modal-title fw-bold"><i class="bi bi-funnel me-2"></i> Bo loc
+                                                nang cao</h5>
                                             <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"
-                                                aria-label="Đóng"></button>
+                                                aria-label="Dong"></button>
                                         </div>
 
                                         <div class="modal-body pt-2">
                                             <div class="row g-3">
 
-                                                <!-- HÃNG SẢN XUẤT -->
+                                                <!-- HANG SAN XUAT -->
                                                 <div class="col-12">
                                                     <div class="card filter-card rounded-3">
-                                                        <div class="card-body">
-                                                            <h6 class="fw-bold mb-2">Hãng sản xuất</h6>
-                                                            <% var FO=[]; FO.push({ value: 'APPLE' ,
-                                                                name: 'Apple (MacBook)' }); FO.push({ value: 'ASUS' ,
-                                                                name: 'Asus' }); FO.push({ value: 'LENOVO' ,
-                                                                name: 'Lenovo' }); FO.push({ value: 'DELL' ,
-                                                                name: 'Dell' }); FO.push({ value: 'LG' , name: 'LG' });
-                                                                FO.push({ value: 'ACER' , name: 'Acer' }); FO.push({
-                                                                value: 'HP' , name: 'HP' }); FO.push({ value: 'MSI' ,
-                                                                name: 'MSI' }); FO.push({ value: 'GIGABYTE' ,
-                                                                name: 'Gigabyte' }); FO.push({ value: 'ALIENWARE' ,
-                                                                name: 'Alienware' }); if (typeof factoryOptions
+                                                        <div class="card-body" id="factoryFilter" data-param="factory">
+                                                            <h6 class="fw-bold mb-2">Hang san xuat</h6>
+                                                            <% var FO=[ { value: 'APPLE' , name: 'Apple (MacBook)' }, {
+                                                                value: 'ASUS' , name: 'Asus' }, { value: 'LENOVO' ,
+                                                                name: 'Lenovo' }, { value: 'DELL' , name: 'Dell' }, {
+                                                                value: 'LG' , name: 'LG' }, { value: 'ACER' ,
+                                                                name: 'Acer' }, { value: 'HP' , name: 'HP' }, {
+                                                                value: 'MSI' , name: 'MSI' }, { value: 'GIGABYTE' ,
+                                                                name: 'Gigabyte' }, { value: 'ALIENWARE' ,
+                                                                name: 'Alienware' } ]; if (typeof factoryOptions
                                                                 !=='undefined' && Array.isArray(factoryOptions) &&
-                                                                factoryOptions.length) { FO=factoryOptions; } var
-                                                                pre=[]; if (typeof precheckedFactories !=='undefined' &&
-                                                                Array.isArray(precheckedFactories)) {
-                                                                pre=precheckedFactories; } %>
-
-                                                                <div id="factoryFilter">
-                                                                    <div class="brand-chips compact" id="brandChips">
-                                                                        <% FO.forEach(function (opt, idx) { var
-                                                                            isChecked=pre.indexOf(opt.value)!==-1; %>
-                                                                            <div class="chip-check">
-                                                                                <input class="form-check-input"
-                                                                                    type="checkbox"
-                                                                                    id="factory-<%= idx %>"
-                                                                                    value="<%= opt.value %>"
-                                                                                    <%=isChecked?'checked':''%> >
-                                                                                <label class="chip"
-                                                                                    for="factory-<%= idx %>">
-                                                                                    <%= opt.name %>
-                                                                                </label>
-                                                                            </div>
-                                                                            <% }); %>
-                                                                    </div>
-                                                                    <% if (FO.length> 6) { %>
-                                                                        <button type="button"
-                                                                            class="btn btn-link px-0 small mt-1"
-                                                                            id="brandMoreBtn">Xem thêm</button>
-                                                                        <% } %>
+                                                                factoryOptions.length) { FO=factoryOptions; } %>
+                                                                <div class="brand-chips compact" id="brandChips">
+                                                                    <% FO.forEach(function(opt, idx){ %>
+                                                                        <div class="chip-check">
+                                                                            <input class="form-check-input"
+                                                                                type="checkbox" id="factory-<%= idx %>"
+                                                                                value="<%= opt.value %>">
+                                                                            <label class="chip"
+                                                                                for="factory-<%= idx %>">
+                                                                                <%= opt.name %>
+                                                                            </label>
+                                                                        </div>
+                                                                        <% }); %>
                                                                 </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <!-- MỤC ĐÍCH SỬ DỤNG -->
+                                                <!-- MUC DICH SU DUNG -->
                                                 <div class="col-12 col-md-6">
                                                     <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="targetFilter">
-                                                            <h6 class="fw-bold mb-2">Mục đích sử dụng</h6>
+                                                        <div class="card-body" id="targetFilter" data-param="target">
+                                                            <h6 class="fw-bold mb-2">Muc dich su dung</h6>
                                                             <div class="stack-choices grid-2">
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" id="target-1"
@@ -472,54 +456,52 @@
                                                                         type="checkbox" id="target-2"
                                                                         value="SINHVIEN-VANPHONG"><label
                                                                         class="form-check-label" for="target-2">Sinh
-                                                                        viên -
-                                                                        Văn phòng</label></div>
+                                                                        vien - Van phong</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" id="target-3"
                                                                         value="THIET-KE-DO-HOA"><label
-                                                                        class="form-check-label" for="target-3">Thiết kế
-                                                                        đồ
-                                                                        họa</label></div>
+                                                                        class="form-check-label" for="target-3">Thiet ke
+                                                                        do hoa</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" id="target-4"
                                                                         value="MONG-NHE"><label class="form-check-label"
-                                                                        for="target-4">Mỏng nhẹ</label></div>
+                                                                        for="target-4">Mong nhe</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" id="target-5"
                                                                         value="DOANH-NHAN"><label
                                                                         class="form-check-label" for="target-5">Doanh
-                                                                        nhân</label></div>
+                                                                        nhan</label></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <!-- MỨC GIÁ -->
+                                                <!-- MUC GIA -->
                                                 <div class="col-12 col-md-6">
                                                     <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="priceFilter">
-                                                            <h6 class="fw-bold mb-2">Mức giá</h6>
+                                                        <div class="card-body" id="priceFilter" data-param="price">
+                                                            <h6 class="fw-bold mb-2">Muc gia</h6>
                                                             <div class="stack-choices grid-2">
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" id="price-1"
                                                                         value="duoi-10-trieu"><label
-                                                                        class="form-check-label" for="price-1">Dưới 10
-                                                                        triệu</label></div>
+                                                                        class="form-check-label" for="price-1">Duoi 10
+                                                                        trieu</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" id="price-2"
                                                                         value="10-15-trieu"><label
                                                                         class="form-check-label" for="price-2">10 - 15
-                                                                        triệu</label></div>
+                                                                        trieu</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" id="price-3"
                                                                         value="15-20-trieu"><label
                                                                         class="form-check-label" for="price-3">15 - 20
-                                                                        triệu</label></div>
+                                                                        trieu</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" id="price-4"
                                                                         value="tren-20-trieu"><label
-                                                                        class="form-check-label" for="price-4">Trên 20
-                                                                        triệu</label></div>
+                                                                        class="form-check-label" for="price-4">Tren 20
+                                                                        trieu</label></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -528,7 +510,7 @@
                                                 <!-- CPU -->
                                                 <div class="col-12 col-md-6">
                                                     <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="cpuFilter">
+                                                        <div class="card-body" id="cpuFilter" data-param="cpu">
                                                             <h6 class="fw-bold mb-2">CPU</h6>
                                                             <div class="stack-choices grid-2">
                                                                 <div class="form-check"><input class="form-check-input"
@@ -550,18 +532,15 @@
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="ryzen 5"
                                                                         id="cpu-r5"><label class="form-check-label"
-                                                                        for="cpu-r5">AMD Ryzen
-                                                                        5</label></div>
+                                                                        for="cpu-r5">AMD Ryzen 5</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="ryzen 7"
                                                                         id="cpu-r7"><label class="form-check-label"
-                                                                        for="cpu-r7">AMD Ryzen
-                                                                        7</label></div>
+                                                                        for="cpu-r7">AMD Ryzen 7</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="ryzen 9"
                                                                         id="cpu-r9"><label class="form-check-label"
-                                                                        for="cpu-r9">AMD Ryzen
-                                                                        9</label></div>
+                                                                        for="cpu-r9">AMD Ryzen 9</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="m1" id="cpu-m1"><label
                                                                         class="form-check-label" for="cpu-m1">Apple
@@ -582,39 +561,35 @@
                                                 <!-- RAM -->
                                                 <div class="col-12 col-md-6">
                                                     <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="ramFilter">
+                                                        <div class="card-body" id="ramFilter" data-param="ram">
                                                             <h6 class="fw-bold mb-2">RAM</h6>
                                                             <div class="stack-choices grid-2">
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="8" id="ram-8"><label
                                                                         class="form-check-label" for="ram-8">8
-                                                                        GB</label>
-                                                                </div>
+                                                                        GB</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="16" id="ram-16"><label
                                                                         class="form-check-label" for="ram-16">16
-                                                                        GB</label>
-                                                                </div>
+                                                                        GB</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="32" id="ram-32"><label
                                                                         class="form-check-label" for="ram-32">32
-                                                                        GB</label>
-                                                                </div>
+                                                                        GB</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="64" id="ram-64"><label
                                                                         class="form-check-label" for="ram-64">64
-                                                                        GB</label>
-                                                                </div>
+                                                                        GB</label></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <!-- Ổ CỨNG -->
+                                                <!-- O CUNG -->
                                                 <div class="col-12 col-md-6">
                                                     <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="storageFilter">
-                                                            <h6 class="fw-bold mb-2">Ổ cứng</h6>
+                                                        <div class="card-body" id="storageFilter" data-param="storage">
+                                                            <h6 class="fw-bold mb-2">O cung</h6>
                                                             <div class="stack-choices grid-2">
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="256" id="st-256"><label
@@ -633,16 +608,16 @@
                                                     </div>
                                                 </div>
 
-                                                <!-- ĐỘ PHÂN GIẢI -->
+                                                <!-- DO PHAN GIAI -->
                                                 <div class="col-12 col-md-6">
                                                     <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="resFilter">
-                                                            <h6 class="fw-bold mb-2">Độ phân giải</h6>
+                                                        <div class="card-body" id="resFilter" data-param="res">
+                                                            <h6 class="fw-bold mb-2">Do phan giai</h6>
                                                             <div class="stack-choices grid-2">
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="FHD" id="res-fhd"><label
                                                                         class="form-check-label" for="res-fhd">FHD
-                                                                        (1920×1080)</label></div>
+                                                                        (1920x1080)</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="QHD" id="res-qhd"><label
                                                                         class="form-check-label" for="res-qhd">QHD /
@@ -656,84 +631,51 @@
                                                     </div>
                                                 </div>
 
-                                                <!-- KÍCH THƯỚC MÀN -->
+                                                <!-- KICH THUOC MAN -->
                                                 <div class="col-12 col-md-6">
                                                     <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="screenFilter">
-                                                            <h6 class="fw-bold mb-2">Kích thước màn hình</h6>
+                                                        <div class="card-body" id="screenFilter" data-param="screen">
+                                                            <h6 class="fw-bold mb-2">Kich thuoc man hinh</h6>
                                                             <div class="stack-choices grid-2">
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="13-14" id="sc-13"><label
-                                                                        class="form-check-label" for="sc-13">13 –
+                                                                        class="form-check-label" for="sc-13">13 -
                                                                         14"</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="15-16" id="sc-15"><label
-                                                                        class="form-check-label" for="sc-15">15 –
+                                                                        class="form-check-label" for="sc-15">15 -
                                                                         16"</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="checkbox" value="17-18" id="sc-17"><label
-                                                                        class="form-check-label" for="sc-17">17 –
+                                                                        class="form-check-label" for="sc-17">17 -
                                                                         18"</label></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <!-- TÍNH NĂNG ĐẶC BIỆT -->
-                                                <!-- <div class="col-12 col-md-6">
-                                                    <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="featureFilter">
-                                                            <h6 class="fw-bold mb-2">Tính năng đặc biệt</h6>
-                                                            <div class="stack-choices grid-2">
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="TOUCH"
-                                                                        id="ft-touch"><label class="form-check-label"
-                                                                        for="ft-touch">Màn hình cảm
-                                                                        ứng</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="2IN1" id="ft-2in1"><label
-                                                                        class="form-check-label" for="ft-2in1">Gập 360°
-                                                                        (2-in-1)</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="TB4" id="ft-tb4"><label
-                                                                        class="form-check-label"
-                                                                        for="ft-tb4">Thunderbolt
-                                                                        4</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="FP" id="ft-fp"><label
-                                                                        class="form-check-label" for="ft-fp">Vân
-                                                                        tay</label>
-                                                                </div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="WCAM1080"
-                                                                        id="ft-w1080"><label class="form-check-label"
-                                                                        for="ft-w1080">Webcam 1080p</label></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div> -->
-
-                                                <!-- SẮP XẾP -->
+                                                <!-- SAP XEP -->
                                                 <div class="col-12 col-md-6">
                                                     <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="sortFilter">
-                                                            <h6 class="fw-bold mb-2">Sắp xếp</h6>
+                                                        <div class="card-body" id="sortFilter" data-param="sort"
+                                                            data-default="gia-khong-sap-xep">
+                                                            <h6 class="fw-bold mb-2">Sap xep</h6>
                                                             <div class="stack-choices grid-1">
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="radio" name="radio-sort" id="sort-1"
                                                                         value="gia-tang-dan"><label
-                                                                        class="form-check-label" for="sort-1">Giá tăng
-                                                                        dần</label></div>
+                                                                        class="form-check-label" for="sort-1">Gia tang
+                                                                        dan</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="radio" name="radio-sort" id="sort-2"
                                                                         value="gia-giam-dan"><label
-                                                                        class="form-check-label" for="sort-2">Giá giảm
-                                                                        dần</label></div>
+                                                                        class="form-check-label" for="sort-2">Gia giam
+                                                                        dan</label></div>
                                                                 <div class="form-check"><input class="form-check-input"
                                                                         type="radio" name="radio-sort" id="sort-3"
-                                                                        value="gia-khong-sap-xep" checked><label
-                                                                        class="form-check-label" for="sort-3">Không sắp
-                                                                        xếp</label></div>
+                                                                        value="gia-khong-sap-xep"><label
+                                                                        class="form-check-label" for="sort-3">Khong sap
+                                                                        xep</label></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -744,17 +686,21 @@
 
                                         <div
                                             class="modal-footer border-0 d-flex justify-content-between flex-wrap gap-2">
-                                            <!-- GIỮ NGUYÊN LOGIC: #btnFilter -->
-                                            <button id="btnFilter" type="button" class="btn btn-success px-4"
-                                                data-bs-dismiss="modal">
-                                                Xem kết quả
-                                            </button>
-                                            <button type="button" class="btn btn-outline-secondary px-4"
-                                                data-bs-dismiss="modal">Đóng</button>
+                                            <div class="d-flex gap-2">
+                                                <button id="btnClearAll" type="button"
+                                                    class="btn btn-outline-danger px-4">Xoa tat ca</button>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <button id="btnFilter" type="button" class="btn btn-success px-4"
+                                                    data-bs-dismiss="modal">Xem ket qua</button>
+                                                <button type="button" class="btn btn-outline-secondary px-4"
+                                                    data-bs-dismiss="modal">Dong</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                             <!-- Product Grid -->
                             <section class="col-12 col-lg-9">
                                 <div class="row g-4">
@@ -852,30 +798,24 @@
                                             <% // Helper tạo link phân trang, giữ nguyên các filter hiện có (qsNoPage)
                                                 function linkPage(p) { var q=(typeof qsNoPage !=='undefined' &&
                                                 qsNoPage) ? ('?' + qsNoPage + '&page=' + p) : ('?page=' + p);
-    return ' /products' + q; } %>
+  return ' /products' + q; } %>
 
-
-                                                <!-- Pagination -->
                                                 <% if (products && products.length) { %>
                                                     <% var _page=parseInt((typeof page !=='undefined' ? page : 1), 10)
                                                         || 1; var _total=parseInt((typeof totalPages !=='undefined' ?
                                                         totalPages : 1), 10) || 1; var _pagination=[]; function
-                                                        _pushRange(a, b) { for (var i=a; i <=b; i++) {
-                                                        _pagination.push(i); } } if (_total> 1) {
+                                                        _pushRange(a, b) { for (var i=a; i<=b; i++) _pagination.push(i);
+                                                        } if (_total> 1) {
                                                         if (_total <= 7) { _pushRange(1, _total); } else if (_page <=3)
                                                             { _pushRange(1, 4); _pagination.push('...');
                                                             _pagination.push(_total); } else if (_page>= _total - 2) {
-                                                            _pagination.push(1);
-                                                            _pagination.push('...');
+                                                            _pagination.push(1); _pagination.push('...');
                                                             _pushRange(_total - 3, _total);
                                                             } else {
-                                                            _pagination.push(1);
-                                                            _pagination.push('...');
-                                                            _pagination.push(_page - 1);
-                                                            _pagination.push(_page);
+                                                            _pagination.push(1); _pagination.push('...');
+                                                            _pagination.push(_page - 1); _pagination.push(_page);
                                                             _pagination.push(_page + 1);
-                                                            _pagination.push('...');
-                                                            _pagination.push(_total);
+                                                            _pagination.push('...'); _pagination.push(_total);
                                                             }
                                                             }
                                                             %>
@@ -885,42 +825,43 @@
                                                                     class="pagination pager d-flex justify-content-center mt-4">
                                                                     <!-- Previous -->
                                                                     <li
-                                                                        class="<%= (_page === 1 ? 'disabled page-item' : 'page-item') %>">
+                                                                        class="page-item <%= (_page === 1 ? 'disabled' : '') %>">
                                                                         <a class="page-link"
                                                                             href="<%= linkPage(_page > 1 ? (_page - 1) : 1) %>"
-                                                                            aria-label="Previous">
+                                                                            aria-label="Previous">&laquo;</a>
                                                                     </li>
 
                                                                     <% for (var k=0; k<_pagination.length; k++) { var
                                                                         p=_pagination[k]; %>
                                                                         <% if (p==='...' ) { %>
                                                                             <li class="page-item disabled"><span
-                                                                                    class="page-link">...</span></li>
+                                                                                    class="page-link page-ellipsis">...</span>
+                                                                            </li>
                                                                             <% } else { %>
-                                                                                <li class="page-item">
-                                                                                    <a class="page-link <%= (_page === p ? 'active' : '') %>"
+                                                                                <li
+                                                                                    class="page-item <%= (_page === p ? 'active' : '') %>">
+                                                                                    <a class="page-link"
                                                                                         href="<%= linkPage(p) %>">
-
+                                                                                        <%= p %>
+                                                                                    </a>
                                                                                 </li>
                                                                                 <% } %>
                                                                                     <% } %>
 
                                                                                         <!-- Next -->
                                                                                         <li
-                                                                                            class="<%= (_page === _total ? 'disabled page-item' : 'page-item') %>">
+                                                                                            class="page-item <%= (_page === _total ? 'disabled' : '') %>">
                                                                                             <a class="page-link"
                                                                                                 href="<%= linkPage(_page < _total ? (_page + 1) : _total) %>"
-                                                                                                aria-label="Next">
-
+                                                                                                aria-label="Next">&raquo;</a>
                                                                                         </li>
-
                                                                 </ul>
                                                                 <% } %>
                                                                     <% } else { %>
                                                                         <div class="text-center py-5">Không tồn tại sản
-                                                                            phẩm
-                                                                            này!</div>
+                                                                            phẩm này!</div>
                                                                         <% } %>
+
                                 </div>
                             </section>
 
@@ -1115,6 +1056,238 @@
                         });
                     })();
                 </script>
+                // active phân trang
+                <script>
+                    // Bật active khi click cho pagination trang filter
+                    document.addEventListener('click', function (e) {
+                        const a = e.target.closest('.pagination.pager .page-link');
+                        if (!a) return;
+
+                        const ul = a.closest('.pagination.pager');
+                        const li = a.closest('.page-item');
+                        if (!ul || !li || li.classList.contains('disabled')) return;
+
+                        // 1) Toggle active tức thì (UI feedback)
+                        ul.querySelectorAll('.page-item').forEach(el => el.classList.remove('active'));
+                        li.classList.add('active');
+
+                        // 2) Nếu dùng AJAX, thêm data-ajax-pagination="true" vào <ul class="pagination pager ...">
+                        const ajaxMode = ul.dataset.ajaxPagination === 'true';
+                        if (!ajaxMode) return;         // điều hướng bình thường (full reload)
+
+                        // 3) AJAX mode: chặn chuyển trang, cập nhật URL & load lại list
+                        e.preventDefault();
+                        const url = a.getAttribute('href');
+                        history.pushState({}, '', url);
+
+                        // Gọi renderer của bạn – thay bằng logic hiện có để load danh sách + phân trang
+                        loadProducts(url);             // bạn đã có hàm fetch/axios nào thì gọi ở đây
+                    });
+
+                    // Ví dụ tối giản cho loadProducts (nếu bạn chưa có):
+                    async function loadProducts(url) {
+                        try {
+                            const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                            const html = await res.text();
+                            const doc = new DOMParser().parseFromString(html, 'text/html');
+
+                            // Thay #product-list và #product-pagination của trang hiện tại
+                            const newList = doc.querySelector('#product-list');
+                            const newPager = doc.querySelector('#product-pagination'); // bọc <ul.pagination.pager> trong div này
+
+                            if (newList) document.querySelector('#product-list')?.replaceWith(newList);
+                            if (newPager) document.querySelector('#product-pagination')?.replaceWith(newPager);
+                        } catch (err) {
+                            console.error(err);
+                        }
+                    }
+                </script>
+
+                <script>
+                    (function () {
+                        var modal = document.getElementById('filterModal');
+                        if (!modal) return;
+
+                        var ajaxMode = (modal.getAttribute('data-ajax') === 'true');
+                        var applyBtn = document.getElementById('btnFilter');
+                        var clearAllBtn = document.getElementById('btnClearAll');
+
+                        // Khai bao cac nhom va param key tren URL
+                        var GROUP_IDS = [
+                            'factoryFilter', 'targetFilter', 'priceFilter', 'cpuFilter', 'ramFilter',
+                            'storageFilter', 'resFilter', 'screenFilter', 'sortFilter'
+                        ];
+                        function getEl(id) { return document.getElementById(id); }
+                        function getKey(el) { return el ? el.getAttribute('data-param') : null; }
+
+                        function syncUIFromURL() {
+                            var url = new URL(window.location.href);
+                            GROUP_IDS.forEach(function (id) {
+                                var wrap = getEl(id);
+                                if (!wrap) return;
+                                var key = getKey(wrap);
+                                if (!key) return;
+
+                                if (id === 'sortFilter') {
+                                    var def = wrap.getAttribute('data-default') || '';
+                                    var v = url.searchParams.get(key);
+                                    var target = v || def;
+                                    var r = wrap.querySelector('input[type="radio"][value="' + target + '"]');
+                                    if (r) r.checked = true;
+                                    // neu khong co radio tuong ung thi bo het
+                                    if (!r) wrap.querySelectorAll('input[type="radio"]').forEach(function (n) { n.checked = false; });
+                                } else {
+                                    var values = url.searchParams.getAll(key);
+                                    wrap.querySelectorAll('input[type="checkbox"]').forEach(function (inp) {
+                                        inp.checked = values.indexOf(inp.value) !== -1;
+                                    });
+                                }
+                            });
+                        }
+
+                        function collectSelectionsFromUI() {
+                            var sel = {};
+                            GROUP_IDS.forEach(function (id) {
+                                var wrap = getEl(id);
+                                if (!wrap) return;
+                                var key = getKey(wrap);
+                                if (!key) return;
+
+                                if (id === 'sortFilter') {
+                                    var def = wrap.getAttribute('data-default') || '';
+                                    var r = wrap.querySelector('input[type="radio"]:checked');
+                                    var val = r ? r.value : '';
+                                    if (val && val !== def) sel[key] = [val];
+                                } else {
+                                    var arr = [];
+                                    wrap.querySelectorAll('input[type="checkbox"]:checked').forEach(function (inp) { arr.push(inp.value); });
+                                    if (arr.length) sel[key] = arr;
+                                }
+                            });
+                            return sel;
+                        }
+
+                        function collectSelectionsFromURL() {
+                            var url = new URL(window.location.href);
+                            var sel = {};
+                            GROUP_IDS.forEach(function (id) {
+                                var wrap = getEl(id);
+                                if (!wrap) return;
+                                var key = getKey(wrap);
+                                if (!key) return;
+
+                                if (id === 'sortFilter') {
+                                    var v = url.searchParams.get(key);
+                                    if (v) sel[key] = [v];
+                                } else {
+                                    var arr = url.searchParams.getAll(key);
+                                    if (arr && arr.length) sel[key] = arr;
+                                }
+                            });
+                            return sel;
+                        }
+
+                        function sameSelections(a, b) {
+                            var ka = Object.keys(a).sort().join('|');
+                            var kb = Object.keys(b).sort().join('|');
+                            if (ka !== kb) return false;
+                            for (var k in a) {
+                                var av = (a[k] || []).slice().sort().join('|');
+                                var bv = (b[k] || []).slice().sort().join('|');
+                                if (av !== bv) return false;
+                            }
+                            return true;
+                        }
+
+                        function updateApplyState() {
+                            var ui = collectSelectionsFromUI();
+                            var url = collectSelectionsFromURL();
+                            if (sameSelections(ui, url)) applyBtn.setAttribute('disabled', 'disabled');
+                            else applyBtn.removeAttribute('disabled');
+                        }
+
+                        function clearAllUI() {
+                            GROUP_IDS.forEach(function (id) {
+                                var wrap = getEl(id);
+                                if (!wrap) return;
+                                wrap.querySelectorAll('input[type="checkbox"]').forEach(function (inp) { inp.checked = false; });
+                                if (id === 'sortFilter') {
+                                    var def = wrap.getAttribute('data-default') || '';
+                                    var rDef = def ? wrap.querySelector('input[type="radio"][value="' + def + '"]') : null;
+                                    if (rDef) rDef.checked = true;
+                                    else wrap.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
+                                } else {
+                                    wrap.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
+                                }
+                            });
+                        }
+
+                        function applySelections(sel) {
+                            var url = new URL(window.location.href);
+                            url.searchParams.delete('page');
+                            // xoa toan bo key filter
+                            GROUP_IDS.forEach(function (id) {
+                                var wrap = getEl(id);
+                                if (!wrap) return;
+                                var key = getKey(wrap);
+                                if (key) url.searchParams.delete(key);
+                            });
+                            // append lai cac gia tri da chon
+                            Object.keys(sel).forEach(function (key) {
+                                sel[key].forEach(function (v) { url.searchParams.append(key, v); });
+                            });
+
+                            if (ajaxMode && typeof window.loadProducts === 'function') {
+                                history.pushState({}, '', url);
+                                window.loadProducts(String(url));
+                            } else {
+                                window.location.assign(String(url));
+                            }
+                        }
+
+                        // Lắng nghe thay đổi trong các nhóm để bật/tắt nút áp dụng
+                        GROUP_IDS.forEach(function (id) {
+                            var wrap = getEl(id);
+                            if (!wrap) return;
+                            wrap.addEventListener('change', updateApplyState);
+                        });
+
+                        // Nút "Xoa tat ca": chỉ clear UI, không áp dụng
+                        clearAllBtn.addEventListener('click', function () {
+                            clearAllUI();
+                            updateApplyState();
+                        });
+
+                        // Nút "Xem ket qua": build URL tu UI va apply
+                        applyBtn.addEventListener('click', function () {
+                            var selections = collectSelectionsFromUI();
+                            applySelections(selections);
+                        });
+
+                        // Khi mo modal: dong bo UI voi URL, cap nhat trang thai nut
+                        modal.addEventListener('shown.bs.modal', function () {
+                            syncUIFromURL();
+                            updateApplyState();
+                        });
+
+                        // Fallback AJAX neu data-ajax="true" ma chua co loadProducts
+                        if (ajaxMode && typeof window.loadProducts !== 'function') {
+                            window.loadProducts = async function (url) {
+                                try {
+                                    var res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                                    var html = await res.text();
+                                    var doc = new DOMParser().parseFromString(html, 'text/html');
+                                    var newList = doc.querySelector('#product-list');
+                                    var newPager = doc.querySelector('#product-pagination');
+                                    if (newList) document.querySelector('#product-list')?.replaceWith(newList);
+                                    if (newPager) document.querySelector('#product-pagination')?.replaceWith(newPager);
+                                } catch (e) { console.error(e); }
+                            };
+                        }
+                    })();
+                </script>
+
+
 
 </body>
 

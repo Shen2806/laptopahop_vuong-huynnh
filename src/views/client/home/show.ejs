@@ -282,59 +282,70 @@
                                                     </div>
                                                 </div>
                                                 <% }) %>
-                                                    <div class="pagination d-flex justify-content-center mt-5">
-                                                        <!-- Nút Previous -->
-                                                        <li
-                                                            class="<%= page === 1 ? 'disabled page-item' : 'page-item' %> ">
-                                                            <a class="page-link" href="/?page=<%= page - 1 %>"
-                                                                aria-label="Previous">
-                                                                <span aria-hidden="true">&laquo;</span>
-                                                            </a>
-                                                        </li>
+                                                    <% function homeLinkPage(p) { var q=(typeof qsNoPage !=='undefined'
+                                                        && qsNoPage) ? ('?' + qsNoPage + '&page=' + p) : ('?page=' + p);
+  return ' /' + q; } %>
 
-                                                        <% function getPagination(current, total) { const pages=[];
-                                                            const range=(start, end)=> {
-                                                            const arr = [];
-                                                            for (let i = start; i <= end; i++) arr.push(i); return arr;
-                                                                }; if (total <=7) return range(1, total); const left=1;
-                                                                const right=1; pages.push(...range(1, left)); if
-                                                                (current> left + 2) {
-                                                                pages.push("...");
+                                                        <% var _page=parseInt((typeof page !=='undefined' ? page : 1),
+                                                            10) || 1; var _total=parseInt((typeof totalPages
+                                                            !=='undefined' ? totalPages : 1), 10) || 1; var
+                                                            _pagination=[]; function _pushRange(a, b){ for (var
+                                                            i=a;i<=b;i++) _pagination.push(i); } if (_total> 1) {
+                                                            if (_total <= 7) { _pushRange(1, _total); } else if (_page
+                                                                <=3) { _pushRange(1, 4); _pagination.push('...');
+                                                                _pagination.push(_total); } else if (_page>= _total - 2)
+                                                                {
+                                                                _pagination.push(1); _pagination.push('...');
+                                                                _pushRange(_total - 3, _total);
+                                                                } else {
+                                                                _pagination.push(1); _pagination.push('...');
+                                                                _pagination.push(_page - 1); _pagination.push(_page);
+                                                                _pagination.push(_page + 1);
+                                                                _pagination.push('...'); _pagination.push(_total);
                                                                 }
+                                                                }
+                                                                %>
 
-                                                                const start = Math.max(current - 1, left + 1);
-                                                                const end = Math.min(current + 1, total - right);
-                                                                for (let i = start; i <= end; i++) { pages.push(i); } if
-                                                                    (current < total - right - 1) { pages.push("..."); }
-                                                                    pages.push(...range(total - right + 1, total));
-                                                                    return pages; } const pagination=getPagination(page,
-                                                                    totalPages); %>
+                                                                <% if (_total> 1) { %>
+                                                                    <nav aria-label="Home pagination">
+                                                                        <ul
+                                                                            class="pagination home-pager d-flex justify-content-center mt-4">
+                                                                            <!-- Prev -->
+                                                                            <li
+                                                                                class="page-item <%= (_page === 1 ? 'disabled' : '') %>">
+                                                                                <a class="page-link"
+                                                                                    href="<%= homeLinkPage(_page > 1 ? (_page - 1) : 1) %>"
+                                                                                    aria-label="Previous">&laquo;</a>
+                                                                            </li>
 
-                                                                    <% pagination.forEach(p=> { %>
-                                                                        <% if (p==="..." ) { %>
-                                                                            <li class="page-item disabled"><span
-                                                                                    class="page-link">...</span></li>
-                                                                            <% } else { %>
-                                                                                <li class="page-item">
-                                                                                    <a class="page-link <%= page === p ? 'active' : '' %>"
-                                                                                        href="/?page=<%= p %>">
-                                                                                        <%= p %>
-                                                                                    </a>
-                                                                                </li>
-                                                                                <% } %>
-                                                                                    <% }) %>
-
-                                                                                        <!-- Nút Next -->
+                                                                            <% for (var i=0;i<_pagination.length;i++){
+                                                                                var p=_pagination[i]; %>
+                                                                                <% if (p==='...' ) { %>
+                                                                                    <li class="page-item disabled"><span
+                                                                                            class="page-link page-ellipsis">...</span>
+                                                                                    </li>
+                                                                                    <% } else { %>
                                                                                         <li
-                                                                                            class="<%= page === totalPages ? 'disabled page-item' : 'page-item' %> ">
+                                                                                            class="page-item <%= (_page === p ? 'active' : '') %>">
                                                                                             <a class="page-link"
-                                                                                                href="/?page=<%= page + 1 %>"
-                                                                                                aria-label="Next">
-                                                                                                <span
-                                                                                                    aria-hidden="true">&raquo;</span>
+                                                                                                href="<%= homeLinkPage(p) %>">
+                                                                                                <%= p %>
                                                                                             </a>
                                                                                         </li>
-                                                    </div>
+                                                                                        <% } %>
+                                                                                            <% } %>
+
+                                                                                                <!-- Next -->
+                                                                                                <li
+                                                                                                    class="page-item <%= (_page === _total ? 'disabled' : '') %>">
+                                                                                                    <a class="page-link"
+                                                                                                        href="<%= homeLinkPage(_page < _total ? (_page + 1) : _total) %>"
+                                                                                                        aria-label="Next">&raquo;</a>
+                                                                                                </li>
+                                                                        </ul>
+                                                                    </nav>
+                                                                    <% } %>
+
 
                                         </div>
                                     </div>

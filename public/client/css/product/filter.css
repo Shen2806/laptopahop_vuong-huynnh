@@ -931,3 +931,134 @@
   background: #8BC34A;
   color: #000;
 }
+
+/* Tổng thể pagination */
+.pagination {
+  list-style: none;
+  padding-left: 0;
+}
+
+/* Riêng cụm pagination sản phẩm – tránh bị CSS khác đè */
+.pagination.pager {
+  gap: .5rem;
+  /* khoảng cách giữa các nút */
+}
+
+/* Nút */
+.pagination.pager .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  min-width: 40px;
+  height: auto !important;
+  width: auto !important;
+  border-radius: 8px !important;
+  /* bỏ tròn vo 50% */
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--glass-bd, #cbd5e1);
+  color: #e5e7eb;
+}
+
+.pagination.pager .page-link:hover {
+  background: rgba(255, 255, 255, .10);
+}
+
+.pagination.pager .page-item.active .page-link {
+  background: rgba(79, 140, 255, .22);
+  border-color: rgba(79, 140, 255, .35);
+  color: #fff;
+}
+
+.pagination.pager .page-item.disabled .page-link {
+  opacity: .6;
+  pointer-events: none;
+}
+
+/* Dấu “…” */
+.pagination.pager .page-ellipsis {
+  background: transparent !important;
+  border: none !important;
+  color: #94a3b8;
+  min-width: 0;
+  padding: 0 6px;
+}
+
+/* Màu chủ đạo có thể đổi cho hợp brand */
+:root {
+  --pg-primary: #0f766e;
+  /* teal */
+  --pg-primary-hover: #0c5f59;
+  /* đậm hơn khi hover */
+  --pg-shadow-strong: 0 10px 24px rgba(15, 118, 110, .25);
+}
+
+/* Các nút mặc định */
+.pagination.home-pager .page-link,
+.pagination.pager .page-link {
+  background: #fff !important;
+  border: 1px solid rgba(15, 118, 110, .25) !important;
+  color: #0f766e !important;
+  border-radius: 12px !important;
+  min-width: 40px;
+  padding: 8px 12px;
+  font-weight: 600;
+  transition: .15s ease;
+}
+
+/* ======= ACTIVE : tô đậm, chữ trắng ======= */
+.pagination.home-pager .page-item.active .page-link,
+.pagination.pager .page-item.active .page-link {
+  background: var(--pg-primary) !important;
+  color: #fff !important;
+  border-color: var(--pg-primary) !important;
+  box-shadow: var(--pg-shadow-strong);
+  transform: translateY(-1px);
+}
+
+/* Hover trên active */
+.pagination.home-pager .page-item.active .page-link:hover,
+.pagination.pager .page-item.active .page-link:hover {
+  background: var(--pg-primary-hover) !important;
+  border-color: var(--pg-primary-hover) !important;
+}
+
+/* Hover trên nút thường */
+.pagination.home-pager .page-link:hover,
+.pagination.pager .page-link:hover {
+  border-color: rgba(15, 118, 110, .45) !important;
+  box-shadow: 0 6px 16px rgba(15, 118, 110, .12);
+}
+
+/* Disabled */
+.pagination.home-pager .page-item.disabled .page-link,
+.pagination.pager .page-item.disabled .page-link {
+  background: #fff !important;
+  color: rgba(15, 118, 110, .45) !important;
+  border-color: rgba(15, 118, 110, .20) !important;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+/* Dấu “…” */
+.pagination.home-pager .page-ellipsis,
+.pagination.pager .page-ellipsis {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(15, 118, 110, .65) !important;
+  padding: 0 6px;
+  min-width: 0;
+}
+
+/* xóa lọc  */
+#factoryFilter #brandClearBtn {
+  border-radius: 10px;
+}
+
+#factoryFilter #brandClearBtn:disabled {
+  opacity: .5;
+  pointer-events: none;
+}
