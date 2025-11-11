@@ -264,17 +264,24 @@
                                                                                     <form onsubmit="return false;">
                                                                                         <button type="button"
                                                                                             data-product-id="<%= product.id %>"
+                                                                                            data-stock="<%= (product.quantity || 0) %>"
                                                                                             class="btnAddToCartHomePage mx-auto btn border rounded-pill px-3 text-primary">
                                                                                             <i
                                                                                                 class="fa fa-shopping-bag me-2 text-primary"></i>
-                                                                                            Thêm vào giỏ
+                                                                                            <span
+                                                                                                class="js-add-label">Thêm
+                                                                                                vào giỏ</span>
                                                                                         </button>
                                                                                     </form>
+
                                                                                     <span
-                                                                                        class="badge bg-primary ms-3">Còn:
-                                                                                        <%= product.quantity %>
+                                                                                        class="badge ms-3 js-stock-badge"
+                                                                                        data-qty="<%= (product.quantity || 0) %>">
+                                                                                        Còn: <%= (product.quantity || 0)
+                                                                                            %>
                                                                                     </span>
                                                                                 </div>
+
 
                                                                 </div>
 
@@ -2119,6 +2126,39 @@ Gợi ý nhanh (**giá tham khảo thị trường**, trong khoảng X–Y tri�
 
                             })();
                         </script>
+                        <!-- hết số lượng tồn -->
+                        <script>
+                            (function () {
+                                function applyOOS() {
+                                    // Badge
+                                    document.querySelectorAll('.js-stock-badge').forEach(function (el) {
+                                        var qty = Number(el.getAttribute('data-qty') || '0');
+                                        el.classList.remove('bg-primary', 'bg-danger');
+                                        el.classList.add(qty <= 0 ? 'bg-danger' : 'bg-primary');
+                                        el.textContent = (qty <= 0) ? 'Hết hàng' : ('Còn: ' + qty);
+                                    });
+
+                                    // Button
+                                    document.querySelectorAll('.btnAddToCartHomePage').forEach(function (btn) {
+                                        var stock = Number(btn.getAttribute('data-stock') || '0');
+                                        var label = btn.querySelector('.js-add-label');
+                                        if (stock <= 0) {
+                                            btn.disabled = true;
+                                            if (label) label.textContent = 'Hết hàng';
+                                        } else {
+                                            btn.disabled = false;
+                                            if (label) label.textContent = 'Thêm vào giỏ';
+                                        }
+                                    });
+                                }
+                                if (document.readyState === 'loading') {
+                                    document.addEventListener('DOMContentLoaded', applyOOS);
+                                } else {
+                                    applyOOS();
+                                }
+                            })();
+                        </script>
+
 
 </body>
 

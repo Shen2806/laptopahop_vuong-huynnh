@@ -88,6 +88,15 @@
     if (s === 'LOW') return '<span class="badge bg-warning text-dark">Thấp</span>';
     return '<span class="badge bg-success">OK</span>';
   }
+// ==== Thêm ngay dưới statusBadge ====
+function deriveStatus(r) {
+  const onHand  = Number(r.onHand ?? 0);
+  const avail   = Number(r.available ?? onHand);
+  const reorder = Number(r.reorderLevel ?? 0);
+  if (onHand <= 0 || avail <= 0) return 'OOS';
+  if (onHand > 0 && onHand <= reorder) return 'LOW';
+  return 'OK';
+}
 
   // ===== 8) Map/Detect brand trên từng record =====
   // Ưu tiên code (APPLE/ASUS/...), fallback đoán theo tên sản phẩm nếu thiếu field.
@@ -129,33 +138,46 @@
   }
 
   // ===== 9) Tạo 1 dòng HTML =====
-  function rowHtml(r) {
-    const factoryCode = getFactoryCode(r);
-    const factoryName = factoryCode ? getFactoryNameByCode(factoryCode) : 'Khác';
+ // ==== Trong rowHtml(r), thay phần onHand/available và status ====
+function rowHtml(r) {
+  const factoryCode = getFactoryCode(r);
+  const factoryName = factoryCode ? getFactoryNameByCode(factoryCode) : 'Khác';
+  const onHand = Number(r.onHand ?? 0);
+  const available = Number(r.available ?? onHand);
+  const computedStatus = r.status || deriveStatus(r);
 
-    const nameCell = `
-      <div class="fw-semibold">${r.name}</div>
-      <div class="small text-muted">Hãng: ${factoryName}</div>
-    `;
+  const nameCell = `
+    <div class="fw-semibold">${r.name}</div>
+    <div class="small text-muted">Hãng: ${factoryName}</div>
+  `;
 
-    return `
-      <tr data-id="${r.id}" data-name="${r.name}" data-reorder="${r.reorderLevel || 0}" data-factory="${factoryCode || ''}">
-        <td>${r.id}</td>
-        <td>${nameCell}</td>
-        <td class="text-end">${r.onHand}</td>
-        <td class="text-end">${r.available}</td>
-        <td class="text-end">
-          <span class="me-1">${r.reorderLevel}</span>
-          <button class="btn btn-sm btn-link inv-set-reorder">Sửa</button>
-        </td>
-        <td>${statusBadge(r.status)}</td>
-        <td class="text-end">
-          <button class="btn btn-sm btn-outline-primary inv-adjust-in">Nhập</button>
-          <button class="btn btn-sm btn-outline-danger  inv-adjust-out">Xuất</button>
-        </td>
-      </tr>
-    `;
-  }
+  const onHandCell = onHand <= 0
+    ? `<span class="text-danger fw-semibold">0 — Hết hàng</span>`
+    : onHand;
+
+  const availCell = available <= 0
+    ? `<span class="text-danger">0</span>`
+    : available;
+
+  return `
+    <tr data-id="${r.id}" data-name="${r.name}" data-reorder="${r.reorderLevel || 0}" data-factory="${factoryCode || ''}">
+      <td>${r.id}</td>
+      <td>${nameCell}</td>
+      <td class="text-end">${onHandCell}</td>
+      <td class="text-end">${availCell}</td>
+      <td class="text-end">
+        <span class="me-1">${r.reorderLevel}</span>
+        <button class="btn btn-sm btn-link inv-set-reorder">Sửa</button>
+      </td>
+      <td>${statusBadge(computedStatus)}</td>
+      <td class="text-end">
+        <button class="btn btn-sm btn-outline-primary inv-adjust-in">Nhập</button>
+        <button class="btn btn-sm btn-outline-danger  inv-adjust-out">Xuất</button>
+      </td>
+    </tr>
+  `;
+}
+
 
   // ===== 10) Render + lọc =====
   function applyAndRender() {
@@ -204,8 +226,8 @@
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const data = await r.json();
       const arr = Array.isArray(data) ? data : (data.items || []);
-      state.data = arr;
-      applyAndRender();
+      state.data = arr.map(r => ({ ...r, status: r.status || deriveStatus(r) }));
+applyAndRender();
     } catch (e) {
       console.error('Load inventory error:', e);
       $body.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">Không tải được dữ liệu tồn kho.</td></tr>`;

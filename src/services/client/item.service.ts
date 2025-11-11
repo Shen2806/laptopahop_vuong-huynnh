@@ -1,4 +1,5 @@
 import { prisma } from "config/client";
+import { getIO } from "src/socket";
 // import { TOTAL_ITEM_PER_PAGE } from "config/constant"; // (nếu không dùng thì có thể xoá)
 
 /* =========================
@@ -286,7 +287,10 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
 
         // Transaction: tạo order + details + TRỪ KHO có điều kiện (anti-oversell)
         try {
+            const changedIds: number[] = [];
+
             const created = await prisma.$transaction(async (tx) => {
+
                 const order = await tx.order.create({
                     data: {
                         userId,
@@ -308,7 +312,7 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
                         receiverStreet,
 
                         status: "PENDING",
-                        paymentMethod: "COD",
+                        paymentMethod: pm,
                         paymentStatus: "UNPAID",
                     },
                 });
@@ -336,6 +340,19 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
 
                 return order;
             });
+            // NEW: phát socket sau khi transaction đã commit
+            try {
+                if (changedIds.length) {
+                    const list = await prisma.product.findMany({
+                        where: { id: { in: changedIds } },
+                        select: { id: true, name: true, quantity: true },
+                    });
+                    const io = getIO();
+                    io.emit('inventory:update', {
+                        items: list.map(p => ({ productId: p.id, name: p.name, quantity: p.quantity }))
+                    });
+                }
+            } catch { }
 
             return {
                 success: true,
@@ -403,7 +420,9 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
     const finalTotal = Math.max(0, base - discountAmount + shippingFee - shippingDiscount);
 
     try {
+        const changedIds: number[] = [];
         const order = await prisma.$transaction(async (tx) => {
+
             const created = await tx.order.create({
                 data: {
                     userId,
@@ -425,7 +444,7 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
                     receiverStreet,
 
                     status: "PENDING",
-                    paymentMethod: "COD",
+                    paymentMethod: pm,
                     paymentStatus: "UNPAID",
                 },
             });
@@ -442,7 +461,7 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
                 if (updated.count !== 1) {
                     throw new Error(`Sản phẩm "${cd.product.name}" không đủ tồn kho.`);
                 }
-
+                changedIds.push(cd.productId);
                 await tx.orderDetail.create({
                     data: { orderId: created.id, productId: cd.productId, price: unit, quantity: qty },
                 });
@@ -453,7 +472,18 @@ async function handlePlaceOrder(args: PlaceOrderArgs): Promise<PlaceOrderResult>
 
             return created;
         });
-
+        try {
+            if (changedIds.length) {
+                const list = await prisma.product.findMany({
+                    where: { id: { in: changedIds } },
+                    select: { id: true, name: true, quantity: true },
+                });
+                const io = getIO();
+                io.emit('inventory:update', {
+                    items: list.map(p => ({ productId: p.id, name: p.name, quantity: p.quantity }))
+                });
+            }
+        } catch { }
         return {
             success: true,
             orderId: order.id,

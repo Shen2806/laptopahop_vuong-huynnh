@@ -87,6 +87,9 @@ app.use("/api/upload", uploadRouter);
 
 // Seed DB (giữ nguyên hành vi cũ)
 initDatabase();
+if (process.env.SEED_ON_BOOT === "true") {
+    initDatabase().catch(err => console.error("Seed failed:", err));
+}
 
 // 404
 app.use((_req, res) => {

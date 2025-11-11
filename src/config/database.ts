@@ -5,8 +5,8 @@ const getConnection = async () => {
     // Create the connection to database
     const connection = await mysql.createConnection({
         port: 3306,
-        host: 'localhost',
-        user: 'root',
+        host: '127.0.0.1',
+        user: 'nodejs',
         password: "123456789",
         database: 'nodejspro',
     });
@@ -15,4 +15,4 @@ const getConnection = async () => {
 
 
 
-export default getConnection ;
+export default getConnection;

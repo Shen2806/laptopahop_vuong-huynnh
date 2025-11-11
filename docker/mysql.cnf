@@ -1,0 +1,13 @@
+[mysqld]
+# Mặc định chỉ lắng nghe trong container; port đã publish qua compose
+# Nếu muốn bind tất cả (VPS) thì giữ mặc định 0.0.0.0 của image MySQL 8
+# bind-address=0.0.0.0
+
+# timezone, collation, character set
+default-time-zone = +07:00
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+# kích hoạt logs nhẹ nếu cần debug
+# general_log = 1
+# general_log_file = /var/lib/mysql/general.log

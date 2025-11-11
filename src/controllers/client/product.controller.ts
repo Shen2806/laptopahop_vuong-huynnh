@@ -712,12 +712,26 @@ const postAddToCartFromDetailPage = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { quantity } = req.body;
     const user = req.user;
-    if (!user) return res.redirect("/login")
+    if (!user) return res.status(401).json({ message: 'Bạn cần đăng nhập' });
 
-    await addProductToCart(+quantity, +id, user)
+    await addProductToCart(+quantity, +id, user);
 
-    return res.redirect(`/product/${id}`)
-}
+    // NEW: nếu là AJAX, trả JSON để main.js cập nhật badge
+    const isAjax = req.xhr || req.headers['x-requested-with'] === 'XMLHttpRequest' || req.accepts('json');
+    if (isAjax) {
+        // Lấy lại tổng số lượng trong giỏ cho badge
+        const count = await prisma.cartDetail.aggregate({
+            _sum: { quantity: true },
+            where: { cart: { userId: user.id } }
+        });
+        const totalQty = Number(count._sum.quantity || 0);
+        return res.json({ ok: true, data: { count: totalQty } });
+    }
+
+    // Cũ: redirect
+    return res.redirect(`/product/${id}`);
+};
+
 
 // Xử lý hủy đơn
 const postCancelOrder = async (req: Request, res: Response) => {

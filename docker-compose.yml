@@ -1,0 +1,47 @@
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456789}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-nodejspro}
+      MYSQL_USER: ${MYSQL_USER:-nodejs}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-123456789}
+    ports:
+      # Local/dev: mở 3306 ra máy host để Workbench kết nối 127.0.0.1:3306
+      # Prod/VPS: cổng này mở ra IP VPS (hãy bảo vệ bằng firewall)
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD | grep 'mysqld is alive' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # DATABASE_URL cho app **bên trong compose** phải trỏ tới host service 'mysql'
+      DATABASE_URL: ${DATABASE_URL:-mysql://nodejs:123456789@mysql:3306/nodejspro}
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-8080}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      # mở port app ra máy host/VPS
+      - "8080:8080"
+    command: ["/bin/sh", "/app/docker/entrypoint.sh"]
+
+volumes:
+  mysql_data:
