@@ -29,7 +29,9 @@
       ]
     },
     "types": [
-      "node"
+      "node",
+      "express",
+      "multer"
     ],
     "typeRoots": [
       "./node_modules/@types",
@@ -37,6 +39,7 @@
     ]
   },
   "include": [
-    "src"
-, "src/api"  ]
+    "src",
+    "src/api"
+  ]
 }
