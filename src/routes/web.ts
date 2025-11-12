@@ -57,7 +57,6 @@ import { requirePerm } from '../middleware/requirePerm';
 import { exposePermsToView } from '../middleware/exposePermsToView';
 import { attachPermissions } from '../middleware/attachPermissions';
 import * as OrderCtl from '../controllers/admin/order.controller';
-import { assignShipperToOrder } from '../services/admin/staff.service';
 
 const router = express.Router();
 
