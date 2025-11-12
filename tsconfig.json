@@ -28,11 +28,6 @@
         "./src/services/*"
       ]
     },
-    "types": [
-      "node",
-      "express",
-      "multer"
-    ],
     "typeRoots": [
       "./node_modules/@types",
       "./types"
