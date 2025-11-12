@@ -1,6 +1,6 @@
 // upload.ts
 import express, { Request, Response } from 'express';
-import multer from 'multer';
+import multer, { Multer } from 'multer';
 import {
     v2 as cloudinary,
     UploadApiResponse,

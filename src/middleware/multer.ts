@@ -1,4 +1,4 @@
-import multer from 'multer'
+import multer, {Multer} from 'multer'
 import path from 'path'
 import { v4 } from 'uuid';
 
