@@ -78,11 +78,13 @@ function parseSpecFilters(text: string): { specs?: SpecFilters; inStockOnly?: bo
         const m = input.match(re);
         return m ? Array.from(m) : [];
     }
+
     const s = deaccent(text);
     const specs: SpecFilters = {};
     const hasAtLeastCue = /\b(>=|>\s*=?|tro\s*len|trở\s*lên|it\s*nhat|ít\s*nhất|toi\s*thieu|tối\s*thiểu)\b/i.test(s);
-    // RAM
-    // RAM: "ram 16gb" → exact; nếu có cue "trở lên/≥" → min
+
+    // ========= RAM =========
+    // Case 1: "ram 16gb" hoặc "16gb ram"
     const ram1 = s.match(/ram[^0-9]{0,6}(\d{2,3})\s*gb/);
     const ram2 = s.match(/(\d{2,3})\s*gb\s*ram/);
     const ramVal = ram1 ? parseInt(ram1[1], 10) : (ram2 ? parseInt(ram2[1], 10) : undefined);
@@ -91,7 +93,23 @@ function parseSpecFilters(text: string): { specs?: SpecFilters; inStockOnly?: bo
         else specs.ramGBExact = ramVal;
     }
 
-    // SSD
+    // ✨ Case 2: fallback "cấu hình 16gb", "msi 32gb" (không ghi chữ RAM)
+    // - Chỉ nhận nếu:
+    //   + chưa bắt được RAM ở trên
+    //   + số GB trong khoảng 4–64
+    //   + KHÔNG đi với SSD/HDD/ROM/bộ nhớ
+    if (typeof (specs as any).ramGBExact !== 'number' && typeof (specs as any).minRamGB !== 'number') {
+        const nakedRam = s.match(/(\d{1,2})\s*gb\b(?!\s*(?:ssd|hdd|emmc|rom|bo\s*nho|luu\s*tru))/i);
+        if (nakedRam) {
+            const v = parseInt(nakedRam[1], 10);
+            if (v >= 4 && v <= 64) {
+                if (hasAtLeastCue) specs.minRamGB = Math.max(4, v);
+                else specs.ramGBExact = v;
+            }
+        }
+    }
+
+    // ========= SSD =========
     const ssdTB = s.match(/(\d+(?:\.\d+)?)\s*tb/);
     // HỖ TRỢ HAI THỨ TỰ: "SSD 512GB" hoặc "512GB SSD"
     const ssdGB_after = s.match(/\bssd[^0-9]{0,6}(\d{3,4})\s*gb\b/);   // "ssd 512gb"
@@ -107,28 +125,28 @@ function parseSpecFilters(text: string): { specs?: SpecFilters; inStockOnly?: bo
         if (hasAtLeastCue) specs.minSsdGB = v; else specs.ssdGBExact = v;
     }
 
-    // CPU keywords
+    // ========= CPU =========
     const cpuTokens: string[] = [];
     for (const t of matchStrings(s, /\b(i[3579]-?\d{3,5}[a-z]?|i[3579]\b|r[3579]-?\d{3,5}[a-z]*|ryzen\s?\d)\b/gi)) {
         cpuTokens.push(t.toUpperCase());
     }
     if (cpuTokens.length) specs.cpu = Array.from(new Set(cpuTokens));
 
-    // GPU keywords
+    // ========= GPU =========
     const gpuTokens: string[] = [];
     for (const t of matchStrings(s, /\b(rtx|gtx|rx|arc)\s?-?\s?\d{3,4}\b/gi)) {
         gpuTokens.push(t.replace(/\s+/g, ' ').toUpperCase());
     }
     if (gpuTokens.length) specs.gpu = Array.from(new Set(gpuTokens));
 
-    // Hz
+    // ========= Hz =========
     const hz = s.match(/(\d{3})\s*hz/);
     if (hz) {
         specs.screen = specs.screen || {};
         specs.screen.minHz = parseInt(hz[1], 10);
     }
 
-    // Resolution
+    // ========= Độ phân giải =========
     const resTokens: string[] = [];
     for (const t of matchStrings(s, /\b(fhd|qhd|uhd|2k|4k|oled|retina)\b/gi)) {
         resTokens.push(t.toUpperCase());
@@ -138,7 +156,7 @@ function parseSpecFilters(text: string): { specs?: SpecFilters; inStockOnly?: bo
         specs.screen.resolutionIn = Array.from(new Set(resTokens));
     }
 
-    // Size (inch)
+    // ========= Kích thước màn =========
     const size = s.match(/(\d{2}(?:\.\d)?)\s*(?:\"|inch)/);
     if (size) {
         const v = parseFloat(size[1]);
@@ -146,16 +164,19 @@ function parseSpecFilters(text: string): { specs?: SpecFilters; inStockOnly?: bo
         specs.screen.sizeInchBetween = [v - 0.2, v + 0.2];
     }
 
-    // Weight
+    // ========= Cân nặng =========
     const w = s.match(/(?:<=|<|duoi|dưới)\s*(\d(?:\.\d)?)\s*kg/);
     if (w) specs.weightKgMax = parseFloat(w[1]);
 
+    // ========= Chỉ hàng còn =========
     const inStockOnly = /\b(con hang|c[oô]n h[aà]ng|sẵn kho|c[oô]n kho)\b/.test(s);
+
     const out: any = {};
     if (Object.keys(specs).length) out.specs = specs;
     if (inStockOnly) out.inStockOnly = true;
     return out;
 }
+
 /* =================== Etiquette & Laptop Cheatsheet =================== */
 
 // Văn phong: xưng "mình – bạn", thân thiện, không khoa trương
@@ -743,7 +764,7 @@ function hasBudgetCue(text: string) {
 // -> true khi có brand mới, có cue "còn/thế/đổi/thử", và KHÔNG nêu lại ngân sách/nhu cầu
 function isBrandOnlyFollowUp(text: string) {
     const t = deaccent(text);
-    const cue = /\b(con|the|th[eê]|doi sang|thu|thủ|thử|sang)\b/.test(t);
+    const cue = /\b(con|the|th[eê]|doi sang|đổi sang|thu|thử|sang|thi\s*sao|thì\s*sao)\b/.test(t);
     const { canonical } = brandFromText(text);
     const hasNewBudget = !!parseBudgetVi(text).min || !!parseBudgetVi(text).max || hasBudgetCue(text);
     const hasNewTarget = !!detectSegmentWide(text);
@@ -818,7 +839,8 @@ function parseTakeVi(text: string) {
 }
 // ==== Ý định & bộ lọc từ câu người dùng ====
 const WANT_STRONGEST_RE = /(mạnh|mạnh|best|khủng|cao\s*nhất|đỉnh)/i;
-
+// ✨ mới: cue cho follow-up cấu hình
+const CONFIG_FOLLOWUP_CUE_RE = /\b(th[iì]\s*sao|c[oò]n|còn|doi sang|đổi sang|doi|đổi|them|thêm)\b/i;
 function parseFilters(text: string) {
     const { canonical: brand } = brandFromText(text);
     const target = detectSegmentWide(text);
@@ -961,7 +983,7 @@ async function smartSearchStrict(
         list = await listByFilters({ ...f, ...widened }, take);
         if (list.length) return { list, reason: "Mở rộng ngân sách ±20% trong đúng hãng & mục đích" };
     }
-    
+
     return { list: [], reason: "no-exact" };
 }
 
@@ -1147,8 +1169,11 @@ export async function runTurtleAgent(params: {
         filtersForAction = {};
     }
 
-    if (noBudgetThisMsg && (wantList || wantStrongest || brand || target || parseTakeVi(message))) {
-        // ép override để không “thừa kế” min/max cũ
+    if (
+        noBudgetThisMsg &&
+        (wantList || wantStrongest || brand || target || parseTakeVi(message) || specs) &&
+        !isBrandOnlyFollowUp(message) // ❗ KHÔNG xoá min/max nếu chỉ là follow-up đổi hãng
+    ) {
         (filtersForAction as any).min = undefined;
         (filtersForAction as any).max = undefined;
     }
@@ -1174,50 +1199,147 @@ export async function runTurtleAgent(params: {
         typeof maxBudget === 'number' ||
         wantList ||
         wantStrongest ||
-        wantsCount
+        wantsCount ||
+        specs
     );
 
     const bf = brandFromText(message);
     const brandOnlyIntent = !!bf.canonical && !target && !minBudget && !maxBudget && !wantList && !wantStrongest;
 
-
+    const isConfigFollowUp =
+        !!specs &&
+        !brand && !target &&
+        typeof minBudget !== 'number' &&
+        typeof maxBudget !== 'number' &&
+        CONFIG_FOLLOWUP_CUE_RE.test(deaccent(message));
     const wantsCompare = WANT_COMPARE_RE.test(message);
     const pickIndex = PICK_INDEX_RE.exec(message);
+    // ⭐ NEW: "chọn 1 máy" sau khi đã có danh sách → chọn trong list cũ, KHÔNG search lại
+    const chooseOneFromLast =
+        !wantsCompare &&
+        !pickIndex &&
+        parseWantedCount(message) === 1 &&
+        !brand && !target && !specs && !hasBudgetCue(message); // không thêm filter mới
+
+    if (chooseOneFromLast) {
+        const raw = await getSessionKV(session.id, "result.ids");
+        if (raw) {
+            const ids: number[] = JSON.parse(raw);
+            if (ids.length) {
+                const best = await strongestInIds(ids); // dùng scoreProduct để pick máy ngon nhất
+                if (best) {
+                    const sm = await getStockMap([best.id]);
+                    const dto = productDTO({ ...best, stock: sm.get(best.id) });
+
+                    // lưu lại context mới: chỉ còn 1 máy, hiển thị dạng cards
+                    await setSessionKV(session.id, "result.ids", JSON.stringify([best.id]));
+                    await setSessionKV(session.id, "result.format", "cards");
+
+                    const reply = await buildLeadText(
+                        remembered,               // giữ mô tả hãng/nhu cầu đã dùng
+                        [dto],
+                        "Chọn máy hợp lý nhất trong danh sách trước"
+                    );
+
+                    await prisma.aiChatMessage.create({
+                        data: { sessionId: session.id, role: "ASSISTANT", content: "Chọn máy từ danh sách trước" }
+                    });
+                    await prisma.aiChatSession.update({
+                        where: { id: session.id },
+                        data: { lastUsedAt: new Date() }
+                    });
+
+                    return {
+                        status: 200 as const,
+                        body: {
+                            sessionId: session.id,
+                            reply,
+                            format: "cards",
+                            products: [dto],
+                            activeFilters: remembered,
+                            suggestions: [
+                                "So sánh với máy còn lại",
+                                "Xem thêm mẫu tương tự",
+                                "Tư vấn theo ngân sách khác"
+                            ]
+                        }
+                    };
+                }
+            }
+        }
+    }
 
     // ===== Brand-only: ⭐ changed – gửi danh sách ngay, không hỏi xác nhận =====
+    // ===== Brand-only: gửi danh sách ngay =====
+
     if (brandOnlyIntent) {
         const brands = [bf.canonical as string];
-        const kWanted = parseWantedCount(message) || 6;
+
+        // Xác định đây có phải brand follow-up không
+        const isFollowUp = isBrandOnlyFollowUp(message);
+
+        // Lấy số lượng mong muốn:
+        // - nếu câu mới có số → dùng
+        // - nếu là follow-up và không có số → lấy từ danh sách trước (result.ids.length)
+        // - fallback 6
+        let kWanted = parseWantedCount(message) || 6;
+        if (!parseWantedCount(message) && isFollowUp) {
+            const rawPrev = await getSessionKV(session.id, "result.ids");
+            if (rawPrev) {
+                const prevIds: number[] = JSON.parse(rawPrev);
+                if (prevIds.length >= 1 && prevIds.length <= 12) kWanted = prevIds.length; // ví dụ giữ = 2
+            }
+        }
         // Không kế thừa target cũ khi câu hiện tại chỉ nêu brand/spec
-        const baseFilters: ProductFiltersExt = { brand: brands };
+        const baseFilters: ProductFiltersExt = {
+            brand: brands,
+            ...(isFollowUp ? {
+                target: remembered.target,
+                min: remembered.min,
+                max: remembered.max,
+            } : {}),
+        };
         // đưa spec filters  inStockOnly của lượt này (nếu có)
         if (specs) baseFilters.specs = specs;
         if (typeof inStockOnly === 'boolean') baseFilters.inStockOnly = inStockOnly;
 
         // Giữ chặt hãng: dùng smartSearchStrict để KHÔNG trôi sang hãng khác
         const { list, reason } = await smartSearchStrict(baseFilters as any, kWanted);
-        // lấy list theo hãng và các filter đã nhớ (nếu có min/max/target đã lưu)
-        // const { list, reason } = await smartSearch({ brand: brands, target: remembered.target, min: remembered.min, max: remembered.max }, kWanted);
+
         const products = await (async () => {
             const sm = await getStockMap(list.map(p => p.id));
             return list.map(p => productDTO({ ...p, stock: sm.get(p.id) }));
         })();
-        const top = await listByFilters({ brand: brands }, takeWanted ?? 3);
 
         let reply: string;
         if (products.length) {
-            reply = await buildLeadText({ brand: brands, specs: baseFilters.specs } as any, products, reason);
+            // Dùng lead text có cả target/budget nếu follow-up
+            const leadFilters: any = {
+                brand: brands,
+                ...(isFollowUp ? { target: remembered.target, min: remembered.min, max: remembered.max } : {}),
+                ...(specs ? { specs } : {}),
+            };
+            reply = await buildLeadText(leadFilters, products, reason);
+
             const ids = products.map(p => p.id);
             await setSessionKV(session.id, "result.ids", JSON.stringify(ids));
             await setSessionKV(session.id, "result.format", "list");
+
         } else {
             const count = await prisma.product.count({ where: { factory: { in: brands } } });
             const specText = specsToText(baseFilters.specs);
-            reply = count > 0
-                ? (specText
-                    ? `Chưa có mẫu **${brands.join('/')}** khớp **${specText}** trong tầm giá bạn đưa. Bạn muốn **mở rộng ±20% ngân sách** hoặc **giữ ${brands.join('/')} nhưng nới thông số** không?`
-                    : `Chưa có mẫu đúng tiêu chí trong **${brands.join('/')}**. Mình có thể **mở rộng ±20% ngân sách** hoặc giữ hãng nhưng nới thông số nhé.`)
-                : `Hiện chưa có mẫu **${brands.join('/')}** trong shop. Bạn muốn xem **dòng tương đương** (ví dụ Dell/ASUS/MSI) không?`;
+            const labelBrand = brands.join('/');
+            if (count > 0) {
+                reply = isFollowUp
+                    ? (specText
+                        ? `Chưa có mẫu **${labelBrand}** khớp **${specText}** cho **${humanTarget(remembered.target) || 'mục đích bạn đưa'}** trong **tầm giá ${vnMil(remembered.min)}${remembered.max ? '–' + vnMil(remembered.max) : '+'}**. Bạn muốn **mở rộng ±20% ngân sách** hoặc **giữ hãng nhưng nới thông số** không?`
+                        : `Chưa có mẫu **${labelBrand}** đúng **doanh nhân/mục đích bạn đưa** trong **tầm giá ${vnMil(remembered.min)}${remembered.max ? '–' + vnMil(remembered.max) : '+'}**. Mình có thể **mở rộng ±20% ngân sách** hoặc giữ hãng nhưng đổi cấu hình nhé.`)
+                    : (specText
+                        ? `Chưa có mẫu **${labelBrand}** khớp **${specText}**. Bạn muốn **mở rộng ±20% ngân sách** hoặc **giữ hãng nhưng nới thông số** không?`
+                        : `Chưa có mẫu đúng tiêu chí trong **${labelBrand}**. Mình có thể **mở rộng ±20% ngân sách** hoặc giữ hãng nhưng nới thông số nhé.`);
+            } else {
+                reply = `Hiện chưa có mẫu **${labelBrand}** trong shop. Bạn muốn xem **dòng tương đương** (ví dụ Dell/ASUS/MSI) không?`;
+            }
         }
 
         await prisma.aiChatMessage.create({ data: { sessionId: session.id, role: "ASSISTANT", content: products.length ? 'Gợi ý sản phẩm' : reply } });
@@ -1227,15 +1349,123 @@ export async function runTurtleAgent(params: {
             status: 200 as const,
             body: {
                 sessionId: session.id,
-                reply, // luôn có lead thân thiện
+                reply,
                 format: products.length ? "list" as const : undefined,
                 products,
-                activeFilters: { brand: brands, target: remembered.target, min: remembered.min, max: remembered.max },
+                activeFilters: baseFilters, // trả đúng context đã giữ
                 suggestions: products.length
                     ? ["Chọn máy mạnh nhất", "Hiển thị dạng thẻ", "So sánh #1 với #2"]
                     : ["Xem Dell tương đương", "Xem ASUS tương đương", "Tư vấn theo ngân sách"]
             }
         };
+    }
+    // ===== Follow-up chỉ đổi cấu hình: "core i5 thì sao" =====
+    if (isConfigFollowUp) {
+        // phải có brand từ lượt trước mới follow-up được
+        const rememberedBrand = remembered.brand;
+        if (!rememberedBrand) {
+            // không có ngữ cảnh hãng → hỏi lại nhẹ nhàng
+            const reply = 'Bạn giúp mình nhắc lại hãng (ví dụ MSI/ASUS/DELL) nhé, mình sẽ lọc theo core i5 cho bạn.';
+            await prisma.aiChatMessage.create({
+                data: { sessionId: session.id, role: "ASSISTANT", content: reply }
+            });
+            await prisma.aiChatSession.update({
+                where: { id: session.id },
+                data: { lastUsedAt: new Date() }
+            });
+            return {
+                status: 200 as const,
+                body: {
+                    sessionId: session.id,
+                    reply,
+                    format: undefined,
+                    products: [],
+                    activeFilters: remembered,
+                    suggestions: ["MSI core i5", "ASUS core i5", "Tư vấn theo ngân sách"]
+                }
+            };
+        }
+
+        const brands = Array.isArray(rememberedBrand) ? rememberedBrand : [rememberedBrand];
+        const kWanted = parseWantedCount(message) || 2; // mặc định 2 con cho tình huống như của bạn
+
+        const baseFilters: ProductFiltersExt = {
+            brand: brands,
+            target: remembered.target,
+            specs,
+            inStockOnly
+        };
+
+        // Giữ chặt hãng + cấu hình: dùng smartSearchStrict
+        const { list, reason } = await smartSearchStrict(baseFilters as any, kWanted);
+
+        let products: any[] = [];
+        if (list.length) {
+            const sm = await getStockMap(list.map(p => p.id));
+            products = list.map(p => productDTO({ ...p, stock: sm.get(p.id) }));
+
+            const leadFilters: any = { brand: brands, target: remembered.target, specs };
+            const reply = await buildLeadText(leadFilters, products, reason);
+
+            const ids = products.map(p => p.id);
+            await setSessionKV(session.id, "result.ids", JSON.stringify(ids));
+            await setSessionKV(session.id, "result.format", "list");
+
+            await prisma.aiChatMessage.create({
+                data: { sessionId: session.id, role: "ASSISTANT", content: "Gợi ý sản phẩm theo cấu hình mới" }
+            });
+            await prisma.aiChatSession.update({
+                where: { id: session.id },
+                data: { lastUsedAt: new Date() }
+            });
+
+            return {
+                status: 200 as const,
+                body: {
+                    sessionId: session.id,
+                    reply,
+                    format: "list",
+                    products,
+                    activeFilters: { brand: brands, target: remembered.target },
+                    suggestions: [
+                        "Chọn máy mạnh nhất",
+                        "Hiển thị dạng thẻ",
+                        "So sánh 2 máy đầu"
+                    ]
+                }
+            };
+        } else {
+            // không có MSI + cấu hình mới
+            const cpuTxt = specs.cpu?.join('/') || 'cấu hình này';
+            const brandLabel = brands.join('/');
+            const reply =
+                `Hiện chưa có mẫu **${brandLabel}** dùng **${cpuTxt}** trong shop. ` +
+                `Bạn muốn mình gợi ý **hãng khác nhưng vẫn ${cpuTxt}** không?`;
+
+            await prisma.aiChatMessage.create({
+                data: { sessionId: session.id, role: "ASSISTANT", content: reply }
+            });
+            await prisma.aiChatSession.update({
+                where: { id: session.id },
+                data: { lastUsedAt: new Date() }
+            });
+
+            return {
+                status: 200 as const,
+                body: {
+                    sessionId: session.id,
+                    reply,
+                    format: undefined,
+                    products: [],
+                    activeFilters: baseFilters,
+                    suggestions: [
+                        "Xem ASUS core i5",
+                        "Xem DELL core i5",
+                        "Tư vấn theo ngân sách khác"
+                    ]
+                }
+            };
+        }
     }
 
     /* ===== A) SO SÁNH THEO TÊN (ưu tiên), nếu không có thì dùng danh sách trước (#) ===== */
