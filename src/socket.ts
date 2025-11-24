@@ -88,6 +88,7 @@ export const initSocket = (server: HttpServer) => {
 
         // ===== SEND MESSAGE =====
         socket.on("chat:message", async ({ sessionId, sender, content }) => {
+            console.log("[DEBUG content từ client/AI]", content);
             if (!sessionId || !content) return;
 
             const sidNum = Number(sessionId);

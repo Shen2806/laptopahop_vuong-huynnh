@@ -52,1279 +52,953 @@
     <!-- Navbar start -->
     <%- include('../client/layout/header'); -%>
 
-        <% if (user) { %>
-            <script>
-                window.USER_ID = "<%= String(user.id) %>";
-            </script>
-            <% } %>
+        <!-- HEADER END -->
+        <div class="py-1"></div>
 
-                <!-- Socket.IO client -->
-                <script src="/socket.io/socket.io.js"></script>
-                <script>
-                    (function () {
-                        if (!window.USER_ID) return; // chưa login thì thôi
+        <!-- Single Product Start -->
+        <div class="container-fluid" id="product-list">
+            <div class="container py-3">
+                <!-- Breadcrumb -->
+                <nav class="mb-3" aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Danh Sách Sản Phẩm</li>
+                    </ol>
+                </nav>
 
-                        const uBadge = document.getElementById('notificationBadge');
-                        const uIcon = document.getElementById('notificationDropdown');
-                        const uPanel = document.getElementById('uNotificationPanel');
-                        const uList = document.getElementById('uNotificationList');
-                        const uSound = document.getElementById('notificationSound');
-                        const USER_ID = window.USER_ID;
+                <div class="row g-4">
+                    <!-- Sidebar: chỉ còn 1 nút mở bộ lọc -->
+                    <aside class="col-12 col-lg-3">
+                        <div class="card border-0 shadow-sm rounded-3">
+                            <div class="card-body">
+                                <button class="btn btn-success w-100 py-2" data-bs-toggle="modal"
+                                    data-bs-target="#filterModal">
+                                    <i class="bi bi-funnel me-2"></i> Bộ lọc sản phẩm
+                                </button>
+                                <div class="small text-muted mt-2">Muốn chọn dễ dàng thì vui lòng bạn có thể
+                                    chọn dòng sản phẩm và mục đích muốn sử dụng để hiển thị kết quả đúng nhất
+                                    nhé !</div>
+                            </div>
+                        </div>
+                    </aside>
+                    <!-- FILTER MODAL (Bootstrap 5) -->
+                    <div class="modal fade filter-modal" id="filterModal" tabindex="-1" aria-hidden="true"
+                        data-ajax="false">
+                        <div class="modal-dialog modal-xl modal-dialog-centered">
+                            <div class="modal-content border-0 rounded-4">
+                                <div class="modal-header border-0 pb-0">
+                                    <h5 class="modal-title fw-bold"><i class="bi bi-funnel me-2"></i> Bo loc
+                                        nang cao</h5>
+                                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"
+                                        aria-label="Dong"></button>
+                                </div>
 
-                        // Toggle panel
-                        if (uIcon && uPanel) {
-                            uIcon.addEventListener('click', () => {
-                                const shown = uPanel.style.display === 'block';
-                                uPanel.style.display = shown ? 'none' : 'block';
-                            });
-                        }
+                                <div class="modal-body pt-2">
+                                    <div class="row g-3">
 
-                        // Unlock audio lần click đầu vào chuông
-                        let audioUnlocked = false;
-                        if (uIcon && uSound) {
-                            uIcon.addEventListener('click', () => {
-                                if (!audioUnlocked) {
-                                    uSound.volume = 0.0;
-                                    uSound.play().catch(() => { });
-                                    setTimeout(() => {
-                                        try { uSound.pause(); uSound.currentTime = 0; } catch { }
-                                        uSound.volume = 1.0;
-                                        audioUnlocked = true;
-                                    }, 50);
-                                }
-                            });
-                        }
+                                        <!-- HANG SAN XUAT -->
+                                        <div class="col-12">
+                                            <div class="card filter-card rounded-3">
+                                                <div class="card-body" id="factoryFilter" data-param="factory">
+                                                    <h6 class="fw-bold mb-2">Hang san xuat</h6>
+                                                    <% var FO=[ { value: 'APPLE' , name: 'Apple (MacBook)' }, {
+                                                        value: 'ASUS' , name: 'Asus' }, { value: 'LENOVO' ,
+                                                        name: 'Lenovo' }, { value: 'DELL' , name: 'Dell' }, {
+                                                        value: 'LG' , name: 'LG' }, { value: 'ACER' , name: 'Acer' }, {
+                                                        value: 'HP' , name: 'HP' }, { value: 'MSI' , name: 'MSI' }, {
+                                                        value: 'GIGABYTE' , name: 'Gigabyte' }, { value: 'ALIENWARE' ,
+                                                        name: 'Alienware' } ]; if (typeof factoryOptions !=='undefined'
+                                                        && Array.isArray(factoryOptions) && factoryOptions.length) {
+                                                        FO=factoryOptions; } %>
+                                                        <div class="brand-chips compact" id="brandChips">
+                                                            <% FO.forEach(function(opt, idx){ %>
+                                                                <div class="chip-check">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        id="factory-<%= idx %>"
+                                                                        value="<%= opt.value %>">
+                                                                    <label class="chip" for="factory-<%= idx %>">
+                                                                        <%= opt.name %>
+                                                                    </label>
+                                                                </div>
+                                                                <% }); %>
+                                                        </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                        function uUpdateBadge(delta = 1) {
-                            if (!uBadge) return;
-                            let cur = parseInt(uBadge.textContent || "0", 10);
-                            cur = isNaN(cur) ? 0 : cur;
-                            cur += delta;
-                            if (cur <= 0) {
-                                uBadge.style.display = "none";
-                                uBadge.textContent = "0";
-                            } else {
-                                uBadge.style.display = "flex";
-                                uBadge.textContent = cur > 9 ? "9+" : String(cur);
-                            }
-                        }
+                                        <!-- MUC DICH SU DUNG -->
+                                        <div class="col-12 col-md-6">
+                                            <div class="card filter-card rounded-3">
+                                                <div class="card-body" id="targetFilter" data-param="target">
+                                                    <h6 class="fw-bold mb-2">Muc dich su dung</h6>
+                                                    <div class="stack-choices grid-2">
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" id="target-1" value="GAMING"><label
+                                                                class="form-check-label" for="target-1">Gaming</label>
+                                                        </div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" id="target-2"
+                                                                value="SINHVIEN-VANPHONG"><label
+                                                                class="form-check-label" for="target-2">Sinh
+                                                                vien - Van phong</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" id="target-3"
+                                                                value="THIET-KE-DO-HOA"><label class="form-check-label"
+                                                                for="target-3">Thiet ke
+                                                                do hoa</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" id="target-4" value="MONG-NHE"><label
+                                                                class="form-check-label" for="target-4">Mong nhe</label>
+                                                        </div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" id="target-5" value="DOANH-NHAN"><label
+                                                                class="form-check-label" for="target-5">Doanh
+                                                                nhan</label></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                        function uPrepend(itemHtml) {
-                            if (!uList) return;
-                            const li = document.createElement('li');
-                            li.className = 'list-group-item';
-                            li.innerHTML = itemHtml;
-                            uList.prepend(li);
-                        }
+                                        <!-- MUC GIA -->
+                                        <div class="col-12 col-md-6">
+                                            <div class="card filter-card rounded-3">
+                                                <div class="card-body" id="priceFilter" data-param="price">
+                                                    <h6 class="fw-bold mb-2">Muc gia</h6>
+                                                    <div class="stack-choices grid-2">
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" id="price-1"
+                                                                value="duoi-10-trieu"><label class="form-check-label"
+                                                                for="price-1">Duoi 10
+                                                                trieu</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" id="price-2" value="10-15-trieu"><label
+                                                                class="form-check-label" for="price-2">10 - 15
+                                                                trieu</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" id="price-3" value="15-20-trieu"><label
+                                                                class="form-check-label" for="price-3">15 - 20
+                                                                trieu</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" id="price-4"
+                                                                value="tren-20-trieu"><label class="form-check-label"
+                                                                for="price-4">Tren 20
+                                                                trieu</label></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                        const markBtn = document.getElementById('uMarkAllRead');
-                        if (markBtn && uBadge) {
-                            markBtn.addEventListener('click', () => {
-                                uBadge.style.display = 'none';
-                                uBadge.textContent = '0';
-                            });
-                        }
+                                        <!-- CPU -->
+                                        <div class="col-12 col-md-6">
+                                            <div class="card filter-card rounded-3">
+                                                <div class="card-body" id="cpuFilter" data-param="cpu">
+                                                    <h6 class="fw-bold mb-2">CPU</h6>
+                                                    <div class="stack-choices grid-2">
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="i3" id="cpu-i3"><label
+                                                                class="form-check-label" for="cpu-i3">Intel Core
+                                                                i3</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="i5" id="cpu-i5"><label
+                                                                class="form-check-label" for="cpu-i5">Intel Core
+                                                                i5</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="i7" id="cpu-i7"><label
+                                                                class="form-check-label" for="cpu-i7">Intel Core
+                                                                i7</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="i9" id="cpu-i9"><label
+                                                                class="form-check-label" for="cpu-i9">Intel Core
+                                                                i9</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="ryzen 5" id="cpu-r5"><label
+                                                                class="form-check-label" for="cpu-r5">AMD Ryzen
+                                                                5</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="ryzen 7" id="cpu-r7"><label
+                                                                class="form-check-label" for="cpu-r7">AMD Ryzen
+                                                                7</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="ryzen 9" id="cpu-r9"><label
+                                                                class="form-check-label" for="cpu-r9">AMD Ryzen
+                                                                9</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="m1" id="cpu-m1"><label
+                                                                class="form-check-label" for="cpu-m1">Apple
+                                                                M1</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="m2" id="cpu-m2"><label
+                                                                class="form-check-label" for="cpu-m2">Apple
+                                                                M2</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="m3" id="cpu-m3"><label
+                                                                class="form-check-label" for="cpu-m3">Apple
+                                                                M3</label></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                        // Socket
-                        const uSocket = io(); // same-origin
-                        uSocket.on('connect', () => {
-                            console.log('[SOCKET] user connected, USER_ID=', USER_ID);
-                            uSocket.emit('join-user-room', USER_ID);
-                        });
+                                        <!-- RAM -->
+                                        <div class="col-12 col-md-6">
+                                            <div class="card filter-card rounded-3">
+                                                <div class="card-body" id="ramFilter" data-param="ram">
+                                                    <h6 class="fw-bold mb-2">RAM</h6>
+                                                    <div class="stack-choices grid-2">
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="8" id="ram-8"><label
+                                                                class="form-check-label" for="ram-8">8
+                                                                GB</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="16" id="ram-16"><label
+                                                                class="form-check-label" for="ram-16">16
+                                                                GB</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="32" id="ram-32"><label
+                                                                class="form-check-label" for="ram-32">32
+                                                                GB</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="64" id="ram-64"><label
+                                                                class="form-check-label" for="ram-64">64
+                                                                GB</label></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                        // Admin xác nhận
-                        uSocket.on('order-confirmed', (data) => {
-                            console.log('[SOCKET] order-confirmed:', data);
-                            try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                            uUpdateBadge(1);
-                            const url = `/order/${data.orderId}`;
-                            const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
-                            uPrepend(
-                                '<div class="d-flex justify-content-between align-items-start">' +
-                                '<div>' +
-                                '<div class="fw-semibold">' + msg + '</div>' +
-                                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                                '</div>' +
-                                '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-                                '</div>'
-                            );
-                        });
+                                        <!-- O CUNG -->
+                                        <div class="col-12 col-md-6">
+                                            <div class="card filter-card rounded-3">
+                                                <div class="card-body" id="storageFilter" data-param="storage">
+                                                    <h6 class="fw-bold mb-2">O cung</h6>
+                                                    <div class="stack-choices grid-2">
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="256" id="st-256"><label
+                                                                class="form-check-label" for="st-256">256 GB
+                                                                SSD</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="512" id="st-512"><label
+                                                                class="form-check-label" for="st-512">512 GB
+                                                                SSD</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="1024" id="st-1024"><label
+                                                                class="form-check-label" for="st-1024">1 TB
+                                                                SSD</label></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                        uSocket.on('order-canceled', (data) => {
-                            console.log('[SOCKET] order-canceled:', data);
-                            try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                            uUpdateBadge(1);
-                            const url = `/order/${data.orderId}`;
-                            const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
-                            uPrepend(
-                                '<div class="d-flex justify-content-between align-items-start">' +
-                                '<div>' +
-                                '<div class="fw-semibold">' + msg + '</div>' +
-                                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                                '</div>' +
-                                '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
-                                '</div>'
-                            );
-                        });
+                                        <!-- DO PHAN GIAI -->
+                                        <div class="col-12 col-md-6">
+                                            <div class="card filter-card rounded-3">
+                                                <div class="card-body" id="resFilter" data-param="res">
+                                                    <h6 class="fw-bold mb-2">Do phan giai</h6>
+                                                    <div class="stack-choices grid-2">
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="FHD" id="res-fhd"><label
+                                                                class="form-check-label" for="res-fhd">FHD
+                                                                (1920x1080)</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="QHD" id="res-qhd"><label
+                                                                class="form-check-label" for="res-qhd">QHD /
+                                                                2K</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="4K" id="res-4k"><label
+                                                                class="form-check-label" for="res-4k">4K</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                        uSocket.on('order-updated', (data) => {
-                            console.log('[SOCKET] order-updated:', data);
-                            try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                            uUpdateBadge(1);
-                            const url = `/order/${data.orderId}`;
-                            const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
-                            uPrepend(
-                                '<div class="d-flex justify-content-between align-items-start">' +
-                                '<div>' +
-                                '<div class="fw-semibold">' + msg + '</div>' +
-                                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                                '</div>' +
-                                '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-                                '</div>'
-                            );
-                        });
-                        uSocket.on('chat-incoming', (data) => {
-                            try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                            uUpdateBadge(1);
+                                        <!-- KICH THUOC MAN -->
+                                        <div class="col-12 col-md-6">
+                                            <div class="card filter-card rounded-3">
+                                                <div class="card-body" id="screenFilter" data-param="screen">
+                                                    <h6 class="fw-bold mb-2">Kich thuoc man hinh</h6>
+                                                    <div class="stack-choices grid-2">
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="13-14" id="sc-13"><label
+                                                                class="form-check-label" for="sc-13">13 -
+                                                                14"</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="15-16" id="sc-15"><label
+                                                                class="form-check-label" for="sc-15">15 -
+                                                                16"</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="checkbox" value="17-18" id="sc-17"><label
+                                                                class="form-check-label" for="sc-17">17 -
+                                                                18"</label></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                            // Ưu tiên link server gửi xuống; nếu thiếu productId thì fallback '/'
-                            const url = data.openUrl || (data.productId ? (`/product/${data.productId}?chat=${data.sessionId}`) : '/');
+                                        <!-- SAP XEP -->
+                                        <div class="col-12 col-md-6">
+                                            <div class="card filter-card rounded-3">
+                                                <div class="card-body" id="sortFilter" data-param="sort"
+                                                    data-default="gia-khong-sap-xep">
+                                                    <h6 class="fw-bold mb-2">Sap xep</h6>
+                                                    <div class="stack-choices grid-1">
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="radio" name="radio-sort" id="sort-1"
+                                                                value="gia-tang-dan"><label class="form-check-label"
+                                                                for="sort-1">Gia tang
+                                                                dan</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="radio" name="radio-sort" id="sort-2"
+                                                                value="gia-giam-dan"><label class="form-check-label"
+                                                                for="sort-2">Gia giam
+                                                                dan</label></div>
+                                                        <div class="form-check"><input class="form-check-input"
+                                                                type="radio" name="radio-sort" id="sort-3"
+                                                                value="gia-khong-sap-xep"><label
+                                                                class="form-check-label" for="sort-3">Khong sap
+                                                                xep</label></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                            uPrepend(
-                                '<div class="d-flex justify-content-between align-items-start">' +
-                                '<div>' +
-                                '<div class="fw-semibold">Tin nhắn mới từ hỗ trợ</div>' +
-                                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                                '</div>' +
-                                '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Mở</a>' +
-                                '</div>'
-                            );
-                        });
-                    })();
-                </script>
-                <!-- Search box -->
-                <script>
-                    (() => {
-                        const form = document.getElementById('headerSearchForm');
-                        const input = document.getElementById('headerSearch');
-                        const popup = document.getElementById('searchPopup');
+                                    </div><!-- /row -->
+                                </div><!-- /modal-body -->
 
-                        let timer = null;
-                        let activeIndex = -1;
-                        let currentItems = []; // giữ dữ liệu gợi ý hiện tại
+                                <div class="modal-footer border-0 d-flex justify-content-between flex-wrap gap-2">
+                                    <div class="d-flex gap-2">
+                                        <button id="btnClearAll" type="button" class="btn btn-outline-danger px-4">Xoa
+                                            tat ca</button>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button id="btnFilter" type="button" class="btn btn-success px-4"
+                                            data-bs-dismiss="modal">Xem ket qua</button>
+                                        <button type="button" class="btn btn-outline-secondary px-4"
+                                            data-bs-dismiss="modal">Dong</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                        const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, s => ({
-                            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-                        }[s]));
-
-                        const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
-
-                        const highlight = (text, q) => {
-                            if (!q) return escapeHtml(text);
-                            const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
-                            return escapeHtml(text).replace(re, '<mark>$1</mark>');
-                        };
-
-                        // Chuẩn hoá đường dẫn ảnh từ DB
-                        const toImg = (v) => {
-                            if (!v) return '/images/no-image.png';
-                            if (/^https?:\/\//.test(v)) return v;   // URL tuyệt đối
-                            if (v.startsWith('/')) return v;        // đã có slash
-                            if (v.startsWith('images/')) return '/' + v; // có thư mục sẵn
-                            // còn lại coi như chỉ là filename
-                            return '/images/product/' + encodeURIComponent(v);
-                        };
-
-                        async function fetchSuggest(q) {
-                            const url = '/api/suggest?q=' + encodeURIComponent(q);
-                            const res = await fetch(url, { credentials: 'same-origin' });
-                            if (!res.ok) throw new Error('Network');
-                            return res.json();
-                        }
-
-                        function render(items, q) {
-                            currentItems = items;           // lưu lại để điều hướng bàn phím
-                            activeIndex = -1;
-
-                            if (!items.length) {
-                                popup.innerHTML = `<div class="empty">Không tìm thấy sản phẩm phù hợp.</div>`;
-                                popup.style.display = 'block';
-                                return;
-                            }
-
-                            popup.innerHTML = items.map((x, i) => {
-                                const img = toImg(x.image);
-                                const href = `/product/${encodeURIComponent(String(x.id))}`;
-                                return `
-        <a class="sug-item" data-index="${i}" data-href="${href}" href="${href}">
-          <img src="${img}" alt="">
-          <div class="flex-1">
-            <div class="title">${highlight(x.name, q)}</div>
-            <div class="price">${money(x.price)}</div>
-          </div>
-        </a>
-      `;
-                            }).join('');
-
-                            // Gán hover để set active
-                            popup.querySelectorAll('.sug-item').forEach(el => {
-                                el.addEventListener('mouseenter', () => {
-                                    setActive(Number(el.dataset.index));
-                                });
-                            });
-
-                            popup.style.display = 'block';
-                        }
-
-                        function hide() {
-                            popup.style.display = 'none';
-                            activeIndex = -1;
-                            currentItems = [];
-                        }
-
-                        function setActive(index) {
-                            const items = popup.querySelectorAll('.sug-item');
-                            items.forEach(a => a.classList.remove('active'));
-                            if (items[index]) {
-                                items[index].classList.add('active');
-                                activeIndex = index;
-                            } else {
-                                activeIndex = -1;
-                            }
-                        }
-
-                        input.addEventListener('input', () => {
-                            const q = input.value.trim();
-                            clearTimeout(timer);
-                            if (!q) return hide();
-                            timer = setTimeout(async () => {
-                                try {
-                                    const items = await fetchSuggest(q);
-                                    render(items, q);
-                                } catch {
-                                    hide();
-                                }
-                            }, 200);
-                        });
-
-                        input.addEventListener('focus', () => {
-                            if (popup.innerHTML.trim()) popup.style.display = 'block';
-                        });
-
-                        document.addEventListener('click', (e) => {
-                            if (!popup.contains(e.target) && e.target !== input) hide();
-                        });
-
-                        input.addEventListener('keydown', (e) => {
-                            const items = popup.querySelectorAll('.sug-item');
-                            if (!items.length) return;
-
-                            if (e.key === 'ArrowDown') {
-                                e.preventDefault();
-                                const next = (activeIndex + 1) % items.length;
-                                setActive(next);
-                            } else if (e.key === 'ArrowUp') {
-                                e.preventDefault();
-                                const prev = (activeIndex - 1 + items.length) % items.length;
-                                setActive(prev);
-                            } else if (e.key === 'Enter') {
-                                if (activeIndex >= 0 && items[activeIndex]) {
-                                    e.preventDefault();
-                                    // Điều hướng thẳng tới sản phẩm đang chọn
-                                    const href = items[activeIndex].dataset.href;
-                                    window.location.href = href;
-                                }
-                                // nếu không có item đang active, để form submit bình thường
-                            } else if (e.key === 'Escape') {
-                                hide();
-                            }
-                        });
-
-                        // Submit form: chuyển đến /products?q=...
-                        form.addEventListener('submit', (e) => {
-                            const q = input.value.trim();
-                            if (!q) { e.preventDefault(); hide(); }
-                        });
-                    })();
-
-                    /**/
-                    (() => {
-                        const form = document.getElementById('headerSearchForm');
-                        const input = document.getElementById('headerSearch');
-                        const btn = form?.querySelector('button[type="submit"]');
-                        if (!form || !input || !btn) return;
-
-                        // Click kính lúp: nếu ô trống => chỉ mở & focus (không submit)
-                        btn.addEventListener('click', (e) => {
-                            if (!input.value.trim()) { e.preventDefault(); form.classList.add('open'); input.focus(); }
-                        });
-
-                        // Rời khỏi input mà không gõ gì => thu gọn lại
-                        input.addEventListener('blur', () => {
-                            if (!input.value.trim()) form.classList.remove('open');
-                        });
-                    })();
-                </script>
-                <!-- Navbar End -->
-                <!-- HEADER END -->
-                <div class="py-1"></div>
-
-                <!-- Single Product Start -->
-                <div class="container-fluid" id="product-list">
-                    <div class="container py-3">
-                        <!-- Breadcrumb -->
-                        <nav class="mb-3" aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Danh Sách Sản Phẩm</li>
-                            </ol>
-                        </nav>
-
+                    <!-- Product Grid -->
+                    <section class="col-12 col-lg-9">
                         <div class="row g-4">
-                            <!-- Sidebar: chỉ còn 1 nút mở bộ lọc -->
-                            <aside class="col-12 col-lg-3">
-                                <div class="card border-0 shadow-sm rounded-3">
-                                    <div class="card-body">
-                                        <button class="btn btn-success w-100 py-2" data-bs-toggle="modal"
-                                            data-bs-target="#filterModal">
-                                            <i class="bi bi-funnel me-2"></i> Bộ lọc sản phẩm
-                                        </button>
-                                        <div class="small text-muted mt-2">Muốn chọn dễ dàng thì vui lòng bạn có thể
-                                            chọn dòng sản phẩm và mục đích muốn sử dụng để hiển thị kết quả đúng nhất
-                                            nhé !</div>
-                                    </div>
-                                </div>
-                            </aside>
-                            <!-- FILTER MODAL (Bootstrap 5) -->
-                            <div class="modal fade filter-modal" id="filterModal" tabindex="-1" aria-hidden="true"
-                                data-ajax="false">
-                                <div class="modal-dialog modal-xl modal-dialog-centered">
-                                    <div class="modal-content border-0 rounded-4">
-                                        <div class="modal-header border-0 pb-0">
-                                            <h5 class="modal-title fw-bold"><i class="bi bi-funnel me-2"></i> Bo loc
-                                                nang cao</h5>
-                                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"
-                                                aria-label="Dong"></button>
+                            <% products.forEach(function(product) { var discountPrice=(product.discount> 0)
+                                ? Math.round(product.price * (100 - product.discount) / 100)
+                                : product.price;
+                                %>
+                                <div class="col-6 col-xl-4">
+                                    <div class="rounded position-relative fruite-item h-100 d-flex flex-column">
+                                        <div class="fruite-img">
+                                            <a href="/product/<%= product.id %>">
+                                                <img src="/images/product/<%= product.image %>"
+                                                    class="img-fluid w-100 rounded-top" alt="">
+                                            </a>
                                         </div>
 
-                                        <div class="modal-body pt-2">
-                                            <div class="row g-3">
+                                        <span
+                                            class="text-white bg-secondary px-3 py-1 rounded position-absolute category-chip"
+                                            style="top:10px;left:10px;">Laptop</span>
 
-                                                <!-- HANG SAN XUAT -->
-                                                <div class="col-12">
-                                                    <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="factoryFilter" data-param="factory">
-                                                            <h6 class="fw-bold mb-2">Hang san xuat</h6>
-                                                            <% var FO=[ { value: 'APPLE' , name: 'Apple (MacBook)' }, {
-                                                                value: 'ASUS' , name: 'Asus' }, { value: 'LENOVO' ,
-                                                                name: 'Lenovo' }, { value: 'DELL' , name: 'Dell' }, {
-                                                                value: 'LG' , name: 'LG' }, { value: 'ACER' ,
-                                                                name: 'Acer' }, { value: 'HP' , name: 'HP' }, {
-                                                                value: 'MSI' , name: 'MSI' }, { value: 'GIGABYTE' ,
-                                                                name: 'Gigabyte' }, { value: 'ALIENWARE' ,
-                                                                name: 'Alienware' } ]; if (typeof factoryOptions
-                                                                !=='undefined' && Array.isArray(factoryOptions) &&
-                                                                factoryOptions.length) { FO=factoryOptions; } %>
-                                                                <div class="brand-chips compact" id="brandChips">
-                                                                    <% FO.forEach(function(opt, idx){ %>
-                                                                        <div class="chip-check">
-                                                                            <input class="form-check-input"
-                                                                                type="checkbox" id="factory-<%= idx %>"
-                                                                                value="<%= opt.value %>">
-                                                                            <label class="chip"
-                                                                                for="factory-<%= idx %>">
-                                                                                <%= opt.name %>
-                                                                            </label>
-                                                                        </div>
-                                                                        <% }); %>
-                                                                </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        <div class="p-3 border border-top-0 rounded-bottom d-flex flex-column">
+                                            <h4 class="mb-1" style="font-size:15px;">
+                                                <a href="/product/<%= product.id %>">
+                                                    <%= product.name %>
+                                                </a>
+                                            </h4>
+                                            <p class="mb-2" style="font-size:13px;">
+                                                <%= product.shortDesc %>
+                                            </p>
 
-                                                <!-- MUC DICH SU DUNG -->
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="targetFilter" data-param="target">
-                                                            <h6 class="fw-bold mb-2">Muc dich su dung</h6>
-                                                            <div class="stack-choices grid-2">
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" id="target-1"
-                                                                        value="GAMING"><label class="form-check-label"
-                                                                        for="target-1">Gaming</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" id="target-2"
-                                                                        value="SINHVIEN-VANPHONG"><label
-                                                                        class="form-check-label" for="target-2">Sinh
-                                                                        vien - Van phong</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" id="target-3"
-                                                                        value="THIET-KE-DO-HOA"><label
-                                                                        class="form-check-label" for="target-3">Thiet ke
-                                                                        do hoa</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" id="target-4"
-                                                                        value="MONG-NHE"><label class="form-check-label"
-                                                                        for="target-4">Mong nhe</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" id="target-5"
-                                                                        value="DOANH-NHAN"><label
-                                                                        class="form-check-label" for="target-5">Doanh
-                                                                        nhan</label></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- MUC GIA -->
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="priceFilter" data-param="price">
-                                                            <h6 class="fw-bold mb-2">Muc gia</h6>
-                                                            <div class="stack-choices grid-2">
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" id="price-1"
-                                                                        value="duoi-10-trieu"><label
-                                                                        class="form-check-label" for="price-1">Duoi 10
-                                                                        trieu</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" id="price-2"
-                                                                        value="10-15-trieu"><label
-                                                                        class="form-check-label" for="price-2">10 - 15
-                                                                        trieu</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" id="price-3"
-                                                                        value="15-20-trieu"><label
-                                                                        class="form-check-label" for="price-3">15 - 20
-                                                                        trieu</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" id="price-4"
-                                                                        value="tren-20-trieu"><label
-                                                                        class="form-check-label" for="price-4">Tren 20
-                                                                        trieu</label></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- CPU -->
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="cpuFilter" data-param="cpu">
-                                                            <h6 class="fw-bold mb-2">CPU</h6>
-                                                            <div class="stack-choices grid-2">
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="i3" id="cpu-i3"><label
-                                                                        class="form-check-label" for="cpu-i3">Intel Core
-                                                                        i3</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="i5" id="cpu-i5"><label
-                                                                        class="form-check-label" for="cpu-i5">Intel Core
-                                                                        i5</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="i7" id="cpu-i7"><label
-                                                                        class="form-check-label" for="cpu-i7">Intel Core
-                                                                        i7</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="i9" id="cpu-i9"><label
-                                                                        class="form-check-label" for="cpu-i9">Intel Core
-                                                                        i9</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="ryzen 5"
-                                                                        id="cpu-r5"><label class="form-check-label"
-                                                                        for="cpu-r5">AMD Ryzen 5</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="ryzen 7"
-                                                                        id="cpu-r7"><label class="form-check-label"
-                                                                        for="cpu-r7">AMD Ryzen 7</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="ryzen 9"
-                                                                        id="cpu-r9"><label class="form-check-label"
-                                                                        for="cpu-r9">AMD Ryzen 9</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="m1" id="cpu-m1"><label
-                                                                        class="form-check-label" for="cpu-m1">Apple
-                                                                        M1</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="m2" id="cpu-m2"><label
-                                                                        class="form-check-label" for="cpu-m2">Apple
-                                                                        M2</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="m3" id="cpu-m3"><label
-                                                                        class="form-check-label" for="cpu-m3">Apple
-                                                                        M3</label></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- RAM -->
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="ramFilter" data-param="ram">
-                                                            <h6 class="fw-bold mb-2">RAM</h6>
-                                                            <div class="stack-choices grid-2">
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="8" id="ram-8"><label
-                                                                        class="form-check-label" for="ram-8">8
-                                                                        GB</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="16" id="ram-16"><label
-                                                                        class="form-check-label" for="ram-16">16
-                                                                        GB</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="32" id="ram-32"><label
-                                                                        class="form-check-label" for="ram-32">32
-                                                                        GB</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="64" id="ram-64"><label
-                                                                        class="form-check-label" for="ram-64">64
-                                                                        GB</label></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- O CUNG -->
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="storageFilter" data-param="storage">
-                                                            <h6 class="fw-bold mb-2">O cung</h6>
-                                                            <div class="stack-choices grid-2">
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="256" id="st-256"><label
-                                                                        class="form-check-label" for="st-256">256 GB
-                                                                        SSD</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="512" id="st-512"><label
-                                                                        class="form-check-label" for="st-512">512 GB
-                                                                        SSD</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="1024" id="st-1024"><label
-                                                                        class="form-check-label" for="st-1024">1 TB
-                                                                        SSD</label></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- DO PHAN GIAI -->
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="resFilter" data-param="res">
-                                                            <h6 class="fw-bold mb-2">Do phan giai</h6>
-                                                            <div class="stack-choices grid-2">
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="FHD" id="res-fhd"><label
-                                                                        class="form-check-label" for="res-fhd">FHD
-                                                                        (1920x1080)</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="QHD" id="res-qhd"><label
-                                                                        class="form-check-label" for="res-qhd">QHD /
-                                                                        2K</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="4K" id="res-4k"><label
-                                                                        class="form-check-label" for="res-4k">4K</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- KICH THUOC MAN -->
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="screenFilter" data-param="screen">
-                                                            <h6 class="fw-bold mb-2">Kich thuoc man hinh</h6>
-                                                            <div class="stack-choices grid-2">
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="13-14" id="sc-13"><label
-                                                                        class="form-check-label" for="sc-13">13 -
-                                                                        14"</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="15-16" id="sc-15"><label
-                                                                        class="form-check-label" for="sc-15">15 -
-                                                                        16"</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="checkbox" value="17-18" id="sc-17"><label
-                                                                        class="form-check-label" for="sc-17">17 -
-                                                                        18"</label></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- SAP XEP -->
-                                                <div class="col-12 col-md-6">
-                                                    <div class="card filter-card rounded-3">
-                                                        <div class="card-body" id="sortFilter" data-param="sort"
-                                                            data-default="gia-khong-sap-xep">
-                                                            <h6 class="fw-bold mb-2">Sap xep</h6>
-                                                            <div class="stack-choices grid-1">
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="radio" name="radio-sort" id="sort-1"
-                                                                        value="gia-tang-dan"><label
-                                                                        class="form-check-label" for="sort-1">Gia tang
-                                                                        dan</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="radio" name="radio-sort" id="sort-2"
-                                                                        value="gia-giam-dan"><label
-                                                                        class="form-check-label" for="sort-2">Gia giam
-                                                                        dan</label></div>
-                                                                <div class="form-check"><input class="form-check-input"
-                                                                        type="radio" name="radio-sort" id="sort-3"
-                                                                        value="gia-khong-sap-xep"><label
-                                                                        class="form-check-label" for="sort-3">Khong sap
-                                                                        xep</label></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            </div><!-- /row -->
-                                        </div><!-- /modal-body -->
-
-                                        <div
-                                            class="modal-footer border-0 d-flex justify-content-between flex-wrap gap-2">
-                                            <div class="d-flex gap-2">
-                                                <button id="btnClearAll" type="button"
-                                                    class="btn btn-outline-danger px-4">Xoa tat ca</button>
-                                            </div>
-                                            <div class="d-flex gap-2">
-                                                <button id="btnFilter" type="button" class="btn btn-success px-4"
-                                                    data-bs-dismiss="modal">Xem ket qua</button>
-                                                <button type="button" class="btn btn-outline-secondary px-4"
-                                                    data-bs-dismiss="modal">Dong</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Product Grid -->
-                            <section class="col-12 col-lg-9">
-                                <div class="row g-4">
-                                    <% products.forEach(function(product) { var discountPrice=(product.discount> 0)
-                                        ? Math.round(product.price * (100 - product.discount) / 100)
-                                        : product.price;
-                                        %>
-                                        <div class="col-6 col-xl-4">
-                                            <div class="rounded position-relative fruite-item h-100 d-flex flex-column">
-                                                <div class="fruite-img">
-                                                    <a href="/product/<%= product.id %>">
-                                                        <img src="/images/product/<%= product.image %>"
-                                                            class="img-fluid w-100 rounded-top" alt="">
-                                                    </a>
-                                                </div>
-
-                                                <span
-                                                    class="text-white bg-secondary px-3 py-1 rounded position-absolute category-chip"
-                                                    style="top:10px;left:10px;">Laptop</span>
-
-                                                <div class="p-3 border border-top-0 rounded-bottom d-flex flex-column">
-                                                    <h4 class="mb-1" style="font-size:15px;">
-                                                        <a href="/product/<%= product.id %>">
-                                                            <%= product.name %>
-                                                        </a>
-                                                    </h4>
-                                                    <p class="mb-2" style="font-size:13px;">
-                                                        <%= product.shortDesc %>
-                                                    </p>
-
-                                                    <div class="mb-2 text-center">
-                                                        <span class="rating-stars"
-                                                            title="<%= ((product.ratingAvg || 0).toFixed ? (product.ratingAvg || 0).toFixed(1) : (0).toFixed(1)) %>/5">
-                                                            <% (product.starsArr || []).forEach(function(s){ %>
-                                                                <% if (s==='full' ) { %><i class="fas fa-star"></i>
+                                            <div class="mb-2 text-center">
+                                                <span class="rating-stars"
+                                                    title="<%= ((product.ratingAvg || 0).toFixed ? (product.ratingAvg || 0).toFixed(1) : (0).toFixed(1)) %>/5">
+                                                    <% (product.starsArr || []).forEach(function(s){ %>
+                                                        <% if (s==='full' ) { %><i class="fas fa-star"></i>
+                                                            <% } %>
+                                                                <% if (s==='half' ) { %><i
+                                                                        class="fas fa-star-half-alt"></i>
                                                                     <% } %>
-                                                                        <% if (s==='half' ) { %><i
-                                                                                class="fas fa-star-half-alt"></i>
+                                                                        <% if (s==='empty' ) { %><i
+                                                                                class="far fa-star"></i>
                                                                             <% } %>
-                                                                                <% if (s==='empty' ) { %><i
-                                                                                        class="far fa-star"></i>
-                                                                                    <% } %>
-                                                                                        <% }); %>
-                                                                                            <span class="count">(<%=
-                                                                                                    product.ratingCount
-                                                                                                    || 0 %>)</span>
-                                                        </span>
-                                                    </div>
-
-                                                    <!-- Giá -->
-                                                    <div class="d-flex flex-column align-items-center mb-2 price-box">
-                                                        <% if (product.discount> 0) { %>
-                                                            <div
-                                                                class="d-flex align-items-center justify-content-center">
-                                                                <small class="text-muted text-decoration-line-through">
-                                                                    <%= new
-                                                                        Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
-                                                                        %>
-                                                                </small>
-                                                                <span class="badge bg-danger ms-2">-<%= product.discount
-                                                                        %>%</span>
-                                                            </div>
-                                                            <p class="text-danger fw-bold mb-1 d-flex align-items-center justify-content-center"
-                                                                style="font-size:15px;">
-                                                                <%= new
-                                                                    Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountPrice)
-                                                                    %>
-                                                            </p>
-                                                            <% } else { %>
-                                                                <p class="text-dark fw-bold mb-1"
-                                                                    style="font-size:15px;">
-                                                                    <%= new
-                                                                        Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
-                                                                        %>
-                                                                </p>
-                                                                <% } %>
-                                                    </div>
-
-                                                    <!-- CTA -->
-                                                    <div
-                                                        class="d-flex justify-content-between align-items-center mt-auto">
-                                                        <form onsubmit="return false;">
-                                                            <button type="button" data-product-id="<%= product.id %>"
-                                                                data-stock="<%= (product.quantity || 0) %>"
-                                                                class="btnAddToCartHomePage btn border rounded-pill px-3">
-                                                                <i class="fa fa-shopping-bag me-2"></i>
-                                                                <span class="js-add-label">Thêm vào giỏ</span>
-                                                            </button>
-                                                        </form>
-
-                                                        <span class="badge ms-3 js-stock-badge"
-                                                            data-qty="<%= (product.quantity || 0) %>">
-                                                            Còn: <%= (product.quantity || 0) %>
-                                                        </span>
-                                                    </div>
-
-                                                </div>
+                                                                                <% }); %>
+                                                                                    <span class="count">(<%=
+                                                                                            product.ratingCount || 0 %>
+                                                                                            )</span>
+                                                </span>
                                             </div>
-                                        </div>
-                                        <% }); %>
-                                            <% // Helper tạo link phân trang, giữ nguyên các filter hiện có (qsNoPage)
-                                                function linkPage(p) { var q=(typeof qsNoPage !=='undefined' &&
-                                                qsNoPage) ? ('?' + qsNoPage + '&page=' + p) : ('?page=' + p);
-  return ' /products' + q; } %>
 
-                                                <% if (products && products.length) { %>
-                                                    <% var _page=parseInt((typeof page !=='undefined' ? page : 1), 10)
-                                                        || 1; var _total=parseInt((typeof totalPages !=='undefined' ?
-                                                        totalPages : 1), 10) || 1; var _pagination=[]; function
-                                                        _pushRange(a, b) { for (var i=a; i<=b; i++) _pagination.push(i);
-                                                        } if (_total> 1) {
-                                                        if (_total <= 7) { _pushRange(1, _total); } else if (_page <=3)
-                                                            { _pushRange(1, 4); _pagination.push('...');
-                                                            _pagination.push(_total); } else if (_page>= _total - 2) {
-                                                            _pagination.push(1); _pagination.push('...');
-                                                            _pushRange(_total - 3, _total);
-                                                            } else {
-                                                            _pagination.push(1); _pagination.push('...');
-                                                            _pagination.push(_page - 1); _pagination.push(_page);
-                                                            _pagination.push(_page + 1);
-                                                            _pagination.push('...'); _pagination.push(_total);
-                                                            }
-                                                            }
+                                            <!-- Giá -->
+                                            <div class="d-flex flex-column align-items-center mb-2 price-box">
+                                                <% if (product.discount> 0) { %>
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                        <small class="text-muted text-decoration-line-through">
+                                                            <%= new
+                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
+                                                                %>
+                                                        </small>
+                                                        <span class="badge bg-danger ms-2">-<%= product.discount %>
+                                                                %</span>
+                                                    </div>
+                                                    <p class="text-danger fw-bold mb-1 d-flex align-items-center justify-content-center"
+                                                        style="font-size:15px;">
+                                                        <%= new
+                                                            Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(discountPrice)
                                                             %>
+                                                    </p>
+                                                    <% } else { %>
+                                                        <p class="text-dark fw-bold mb-1" style="font-size:15px;">
+                                                            <%= new
+                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(product.price)
+                                                                %>
+                                                        </p>
+                                                        <% } %>
+                                            </div>
 
-                                                            <% if (_pagination.length) { %>
-                                                                <ul
-                                                                    class="pagination pager d-flex justify-content-center mt-4">
-                                                                    <!-- Previous -->
-                                                                    <li
-                                                                        class="page-item <%= (_page === 1 ? 'disabled' : '') %>">
-                                                                        <a class="page-link"
-                                                                            href="<%= linkPage(_page > 1 ? (_page - 1) : 1) %>"
-                                                                            aria-label="Previous">&laquo;</a>
-                                                                    </li>
+                                            <!-- CTA -->
+                                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                                <form onsubmit="return false;">
+                                                    <button type="button" data-product-id="<%= product.id %>"
+                                                        data-stock="<%= (product.quantity || 0) %>"
+                                                        class="btnAddToCartHomePage btn border rounded-pill px-3">
+                                                        <i class="fa fa-shopping-bag me-2"></i>
+                                                        <span class="js-add-label">Thêm vào giỏ</span>
+                                                    </button>
+                                                </form>
 
-                                                                    <% for (var k=0; k<_pagination.length; k++) { var
-                                                                        p=_pagination[k]; %>
-                                                                        <% if (p==='...' ) { %>
-                                                                            <li class="page-item disabled"><span
-                                                                                    class="page-link page-ellipsis">...</span>
-                                                                            </li>
-                                                                            <% } else { %>
-                                                                                <li
-                                                                                    class="page-item <%= (_page === p ? 'active' : '') %>">
-                                                                                    <a class="page-link"
-                                                                                        href="<%= linkPage(p) %>">
-                                                                                        <%= p %>
-                                                                                    </a>
-                                                                                </li>
-                                                                                <% } %>
-                                                                                    <% } %>
+                                                <span class="badge ms-3 js-stock-badge"
+                                                    data-qty="<%= (product.quantity || 0) %>">
+                                                    Còn: <%= (product.quantity || 0) %>
+                                                </span>
+                                            </div>
 
-                                                                                        <!-- Next -->
-                                                                                        <li
-                                                                                            class="page-item <%= (_page === _total ? 'disabled' : '') %>">
-                                                                                            <a class="page-link"
-                                                                                                href="<%= linkPage(_page < _total ? (_page + 1) : _total) %>"
-                                                                                                aria-label="Next">&raquo;</a>
-                                                                                        </li>
-                                                                </ul>
-                                                                <% } %>
-                                                                    <% } else { %>
-                                                                        <div class="text-center py-5">Không tồn tại sản
-                                                                            phẩm này!</div>
-                                                                        <% } %>
-
-                                </div>
-                            </section>
-
-                        </div>
-                    </div>
-                </div>
-                <!-- Single Product End -->
-
-
-                <!-- Footer Start -->
-                <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-                    <div class="container py-5">
-                        <div class="row g-5">
-                            <!-- Logo & Giới thiệu -->
-                            <div class="col-lg-3 col-md-6">
-                                <a href="/" class="d-inline-block mb-3">
-                                    <h2 class="text-primary fw-bold">LaptopShop</h2>
-                                </a>
-                                <p class="small">
-                                    Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
-                                    dịch vụ tận tâm và giá cả cạnh tranh nhất.
-                                </p>
-                                <!-- Icon mạng xã hội -->
-                                <div class="d-flex pt-2">
-                                    <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                            class="fab fa-facebook-f"></i></a>
-                                    <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                            class="fab fa-instagram"></i></a>
-                                    <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                            class="fab fa-youtube"></i></a>
-                                    <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
-                                            class="fab fa-tiktok"></i></a>
-                                </div>
-                            </div>
-
-                            <!-- Thông tin cửa hàng -->
-                            <div class="col-lg-3 col-md-6">
-                                <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
-                                <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
-                                <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
-                                <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
-                                <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
-                            </div>
-
-                            <!-- Tài khoản -->
-                            <div class="col-lg-3 col-md-6">
-                                <h4 class="text-light mb-3">Tài khoản</h4>
-                                <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
-                                <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
-                                <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
-                                <a class="btn-link d-block" href="/blogs">Blogs</a>
-                            </div>
-
-                            <!-- Liên hệ -->
-                            <div class="col-lg-3 col-md-6">
-                                <h4 class="text-light mb-3">Liên hệ</h4>
-                                <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
-                                <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
-                                <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
-                                <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
-                                <!-- Form đăng ký nhận tin -->
-                                <form class="mt-3">
-                                    <div class="input-group">
-                                        <input type="email" class="form-control border-0"
-                                            placeholder="Nhập email của bạn">
-                                        <button class="btn btn-primary">Đăng ký</button>
+                                        </div>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                                <% }); %>
+                                    <% // Helper tạo link phân trang, giữ nguyên các filter hiện có (qsNoPage) var
+                                        linkPage=function (p) { var q=(typeof qsNoPage !=='undefined' && qsNoPage) ?
+                                        ('?' + qsNoPage + '&page=' + p) : ('?page=' + p);
+    return ' /products' + q; }; %>
+
+
+                                        <% if (products && products.length) { %>
+                                            <% var _page=parseInt((typeof page !=='undefined' ? page : 1), 10) || 1; var
+                                                _total=parseInt((typeof totalPages !=='undefined' ? totalPages : 1), 10)
+                                                || 1; var _pagination=[]; function _pushRange(a, b) { for (var i=a;
+                                                i<=b; i++) _pagination.push(i); } if (_total> 1) {
+                                                if (_total <= 7) { _pushRange(1, _total); } else if (_page <=3) {
+                                                    _pushRange(1, 4); _pagination.push('...'); _pagination.push(_total);
+                                                    } else if (_page>= _total - 2) {
+                                                    _pagination.push(1); _pagination.push('...');
+                                                    _pushRange(_total - 3, _total);
+                                                    } else {
+                                                    _pagination.push(1); _pagination.push('...');
+                                                    _pagination.push(_page - 1); _pagination.push(_page);
+                                                    _pagination.push(_page + 1);
+                                                    _pagination.push('...'); _pagination.push(_total);
+                                                    }
+                                                    }
+                                                    %>
+
+                                                    <% if (_pagination.length) { %>
+                                                        <ul class="pagination pager d-flex justify-content-center mt-4">
+                                                            <!-- Previous -->
+                                                            <li
+                                                                class="page-item <%= (_page === 1 ? 'disabled' : '') %>">
+                                                                <a class="page-link"
+                                                                    href="<%= linkPage(_page > 1 ? (_page - 1) : 1) %>"
+                                                                    aria-label="Previous">&laquo;</a>
+                                                            </li>
+
+                                                            <% for (var k=0; k<_pagination.length; k++) { var
+                                                                p=_pagination[k]; %>
+                                                                <% if (p==='...' ) { %>
+                                                                    <li class="page-item disabled"><span
+                                                                            class="page-link page-ellipsis">...</span>
+                                                                    </li>
+                                                                    <% } else { %>
+                                                                        <li
+                                                                            class="page-item <%= (_page === p ? 'active' : '') %>">
+                                                                            <a class="page-link"
+                                                                                href="<%= linkPage(p) %>">
+                                                                                <%= p %>
+                                                                            </a>
+                                                                        </li>
+                                                                        <% } %>
+                                                                            <% } %>
+
+                                                                                <!-- Next -->
+                                                                                <li
+                                                                                    class="page-item <%= (_page === _total ? 'disabled' : '') %>">
+                                                                                    <a class="page-link"
+                                                                                        href="<%= linkPage(_page < _total ? (_page + 1) : _total) %>"
+                                                                                        aria-label="Next">&raquo;</a>
+                                                                                </li>
+                                                        </ul>
+                                                        <% } %>
+                                                            <% } else { %>
+                                                                <div class="text-center py-5">Không tồn tại sản
+                                                                    phẩm này!</div>
+                                                                <% } %>
+
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </div>
+        <!-- Single Product End -->
+
+
+        <!-- Footer Start -->
+        <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <!-- Logo & Giới thiệu -->
+                    <div class="col-lg-3 col-md-6">
+                        <a href="/" class="d-inline-block mb-3">
+                            <h2 class="text-primary fw-bold">LaptopShop</h2>
+                        </a>
+                        <p class="small">
+                            Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
+                            dịch vụ tận tâm và giá cả cạnh tranh nhất.
+                        </p>
+                        <!-- Icon mạng xã hội -->
+                        <div class="d-flex pt-2">
+                            <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                    class="fab fa-youtube"></i></a>
+                            <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
+                                    class="fab fa-tiktok"></i></a>
                         </div>
                     </div>
-                </div>
 
-                <!-- Copyright -->
-                <div class="container-fluid bg-dark copyright bg-black py-3">
-                    <div
-                        class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
-                        <span class="text-light mb-2 mb-md-0">
-                            <i class="fas fa-copyright me-2"></i>2025
-                            <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
-                        </span>
-                        <span class="text-white">
-                            Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML
-                                Codex</a> |
-                            Distributed by <a class="text-primary border-bottom"
-                                href="https://themewagon.com">ThemeWagon</a>
-                        </span>
+                    <!-- Thông tin cửa hàng -->
+                    <div class="col-lg-3 col-md-6">
+                        <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
+                        <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
+                        <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
+                        <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
+                        <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
+                    </div>
+
+                    <!-- Tài khoản -->
+                    <div class="col-lg-3 col-md-6">
+                        <h4 class="text-light mb-3">Tài khoản</h4>
+                        <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
+                        <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
+                        <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
+                        <a class="btn-link d-block" href="/blogs">Blogs</a>
+                    </div>
+
+                    <!-- Liên hệ -->
+                    <div class="col-lg-3 col-md-6">
+                        <h4 class="text-light mb-3">Liên hệ</h4>
+                        <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
+                        <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
+                        <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
+                        <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
+                        <!-- Form đăng ký nhận tin -->
+                        <form class="mt-3">
+                            <div class="input-group">
+                                <input type="email" class="form-control border-0" placeholder="Nhập email của bạn">
+                                <button class="btn btn-primary">Đăng ký</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <!-- Footer End -->
+            </div>
+        </div>
+
+        <!-- Copyright -->
+        <div class="container-fluid bg-dark copyright bg-black py-3">
+            <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
+                <span class="text-light mb-2 mb-md-0">
+                    <i class="fas fa-copyright me-2"></i>2025
+                    <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
+                </span>
+                <span class="text-white">
+                    Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML
+                        Codex</a> |
+                    Distributed by <a class="text-primary border-bottom" href="https://themewagon.com">ThemeWagon</a>
+                </span>
+            </div>
+        </div>
+        <!-- Footer End -->
 
 
-                <!-- Back to Top -->
-                <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-                        class="fa fa-arrow-up"></i></a>
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                class="fa fa-arrow-up"></i></a>
 
 
-                <!-- JavaScript Libraries -->
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-                <script src="/client/lib/easing/easing.min.js"></script>
-                <script src="/client/lib/waypoints/waypoints.min.js"></script>
-                <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-                <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+        <!-- JavaScript Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/client/lib/easing/easing.min.js"></script>
+        <script src="/client/lib/waypoints/waypoints.min.js"></script>
+        <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+        <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
-                <!-- Template Javascript -->
-                <script src="/client/js/main.js"></script>
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
-                    integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
-                    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-                <script>
-                    // Toggle "Xem thêm" cho Hãng
-                    (function () {
-                        const moreBtn = document.getElementById('brandMoreBtn');
-                        const chips = document.getElementById('brandChips');
-                        if (!moreBtn || !chips) return;
-                        const setState = (expanded) => {
-                            chips.classList.toggle('expanded', expanded);
-                            chips.classList.toggle('compact', !expanded);
-                            moreBtn.textContent = expanded ? 'Thu gọn' : 'Xem thêm';
-                        };
-                        setState(false); // mặc định gọn
-                        moreBtn.addEventListener('click', () => {
-                            const expanded = !chips.classList.contains('expanded');
-                            setState(expanded);
-                        });
-                    })();
-                </script>
+        <!-- Template Javascript -->
+        <script src="/client/js/main.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"
+            integrity="sha512-zlWWyZq71UMApAjih4WkaRpikgY9Bz1oXIW5G0fED4vk14JjGlQ1UmkGM392jEULP8jbNMiwLWdM8Z87Hu88Fw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-                <!--  phân trang -->
-                <script>
-                    (function () {
-                        const $ = (sel, ctx = document) => ctx.querySelector(sel);
-                        const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+        <script>
+            // Toggle "Xem thêm" cho Hãng
+            (function () {
+                const moreBtn = document.getElementById('brandMoreBtn');
+                const chips = document.getElementById('brandChips');
+                if (!moreBtn || !chips) return;
+                const setState = (expanded) => {
+                    chips.classList.toggle('expanded', expanded);
+                    chips.classList.toggle('compact', !expanded);
+                    moreBtn.textContent = expanded ? 'Thu gọn' : 'Xem thêm';
+                };
+                setState(false); // mặc định gọn
+                moreBtn.addEventListener('click', () => {
+                    const expanded = !chips.classList.contains('expanded');
+                    setState(expanded);
+                });
+            })();
+        </script>
 
-                        function appendMulti(sp, name, values) {
-                            values.forEach(v => sp.append(name, v));
+        <!--  phân trang -->
+        <script>
+            (function () {
+                const $ = (sel, ctx = document) => ctx.querySelector(sel);
+                const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
+                function appendMulti(sp, name, values) {
+                    values.forEach(v => sp.append(name, v));
+                }
+
+                function getCheckedValues(container) {
+                    return $$('.form-check-input:checked', container).map(el => el.value);
+                }
+
+                const btn = document.getElementById('btnFilter');
+                if (!btn) return;
+
+                btn.addEventListener('click', function () {
+                    const sp = new URLSearchParams();
+
+                    // Hãng (factoryFilter)
+                    const factoryBox = document.getElementById('factoryFilter');
+                    if (factoryBox) appendMulti(sp, 'factory', getCheckedValues(factoryBox));
+
+                    // Mục đích
+                    const targetBox = document.getElementById('targetFilter');
+                    if (targetBox) appendMulti(sp, 'target', getCheckedValues(targetBox));
+
+                    // Giá
+                    const priceBox = document.getElementById('priceFilter');
+                    if (priceBox) appendMulti(sp, 'price', getCheckedValues(priceBox));
+
+                    // CPU
+                    const cpuBox = document.getElementById('cpuFilter');
+                    if (cpuBox) appendMulti(sp, 'cpu', getCheckedValues(cpuBox));
+
+                    // RAM
+                    const ramBox = document.getElementById('ramFilter');
+                    if (ramBox) appendMulti(sp, 'ram', getCheckedValues(ramBox));
+
+                    // Storage
+                    const stBox = document.getElementById('storageFilter');
+                    if (stBox) appendMulti(sp, 'storage', getCheckedValues(stBox));
+
+                    // Độ phân giải
+                    const resBox = document.getElementById('resFilter');
+                    if (resBox) appendMulti(sp, 'res', getCheckedValues(resBox));
+
+                    // Kích thước màn
+                    const scBox = document.getElementById('screenFilter');
+                    if (scBox) appendMulti(sp, 'screen', getCheckedValues(scBox));
+
+                    // Sort (radio)
+                    const sortChecked = $('#sortFilter input[name="radio-sort"]:checked');
+                    if (sortChecked) sp.set('sort', sortChecked.value);
+
+                    // Luôn quay về trang 1 khi đổi bộ lọc
+                    sp.set('page', '1');
+
+                    // Điều hướng
+                    const url = '/products?' + sp.toString();
+                    window.location.href = url;
+                });
+            })();
+        </script>
+        // active phân trang
+        <script>
+            // Bật active khi click cho pagination trang filter
+            document.addEventListener('click', function (e) {
+                const a = e.target.closest('.pagination.pager .page-link');
+                if (!a) return;
+
+                const ul = a.closest('.pagination.pager');
+                const li = a.closest('.page-item');
+                if (!ul || !li || li.classList.contains('disabled')) return;
+
+                // 1) Toggle active tức thì (UI feedback)
+                ul.querySelectorAll('.page-item').forEach(el => el.classList.remove('active'));
+                li.classList.add('active');
+
+                // 2) Nếu dùng AJAX, thêm data-ajax-pagination="true" vào <ul class="pagination pager ...">
+                const ajaxMode = ul.dataset.ajaxPagination === 'true';
+                if (!ajaxMode) return;         // điều hướng bình thường (full reload)
+
+                // 3) AJAX mode: chặn chuyển trang, cập nhật URL & load lại list
+                e.preventDefault();
+                const url = a.getAttribute('href');
+                history.pushState({}, '', url);
+
+                // Gọi renderer của bạn – thay bằng logic hiện có để load danh sách + phân trang
+                loadProducts(url);             // bạn đã có hàm fetch/axios nào thì gọi ở đây
+            });
+
+            // Ví dụ tối giản cho loadProducts (nếu bạn chưa có):
+            async function loadProducts(url) {
+                try {
+                    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+                    // Thay #product-list và #product-pagination của trang hiện tại
+                    const newList = doc.querySelector('#product-list');
+                    const newPager = doc.querySelector('#product-pagination'); // bọc <ul.pagination.pager> trong div này
+
+                    if (newList) document.querySelector('#product-list')?.replaceWith(newList);
+                    if (newPager) document.querySelector('#product-pagination')?.replaceWith(newPager);
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        </script>
+
+        <script>
+            (function () {
+                var modal = document.getElementById('filterModal');
+                if (!modal) return;
+
+                var ajaxMode = (modal.getAttribute('data-ajax') === 'true');
+                var applyBtn = document.getElementById('btnFilter');
+                var clearAllBtn = document.getElementById('btnClearAll');
+
+                // Khai bao cac nhom va param key tren URL
+                var GROUP_IDS = [
+                    'factoryFilter', 'targetFilter', 'priceFilter', 'cpuFilter', 'ramFilter',
+                    'storageFilter', 'resFilter', 'screenFilter', 'sortFilter'
+                ];
+                function getEl(id) { return document.getElementById(id); }
+                function getKey(el) { return el ? el.getAttribute('data-param') : null; }
+
+                function syncUIFromURL() {
+                    var url = new URL(window.location.href);
+                    GROUP_IDS.forEach(function (id) {
+                        var wrap = getEl(id);
+                        if (!wrap) return;
+                        var key = getKey(wrap);
+                        if (!key) return;
+
+                        if (id === 'sortFilter') {
+                            var def = wrap.getAttribute('data-default') || '';
+                            var v = url.searchParams.get(key);
+                            var target = v || def;
+                            var r = wrap.querySelector('input[type="radio"][value="' + target + '"]');
+                            if (r) r.checked = true;
+                            // neu khong co radio tuong ung thi bo het
+                            if (!r) wrap.querySelectorAll('input[type="radio"]').forEach(function (n) { n.checked = false; });
+                        } else {
+                            var values = url.searchParams.getAll(key);
+                            wrap.querySelectorAll('input[type="checkbox"]').forEach(function (inp) {
+                                inp.checked = values.indexOf(inp.value) !== -1;
+                            });
                         }
+                    });
+                }
 
-                        function getCheckedValues(container) {
-                            return $$('.form-check-input:checked', container).map(el => el.value);
+                function collectSelectionsFromUI() {
+                    var sel = {};
+                    GROUP_IDS.forEach(function (id) {
+                        var wrap = getEl(id);
+                        if (!wrap) return;
+                        var key = getKey(wrap);
+                        if (!key) return;
+
+                        if (id === 'sortFilter') {
+                            var def = wrap.getAttribute('data-default') || '';
+                            var r = wrap.querySelector('input[type="radio"]:checked');
+                            var val = r ? r.value : '';
+                            if (val && val !== def) sel[key] = [val];
+                        } else {
+                            var arr = [];
+                            wrap.querySelectorAll('input[type="checkbox"]:checked').forEach(function (inp) { arr.push(inp.value); });
+                            if (arr.length) sel[key] = arr;
                         }
+                    });
+                    return sel;
+                }
 
-                        const btn = document.getElementById('btnFilter');
-                        if (!btn) return;
+                function collectSelectionsFromURL() {
+                    var url = new URL(window.location.href);
+                    var sel = {};
+                    GROUP_IDS.forEach(function (id) {
+                        var wrap = getEl(id);
+                        if (!wrap) return;
+                        var key = getKey(wrap);
+                        if (!key) return;
 
-                        btn.addEventListener('click', function () {
-                            const sp = new URLSearchParams();
+                        if (id === 'sortFilter') {
+                            var v = url.searchParams.get(key);
+                            if (v) sel[key] = [v];
+                        } else {
+                            var arr = url.searchParams.getAll(key);
+                            if (arr && arr.length) sel[key] = arr;
+                        }
+                    });
+                    return sel;
+                }
 
-                            // Hãng (factoryFilter)
-                            const factoryBox = document.getElementById('factoryFilter');
-                            if (factoryBox) appendMulti(sp, 'factory', getCheckedValues(factoryBox));
+                function sameSelections(a, b) {
+                    var ka = Object.keys(a).sort().join('|');
+                    var kb = Object.keys(b).sort().join('|');
+                    if (ka !== kb) return false;
+                    for (var k in a) {
+                        var av = (a[k] || []).slice().sort().join('|');
+                        var bv = (b[k] || []).slice().sort().join('|');
+                        if (av !== bv) return false;
+                    }
+                    return true;
+                }
 
-                            // Mục đích
-                            const targetBox = document.getElementById('targetFilter');
-                            if (targetBox) appendMulti(sp, 'target', getCheckedValues(targetBox));
+                function updateApplyState() {
+                    var ui = collectSelectionsFromUI();
+                    var url = collectSelectionsFromURL();
+                    if (sameSelections(ui, url)) applyBtn.setAttribute('disabled', 'disabled');
+                    else applyBtn.removeAttribute('disabled');
+                }
 
-                            // Giá
-                            const priceBox = document.getElementById('priceFilter');
-                            if (priceBox) appendMulti(sp, 'price', getCheckedValues(priceBox));
+                function clearAllUI() {
+                    GROUP_IDS.forEach(function (id) {
+                        var wrap = getEl(id);
+                        if (!wrap) return;
+                        wrap.querySelectorAll('input[type="checkbox"]').forEach(function (inp) { inp.checked = false; });
+                        if (id === 'sortFilter') {
+                            var def = wrap.getAttribute('data-default') || '';
+                            var rDef = def ? wrap.querySelector('input[type="radio"][value="' + def + '"]') : null;
+                            if (rDef) rDef.checked = true;
+                            else wrap.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
+                        } else {
+                            wrap.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
+                        }
+                    });
+                }
 
-                            // CPU
-                            const cpuBox = document.getElementById('cpuFilter');
-                            if (cpuBox) appendMulti(sp, 'cpu', getCheckedValues(cpuBox));
-
-                            // RAM
-                            const ramBox = document.getElementById('ramFilter');
-                            if (ramBox) appendMulti(sp, 'ram', getCheckedValues(ramBox));
-
-                            // Storage
-                            const stBox = document.getElementById('storageFilter');
-                            if (stBox) appendMulti(sp, 'storage', getCheckedValues(stBox));
-
-                            // Độ phân giải
-                            const resBox = document.getElementById('resFilter');
-                            if (resBox) appendMulti(sp, 'res', getCheckedValues(resBox));
-
-                            // Kích thước màn
-                            const scBox = document.getElementById('screenFilter');
-                            if (scBox) appendMulti(sp, 'screen', getCheckedValues(scBox));
-
-                            // Sort (radio)
-                            const sortChecked = $('#sortFilter input[name="radio-sort"]:checked');
-                            if (sortChecked) sp.set('sort', sortChecked.value);
-
-                            // Luôn quay về trang 1 khi đổi bộ lọc
-                            sp.set('page', '1');
-
-                            // Điều hướng
-                            const url = '/products?' + sp.toString();
-                            window.location.href = url;
-                        });
-                    })();
-                </script>
-                // active phân trang
-                <script>
-                    // Bật active khi click cho pagination trang filter
-                    document.addEventListener('click', function (e) {
-                        const a = e.target.closest('.pagination.pager .page-link');
-                        if (!a) return;
-
-                        const ul = a.closest('.pagination.pager');
-                        const li = a.closest('.page-item');
-                        if (!ul || !li || li.classList.contains('disabled')) return;
-
-                        // 1) Toggle active tức thì (UI feedback)
-                        ul.querySelectorAll('.page-item').forEach(el => el.classList.remove('active'));
-                        li.classList.add('active');
-
-                        // 2) Nếu dùng AJAX, thêm data-ajax-pagination="true" vào <ul class="pagination pager ...">
-                        const ajaxMode = ul.dataset.ajaxPagination === 'true';
-                        if (!ajaxMode) return;         // điều hướng bình thường (full reload)
-
-                        // 3) AJAX mode: chặn chuyển trang, cập nhật URL & load lại list
-                        e.preventDefault();
-                        const url = a.getAttribute('href');
-                        history.pushState({}, '', url);
-
-                        // Gọi renderer của bạn – thay bằng logic hiện có để load danh sách + phân trang
-                        loadProducts(url);             // bạn đã có hàm fetch/axios nào thì gọi ở đây
+                function applySelections(sel) {
+                    var url = new URL(window.location.href);
+                    url.searchParams.delete('page');
+                    // xoa toan bo key filter
+                    GROUP_IDS.forEach(function (id) {
+                        var wrap = getEl(id);
+                        if (!wrap) return;
+                        var key = getKey(wrap);
+                        if (key) url.searchParams.delete(key);
+                    });
+                    // append lai cac gia tri da chon
+                    Object.keys(sel).forEach(function (key) {
+                        sel[key].forEach(function (v) { url.searchParams.append(key, v); });
                     });
 
-                    // Ví dụ tối giản cho loadProducts (nếu bạn chưa có):
-                    async function loadProducts(url) {
+                    if (ajaxMode && typeof window.loadProducts === 'function') {
+                        history.pushState({}, '', url);
+                        window.loadProducts(String(url));
+                    } else {
+                        window.location.assign(String(url));
+                    }
+                }
+
+                // Lắng nghe thay đổi trong các nhóm để bật/tắt nút áp dụng
+                GROUP_IDS.forEach(function (id) {
+                    var wrap = getEl(id);
+                    if (!wrap) return;
+                    wrap.addEventListener('change', updateApplyState);
+                });
+
+                // Nút "Xoa tat ca": chỉ clear UI, không áp dụng
+                clearAllBtn.addEventListener('click', function () {
+                    clearAllUI();
+                    updateApplyState();
+                });
+
+                // Nút "Xem ket qua": build URL tu UI va apply
+                applyBtn.addEventListener('click', function () {
+                    var selections = collectSelectionsFromUI();
+                    applySelections(selections);
+                });
+
+                // Khi mo modal: dong bo UI voi URL, cap nhat trang thai nut
+                modal.addEventListener('shown.bs.modal', function () {
+                    syncUIFromURL();
+                    updateApplyState();
+                });
+
+                // Fallback AJAX neu data-ajax="true" ma chua co loadProducts
+                if (ajaxMode && typeof window.loadProducts !== 'function') {
+                    window.loadProducts = async function (url) {
                         try {
-                            const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                            const html = await res.text();
-                            const doc = new DOMParser().parseFromString(html, 'text/html');
-
-                            // Thay #product-list và #product-pagination của trang hiện tại
-                            const newList = doc.querySelector('#product-list');
-                            const newPager = doc.querySelector('#product-pagination'); // bọc <ul.pagination.pager> trong div này
-
+                            var res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                            var html = await res.text();
+                            var doc = new DOMParser().parseFromString(html, 'text/html');
+                            var newList = doc.querySelector('#product-list');
+                            var newPager = doc.querySelector('#product-pagination');
                             if (newList) document.querySelector('#product-list')?.replaceWith(newList);
                             if (newPager) document.querySelector('#product-pagination')?.replaceWith(newPager);
-                        } catch (err) {
-                            console.error(err);
-                        }
-                    }
-                </script>
+                        } catch (e) { console.error(e); }
+                    };
+                }
+            })();
+        </script>
 
-                <script>
-                    (function () {
-                        var modal = document.getElementById('filterModal');
-                        if (!modal) return;
+        <!-- hết số lượng tồn -->
+        <script>
+            (function () {
+                function applyOOS() {
+                    // Badge
+                    document.querySelectorAll('.js-stock-badge').forEach(function (el) {
+                        var qty = Number(el.getAttribute('data-qty') || '0');
+                        el.classList.remove('bg-primary', 'bg-danger');
+                        el.classList.add(qty <= 0 ? 'bg-danger' : 'bg-primary');
+                        el.textContent = (qty <= 0) ? 'Hết hàng' : ('Còn: ' + qty);
+                    });
 
-                        var ajaxMode = (modal.getAttribute('data-ajax') === 'true');
-                        var applyBtn = document.getElementById('btnFilter');
-                        var clearAllBtn = document.getElementById('btnClearAll');
-
-                        // Khai bao cac nhom va param key tren URL
-                        var GROUP_IDS = [
-                            'factoryFilter', 'targetFilter', 'priceFilter', 'cpuFilter', 'ramFilter',
-                            'storageFilter', 'resFilter', 'screenFilter', 'sortFilter'
-                        ];
-                        function getEl(id) { return document.getElementById(id); }
-                        function getKey(el) { return el ? el.getAttribute('data-param') : null; }
-
-                        function syncUIFromURL() {
-                            var url = new URL(window.location.href);
-                            GROUP_IDS.forEach(function (id) {
-                                var wrap = getEl(id);
-                                if (!wrap) return;
-                                var key = getKey(wrap);
-                                if (!key) return;
-
-                                if (id === 'sortFilter') {
-                                    var def = wrap.getAttribute('data-default') || '';
-                                    var v = url.searchParams.get(key);
-                                    var target = v || def;
-                                    var r = wrap.querySelector('input[type="radio"][value="' + target + '"]');
-                                    if (r) r.checked = true;
-                                    // neu khong co radio tuong ung thi bo het
-                                    if (!r) wrap.querySelectorAll('input[type="radio"]').forEach(function (n) { n.checked = false; });
-                                } else {
-                                    var values = url.searchParams.getAll(key);
-                                    wrap.querySelectorAll('input[type="checkbox"]').forEach(function (inp) {
-                                        inp.checked = values.indexOf(inp.value) !== -1;
-                                    });
-                                }
-                            });
-                        }
-
-                        function collectSelectionsFromUI() {
-                            var sel = {};
-                            GROUP_IDS.forEach(function (id) {
-                                var wrap = getEl(id);
-                                if (!wrap) return;
-                                var key = getKey(wrap);
-                                if (!key) return;
-
-                                if (id === 'sortFilter') {
-                                    var def = wrap.getAttribute('data-default') || '';
-                                    var r = wrap.querySelector('input[type="radio"]:checked');
-                                    var val = r ? r.value : '';
-                                    if (val && val !== def) sel[key] = [val];
-                                } else {
-                                    var arr = [];
-                                    wrap.querySelectorAll('input[type="checkbox"]:checked').forEach(function (inp) { arr.push(inp.value); });
-                                    if (arr.length) sel[key] = arr;
-                                }
-                            });
-                            return sel;
-                        }
-
-                        function collectSelectionsFromURL() {
-                            var url = new URL(window.location.href);
-                            var sel = {};
-                            GROUP_IDS.forEach(function (id) {
-                                var wrap = getEl(id);
-                                if (!wrap) return;
-                                var key = getKey(wrap);
-                                if (!key) return;
-
-                                if (id === 'sortFilter') {
-                                    var v = url.searchParams.get(key);
-                                    if (v) sel[key] = [v];
-                                } else {
-                                    var arr = url.searchParams.getAll(key);
-                                    if (arr && arr.length) sel[key] = arr;
-                                }
-                            });
-                            return sel;
-                        }
-
-                        function sameSelections(a, b) {
-                            var ka = Object.keys(a).sort().join('|');
-                            var kb = Object.keys(b).sort().join('|');
-                            if (ka !== kb) return false;
-                            for (var k in a) {
-                                var av = (a[k] || []).slice().sort().join('|');
-                                var bv = (b[k] || []).slice().sort().join('|');
-                                if (av !== bv) return false;
-                            }
-                            return true;
-                        }
-
-                        function updateApplyState() {
-                            var ui = collectSelectionsFromUI();
-                            var url = collectSelectionsFromURL();
-                            if (sameSelections(ui, url)) applyBtn.setAttribute('disabled', 'disabled');
-                            else applyBtn.removeAttribute('disabled');
-                        }
-
-                        function clearAllUI() {
-                            GROUP_IDS.forEach(function (id) {
-                                var wrap = getEl(id);
-                                if (!wrap) return;
-                                wrap.querySelectorAll('input[type="checkbox"]').forEach(function (inp) { inp.checked = false; });
-                                if (id === 'sortFilter') {
-                                    var def = wrap.getAttribute('data-default') || '';
-                                    var rDef = def ? wrap.querySelector('input[type="radio"][value="' + def + '"]') : null;
-                                    if (rDef) rDef.checked = true;
-                                    else wrap.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
-                                } else {
-                                    wrap.querySelectorAll('input[type="radio"]').forEach(function (r) { r.checked = false; });
-                                }
-                            });
-                        }
-
-                        function applySelections(sel) {
-                            var url = new URL(window.location.href);
-                            url.searchParams.delete('page');
-                            // xoa toan bo key filter
-                            GROUP_IDS.forEach(function (id) {
-                                var wrap = getEl(id);
-                                if (!wrap) return;
-                                var key = getKey(wrap);
-                                if (key) url.searchParams.delete(key);
-                            });
-                            // append lai cac gia tri da chon
-                            Object.keys(sel).forEach(function (key) {
-                                sel[key].forEach(function (v) { url.searchParams.append(key, v); });
-                            });
-
-                            if (ajaxMode && typeof window.loadProducts === 'function') {
-                                history.pushState({}, '', url);
-                                window.loadProducts(String(url));
-                            } else {
-                                window.location.assign(String(url));
-                            }
-                        }
-
-                        // Lắng nghe thay đổi trong các nhóm để bật/tắt nút áp dụng
-                        GROUP_IDS.forEach(function (id) {
-                            var wrap = getEl(id);
-                            if (!wrap) return;
-                            wrap.addEventListener('change', updateApplyState);
-                        });
-
-                        // Nút "Xoa tat ca": chỉ clear UI, không áp dụng
-                        clearAllBtn.addEventListener('click', function () {
-                            clearAllUI();
-                            updateApplyState();
-                        });
-
-                        // Nút "Xem ket qua": build URL tu UI va apply
-                        applyBtn.addEventListener('click', function () {
-                            var selections = collectSelectionsFromUI();
-                            applySelections(selections);
-                        });
-
-                        // Khi mo modal: dong bo UI voi URL, cap nhat trang thai nut
-                        modal.addEventListener('shown.bs.modal', function () {
-                            syncUIFromURL();
-                            updateApplyState();
-                        });
-
-                        // Fallback AJAX neu data-ajax="true" ma chua co loadProducts
-                        if (ajaxMode && typeof window.loadProducts !== 'function') {
-                            window.loadProducts = async function (url) {
-                                try {
-                                    var res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                                    var html = await res.text();
-                                    var doc = new DOMParser().parseFromString(html, 'text/html');
-                                    var newList = doc.querySelector('#product-list');
-                                    var newPager = doc.querySelector('#product-pagination');
-                                    if (newList) document.querySelector('#product-list')?.replaceWith(newList);
-                                    if (newPager) document.querySelector('#product-pagination')?.replaceWith(newPager);
-                                } catch (e) { console.error(e); }
-                            };
-                        }
-                    })();
-                </script>
-
-                <!-- hết số lượng tồn -->
-                <script>
-                    (function () {
-                        function applyOOS() {
-                            // Badge
-                            document.querySelectorAll('.js-stock-badge').forEach(function (el) {
-                                var qty = Number(el.getAttribute('data-qty') || '0');
-                                el.classList.remove('bg-primary', 'bg-danger');
-                                el.classList.add(qty <= 0 ? 'bg-danger' : 'bg-primary');
-                                el.textContent = (qty <= 0) ? 'Hết hàng' : ('Còn: ' + qty);
-                            });
-
-                            // Button
-                            document.querySelectorAll('.btnAddToCartHomePage').forEach(function (btn) {
-                                var stock = Number(btn.getAttribute('data-stock') || '0');
-                                var label = btn.querySelector('.js-add-label');
-                                if (stock <= 0) {
-                                    btn.disabled = true;
-                                    if (label) label.textContent = 'Hết hàng';
-                                } else {
-                                    btn.disabled = false;
-                                    if (label) label.textContent = 'Thêm vào giỏ';
-                                }
-                            });
-                        }
-                        if (document.readyState === 'loading') {
-                            document.addEventListener('DOMContentLoaded', applyOOS);
+                    // Button
+                    document.querySelectorAll('.btnAddToCartHomePage').forEach(function (btn) {
+                        var stock = Number(btn.getAttribute('data-stock') || '0');
+                        var label = btn.querySelector('.js-add-label');
+                        if (stock <= 0) {
+                            btn.disabled = true;
+                            if (label) label.textContent = 'Hết hàng';
                         } else {
-                            applyOOS();
+                            btn.disabled = false;
+                            if (label) label.textContent = 'Thêm vào giỏ';
                         }
-                    })();
-                </script>
+                    });
+                }
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', applyOOS);
+                } else {
+                    applyOOS();
+                }
+            })();
+        </script>
 
 </body>
 

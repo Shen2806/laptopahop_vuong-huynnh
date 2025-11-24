@@ -443,16 +443,28 @@ const getRegisterPage = async (req: Request, res: Response) => {
 }
 // Hiển thị trang profile
 const updateProfilePage = async (req: Request, res: Response) => {
-    const userId = (req as any).user?.id;
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    // Lấy user từ passport (hoặc middleware auth của bạn)
+    const authUser = (req as any).user;
+    const userId = authUser?.id ? Number(authUser.id) : null;
 
-    // Lấy ra và xoá liền (success + error)
+    // Nếu chưa đăng nhập hoặc id không hợp lệ -> cho quay về trang login (tuỳ bạn muốn redirect đi đâu)
+    if (!userId || !Number.isFinite(userId)) {
+        (req.session as any).errorMessage = "Bạn cần đăng nhập để xem trang này.";
+        return res.redirect("/login"); // nếu route login khác thì đổi lại
+    }
+
+    // Lúc này chắc chắn đã có userId là number
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+    });
+
+    // Lấy ra message từ session rồi clear
     const successMessage = (req.session as any).successMessage || null;
     const errorMessage = (req.session as any).errorMessage || null;
     (req.session as any).successMessage = null;
     (req.session as any).errorMessage = null;
 
-    res.render("client/profiles/profile", {
+    return res.render("client/profiles/profile", {
         user,
         successMessage,
         errorMessage,
@@ -462,9 +474,19 @@ const updateProfilePage = async (req: Request, res: Response) => {
 
 // Xử lý cập nhật profile
 const handleUpdateProfile = async (req: Request, res: Response) => {
-    const userId = req.user?.id;
+    const authUser = (req as any).user;
+    const userId = authUser?.id ? Number(authUser.id) : null;
+
+    console.log('--- DEBUG PROFILE UPDATE ---');
+    console.log('body =', req.body);
+    console.log('file =', req.file);
+
+    if (!userId || !Number.isFinite(userId)) {
+        return res.status(401).send("Bạn cần đăng nhập.");
+    }
+
     const { fullName, phone, address } = req.body;
-    let avatar = req.file ? req.file.filename : undefined;
+    const avatar = req.file?.filename;
 
     try {
         await prisma.user.update({
@@ -473,19 +495,20 @@ const handleUpdateProfile = async (req: Request, res: Response) => {
                 fullName,
                 phone,
                 address,
-                ...(avatar && { avatar })
-            }
+                ...(avatar && { avatar }),
+            },
         });
 
-        // Lưu thông báo vào session
-        req.session.successMessage = "Cập nhật thông tin thành công!";
-
-        res.redirect("/profile");
+        (req.session as any).successMessage = "Cập nhật thông tin thành công!";
+        return res.redirect("/profile");
     } catch (error) {
         console.error(error);
-        res.status(500).send("Lỗi khi cập nhật thông tin.");
+        (req.session as any).errorMessage = "Lỗi khi cập nhật thông tin.";
+        return res.redirect("/profile");
     }
 };
+
+
 
 const ALLOW_USER_CANCEL = ["PENDING", "CONFIRMED"] as const;
 

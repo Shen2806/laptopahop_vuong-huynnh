@@ -186,149 +186,139 @@
 
         <!-- Socket.IO client -->
         <script src="/socket.io/socket.io.js"></script>
+
+        <!-- (A) UI toggle cho chuông: chạy mọi lúc, không phụ thuộc USER_ID -->
         <script>
-            (function () {
+            (() => {
+                const uIcon = document.getElementById('notificationDropdown');
+                const uPanel = document.getElementById('uNotificationPanel');
+                const uSound = document.getElementById('notificationSound');
+                if (!uIcon || !uPanel) return;
+
+                let audioUnlocked = false;
+
+                function toggle(e) {
+                    e?.preventDefault?.(); e?.stopPropagation?.();
+                    const shown = uPanel.style.display === 'block';
+                    uPanel.style.display = shown ? 'none' : 'block';
+
+                    // mở khoá audio lần đầu click chuông
+                    if (!audioUnlocked && uSound) {
+                        try {
+                            uSound.volume = 0; uSound.play().catch(() => { });
+                            setTimeout(() => { try { uSound.pause(); uSound.currentTime = 0; } catch { } uSound.volume = 1; }, 50);
+                        } catch { }
+                        audioUnlocked = true;
+                    }
+                }
+
+                uIcon.addEventListener('click', toggle);
+                document.addEventListener('click', (e) => {
+                    if (!uPanel.contains(e.target) && e.target !== uIcon) uPanel.style.display = 'none';
+                });
+            })();
+        </script>
+
+        <!-- (B) Socket + LƯU/KHÔI PHỤC thông báo bằng localStorage (chỉ chạy khi đã login) -->
+        <script>
+            (() => {
                 if (!window.USER_ID) return; // chưa login thì thôi
 
                 const uBadge = document.getElementById('notificationBadge');
-                const uIcon = document.getElementById('notificationDropdown');
-                const uPanel = document.getElementById('uNotificationPanel');
                 const uList = document.getElementById('uNotificationList');
                 const uSound = document.getElementById('notificationSound');
                 const USER_ID = window.USER_ID;
 
-                // Toggle panel
-                if (uIcon && uPanel) {
-                    uIcon.addEventListener('click', () => {
-                        const shown = uPanel.style.display === 'block';
-                        uPanel.style.display = shown ? 'none' : 'block';
-                    });
-                }
+                /* ===== Cache (per user) ===== */
+                const STORAGE_KEY = `noti:${USER_ID}`;
+                const CACHE_LIMIT = 30;
 
-                // Unlock audio lần click đầu vào chuông
-                let audioUnlocked = false;
-                if (uIcon && uSound) {
-                    uIcon.addEventListener('click', () => {
-                        if (!audioUnlocked) {
-                            uSound.volume = 0.0;
-                            uSound.play().catch(() => { });
-                            setTimeout(() => {
-                                try { uSound.pause(); uSound.currentTime = 0; } catch { }
-                                uSound.volume = 1.0;
-                                audioUnlocked = true;
-                            }, 50);
-                        }
-                    });
-                }
+                function loadCache() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; } }
+                function saveCache(arr) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr.slice(0, CACHE_LIMIT))); } catch { } }
+                function prependCache(html) { const arr = loadCache(); arr.unshift({ html, ts: Date.now() }); saveCache(arr); }
+                function clearCache() { try { localStorage.removeItem(STORAGE_KEY); } catch { } }
 
-                function uUpdateBadge(delta = 1) {
+                function setBadge(n) {
                     if (!uBadge) return;
-                    let cur = parseInt(uBadge.textContent || "0", 10);
-                    cur = isNaN(cur) ? 0 : cur;
-                    cur += delta;
-                    if (cur <= 0) {
-                        uBadge.style.display = "none";
-                        uBadge.textContent = "0";
-                    } else {
-                        uBadge.style.display = "flex";
-                        uBadge.textContent = cur > 9 ? "9+" : String(cur);
-                    }
+                    if (!n || n <= 0) { uBadge.style.display = 'none'; uBadge.textContent = '0'; }
+                    else { uBadge.style.display = 'flex'; uBadge.textContent = n > 9 ? '9+' : String(n); }
                 }
 
-                function uPrepend(itemHtml) {
+                function hydrate() {
                     if (!uList) return;
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item';
-                    li.innerHTML = itemHtml;
+                    const arr = loadCache();
+                    uList.innerHTML = '';
+                    for (const it of arr) {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item';
+                        li.innerHTML = it.html;
+                        uList.appendChild(li);
+                    }
+                    setBadge(arr.length);
+                    console.debug('[noti] hydrated', arr.length); // debug
+                }
+                hydrate(); // <-- QUAN TRỌNG: khôi phục khi vừa reload trang
+
+                /* ===== Helpers render ===== */
+                function itemHtml({ msg, url, variant = 'primary' }) {
+                    return (
+                        '<div class="d-flex justify-content-between align-items-start">'
+                        + '<div>'
+                        + '<div class="fw-semibold">' + msg + '</div>'
+                        + '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>'
+                        + '</div>'
+                        + '<a href="' + url + '" class="btn btn-sm btn-' + variant + ' ms-2">Xem</a>'
+                        + '</div>'
+                    );
+                }
+                function pushAndRender(html) {
+                    try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
+                    const li = document.createElement('li'); li.className = 'list-group-item'; li.innerHTML = html;
                     uList.prepend(li);
+                    prependCache(html);
+                    setBadge(loadCache().length);
                 }
 
+                // Nút “Đánh dấu đã đọc”
                 const markBtn = document.getElementById('uMarkAllRead');
-                if (markBtn && uBadge) {
+                if (markBtn) {
                     markBtn.addEventListener('click', () => {
-                        uBadge.style.display = 'none';
-                        uBadge.textContent = '0';
+                        clearCache();
+                        if (uList) uList.innerHTML = '';
+                        setBadge(0);
                     });
                 }
 
-                // Socket
+                /* ===== Socket ===== */
                 const uSocket = io(); // same-origin
-                uSocket.on('connect', () => {
-                    console.log('[SOCKET] user connected, USER_ID=', USER_ID);
-                    uSocket.emit('join-user-room', USER_ID);
-                });
+                uSocket.on('connect', () => { uSocket.emit('join-user-room', USER_ID); });
 
-                // Admin xác nhận
                 uSocket.on('order-confirmed', (data) => {
-                    console.log('[SOCKET] order-confirmed:', data);
-                    try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                    uUpdateBadge(1);
                     const url = `/order/${data.orderId}`;
-                    const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
-                    uPrepend(
-                        '<div class="d-flex justify-content-between align-items-start">' +
-                        '<div>' +
-                        '<div class="fw-semibold">' + msg + '</div>' +
-                        '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                        '</div>' +
-                        '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-                        '</div>'
-                    );
+                    const msg = data.message || (`Đơn #${data.orderId} đã được xác nhận`);
+                    pushAndRender(itemHtml({ msg, url, variant: 'primary' }));
                 });
 
                 uSocket.on('order-canceled', (data) => {
-                    console.log('[SOCKET] order-canceled:', data);
-                    try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                    uUpdateBadge(1);
                     const url = `/order/${data.orderId}`;
-                    const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
-                    uPrepend(
-                        '<div class="d-flex justify-content-between align-items-start">' +
-                        '<div>' +
-                        '<div class="fw-semibold">' + msg + '</div>' +
-                        '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                        '</div>' +
-                        '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
-                        '</div>'
-                    );
+                    const msg = data.message || (`Đơn #${data.orderId} đã bị hủy`);
+                    pushAndRender(itemHtml({ msg, url, variant: 'outline-danger' }));
                 });
 
                 uSocket.on('order-updated', (data) => {
-                    console.log('[SOCKET] order-updated:', data);
-                    try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                    uUpdateBadge(1);
                     const url = `/order/${data.orderId}`;
-                    const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
-                    uPrepend(
-                        '<div class="d-flex justify-content-between align-items-start">' +
-                        '<div>' +
-                        '<div class="fw-semibold">' + msg + '</div>' +
-                        '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                        '</div>' +
-                        '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-                        '</div>'
-                    );
+                    const msg = data.message || (`Đơn #${data.orderId} cập nhật: ${data.status}`);
+                    pushAndRender(itemHtml({ msg, url, variant: 'primary' }));
                 });
+
                 uSocket.on('chat-incoming', (data) => {
-                    try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                    uUpdateBadge(1);
-
-                    // Ưu tiên link server gửi xuống; nếu thiếu productId thì fallback '/'
                     const url = data.openUrl || (data.productId ? (`/product/${data.productId}?chat=${data.sessionId}`) : '/');
-
-                    uPrepend(
-                        '<div class="d-flex justify-content-between align-items-start">' +
-                        '<div>' +
-                        '<div class="fw-semibold">Tin nhắn mới từ hỗ trợ</div>' +
-                        '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                        '</div>' +
-                        '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Mở</a>' +
-                        '</div>'
-                    );
+                    const msg = 'Tin nhắn mới từ hỗ trợ';
+                    pushAndRender(itemHtml({ msg, url, variant: 'primary' }));
                 });
             })();
         </script>
-        <!-- Search box -->
+        <!-- tìm kiếm từ ô tìm kiếm -->
         <script>
             (() => {
                 const form = document.getElementById('headerSearchForm');
@@ -491,4 +481,5 @@
                 });
             })();
         </script>
+
         <!-- Navbar End -->

@@ -150,14 +150,11 @@ const webRoutes = (app: Express) => {
     router.post('/register', postRegister);
 
     // ================== cập nhật thông tin hồ sơ ==================
-    // Vercel: filesystem readonly → dùng memoryStorage (controller xử lý upload buffer)
-    const upload = multer({ storage: multer.memoryStorage() });
-
     // GET profile page
     router.get('/profile', updateProfilePage);
 
-    // POST update profile
-    router.post('/profile/update', upload.single('avatar'), handleUpdateProfile);
+    // POST update profile (dùng chung middleware upload với admin)
+    router.post('/profile/update', fileUploadMiddleware('avatar'), handleUpdateProfile);
     // NEW: đổi mật khẩu (cần đăng nhập)
     router.post('/profile/change-password', ensureAuthenticated, postChangePassword);
     //  lịch sử mua hàng

@@ -47,688 +47,644 @@
     <!-- Navbar start -->
     <%- include('../client/layout/header'); -%>
 
-        <% if (user) { %>
-            <script>
-                window.USER_ID = "<%= String(user.id) %>";
-            </script>
-            <% } %>
+        <!-- Navbar End -->
 
-                <!-- Socket.IO client -->
-                <script src="/socket.io/socket.io.js"></script>
-                <script>
-                    (function () {
-                        if (!window.USER_ID) return; // chưa login thì thôi
+        <!-- Checkout Page Start -->
+        <div class="container-fluid py-5 bg-light">
+            <div class="container">
 
-                        const uBadge = document.getElementById('notificationBadge');
-                        const uIcon = document.getElementById('notificationDropdown');
-                        const uPanel = document.getElementById('uNotificationPanel');
-                        const uList = document.getElementById('uNotificationList');
-                        const uSound = document.getElementById('notificationSound');
-                        const USER_ID = window.USER_ID;
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb bg-white px-4 py-2 rounded shadow-sm">
+                        <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a href="/cart" class="text-decoration-none">Chi tiết giỏ
+                                hàng</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Thanh toán</li>
+                    </ol>
+                </nav>
 
-                        // Toggle panel
-                        if (uIcon && uPanel) {
-                            uIcon.addEventListener('click', () => {
-                                const shown = uPanel.style.display === 'block';
-                                uPanel.style.display = shown ? 'none' : 'block';
-                            });
-                        }
+                <% if (mode==='cart' && (!cartDetails || cartDetails.length===0)) { %>
+                    <div class="alert alert-info text-center py-5 rounded">
+                        Chưa có sản phẩm trong giỏ hàng
+                    </div>
+                    <% } else { %>
 
-                        // Unlock audio lần click đầu vào chuông
-                        let audioUnlocked = false;
-                        if (uIcon && uSound) {
-                            uIcon.addEventListener('click', () => {
-                                if (!audioUnlocked) {
-                                    uSound.volume = 0.0;
-                                    uSound.play().catch(() => { });
-                                    setTimeout(() => {
-                                        try { uSound.pause(); uSound.currentTime = 0; } catch { }
-                                        uSound.volume = 1.0;
-                                        audioUnlocked = true;
-                                    }, 50);
-                                }
-                            });
-                        }
+                        <!-- Cart Table -->
+                        <div class="mb-5">
+                            <% var totalAfterDiscount=0; %>
+                                <% cartDetails.forEach(function(cartDetail){ %>
+                                    <% var p=cartDetail.product; var price=Number(p && p.price ? p.price : 0); var
+                                        disc=Number(p && p.discount ? p.discount : 0); var discountedPrice=disc> 0 ?
+                                        Math.round(price * (100 - disc) / 100) : price;
+                                        var qty = Number(cartDetail.quantity || 1);
+                                        totalAfterDiscount += discountedPrice * qty;
 
-                        function uUpdateBadge(delta = 1) {
-                            if (!uBadge) return;
-                            let cur = parseInt(uBadge.textContent || "0", 10);
-                            cur = isNaN(cur) ? 0 : cur;
-                            cur += delta;
-                            if (cur <= 0) {
-                                uBadge.style.display = "none";
-                                uBadge.textContent = "0";
-                            } else {
-                                uBadge.style.display = "flex";
-                                uBadge.textContent = cur > 9 ? "9+" : String(cur);
-                            }
-                        }
+                                        // Ảnh: dự án bạn đang để trong /images/product/
+                                        var imageName = (p && p.image) ? String(p.image) : '';
+                                        var imgSrc = '/images/product/' + imageName;
+                                        %>
 
-                        function uPrepend(itemHtml) {
-                            if (!uList) return;
-                            const li = document.createElement('li');
-                            li.className = 'list-group-item';
-                            li.innerHTML = itemHtml;
-                            uList.prepend(li);
-                        }
+                                        <div
+                                            class="d-flex align-items-center justify-content-between bg-white rounded shadow-sm mb-3 p-3 hover-shadow">
 
-                        const markBtn = document.getElementById('uMarkAllRead');
-                        if (markBtn && uBadge) {
-                            markBtn.addEventListener('click', () => {
-                                uBadge.style.display = 'none';
-                                uBadge.textContent = '0';
-                            });
-                        }
-
-                        // Socket
-                        const uSocket = io(); // same-origin
-                        uSocket.on('connect', () => {
-                            console.log('[SOCKET] user connected, USER_ID=', USER_ID);
-                            uSocket.emit('join-user-room', USER_ID);
-                        });
-
-                        // Admin xác nhận
-                        uSocket.on('order-confirmed', (data) => {
-                            console.log('[SOCKET] order-confirmed:', data);
-                            try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                            uUpdateBadge(1);
-                            const url = `/order/${data.orderId}`;
-                            const msg = data.message || ('Đơn #' + data.orderId + ' đã được xác nhận');
-                            uPrepend(
-                                '<div class="d-flex justify-content-between align-items-start">' +
-                                '<div>' +
-                                '<div class="fw-semibold">' + msg + '</div>' +
-                                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                                '</div>' +
-                                '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-                                '</div>'
-                            );
-                        });
-
-                        uSocket.on('order-canceled', (data) => {
-                            console.log('[SOCKET] order-canceled:', data);
-                            try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                            uUpdateBadge(1);
-                            const url = `/order/${data.orderId}`;
-                            const msg = data.message || ('Đơn #' + data.orderId + ' đã bị hủy');
-                            uPrepend(
-                                '<div class="d-flex justify-content-between align-items-start">' +
-                                '<div>' +
-                                '<div class="fw-semibold">' + msg + '</div>' +
-                                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                                '</div>' +
-                                '<a href="' + url + '" class="btn btn-sm btn-outline-danger ms-2">Xem</a>' +
-                                '</div>'
-                            );
-                        });
-
-                        uSocket.on('order-updated', (data) => {
-                            console.log('[SOCKET] order-updated:', data);
-                            try { if (uSound) { uSound.currentTime = 0; uSound.play(); } } catch { }
-                            uUpdateBadge(1);
-                            const url = `/order/${data.orderId}`;
-                            const msg = data.message || ('Đơn #' + data.orderId + ' cập nhật: ' + data.status);
-                            uPrepend(
-                                '<div class="d-flex justify-content-between align-items-start">' +
-                                '<div>' +
-                                '<div class="fw-semibold">' + msg + '</div>' +
-                                '<small class="text-muted">' + new Date().toLocaleString('vi-VN') + '</small>' +
-                                '</div>' +
-                                '<a href="' + url + '" class="btn btn-sm btn-primary ms-2">Xem</a>' +
-                                '</div>'
-                            );
-                        });
-                    })();
-                </script>
-                <!-- Navbar End -->
-
-                <!-- Checkout Page Start -->
-                <div class="container-fluid py-5 bg-light">
-                    <div class="container">
-
-                        <!-- Breadcrumb -->
-                        <nav aria-label="breadcrumb" class="mb-4">
-                            <ol class="breadcrumb bg-white px-4 py-2 rounded shadow-sm">
-                                <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
-                                <li class="breadcrumb-item"><a href="/cart" class="text-decoration-none">Chi tiết giỏ
-                                        hàng</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Thanh toán</li>
-                            </ol>
-                        </nav>
-
-                        <% if (mode==='cart' && (!cartDetails || cartDetails.length===0)) { %>
-                            <div class="alert alert-info text-center py-5 rounded">
-                                Chưa có sản phẩm trong giỏ hàng
-                            </div>
-                            <% } else { %>
-
-                                <!-- Cart Table -->
-                                <div class="mb-5">
-                                    <% var totalAfterDiscount=0; %>
-                                        <% cartDetails.forEach(function(cartDetail){ %>
-                                            <% var p=cartDetail.product; var price=Number(p && p.price ? p.price : 0);
-                                                var disc=Number(p && p.discount ? p.discount : 0); var
-                                                discountedPrice=disc> 0 ?
-                                                Math.round(price * (100 - disc) / 100) : price;
-                                                var qty = Number(cartDetail.quantity || 1);
-                                                totalAfterDiscount += discountedPrice * qty;
-
-                                                // Ảnh: dự án bạn đang để trong /images/product/
-                                                var imageName = (p && p.image) ? String(p.image) : '';
-                                                var imgSrc = '/images/product/' + imageName;
-                                                %>
-
-                                                <div
-                                                    class="d-flex align-items-center justify-content-between bg-white rounded shadow-sm mb-3 p-3 hover-shadow">
-
-                                                    <!-- Product Info -->
-                                                    <div class="d-flex align-items-center" style="flex: 2;">
-                                                        <img src="<%= imgSrc %>" class="rounded me-3 shadow-sm"
-                                                            style="width: 80px; height: 80px; object-fit: cover;"
-                                                            alt="">
-                                                        <div>
-                                                            <a href="/product/<%= p.id %>" target="_blank"
-                                                                class="fw-bold text-dark text-decoration-none">
-                                                                <%= p.name %>
-                                                            </a>
-                                                            <div class="text-muted mt-1">SKU: <%= p.id %>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <!-- Price -->
-                                                    <div class="text-center" style="flex: 1;">
-                                                        <% if (disc> 0) { %>
-                                                            <div class="text-muted text-decoration-line-through">
-                                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                                    currency: 'VND' }).format(price) %>
-                                                            </div>
-                                                            <span class="fw-bold text-primary">
-                                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                                    currency: 'VND' }).format(discountedPrice) %>
-                                                            </span>
-                                                            <% } else { %>
-                                                                <span class="fw-bold text-primary">
-                                                                    <%= new Intl.NumberFormat('vi-VN', {
-                                                                        style: 'currency' , currency: 'VND'
-                                                                        }).format(price) %>
-                                                                </span>
-                                                                <% } %>
-                                                    </div>
-
-                                                    <!-- Quantity -->
-                                                    <div class="text-center" style="flex: 1;">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm text-center rounded-pill"
-                                                            style="width: 60px;" value="<%= qty %>" disabled>
-                                                    </div>
-
-                                                    <!-- Total -->
-                                                    <div class="text-center fw-bold text-success" style="flex: 1;">
-                                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                            currency: 'VND' }) .format(discountedPrice * qty) %>
-                                                    </div>
-
-                                                </div>
-                                                <% }); %>
-                                </div>
-
-                                <!-- Checkout Form -->
-                                <form action="/place-order" method="post">
-                                    <!-- quan trọng để server phân nhánh: buy/cart -->
-                                    <input type="hidden" name="mode" value="<%= mode %>">
-                                    <input type="hidden" name="discountAmount" id="discountAmount" value="0">
-                                    <input type="hidden" name="couponCode" id="couponCode" value="">
-
-                                    <div class="row g-4">
-                                        <!-- Receiver Info -->
-                                        <div class="col-12 col-lg-6">
-                                            <div class="bg-white rounded shadow-sm p-4 border border-light h-100">
-                                                <h5 class="mb-4 fw-bold text-uppercase border-bottom pb-2"><i
-                                                        class="fa fa-user"></i> Thông Tin Người Nhận</h5>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-semibold">Tên người nhận</label>
-                                                    <input class="form-control rounded-pill" name="receiverName"
-                                                        required>
-                                                </div>
-                                                <div class="row g-3">
-                                                    <div class="col-12">
-                                                        <label class="form-label fw-semibold">Tỉnh/Thành phố</label>
-                                                        <select id="province" name="receiverProvinceCode"
-                                                            class="form-select rounded-pill" required></select>
-                                                    </div>
-                                                    <div class="col-12 col-md-6">
-                                                        <label class="form-label fw-semibold">Quận/Huyện</label>
-                                                        <select id="district" name="receiverDistrictCode"
-                                                            class="form-select rounded-pill" required disabled></select>
-                                                    </div>
-                                                    <div class="col-12 col-md-6">
-                                                        <label class="form-label fw-semibold">Phường/Xã</label>
-                                                        <select id="ward" name="receiverWardCode"
-                                                            class="form-select rounded-pill" required disabled></select>
-                                                    </div>
-                                                    <div class="col-12">
-                                                        <label class="form-label fw-semibold">Số nhà, đường</label>
-                                                        <input id="street" class="form-control rounded-pill"
-                                                            name="receiverStreet" placeholder="VD: 123/4 Lê Lợi"
-                                                            required>
-                                                    </div>
-                                                </div>
-
-                                                <input type="hidden" class="form-control rounded-pill"
-                                                    name="receiverAddress" required>
-
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-semibold">Số điện thoại</label>
-                                                    <input class="form-control rounded-pill" name="receiverPhone"
-                                                        required>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-semibold">Ghi chú khi giao hàng</label>
-                                                    <textarea class="form-control rounded"
-                                                        name="receiverNote"></textarea>
-                                                </div>
-
-                                                <% if (mode==='cart' ) { %>
-                                                    <a href="/cart"
-                                                        class="d-inline-flex align-items-center text-decoration-none text-primary fw-semibold mt-3">
-                                                        <i class="fas fa-arrow-left me-2"></i>Quay lại giỏ hàng
+                                            <!-- Product Info -->
+                                            <div class="d-flex align-items-center" style="flex: 2;">
+                                                <img src="<%= imgSrc %>" class="rounded me-3 shadow-sm"
+                                                    style="width: 80px; height: 80px; object-fit: cover;" alt="">
+                                                <div>
+                                                    <a href="/product/<%= p.id %>" target="_blank"
+                                                        class="fw-bold text-dark text-decoration-none">
+                                                        <%= p.name %>
                                                     </a>
-                                                    <% } %>
+                                                    <div class="text-muted mt-1">SKU: <%= p.id %>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Price -->
+                                            <div class="text-center" style="flex: 1;">
+                                                <% if (disc> 0) { %>
+                                                    <div class="text-muted text-decoration-line-through">
+                                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                            currency: 'VND' }).format(price) %>
+                                                    </div>
+                                                    <span class="fw-bold text-primary">
+                                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                            currency: 'VND' }).format(discountedPrice) %>
+                                                    </span>
+                                                    <% } else { %>
+                                                        <span class="fw-bold text-primary">
+                                                            <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                                currency: 'VND' }).format(price) %>
+                                                        </span>
+                                                        <% } %>
+                                            </div>
+
+                                            <!-- Quantity -->
+                                            <div class="text-center" style="flex: 1;">
+                                                <input type="text"
+                                                    class="form-control form-control-sm text-center rounded-pill"
+                                                    style="width: 60px;" value="<%= qty %>" disabled>
+                                            </div>
+
+                                            <!-- Total -->
+                                            <div class="text-center fw-bold text-success" style="flex: 1;">
+                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' , currency: 'VND'
+                                                    }) .format(discountedPrice * qty) %>
+                                            </div>
+
+                                        </div>
+                                        <% }); %>
+                        </div>
+
+                        <!-- Checkout Form -->
+                        <form action="/place-order" method="post">
+                            <!-- quan trọng để server phân nhánh: buy/cart -->
+                            <input type="hidden" name="mode" value="<%= mode %>">
+                            <input type="hidden" name="discountAmount" id="discountAmount" value="0">
+                            <input type="hidden" name="couponCode" id="couponCode" value="">
+
+                            <div class="row g-4">
+                                <!-- Receiver Info -->
+                                <div class="col-12 col-lg-6">
+                                    <div class="bg-white rounded shadow-sm p-4 border border-light h-100">
+                                        <h5 class="mb-4 fw-bold text-uppercase border-bottom pb-2"><i
+                                                class="fa fa-user"></i> Thông Tin Người Nhận</h5>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Tên người nhận</label>
+                                            <input class="form-control rounded-pill" name="receiverName" required>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold">Tỉnh/Thành phố</label>
+                                                <select id="province" name="receiverProvinceCode"
+                                                    class="form-select rounded-pill" required></select>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <label class="form-label fw-semibold">Quận/Huyện</label>
+                                                <select id="district" name="receiverDistrictCode"
+                                                    class="form-select rounded-pill" required disabled></select>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <label class="form-label fw-semibold">Phường/Xã</label>
+                                                <select id="ward" name="receiverWardCode"
+                                                    class="form-select rounded-pill" required disabled></select>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold">Số nhà, đường</label>
+                                                <input id="street" class="form-control rounded-pill"
+                                                    name="receiverStreet" placeholder="VD: 123/4 Lê Lợi" required>
                                             </div>
                                         </div>
 
-                                        <!-- Payment Info -->
-                                        <div class="col-12 col-lg-6">
-                                            <div class="bg-white rounded shadow-sm p-4 border border-light h-100">
-                                                <h5 class="mb-4 fw-bold text-uppercase border-bottom pb-2">
-                                                    <i class="fa fa-credit-card me-2 text-info"></i>Thông Tin Thanh Toán
-                                                </h5>
+                                        <input type="hidden" class="form-control rounded-pill" name="receiverAddress"
+                                            required>
 
-                                                <!-- Phí ship & giảm giá hiển thị (tạm tính) -->
-                                                <!-- Tóm tắt tiền -->
-                                                <div class="border-top pt-3 mt-2">
-                                                    <div class="d-flex justify-content-between mb-2">
-                                                        <span>Tạm tính hàng hóa</span>
-                                                        <span id="subtotal-amount">
-                                                            <%= new
-                                                                Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(totalPrice)
-                                                                %>
-                                                        </span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between mb-2">
-                                                        <span>Phí vận chuyển</span>
-                                                        <span id="shipping-fee">0 ₫</span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between mb-2">
-                                                        <span>Giảm phí ship</span>
-                                                        <span id="shipping-discount">-0 ₫</span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between mb-2">
-                                                        <span>Giảm trên hàng hóa</span>
-                                                        <span id="order-discount">-0 ₫</span>
-                                                    </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Số điện thoại</label>
+                                            <input class="form-control rounded-pill" name="receiverPhone" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Ghi chú khi giao hàng</label>
+                                            <textarea class="form-control rounded" name="receiverNote"></textarea>
+                                        </div>
+
+                                        <% if (mode==='cart' ) { %>
+                                            <a href="/cart"
+                                                class="d-inline-flex align-items-center text-decoration-none text-primary fw-semibold mt-3">
+                                                <i class="fas fa-arrow-left me-2"></i>Quay lại giỏ hàng
+                                            </a>
+                                            <% } %>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Info -->
+                                <div class="col-12 col-lg-6">
+                                    <div class="bg-white rounded shadow-sm p-4 border border-light h-100">
+                                        <h5 class="mb-4 fw-bold text-uppercase border-bottom pb-2">
+                                            <i class="fa fa-credit-card me-2 text-info"></i>Thông Tin Thanh Toán
+                                        </h5>
+
+                                        <!-- Phí ship & giảm giá hiển thị (tạm tính) -->
+                                        <!-- Tóm tắt tiền -->
+                                        <div class="border-top pt-3 mt-2">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Tạm tính hàng hóa</span>
+                                                <span id="subtotal-amount">
+                                                    <%= new
+                                                        Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(totalPrice)
+                                                        %>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Phí vận chuyển</span>
+                                                <span id="shipping-fee">0 ₫</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Giảm phí ship</span>
+                                                <span id="shipping-discount">-0 ₫</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Giảm trên hàng hóa</span>
+                                                <span id="order-discount">-0 ₫</span>
+                                            </div>
+                                        </div>
+
+
+
+                                        <!-- PHƯƠNG THỨC THANH TOÁN -->
+                                        <div class="mb-4">
+                                            <label class="form-label fw-semibold">Phương thức thanh toán</label>
+
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="paymentMethod"
+                                                    id="pmCOD" value="COD" checked>
+                                                <label class="form-check-label" for="pmCOD">
+                                                    Thanh toán khi nhận hàng (COD)
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check mt-2">
+                                                <input class="form-check-input" type="radio" name="paymentMethod"
+                                                    id="pmONLINE" value="ONLINE">
+                                                <label class="form-check-label d-flex align-items-center gap-2"
+                                                    for="pmONLINE">
+                                                    Thanh toán online qua VNPAY
+                                                    <!-- (tuỳ chọn) logo vnpay của bạn: <img src="/images/vnpay-logo.png" alt="VNPAY" style="height:20px"> -->
+                                                </label>
+                                                <div id="pmHint" class="small text-muted ms-4 d-none">
+                                                    Bạn sẽ được chuyển tới cổng thanh toán VNPAY sau khi bấm
+                                                    “Xác
+                                                    nhận thanh toán”.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- COUPON -->
+                                        <!-- COUPON -->
+                                        <% if (coupons && coupons.length> 0) { %>
+                                            <div class="mb-4">
+                                                <label class="fw-bold mb-2 text-primary">
+                                                    <i class="fa fa-ticket me-2"></i>Chọn mã giảm giá:
+                                                </label>
+
+                                                <!-- Không dùng mã -->
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input" type="radio" name="couponId"
+                                                        value="" data-code="" data-discount="0" data-freeship="0"
+                                                        checked>
+                                                    <label class="form-check-label">Không dùng mã</label>
                                                 </div>
 
-
-
-                                                <!-- PHƯƠNG THỨC THANH TOÁN -->
-                                                <div class="mb-4">
-                                                    <label class="form-label fw-semibold">Phương thức thanh toán</label>
-
+                                                <% coupons.forEach(function (coupon) { const
+                                                    isFS=(coupon.freeShip===true) || /^FS|FREESHIP/i.test(coupon.code);
+                                                    %>
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="radio"
-                                                            name="paymentMethod" id="pmCOD" value="COD" checked>
-                                                        <label class="form-check-label" for="pmCOD">
-                                                            Thanh toán khi nhận hàng (COD)
-                                                        </label>
-                                                    </div>
-
-                                                    <div class="form-check mt-2">
-                                                        <input class="form-check-input" type="radio"
-                                                            name="paymentMethod" id="pmONLINE" value="ONLINE">
-                                                        <label class="form-check-label d-flex align-items-center gap-2"
-                                                            for="pmONLINE">
-                                                            Thanh toán online qua VNPAY
-                                                            <!-- (tuỳ chọn) logo vnpay của bạn: <img src="/images/vnpay-logo.png" alt="VNPAY" style="height:20px"> -->
-                                                        </label>
-                                                        <div id="pmHint" class="small text-muted ms-4 d-none">
-                                                            Bạn sẽ được chuyển tới cổng thanh toán VNPAY sau khi bấm
-                                                            “Xác
-                                                            nhận thanh toán”.
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <!-- COUPON -->
-                                                <% if (coupons && coupons.length> 0) { %>
-                                                    <div class="mb-4">
-                                                        <label class="fw-bold mb-2 text-primary">
-                                                            <i class="fa fa-ticket me-2"></i>Chọn mã giảm giá:
-                                                        </label>
-
-                                                        <!-- Không dùng mã -->
-                                                        <div class="form-check mb-2">
-                                                            <input class="form-check-input" type="radio" name="couponId"
-                                                                value="" data-code="" data-discount="0"
-                                                                data-freeship="0" checked>
-                                                            <label class="form-check-label">Không dùng mã</label>
-                                                        </div>
-
-                                                        <% coupons.forEach(function(coupon){ const
-                                                            isFS=(coupon.freeShip===true) ||
-                                                            /^FS|FREESHIP/i.test(coupon.code); %>
-                                                            <div class="form-check">
-                                                                <input class="form-check-input" type="radio"
-                                                                    name="couponId" value="<%= coupon.id %>"
-                                                                    data-code="<%= coupon.code %>"
-                                                                    data-discount="<%= coupon.discount || 0 %>"
-                                                                    data-freeship="<%= isFS ? '1' : '0' %>" <% if
-                                                                    (coupon.minOrder !=null) { %> data-minorder="<%=
-                                                                    coupon.minOrder %>" <% } %>
-                                                                        <% if (coupon.shipDiscountCap !=null) { %>
-                                                                            data-shipcap="<%= coupon.shipDiscountCap %>"
-                                                                                <% } %>
-                                                                                    >
-                                                                                    <label class="form-check-label">
-                                                                                        <%= coupon.code %> -
-                                                                                            <% if (isFS) { %>
-                                                                                                Miễn phí vận chuyển
-                                                                                                <% if
-                                                                                                    (coupon.shipDiscountCap)
-                                                                                                    { %>
-                                                                                                    (tối đa <%=
-                                                                                                        coupon.shipDiscountCap.toLocaleString('vi-VN')
-                                                                                                        %> ₫)
+                                                        <input class="form-check-input" type="radio" name="couponId"
+                                                            value="<%= coupon.id %>" data-code="<%= coupon.code %>"
+                                                            data-discount="<%= coupon.discount || 0 %>"
+                                                            data-freeship="<%= isFS ? '1' : '0' %>" <% if
+                                                            (coupon.minOrder !=null) { %>
+                                                        data-minorder="<%= coupon.minOrder %>"
+                                                            <% } %>
+                                                                <% if (coupon.shipDiscountCap !=null) { %>
+                                                                    data-shipcap="<%= coupon.shipDiscountCap %>"
+                                                                        <% } %>
+                                                                            >
+                                                                            <label class="form-check-label">
+                                                                                <strong>
+                                                                                    <%= coupon.code %>
+                                                                                </strong>
+                                                                                -
+                                                                                <% if (isFS) { %>
+                                                                                    Miễn phí vận chuyển
+                                                                                    <% if (coupon.shipDiscountCap) { %>
+                                                                                        (tối đa
+                                                                                        <%= Number(coupon.shipDiscountCap).toLocaleString('vi-VN')
+                                                                                            %> ₫
+                                                                                            )
+                                                                                            <% } %>
+                                                                                                <% } else { %>
+                                                                                                    Giảm <%=
+                                                                                                        coupon.discount
+                                                                                                        %>%
+                                                                                                        <small
+                                                                                                            class="text-muted">(áp
+                                                                                                            dụng
+                                                                                                            cho
+                                                                                                            đơn
+                                                                                                            từ
+                                                                                                            25.000.000₫)</small>
                                                                                                         <% } %>
-                                                                                                            <% } else {
-                                                                                                                %>
-                                                                                                                Giảm <%=
-                                                                                                                    coupon.discount
-                                                                                                                    %>%
+                                                                                                            <% if
+                                                                                                                (coupon.expiryDate)
+                                                                                                                { %>
+                                                                                                                (HSD:
+                                                                                                                <%= new
+                                                                                                                    Date(coupon.expiryDate).toLocaleDateString('vi-VN')
+                                                                                                                    %>
+                                                                                                                    )
                                                                                                                     <% }
                                                                                                                         %>
-                                                                                                                        (HSD:
-                                                                                                                        <%= coupon.expiryDate.toLocaleDateString('vi-VN')
-                                                                                                                            %>
-                                                                                                                            )
-                                                                                    </label>
-                                                            </div>
-                                                            <% }); %>
+                                                                            </label>
                                                     </div>
-                                                    <% } %>
-
-                                                        <!-- giữ hidden để post lên server -->
-                                                        <input type="hidden" id="couponCode" name="couponCode" value="">
-
-
-                                                        <!-- Hidden tổng base (server đã tính) -->
-                                                        <input type="hidden" name="totalPrice"
-                                                            value="<%= totalPrice %>">
-
-                                                        <div
-                                                            class="border-top border-bottom py-3 mb-4 d-flex justify-content-between align-items-center">
-                                                            <h5 class="mb-0">Tổng số tiền</h5>
-                                                            <h5 class="mb-0 text-danger fw-bold" id="checkout-total"
-                                                                data-checkout-base="<%= totalPrice %>">
-                                                                <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
-                                                                    currency: 'VND' }).format(totalPrice) %>
-                                                            </h5>
-                                                        </div>
-
-                                                        <button
-                                                            class="btn w-100 py-3 fw-bold rounded-pill btn-gradient hover-scale">
-                                                            Xác nhận thanh toán
-                                                        </button>
+                                                    <% }); %>
                                             </div>
-                                        </div>
+                                            <% } %>
 
+
+
+                                                <!-- giữ hidden để post lên server -->
+                                                <input type="hidden" id="couponCode" name="couponCode" value="">
+
+
+                                                <!-- Hidden tổng base (server đã tính) -->
+                                                <input type="hidden" name="totalPrice" value="<%= totalPrice %>">
+
+                                                <div
+                                                    class="border-top border-bottom py-3 mb-4 d-flex justify-content-between align-items-center">
+                                                    <h5 class="mb-0">Tổng số tiền</h5>
+                                                    <h5 class="mb-0 text-danger fw-bold" id="checkout-total"
+                                                        data-checkout-base="<%= totalPrice %>">
+                                                        <%= new Intl.NumberFormat('vi-VN', { style: 'currency' ,
+                                                            currency: 'VND' }).format(totalPrice) %>
+                                                    </h5>
+                                                </div>
+
+                                                <button
+                                                    class="btn w-100 py-3 fw-bold rounded-pill btn-gradient hover-scale">
+                                                    Xác nhận thanh toán
+                                                </button>
                                     </div>
-
-                                </form>
-
-                                <% } %>
-                    </div>
-                </div>
-                <!-- Checkout Page End -->
-
-                <!-- Cart Page End -->
-                <!-- Footer Start -->
-                <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
-                    <div class="container py-5">
-                        <div class="row g-5">
-                            <!-- Logo & Giới thiệu -->
-                            <div class="col-lg-3 col-md-6">
-                                <a href="/" class="d-inline-block mb-3">
-                                    <h2 class="text-primary fw-bold">LaptopShop</h2>
-                                </a>
-                                <p class="small">
-                                    Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
-                                    dịch vụ tận tâm và giá cả cạnh tranh nhất.
-                                </p>
-                                <!-- Icon mạng xã hội -->
-                                <div class="d-flex pt-2">
-                                    <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                            class="fab fa-facebook-f"></i></a>
-                                    <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                            class="fab fa-instagram"></i></a>
-                                    <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
-                                            class="fab fa-youtube"></i></a>
-                                    <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
-                                            class="fab fa-tiktok"></i></a>
                                 </div>
+
                             </div>
 
-                            <!-- Thông tin cửa hàng -->
-                            <div class="col-lg-3 col-md-6">
-                                <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
-                                <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
-                                <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
-                                <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
-                                <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
-                            </div>
+                        </form>
 
-                            <!-- Tài khoản -->
-                            <div class="col-lg-3 col-md-6">
-                                <h4 class="text-light mb-3">Tài khoản</h4>
-                                <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
-                                <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
-                                <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
-                                <a class="btn-link d-block" href="/blogs">Blogs</a>
-                            </div>
+                        <% } %>
+            </div>
+        </div>
+        <!-- Checkout Page End -->
 
-                            <!-- Liên hệ -->
-                            <div class="col-lg-3 col-md-6">
-                                <h4 class="text-light mb-3">Liên hệ</h4>
-                                <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
-                                <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
-                                <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
-                                <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
-                                <!-- Form đăng ký nhận tin -->
-                                <form class="mt-3">
-                                    <div class="input-group">
-                                        <input type="email" class="form-control border-0"
-                                            placeholder="Nhập email của bạn">
-                                        <button class="btn btn-primary">Đăng ký</button>
-                                    </div>
-                                </form>
-                            </div>
+        <!-- Cart Page End -->
+        <!-- Footer Start -->
+        <div class="container-fluid bg-dark text-white-50 footer pt-5 mt-5">
+            <div class="container py-5">
+                <div class="row g-5">
+                    <!-- Logo & Giới thiệu -->
+                    <div class="col-lg-3 col-md-6">
+                        <a href="/" class="d-inline-block mb-3">
+                            <h2 class="text-primary fw-bold">LaptopShop</h2>
+                        </a>
+                        <p class="small">
+                            Chúng tôi cam kết mang đến sản phẩm <span class="text-light">chính hãng</span>,
+                            dịch vụ tận tâm và giá cả cạnh tranh nhất.
+                        </p>
+                        <!-- Icon mạng xã hội -->
+                        <div class="d-flex pt-2">
+                            <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a class="btn btn-outline-light btn-social me-2 rounded-circle" href="#"><i
+                                    class="fab fa-youtube"></i></a>
+                            <a class="btn btn-outline-light btn-social rounded-circle" href="#"><i
+                                    class="fab fa-tiktok"></i></a>
                         </div>
                     </div>
-                </div>
 
-                <!-- Copyright -->
-                <div class="container-fluid bg-dark copyright bg-black py-3">
-                    <div
-                        class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
-                        <span class="text-light mb-2 mb-md-0">
-                            <i class="fas fa-copyright me-2"></i>2025
-                            <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
-                        </span>
-                        <span class="text-white">
-                            Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML
-                                Codex</a> |
-                            Distributed by <a class="text-primary border-bottom"
-                                href="https://themewagon.com">ThemeWagon</a>
-                        </span>
+                    <!-- Thông tin cửa hàng -->
+                    <div class="col-lg-3 col-md-6">
+                        <h4 class="text-light mb-3">Thông tin cửa hàng</h4>
+                        <a class="btn-link d-block mb-2" href="/about">Về chúng tôi</a>
+                        <a class="btn-link d-block mb-2" href="/privacy">Chính sách bảo mật</a>
+                        <a class="btn-link d-block mb-2" href="/terms">Điều khoản & dịch vụ</a>
+                        <a class="btn-link d-block" href="/support">FAQs & Hỗ trợ</a>
+                    </div>
+
+                    <!-- Tài khoản -->
+                    <div class="col-lg-3 col-md-6">
+                        <h4 class="text-light mb-3">Tài khoản</h4>
+                        <a class="btn-link d-block mb-2" href="/profile">Tài khoản của tôi</a>
+                        <a class="btn-link d-block mb-2" href="/cart">Giỏ hàng</a>
+                        <a class="btn-link d-block mb-2" href="/order-user">Đơn hàng</a>
+                        <a class="btn-link d-block" href="/blogs">Blogs</a>
+                    </div>
+
+                    <!-- Liên hệ -->
+                    <div class="col-lg-3 col-md-6">
+                        <h4 class="text-light mb-3">Liên hệ</h4>
+                        <p><i class="fas fa-map-marker-alt me-2 text-primary"></i>99 ABC, Thống Nhất, Gò Vấp</p>
+                        <p><i class="fas fa-envelope me-2 text-primary"></i>vuonghuynhitk3@gmail.com</p>
+                        <p><i class="fas fa-phone-alt me-2 text-primary"></i>0999 887 744</p>
+                        <p><i class="fas fa-clock me-2 text-primary"></i>Cả tuần (8:00 - 20:00)</p>
+                        <!-- Form đăng ký nhận tin -->
+                        <form class="mt-3">
+                            <div class="input-group">
+                                <input type="email" class="form-control border-0" placeholder="Nhập email của bạn">
+                                <button class="btn btn-primary">Đăng ký</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <!-- Footer End -->
+            </div>
+        </div>
 
-                <!-- Back to Top -->
-                <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
-                        class="fa fa-arrow-up"></i></a>
+        <!-- Copyright -->
+        <div class="container-fluid bg-dark copyright bg-black py-3">
+            <div class="container d-flex flex-column flex-md-row justify-content-between text-center text-md-start">
+                <span class="text-light mb-2 mb-md-0">
+                    <i class="fas fa-copyright me-2"></i>2025
+                    <a href="#" class="text-primary fw-bold">VuongHuynh-LaptopShop</a>. All rights reserved.
+                </span>
+                <span class="text-white">
+                    Designed by <a class="text-primary border-bottom" href="https://htmlcodex.com">HTML
+                        Codex</a> |
+                    Distributed by <a class="text-primary border-bottom" href="https://themewagon.com">ThemeWagon</a>
+                </span>
+            </div>
+        </div>
+        <!-- Footer End -->
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top"><i
+                class="fa fa-arrow-up"></i></a>
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-primary border-3 border-primary rounded-circle back-to-top">
+            <i class="fa fa-arrow-up"></i>
+        </a>
+
+        <!-- Modal thông báo coupon -->
+        <div class="modal fade" id="couponAlertModal" tabindex="-1" aria-labelledby="couponAlertLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="couponAlertLabel">Thông báo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body" id="couponAlertMessage">
+                        <!-- nội dung sẽ được JS set -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                            Đã hiểu
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
 
-                <!-- JavaScript Libraries -->
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-                <script src="/client/lib/easing/easing.min.js"></script>
-                <script src="/client/lib/waypoints/waypoints.min.js"></script>
-                <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
-                <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
+        <!-- JavaScript Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/client/lib/easing/easing.min.js"></script>
+        <script src="/client/lib/waypoints/waypoints.min.js"></script>
+        <script src="/client/lib/lightbox/js/lightbox.min.js"></script>
+        <script src="/client/lib/owlcarousel/owl.carousel.min.js"></script>
 
-                <!-- Template Javascript -->
-                <script src="/client/js/main.js"></script>
-                <!-- cập nhật 2 cái trên  -->
-                <script>
-                    (function () {
-                        // ====== Hiển thị tổng & coupon ======
-                        const totalEl = document.getElementById('checkout-total');
-                        if (!totalEl) return;
-                        const base = Number(totalEl.getAttribute('data-checkout-base') || '0');
-                        const fmt = n => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n);
+        <!-- Template Javascript -->
+        <script src="/client/js/main.js"></script>
+        <!-- cập nhật 2 cái trên  -->
+        <script>
+            (function () {
+                // ====== Modal thông báo (dùng Bootstrap) ======
+                const couponAlertModalEl = document.getElementById('couponAlertModal');
+                const couponAlertMessageEl = document.getElementById('couponAlertMessage');
+                let couponAlertModal = null;
 
-                        const discountAmountInput = document.getElementById('discountAmount');
-                        const couponCodeInput = document.getElementById('couponCode');
+                if (couponAlertModalEl && typeof bootstrap !== 'undefined') {
+                    couponAlertModal = new bootstrap.Modal(couponAlertModalEl);
+                }
 
-                        // set mặc định
-                        totalEl.textContent = fmt(base);
-                        if (discountAmountInput) discountAmountInput.value = '0';
-                        if (couponCodeInput) couponCodeInput.value = '';
-
-                        document.querySelectorAll('input[name="couponId"]').forEach(r => {
-                            r.addEventListener('change', (e) => {
-                                const el = e.target;
-                                const pct = Number(el.getAttribute('data-discount') || '0');
-                                const code = el.getAttribute('data-code') || '';
-                                const discount = Math.round(base * pct / 100);
-                                const final = Math.max(0, base - discount);
-
-                                totalEl.textContent = fmt(final);
-                                if (discountAmountInput) discountAmountInput.value = String(discount);
-                                if (couponCodeInput) couponCodeInput.value = code;
-                            });
-                        });
-
-                        // ====== Gợi ý khi chọn ONLINE (VNPAY) ======
-                        const pmOnline = document.getElementById('pmONLINE');
-                        const pmHint = document.getElementById('pmHint');
-                        const pmCOD = document.getElementById('pmCOD');
-                        function toggleHint() {
-                            if (!pmHint) return;
-                            pmHint.classList.toggle('d-none', !pmOnline.checked);
-                        }
-                        if (pmOnline) pmOnline.addEventListener('change', toggleHint);
-                        if (pmCOD) pmCOD.addEventListener('change', toggleHint);
-                        toggleHint();
-                    })();
-                </script>
-
-                <!-- cập nhật số lượng khi thêm ở giỏ hàng  -->
-                <script>
-                    document.querySelectorAll('.cart-item').forEach(item => {
-                        const btnPlus = item.querySelector('.btn-plus');
-                        const btnMinus = item.querySelector('.btn-minus');
-                        const qtyInput = item.querySelector('.cart-qty');
-                        const hiddenInput = item.querySelector('.cart-qty-hidden');
-
-                        const updateQty = (delta) => {
-                            let qty = parseInt(qtyInput.value);
-                            qty += delta;
-                            if (qty < 1) qty = 1;
-                            qtyInput.value = qty;
-                            hiddenInput.value = qty; // update hidden input để gửi đúng số lượng
-                            updateCartTotal();
-                        };
-
-                        btnPlus.addEventListener('click', () => updateQty(1));
-                        btnMinus.addEventListener('click', () => updateQty(-1));
-                    });
-
-                    function updateCartTotal() {
-                        let total = 0;
-                        document.querySelectorAll('.cart-item').forEach(item => {
-                            const qtyInput = item.querySelector('.cart-qty');
-                            const price = parseInt(qtyInput.dataset.cartDetailPrice);
-                            const quantity = parseInt(qtyInput.value);
-                            const itemTotal = price * quantity;
-                            total += itemTotal;
-                            // Update thành tiền từng sản phẩm
-                            item.querySelector('.cart-item-total p').textContent =
-                                new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(itemTotal);
-                        });
-                        // Update tổng tiền
-                        document.getElementById('cart-subtotal').textContent =
-                            new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total);
-                        document.getElementById('cart-total').textContent =
-                            new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total);
+                function showCouponAlert(msg) {
+                    if (!couponAlertModal || !couponAlertMessageEl) {
+                        // fallback nếu vì lý do gì modal không khởi tạo được
+                        alert(msg);
+                        return;
                     }
-                </script>
+                    couponAlertMessageEl.textContent = msg;
+                    couponAlertModal.show();
+                }
 
-                <script>
-                    (() => {
-                        const form = document.getElementById('headerSearchForm');
-                        const input = document.getElementById('headerSearch');
-                        const popup = document.getElementById('searchPopup');
+                // ====== Hiển thị tổng & coupon ======
+                const totalEl = document.getElementById('checkout-total');
+                if (!totalEl) return;
 
-                        let timer = null;
-                        let activeIndex = -1;
-                        let currentItems = []; // giữ dữ liệu gợi ý hiện tại
+                const base = Number(totalEl.getAttribute('data-checkout-base') || '0');
+                const COUPON_THRESHOLD = 25000000; // 25 triệu
+                const fmt = n => new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(n);
 
-                        const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, s => ({
-                            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-                        }[s]));
+                const discountAmountInput = document.getElementById('discountAmount');
+                const couponCodeInput = document.getElementById('couponCode');
 
-                        const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
+                // set mặc định
+                totalEl.textContent = fmt(base);
+                if (discountAmountInput) discountAmountInput.value = '0';
+                if (couponCodeInput) couponCodeInput.value = '';
 
-                        const highlight = (text, q) => {
-                            if (!q) return escapeHtml(text);
-                            const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
-                            return escapeHtml(text).replace(re, '<mark>$1</mark>');
-                        };
+                document.querySelectorAll('input[name="couponId"]').forEach(r => {
+                    r.addEventListener('change', (e) => {
+                        const el = e.target;
+                        const pct = Number(el.getAttribute('data-discount') || '0');
+                        const code = el.getAttribute('data-code') || '';
+                        const isFreeShip = (el.getAttribute('data-freeship') || '0') === '1';
 
-                        // Chuẩn hoá đường dẫn ảnh từ DB
-                        const toImg = (v) => {
-                            if (!v) return '/images/no-image.png';
-                            if (/^https?:\/\//.test(v)) return v;   // URL tuyệt đối
-                            if (v.startsWith('/')) return v;        // đã có slash
-                            if (v.startsWith('images/')) return '/' + v; // có thư mục sẵn
-                            // còn lại coi như chỉ là filename
-                            return '/images/product/' + encodeURIComponent(v);
-                        };
+                        // Nếu là mã giảm % mà đơn chưa đủ 25 triệu
+                        if (!isFreeShip && pct > 0 && base < COUPON_THRESHOLD) {
+                            // reset lại dữ liệu về trạng thái ban đầu
+                            totalEl.textContent = fmt(base);
+                            if (discountAmountInput) discountAmountInput.value = '0';
+                            if (couponCodeInput) couponCodeInput.value = '';
 
-                        async function fetchSuggest(q) {
-                            const url = '/api/suggest?q=' + encodeURIComponent(q);
-                            const res = await fetch(url, { credentials: 'same-origin' });
-                            if (!res.ok) throw new Error('Network');
-                            return res.json();
-                        }
-
-                        function render(items, q) {
-                            currentItems = items;           // lưu lại để điều hướng bàn phím
-                            activeIndex = -1;
-
-                            if (!items.length) {
-                                popup.innerHTML = `<div class="empty">Không tìm thấy sản phẩm phù hợp.</div>`;
-                                popup.style.display = 'block';
-                                return;
+                            // chuyển lại radio "Không dùng mã"
+                            const defaultRadio = document.querySelector(
+                                'input[name="couponId"][data-discount="0"][data-freeship="0"]'
+                            );
+                            if (defaultRadio) {
+                                defaultRadio.checked = true;
                             }
 
-                            popup.innerHTML = items.map((x, i) => {
-                                const img = toImg(x.image);
-                                const href = `/product/${encodeURIComponent(String(x.id))}`;
-                                return `
+                            // hiện modal thông báo
+                            showCouponAlert('Đơn hàng phải đạt từ 25.000.000đ mới áp dụng mã giảm giá.');
+                            return;
+                        }
+
+                        let discount = 0;
+                        let final = base;
+
+                        // Mã freeship không trừ tiền hàng, chỉ trừ ship (server xử lý)
+                        if (!isFreeShip && pct > 0) {
+                            discount = Math.round(base * pct / 100);
+                            final = Math.max(0, base - discount);
+                        }
+
+                        totalEl.textContent = fmt(final);
+                        if (discountAmountInput) discountAmountInput.value = String(discount);
+                        if (couponCodeInput) couponCodeInput.value = code;
+                    });
+                });
+
+                // ====== Gợi ý khi chọn ONLINE (VNPAY) ======
+                const pmOnline = document.getElementById('pmONLINE');
+                const pmHint = document.getElementById('pmHint');
+                const pmCOD = document.getElementById('pmCOD');
+
+                function toggleHint() {
+                    if (!pmHint) return;
+                    pmHint.classList.toggle('d-none', !pmOnline.checked);
+                }
+
+                if (pmOnline) pmOnline.addEventListener('change', toggleHint);
+                if (pmCOD) pmCOD.addEventListener('change', toggleHint);
+                toggleHint();
+            })();
+        </script>
+
+
+        <!-- cập nhật số lượng khi thêm ở giỏ hàng  -->
+        <script>
+            document.querySelectorAll('.cart-item').forEach(item => {
+                const btnPlus = item.querySelector('.btn-plus');
+                const btnMinus = item.querySelector('.btn-minus');
+                const qtyInput = item.querySelector('.cart-qty');
+                const hiddenInput = item.querySelector('.cart-qty-hidden');
+
+                const updateQty = (delta) => {
+                    let qty = parseInt(qtyInput.value);
+                    qty += delta;
+                    if (qty < 1) qty = 1;
+                    qtyInput.value = qty;
+                    hiddenInput.value = qty; // update hidden input để gửi đúng số lượng
+                    updateCartTotal();
+                };
+
+                btnPlus.addEventListener('click', () => updateQty(1));
+                btnMinus.addEventListener('click', () => updateQty(-1));
+            });
+
+            function updateCartTotal() {
+                let total = 0;
+                document.querySelectorAll('.cart-item').forEach(item => {
+                    const qtyInput = item.querySelector('.cart-qty');
+                    const price = parseInt(qtyInput.dataset.cartDetailPrice);
+                    const quantity = parseInt(qtyInput.value);
+                    const itemTotal = price * quantity;
+                    total += itemTotal;
+                    // Update thành tiền từng sản phẩm
+                    item.querySelector('.cart-item-total p').textContent =
+                        new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(itemTotal);
+                });
+                // Update tổng tiền
+                document.getElementById('cart-subtotal').textContent =
+                    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total);
+                document.getElementById('cart-total').textContent =
+                    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total);
+            }
+        </script>
+
+        <script>
+            (() => {
+                const form = document.getElementById('headerSearchForm');
+                const input = document.getElementById('headerSearch');
+                const popup = document.getElementById('searchPopup');
+
+                let timer = null;
+                let activeIndex = -1;
+                let currentItems = []; // giữ dữ liệu gợi ý hiện tại
+
+                const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, s => ({
+                    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                }[s]));
+
+                const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
+
+                const highlight = (text, q) => {
+                    if (!q) return escapeHtml(text);
+                    const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+                    return escapeHtml(text).replace(re, '<mark>$1</mark>');
+                };
+
+                // Chuẩn hoá đường dẫn ảnh từ DB
+                const toImg = (v) => {
+                    if (!v) return '/images/no-image.png';
+                    if (/^https?:\/\//.test(v)) return v;   // URL tuyệt đối
+                    if (v.startsWith('/')) return v;        // đã có slash
+                    if (v.startsWith('images/')) return '/' + v; // có thư mục sẵn
+                    // còn lại coi như chỉ là filename
+                    return '/images/product/' + encodeURIComponent(v);
+                };
+
+                async function fetchSuggest(q) {
+                    const url = '/api/suggest?q=' + encodeURIComponent(q);
+                    const res = await fetch(url, { credentials: 'same-origin' });
+                    if (!res.ok) throw new Error('Network');
+                    return res.json();
+                }
+
+                function render(items, q) {
+                    currentItems = items;           // lưu lại để điều hướng bàn phím
+                    activeIndex = -1;
+
+                    if (!items.length) {
+                        popup.innerHTML = `<div class="empty">Không tìm thấy sản phẩm phù hợp.</div>`;
+                        popup.style.display = 'block';
+                        return;
+                    }
+
+                    popup.innerHTML = items.map((x, i) => {
+                        const img = toImg(x.image);
+                        const href = `/product/${encodeURIComponent(String(x.id))}`;
+                        return `
         <a class="sug-item" data-index="${i}" data-href="${href}" href="${href}">
           <img src="${img}" alt="">
           <div class="flex-1">
@@ -737,295 +693,295 @@
           </div>
         </a>
       `;
-                            }).join('');
+                    }).join('');
 
-                            // Gán hover để set active
-                            popup.querySelectorAll('.sug-item').forEach(el => {
-                                el.addEventListener('mouseenter', () => {
-                                    setActive(Number(el.dataset.index));
-                                });
-                            });
+                    // Gán hover để set active
+                    popup.querySelectorAll('.sug-item').forEach(el => {
+                        el.addEventListener('mouseenter', () => {
+                            setActive(Number(el.dataset.index));
+                        });
+                    });
 
-                            popup.style.display = 'block';
+                    popup.style.display = 'block';
+                }
+
+                function hide() {
+                    popup.style.display = 'none';
+                    activeIndex = -1;
+                    currentItems = [];
+                }
+
+                function setActive(index) {
+                    const items = popup.querySelectorAll('.sug-item');
+                    items.forEach(a => a.classList.remove('active'));
+                    if (items[index]) {
+                        items[index].classList.add('active');
+                        activeIndex = index;
+                    } else {
+                        activeIndex = -1;
+                    }
+                }
+
+                input.addEventListener('input', () => {
+                    const q = input.value.trim();
+                    clearTimeout(timer);
+                    if (!q) return hide();
+                    timer = setTimeout(async () => {
+                        try {
+                            const items = await fetchSuggest(q);
+                            render(items, q);
+                        } catch {
+                            hide();
                         }
+                    }, 200);
+                });
 
-                        function hide() {
-                            popup.style.display = 'none';
-                            activeIndex = -1;
-                            currentItems = [];
+                input.addEventListener('focus', () => {
+                    if (popup.innerHTML.trim()) popup.style.display = 'block';
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!popup.contains(e.target) && e.target !== input) hide();
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    const items = popup.querySelectorAll('.sug-item');
+                    if (!items.length) return;
+
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const next = (activeIndex + 1) % items.length;
+                        setActive(next);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prev = (activeIndex - 1 + items.length) % items.length;
+                        setActive(prev);
+                    } else if (e.key === 'Enter') {
+                        if (activeIndex >= 0 && items[activeIndex]) {
+                            e.preventDefault();
+                            // Điều hướng thẳng tới sản phẩm đang chọn
+                            const href = items[activeIndex].dataset.href;
+                            window.location.href = href;
                         }
+                        // nếu không có item đang active, để form submit bình thường
+                    } else if (e.key === 'Escape') {
+                        hide();
+                    }
+                });
 
-                        function setActive(index) {
-                            const items = popup.querySelectorAll('.sug-item');
-                            items.forEach(a => a.classList.remove('active'));
-                            if (items[index]) {
-                                items[index].classList.add('active');
-                                activeIndex = index;
-                            } else {
-                                activeIndex = -1;
+                // Submit form: chuyển đến /products?q=...
+                form.addEventListener('submit', (e) => {
+                    const q = input.value.trim();
+                    if (!q) { e.preventDefault(); hide(); }
+                });
+            })();
+
+            /**/
+            (() => {
+                const form = document.getElementById('headerSearchForm');
+                const input = document.getElementById('headerSearch');
+                const btn = form?.querySelector('button[type="submit"]');
+                if (!form || !input || !btn) return;
+
+                // Click kính lúp: nếu ô trống => chỉ mở & focus (không submit)
+                btn.addEventListener('click', (e) => {
+                    if (!input.value.trim()) { e.preventDefault(); form.classList.add('open'); input.focus(); }
+                });
+
+                // Rời khỏi input mà không gõ gì => thu gọn lại
+                input.addEventListener('blur', () => {
+                    if (!input.value.trim()) form.classList.remove('open');
+                });
+            })();
+        </script>
+
+        <!-- api address -->
+        <script>
+            (async function () {
+                const $p = document.getElementById('province');
+                const $d = document.getElementById('district');
+                const $w = document.getElementById('ward');
+                const $street = document.getElementById('street');
+                const $preview = document.getElementById('addrPreview');
+                const $hiddenAddr = document.getElementById('receiverAddressInput');
+
+                let pName = '', dName = '', wName = '';
+
+                const fetchJSON = (u) => fetch(u, { headers: { 'Accept': 'application/json' } }).then(r => r.json());
+                const joinAddr = (street, w, d, p) => [street, w, d, p].filter(Boolean).join(', ');
+                const refreshPreview = () => {
+                    const full = joinAddr(($street.value || '').trim(), wName, dName, pName);
+                    $preview.textContent = full || '—';
+                    $hiddenAddr.value = full; // giữ tương thích
+                };
+
+                // load provinces
+                const provinces = await fetchJSON('/api/locations/provinces');
+                $p.innerHTML =
+                    '<option value="" hidden>Chọn tỉnh/thành...</option>' +
+                    provinces.map(p => `<option value="${p.code}">${p.name}</option>`).join('');
+
+                $p.addEventListener('change', async () => {
+                    const code = $p.value;
+                    pName = $p.options[$p.selectedIndex]?.text || '';
+                    $d.disabled = !code; $w.disabled = true;
+                    wName = dName = '';
+                    $w.innerHTML = '<option value="" hidden>Chọn phường/xã...</option>';
+                    if (!code) { $d.innerHTML = '<option value="" hidden>Chọn quận/huyện...</option>'; refreshPreview(); return; }
+                    const districts = await fetchJSON('/api/locations/districts?provinceCode=' + code);
+                    $d.innerHTML =
+                        '<option value="" hidden>Chọn quận/huyện...</option>' +
+                        districts.map(d => `<option value="${d.code}">${d.name}</option>`).join('');
+                    refreshPreview();
+                });
+
+                $d.addEventListener('change', async () => {
+                    const code = $d.value;
+                    dName = $d.options[$d.selectedIndex]?.text || '';
+                    $w.disabled = !code;
+                    wName = '';
+                    if (!code) { $w.innerHTML = '<option value="" hidden>Chọn phường/xã...</option>'; refreshPreview(); return; }
+                    const wards = await fetchJSON('/api/locations/wards?districtCode=' + code);
+                    $w.innerHTML =
+                        '<option value="" hidden>Chọn phường/xã...</option>' +
+                        wards.map(w => `<option value="${w.code}">${w.name}</option>`).join('');
+                    refreshPreview();
+                });
+
+                $w.addEventListener('change', () => {
+                    wName = $w.options[$w.selectedIndex]?.text || '';
+                    refreshPreview();
+                });
+
+                $street.addEventListener('input', refreshPreview);
+            })();
+        </script>
+
+        <!-- phí ship -->
+        <script>
+            (function () {
+                // ===== Helpers =====
+                const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
+                const toInt = (v) => {
+                    const n = Number(v);
+                    return Number.isFinite(n) ? n : 0;
+                };
+
+                // DOM refs
+                const elTotal = document.getElementById('checkout-total');
+                const elShipFee = document.getElementById('shipping-fee');
+                const elShipDisc = document.getElementById('shipping-discount');
+                const elOrderDisc = document.getElementById('order-discount');
+                const elSubtotal = document.getElementById('subtotal-amount');
+                const elCouponCode = document.getElementById('couponCode');
+
+                const rProvince = document.getElementById('province');
+                const rDistrict = document.getElementById('district');
+                const pmCOD = document.getElementById('pmCOD');
+                const pmONLINE = document.getElementById('pmONLINE');
+
+                // Lấy base (tạm tính hàng hóa) từ data attribute
+                const base = toInt(elTotal?.dataset?.checkoutBase);
+
+                // Render mặc định subtotal
+                if (elSubtotal) elSubtotal.textContent = money(base);
+
+                // ===== Shipping rules (bám theo server) =====
+                // Tỉnh: Hà Nội = 1, HCM = 79
+                const HN_PROVINCE = 1;
+                const HCM_PROVINCE = 79;
+                const HN_INNER_DIST = new Set(); // có thể điền quận nội thành nếu có
+                const HCM_INNER_DIST = new Set();
+
+                const SHIPPING_RULES = {
+                    HN_INNER: { base: 15000, codSurcharge: 0 },
+                    HCM_INNER: { base: 15000, codSurcharge: 0 },
+                    NEAR: { base: 25000, codSurcharge: 5000 },
+                    FAR: { base: 35000, codSurcharge: 5000 },
+                };
+
+                function classifyRegion(provinceCode, districtCode) {
+                    // nếu muốn chi tiết miền, có thể mở rộng như server, tạm coi NEAR là mặc định
+                    if (provinceCode === HN_PROVINCE && districtCode && HN_INNER_DIST.has(districtCode)) return 'HN_INNER';
+                    if (provinceCode === HCM_PROVINCE && districtCode && HCM_INNER_DIST.has(districtCode)) return 'HCM_INNER';
+                    return 'NEAR';
+                }
+
+                function calcShippingFee(paymentMethod, provinceCode, districtCode) {
+                    // chưa chọn tỉnh → 0 cho dễ hiểu
+                    if (!provinceCode) return 0;
+                    const region = classifyRegion(provinceCode, districtCode);
+                    const rule = SHIPPING_RULES[region] || SHIPPING_RULES.NEAR;
+                    return rule.base + (paymentMethod === 'COD' ? (rule.codSurcharge || 0) : 0);
+                }
+
+                // ===== Recalc tổng =====
+                function recalc() {
+                    const provinceCode = toInt(rProvince?.value);
+                    const districtCode = toInt(rDistrict?.value);
+                    const paymentMethod = (pmONLINE && pmONLINE.checked) ? 'ONLINE' : 'COD';
+
+                    // phí ship
+                    const shippingFee = calcShippingFee(paymentMethod, provinceCode, districtCode);
+
+                    // coupon
+                    let couponRadio = document.querySelector('input[name="couponId"]:checked');
+                    // fallback nếu không có nhóm radio
+                    if (!couponRadio) { elCouponCode && (elCouponCode.value = ''); couponRadio = null; }
+
+                    let orderDiscount = 0;
+                    let shippingDiscount = 0;
+
+                    if (couponRadio) {
+                        const code = couponRadio.dataset.code || '';
+                        const percent = toInt(couponRadio.dataset.discount);
+                        const isFS = couponRadio.dataset.freeship === '1';
+                        const minOrder = toInt(couponRadio.dataset.minorder);
+                        const shipCap = toInt(couponRadio.dataset.shipcap);
+
+                        // gán mã để submit
+                        if (elCouponCode) elCouponCode.value = code;
+
+                        if (isFS) {
+                            // freeship: check ngưỡng (nếu có)
+                            if (!minOrder || base >= minOrder) {
+                                const cap = shipCap || shippingFee;          // mặc định cap = toàn bộ ship
+                                shippingDiscount = Math.min(shippingFee, cap);
+                            }
+                        } else {
+                            // giảm % trên hàng hóa (giữ nguyên logic ngưỡng phía server)
+                            if (percent > 0 /* client không check ngưỡng COUPON_THRESHOLD của bạn, server sẽ là nguồn sự thật */) {
+                                orderDiscount = Math.floor(base * percent / 100);
                             }
                         }
+                    }
 
-                        input.addEventListener('input', () => {
-                            const q = input.value.trim();
-                            clearTimeout(timer);
-                            if (!q) return hide();
-                            timer = setTimeout(async () => {
-                                try {
-                                    const items = await fetchSuggest(q);
-                                    render(items, q);
-                                } catch {
-                                    hide();
-                                }
-                            }, 200);
-                        });
+                    // Tổng = base - orderDiscount + shippingFee - shippingDiscount
+                    const total = Math.max(0, base - orderDiscount + shippingFee - shippingDiscount);
 
-                        input.addEventListener('focus', () => {
-                            if (popup.innerHTML.trim()) popup.style.display = 'block';
-                        });
+                    // Render
+                    if (elShipFee) elShipFee.textContent = money(shippingFee);
+                    if (elShipDisc) elShipDisc.textContent = '-' + money(shippingDiscount);
+                    if (elOrderDisc) elOrderDisc.textContent = '-' + money(orderDiscount);
+                    if (elTotal) elTotal.textContent = money(total);
+                }
 
-                        document.addEventListener('click', (e) => {
-                            if (!popup.contains(e.target) && e.target !== input) hide();
-                        });
+                // Event bindings
+                ['change', 'keyup'].forEach(evt => {
+                    rProvince && rProvince.addEventListener(evt, recalc);
+                    rDistrict && rDistrict.addEventListener(evt, recalc);
+                });
+                pmCOD && pmCOD.addEventListener('change', recalc);
+                pmONLINE && pmONLINE.addEventListener('change', recalc);
 
-                        input.addEventListener('keydown', (e) => {
-                            const items = popup.querySelectorAll('.sug-item');
-                            if (!items.length) return;
+                document.querySelectorAll('input[name="couponId"]').forEach(r => {
+                    r.addEventListener('change', recalc);
+                });
 
-                            if (e.key === 'ArrowDown') {
-                                e.preventDefault();
-                                const next = (activeIndex + 1) % items.length;
-                                setActive(next);
-                            } else if (e.key === 'ArrowUp') {
-                                e.preventDefault();
-                                const prev = (activeIndex - 1 + items.length) % items.length;
-                                setActive(prev);
-                            } else if (e.key === 'Enter') {
-                                if (activeIndex >= 0 && items[activeIndex]) {
-                                    e.preventDefault();
-                                    // Điều hướng thẳng tới sản phẩm đang chọn
-                                    const href = items[activeIndex].dataset.href;
-                                    window.location.href = href;
-                                }
-                                // nếu không có item đang active, để form submit bình thường
-                            } else if (e.key === 'Escape') {
-                                hide();
-                            }
-                        });
-
-                        // Submit form: chuyển đến /products?q=...
-                        form.addEventListener('submit', (e) => {
-                            const q = input.value.trim();
-                            if (!q) { e.preventDefault(); hide(); }
-                        });
-                    })();
-
-                    /**/
-                    (() => {
-                        const form = document.getElementById('headerSearchForm');
-                        const input = document.getElementById('headerSearch');
-                        const btn = form?.querySelector('button[type="submit"]');
-                        if (!form || !input || !btn) return;
-
-                        // Click kính lúp: nếu ô trống => chỉ mở & focus (không submit)
-                        btn.addEventListener('click', (e) => {
-                            if (!input.value.trim()) { e.preventDefault(); form.classList.add('open'); input.focus(); }
-                        });
-
-                        // Rời khỏi input mà không gõ gì => thu gọn lại
-                        input.addEventListener('blur', () => {
-                            if (!input.value.trim()) form.classList.remove('open');
-                        });
-                    })();
-                </script>
-
-                <!-- api address -->
-                <script>
-                    (async function () {
-                        const $p = document.getElementById('province');
-                        const $d = document.getElementById('district');
-                        const $w = document.getElementById('ward');
-                        const $street = document.getElementById('street');
-                        const $preview = document.getElementById('addrPreview');
-                        const $hiddenAddr = document.getElementById('receiverAddressInput');
-
-                        let pName = '', dName = '', wName = '';
-
-                        const fetchJSON = (u) => fetch(u, { headers: { 'Accept': 'application/json' } }).then(r => r.json());
-                        const joinAddr = (street, w, d, p) => [street, w, d, p].filter(Boolean).join(', ');
-                        const refreshPreview = () => {
-                            const full = joinAddr(($street.value || '').trim(), wName, dName, pName);
-                            $preview.textContent = full || '—';
-                            $hiddenAddr.value = full; // giữ tương thích
-                        };
-
-                        // load provinces
-                        const provinces = await fetchJSON('/api/locations/provinces');
-                        $p.innerHTML =
-                            '<option value="" hidden>Chọn tỉnh/thành...</option>' +
-                            provinces.map(p => `<option value="${p.code}">${p.name}</option>`).join('');
-
-                        $p.addEventListener('change', async () => {
-                            const code = $p.value;
-                            pName = $p.options[$p.selectedIndex]?.text || '';
-                            $d.disabled = !code; $w.disabled = true;
-                            wName = dName = '';
-                            $w.innerHTML = '<option value="" hidden>Chọn phường/xã...</option>';
-                            if (!code) { $d.innerHTML = '<option value="" hidden>Chọn quận/huyện...</option>'; refreshPreview(); return; }
-                            const districts = await fetchJSON('/api/locations/districts?provinceCode=' + code);
-                            $d.innerHTML =
-                                '<option value="" hidden>Chọn quận/huyện...</option>' +
-                                districts.map(d => `<option value="${d.code}">${d.name}</option>`).join('');
-                            refreshPreview();
-                        });
-
-                        $d.addEventListener('change', async () => {
-                            const code = $d.value;
-                            dName = $d.options[$d.selectedIndex]?.text || '';
-                            $w.disabled = !code;
-                            wName = '';
-                            if (!code) { $w.innerHTML = '<option value="" hidden>Chọn phường/xã...</option>'; refreshPreview(); return; }
-                            const wards = await fetchJSON('/api/locations/wards?districtCode=' + code);
-                            $w.innerHTML =
-                                '<option value="" hidden>Chọn phường/xã...</option>' +
-                                wards.map(w => `<option value="${w.code}">${w.name}</option>`).join('');
-                            refreshPreview();
-                        });
-
-                        $w.addEventListener('change', () => {
-                            wName = $w.options[$w.selectedIndex]?.text || '';
-                            refreshPreview();
-                        });
-
-                        $street.addEventListener('input', refreshPreview);
-                    })();
-                </script>
-
-                <!-- phí ship -->
-                <script>
-                    (function () {
-                        // ===== Helpers =====
-                        const money = (n) => (Number(n || 0)).toLocaleString('vi-VN') + ' ₫';
-                        const toInt = (v) => {
-                            const n = Number(v);
-                            return Number.isFinite(n) ? n : 0;
-                        };
-
-                        // DOM refs
-                        const elTotal = document.getElementById('checkout-total');
-                        const elShipFee = document.getElementById('shipping-fee');
-                        const elShipDisc = document.getElementById('shipping-discount');
-                        const elOrderDisc = document.getElementById('order-discount');
-                        const elSubtotal = document.getElementById('subtotal-amount');
-                        const elCouponCode = document.getElementById('couponCode');
-
-                        const rProvince = document.getElementById('province');
-                        const rDistrict = document.getElementById('district');
-                        const pmCOD = document.getElementById('pmCOD');
-                        const pmONLINE = document.getElementById('pmONLINE');
-
-                        // Lấy base (tạm tính hàng hóa) từ data attribute
-                        const base = toInt(elTotal?.dataset?.checkoutBase);
-
-                        // Render mặc định subtotal
-                        if (elSubtotal) elSubtotal.textContent = money(base);
-
-                        // ===== Shipping rules (bám theo server) =====
-                        // Tỉnh: Hà Nội = 1, HCM = 79
-                        const HN_PROVINCE = 1;
-                        const HCM_PROVINCE = 79;
-                        const HN_INNER_DIST = new Set(); // có thể điền quận nội thành nếu có
-                        const HCM_INNER_DIST = new Set();
-
-                        const SHIPPING_RULES = {
-                            HN_INNER: { base: 15000, codSurcharge: 0 },
-                            HCM_INNER: { base: 15000, codSurcharge: 0 },
-                            NEAR: { base: 25000, codSurcharge: 5000 },
-                            FAR: { base: 35000, codSurcharge: 5000 },
-                        };
-
-                        function classifyRegion(provinceCode, districtCode) {
-                            // nếu muốn chi tiết miền, có thể mở rộng như server, tạm coi NEAR là mặc định
-                            if (provinceCode === HN_PROVINCE && districtCode && HN_INNER_DIST.has(districtCode)) return 'HN_INNER';
-                            if (provinceCode === HCM_PROVINCE && districtCode && HCM_INNER_DIST.has(districtCode)) return 'HCM_INNER';
-                            return 'NEAR';
-                        }
-
-                        function calcShippingFee(paymentMethod, provinceCode, districtCode) {
-                            // chưa chọn tỉnh → 0 cho dễ hiểu
-                            if (!provinceCode) return 0;
-                            const region = classifyRegion(provinceCode, districtCode);
-                            const rule = SHIPPING_RULES[region] || SHIPPING_RULES.NEAR;
-                            return rule.base + (paymentMethod === 'COD' ? (rule.codSurcharge || 0) : 0);
-                        }
-
-                        // ===== Recalc tổng =====
-                        function recalc() {
-                            const provinceCode = toInt(rProvince?.value);
-                            const districtCode = toInt(rDistrict?.value);
-                            const paymentMethod = (pmONLINE && pmONLINE.checked) ? 'ONLINE' : 'COD';
-
-                            // phí ship
-                            const shippingFee = calcShippingFee(paymentMethod, provinceCode, districtCode);
-
-                            // coupon
-                            let couponRadio = document.querySelector('input[name="couponId"]:checked');
-                            // fallback nếu không có nhóm radio
-                            if (!couponRadio) { elCouponCode && (elCouponCode.value = ''); couponRadio = null; }
-
-                            let orderDiscount = 0;
-                            let shippingDiscount = 0;
-
-                            if (couponRadio) {
-                                const code = couponRadio.dataset.code || '';
-                                const percent = toInt(couponRadio.dataset.discount);
-                                const isFS = couponRadio.dataset.freeship === '1';
-                                const minOrder = toInt(couponRadio.dataset.minorder);
-                                const shipCap = toInt(couponRadio.dataset.shipcap);
-
-                                // gán mã để submit
-                                if (elCouponCode) elCouponCode.value = code;
-
-                                if (isFS) {
-                                    // freeship: check ngưỡng (nếu có)
-                                    if (!minOrder || base >= minOrder) {
-                                        const cap = shipCap || shippingFee;          // mặc định cap = toàn bộ ship
-                                        shippingDiscount = Math.min(shippingFee, cap);
-                                    }
-                                } else {
-                                    // giảm % trên hàng hóa (giữ nguyên logic ngưỡng phía server)
-                                    if (percent > 0 /* client không check ngưỡng COUPON_THRESHOLD của bạn, server sẽ là nguồn sự thật */) {
-                                        orderDiscount = Math.floor(base * percent / 100);
-                                    }
-                                }
-                            }
-
-                            // Tổng = base - orderDiscount + shippingFee - shippingDiscount
-                            const total = Math.max(0, base - orderDiscount + shippingFee - shippingDiscount);
-
-                            // Render
-                            if (elShipFee) elShipFee.textContent = money(shippingFee);
-                            if (elShipDisc) elShipDisc.textContent = '-' + money(shippingDiscount);
-                            if (elOrderDisc) elOrderDisc.textContent = '-' + money(orderDiscount);
-                            if (elTotal) elTotal.textContent = money(total);
-                        }
-
-                        // Event bindings
-                        ['change', 'keyup'].forEach(evt => {
-                            rProvince && rProvince.addEventListener(evt, recalc);
-                            rDistrict && rDistrict.addEventListener(evt, recalc);
-                        });
-                        pmCOD && pmCOD.addEventListener('change', recalc);
-                        pmONLINE && pmONLINE.addEventListener('change', recalc);
-
-                        document.querySelectorAll('input[name="couponId"]').forEach(r => {
-                            r.addEventListener('change', recalc);
-                        });
-
-                        // lần đầu
-                        recalc();
-                    })();
-                </script>
+                // lần đầu
+                recalc();
+            })();
+        </script>
 
 
 </body>

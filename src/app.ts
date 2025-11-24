@@ -65,7 +65,8 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.authenticate("session"));
 configPassportLocal();
-
+// app.ts
+app.use('/payment', paymentRoutes);
 // Expose user cho view
 app.use((req, res, next) => {
     res.locals.user = (req as any).user || null;
