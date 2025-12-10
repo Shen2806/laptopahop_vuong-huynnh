@@ -504,7 +504,9 @@
                                                     %>
 
                                                     <% if (_pagination.length) { %>
-                                                        <ul class="pagination pager d-flex justify-content-center mt-4">
+                                                        <ul id="product-pagination"
+                                                            class="pagination pager d-flex justify-content-center mt-4"
+                                                            data-page-size="12">
                                                             <!-- Previous -->
                                                             <li
                                                                 class="page-item <%= (_page === 1 ? 'disabled' : '') %>">
@@ -671,71 +673,7 @@
             })();
         </script>
 
-        <!--  phân trang -->
-        <script>
-            (function () {
-                const $ = (sel, ctx = document) => ctx.querySelector(sel);
-                const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-                function appendMulti(sp, name, values) {
-                    values.forEach(v => sp.append(name, v));
-                }
-
-                function getCheckedValues(container) {
-                    return $$('.form-check-input:checked', container).map(el => el.value);
-                }
-
-                const btn = document.getElementById('btnFilter');
-                if (!btn) return;
-
-                btn.addEventListener('click', function () {
-                    const sp = new URLSearchParams();
-
-                    // Hãng (factoryFilter)
-                    const factoryBox = document.getElementById('factoryFilter');
-                    if (factoryBox) appendMulti(sp, 'factory', getCheckedValues(factoryBox));
-
-                    // Mục đích
-                    const targetBox = document.getElementById('targetFilter');
-                    if (targetBox) appendMulti(sp, 'target', getCheckedValues(targetBox));
-
-                    // Giá
-                    const priceBox = document.getElementById('priceFilter');
-                    if (priceBox) appendMulti(sp, 'price', getCheckedValues(priceBox));
-
-                    // CPU
-                    const cpuBox = document.getElementById('cpuFilter');
-                    if (cpuBox) appendMulti(sp, 'cpu', getCheckedValues(cpuBox));
-
-                    // RAM
-                    const ramBox = document.getElementById('ramFilter');
-                    if (ramBox) appendMulti(sp, 'ram', getCheckedValues(ramBox));
-
-                    // Storage
-                    const stBox = document.getElementById('storageFilter');
-                    if (stBox) appendMulti(sp, 'storage', getCheckedValues(stBox));
-
-                    // Độ phân giải
-                    const resBox = document.getElementById('resFilter');
-                    if (resBox) appendMulti(sp, 'res', getCheckedValues(resBox));
-
-                    // Kích thước màn
-                    const scBox = document.getElementById('screenFilter');
-                    if (scBox) appendMulti(sp, 'screen', getCheckedValues(scBox));
-
-                    // Sort (radio)
-                    const sortChecked = $('#sortFilter input[name="radio-sort"]:checked');
-                    if (sortChecked) sp.set('sort', sortChecked.value);
-
-                    // Luôn quay về trang 1 khi đổi bộ lọc
-                    sp.set('page', '1');
-
-                    // Điều hướng
-                    const url = '/products?' + sp.toString();
-                    window.location.href = url;
-                });
-            })();
-        </script>
         // active phân trang
         <script>
             // Bật active khi click cho pagination trang filter
@@ -777,6 +715,17 @@
 
                     if (newList) document.querySelector('#product-list')?.replaceWith(newList);
                     if (newPager) document.querySelector('#product-pagination')?.replaceWith(newPager);
+                    // Áp bộ lọc giá trên client sau khi danh sách thay mới
+                    if (window.__applyClientPriceFilter) window.__applyClientPriceFilter();
+                    // (tùy chọn) phát sự kiện cho nơi khác lắng nghe
+                    document.dispatchEvent(new CustomEvent('products:replaced'));
+                    // Áp lại lọc giá trên client + sửa phân trang sau khi thay list/pager
+                    if (window.__applyClientPriceFilter) window.__applyClientPriceFilter();
+                    else if (window.__fixPaginationAfterClientFilter) window.__fixPaginationAfterClientFilter();
+
+                    // (tuỳ chọn) bắn sự kiện để nơi khác có thể lắng nghe
+                    document.dispatchEvent(new CustomEvent('products:replaced'));
+
                 } catch (err) {
                     console.error(err);
                 }

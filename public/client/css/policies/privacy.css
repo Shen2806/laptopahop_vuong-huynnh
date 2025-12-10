@@ -1,14 +1,14 @@
 :root{
-  --brand:#63C047;         /* đổi theo mã xanh thương hiệu của bạn */
-  --brand-600:#43a72f;
-  --brand-700:#2f8e22;
-  --brand-soft:rgba(99,192,71,.12);
-  --brand-border:rgba(99,192,71,.22);
-  --ink:#111827;
-  --muted:#6b7280;
-  --radius:14px;
-  --shadow:0 10px 24px rgba(18,38,63,.06);
-  --shadow-lg:0 18px 42px rgba(18,38,63,.12);
+--brand:#63C047;         /* đổi theo mã xanh thương hiệu của bạn */
+--brand-600:#43a72f;
+--brand-700:#2f8e22;
+--brand-soft:rgba(99,192,71,.12);
+--brand-border:rgba(99,192,71,.22);
+--ink:#111827;
+--muted:#6b7280;
+--radius:14px;
+--shadow:0 10px 24px rgba(18,38,63,.06);
+--shadow-lg:0 18px 42px rgba(18,38,63,.12);
 }
 
 /* Breadcrumb */
@@ -18,25 +18,25 @@
 
 /* Hero */
 .pv-hero{
-  position:relative; height:240px;
-  background: linear-gradient(135deg, rgba(99,192,71,.14), rgba(67,167,47,.08)),
-              url('https://i.redd.it/nqx40saln5w61.jpg') center/cover no-repeat;
-  border:1px solid var(--brand-border);
+position:relative; height:240px;
+background: linear-gradient(135deg, rgba(99,192,71,.14), rgba(67,167,47,.08)),
+            url('https://i.redd.it/nqx40saln5w61.jpg') center/cover no-repeat;
+border:1px solid var(--brand-border);
 }
 .pv-hero__overlay{ position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.35)); }
 .pv-hero__content{
-  position:relative; z-index:1; height:100%;
-  display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#fff;
+position:relative; z-index:1; height:100%;
+display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#fff;
 }
 .pv-hero h1{ font-weight:900; letter-spacing:.2px; }
 
 /* Cards */
 .pv-card{
-  border:1px solid var(--brand-border);
-  border-radius:var(--radius);
-  background:#fff;
-  padding:1.1rem 1.1rem 1.2rem;
-  box-shadow:var(--shadow);
+border:1px solid var(--brand-border);
+border-radius:var(--radius);
+background:#fff;
+padding:1.1rem 1.1rem 1.2rem;
+box-shadow:var(--shadow);
 }
 .pv-card + .pv-card{ margin-top:1rem; }
 .pv-card:hover{ box-shadow:var(--shadow-lg); }
@@ -46,18 +46,18 @@
 .sticky-card{ position:sticky; top:88px; }
 .pv-toc li{ margin:.3rem 0; }
 .pv-toc a{
-  display:block; padding:.5rem .7rem; border-radius:10px;
-  color:#1f2937; text-decoration:none; border:1px solid transparent;
-  transition:all .16s ease;
+display:block; padding:.5rem .7rem; border-radius:10px;
+color:#1f2937; text-decoration:none; border:1px solid transparent;
+transition:all .16s ease;
 }
 .pv-toc a:hover{ background:var(--brand-soft); border-color:var(--brand-border); color:var(--brand-700); }
 .pv-updated{ font-size:.94rem; color:var(--muted); }
 
 /* Chips */
 .pv-chip{
-  display:flex; gap:.75rem; align-items:center;
-  border:1px solid var(--brand-border); border-radius:12px; background:#fff;
-  padding:.7rem .9rem; box-shadow:var(--shadow);
+display:flex; gap:.75rem; align-items:center;
+border:1px solid var(--brand-border); border-radius:12px; background:#fff;
+padding:.7rem .9rem; box-shadow:var(--shadow);
 }
 .pv-chip i{ color:var(--brand-700); font-size:20px; }
 .pv-chip small{ color:var(--muted); }
@@ -65,12 +65,12 @@
 /* Lists */
 .pv-list{ margin:0; padding-left:0; list-style:none; }
 .pv-list > li{
-  position:relative; padding-left:1.6rem; margin:.35rem 0; color:#1f2937;
+position:relative; padding-left:1.6rem; margin:.35rem 0; color:#1f2937;
 }
 .pv-list > li::before{
-  content:""; position:absolute; left:.2rem; top:.45rem;
-  width:.85rem; height:.85rem; border-radius:50%; background:var(--brand);
-  box-shadow:0 0 0 4px var(--brand-soft);
+content:""; position:absolute; left:.2rem; top:.45rem;
+width:.85rem; height:.85rem; border-radius:50%; background:var(--brand);
+box-shadow:0 0 0 4px var(--brand-soft);
 }
 
 /* Contact list */
@@ -79,11 +79,11 @@
 
 /* Buttons */
 .btn-success, .btn-primary{
-  background:var(--brand) !important; border-color:var(--brand) !important;
+background:var(--brand) !important; border-color:var(--brand) !important;
 }
 .btn-success:hover, .btn-primary:hover{
-  background:var(--brand-600) !important; border-color:var(--brand-600) !important;
-  transform:translateY(-1px); box-shadow:0 12px 26px rgba(99,192,71,.22);
+background:var(--brand-600) !important; border-color:var(--brand-600) !important;
+transform:translateY(-1px); box-shadow:0 12px 26px rgba(99,192,71,.22);
 }
 .btn-outline-success{ border-color:var(--brand); color:var(--brand-700); }
 .btn-outline-success:hover{ background:var(--brand); color:#fff; }
@@ -92,5 +92,5 @@
 
 /* Responsive */
 @media (max-width:575.98px){
-  .pv-hero{ height:180px; }
+.pv-hero{ height:180px; }
 }

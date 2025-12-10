@@ -1,174 +1,174 @@
 body {
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 :root {
-    --brand: #8BC34A;
-    --brand-dark: #5a9b1b;
-    --bg1: #0f2027;
-    --bg2: #203a43;
-    --bg3: #2c5364;
+--brand: #8BC34A;
+--brand-dark: #5a9b1b;
+--bg1: #0f2027;
+--bg2: #203a43;
+--bg3: #2c5364;
 }
 
 body {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(1200px 600px at -10% 110%, #1a2730 0%, transparent 50%),
-        radial-gradient(1200px 600px at 110% -10%, #1a2730 0%, transparent 50%),
-        linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    padding: 24px;
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+background: radial-gradient(1200px 600px at -10% 110%, #1a2730 0%, transparent 50%),
+    radial-gradient(1200px 600px at 110% -10%, #1a2730 0%, transparent 50%),
+    linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+padding: 24px;
 }
 
 .auth-card {
-    width: 100%;
-    max-width: 1080px;
-    border: 0;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 18px 60px rgba(0, 0, 0, .35);
-    background: #fff
+width: 100%;
+max-width: 1080px;
+border: 0;
+border-radius: 18px;
+overflow: hidden;
+box-shadow: 0 18px 60px rgba(0, 0, 0, .35);
+background: #fff
 }
 
 .auth-left {
-    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-    color: #fff
+background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+color: #fff
 }
 
 .auth-right {
-    padding: 36px 32px
+padding: 36px 32px
 }
 
 .brand img {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    background: #fff
+width: 42px;
+height: 42px;
+border-radius: 50%;
+border: 2px solid #fff;
+background: #fff
 }
 
 .form-control {
-    border-radius: 12px;
-    padding-left: 2.5rem;
-    height: 48px
+border-radius: 12px;
+padding-left: 2.5rem;
+height: 48px
 }
 
 .input-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #9aa1a7
+position: absolute;
+left: 14px;
+top: 50%;
+transform: translateY(-50%);
+color: #9aa1a7
 }
 
 .toggle-pass {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: 0;
-    background: transparent;
-    color: #9aa1a7
+position: absolute;
+right: 12px;
+top: 50%;
+transform: translateY(-50%);
+border: 0;
+background: transparent;
+color: #9aa1a7
 }
 
 .btn-brand {
-    background: var(--brand);
-    border: none;
-    border-radius: 12px;
-    height: 48px;
-    font-weight: 600
+background: var(--brand);
+border: none;
+border-radius: 12px;
+height: 48px;
+font-weight: 600
 }
 
 .btn-brand:hover {
-    background: var(--brand-dark)
+background: var(--brand-dark)
 }
 
 .alert {
-    border-radius: 12px
+border-radius: 12px
 }
 
 .card {
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+border-radius: 1rem;
+overflow: hidden;
+box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+transform: translateY(-5px);
+box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
 }
 
 .card-header {
-    background: linear-gradient(45deg, #1b263b, #415a77);
-    color: #fff;
-    text-align: center;
-    padding: 1.8rem;
+background: linear-gradient(45deg, #1b263b, #415a77);
+color: #fff;
+text-align: center;
+padding: 1.8rem;
 }
 
 .card-header h3 {
-    font-weight: 700;
-    margin: 0.3rem 0;
-    letter-spacing: 1px;
+font-weight: 700;
+margin: 0.3rem 0;
+letter-spacing: 1px;
 }
 
 .form-control {
-    border-radius: 0.6rem;
-    padding-left: 2.5rem;
-    transition: all 0.3s;
+border-radius: 0.6rem;
+padding-left: 2.5rem;
+transition: all 0.3s;
 }
 
 .form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+border-color: #0d6efd;
+box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
 .form-control:hover {
-    border-color: #0a58ca;
+border-color: #0a58ca;
 }
 
 .input-icon {
-    position: absolute;
-    top: 50%;
-    left: 0.9rem;
-    transform: translateY(-50%);
-    color: #6c757d;
+position: absolute;
+top: 50%;
+left: 0.9rem;
+transform: translateY(-50%);
+color: #6c757d;
 }
 
 .btn-primary {
-    background-color: #0d6efd;
-    border-radius: 0.6rem;
-    font-weight: 600;
-    transition: 0.3s;
+background-color: #0d6efd;
+border-radius: 0.6rem;
+font-weight: 600;
+transition: 0.3s;
 }
 
 .btn-primary:hover {
-    background-color: #084298;
+background-color: #084298;
 }
 
 .card-footer {
-    background: #f8f9fa;
-    border-top: none;
+background: #f8f9fa;
+border-top: none;
 }
 
 .tech-icon {
-    font-size: 3rem;
-    color: #0d6efd;
-    transition: transform 0.3s;
+font-size: 3rem;
+color: #0d6efd;
+transition: transform 0.3s;
 }
 
 .tech-icon:hover {
-    transform: rotate(15deg) scale(1.1);
+transform: rotate(15deg) scale(1.1);
 }
 
 .alert {
-    border-radius: 0.5rem;
-    font-size: 0.95rem;
+border-radius: 0.5rem;
+font-size: 0.95rem;
 }

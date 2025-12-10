@@ -1,160 +1,160 @@
 /* ====== PROFILE LAYOUT ====== */
 body {
-    background: #f7f9fb;
+background: #f7f9fb;
 }
 
 .account-shell {
-    padding-top: 24px;
-    padding-bottom: 24px;
+padding-top: 24px;
+padding-bottom: 24px;
 }
 
 .acc-card {
-    border: 1px solid #e9eef3;
-    border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 8px 24px rgba(16, 24, 40, .06);
+border: 1px solid #e9eef3;
+border-radius: 16px;
+background: #fff;
+box-shadow: 0 8px 24px rgba(16, 24, 40, .06);
 }
 
 /* Sidebar */
 .acc-sidebar .avatar-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: .5rem;
-    padding: 20px;
-    border-bottom: 1px solid #eef2f6;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: .5rem;
+padding: 20px;
+border-bottom: 1px solid #eef2f6;
 }
 
 .acc-sidebar .avatar {
-    width: 96px;
-    height: 96px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #8BC34A;
-    background: #fff;
+width: 96px;
+height: 96px;
+border-radius: 50%;
+object-fit: cover;
+border: 3px solid #8BC34A;
+background: #fff;
 }
 
 .acc-sidebar .name {
-    font-weight: 800;
-    font-size: 1.05rem;
+font-weight: 800;
+font-size: 1.05rem;
 }
 
 .acc-sidebar .email {
-    color: #6b7280;
-    font-size: .92rem;
-    word-break: break-all;
+color: #6b7280;
+font-size: .92rem;
+word-break: break-all;
 }
 
 .acc-sidebar .verify-badges {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
+display: flex;
+gap: 6px;
+flex-wrap: wrap;
+justify-content: center;
 }
 
 .acc-sidebar .verify-badges .badge {
-    font-weight: 700;
+font-weight: 700;
 }
 
 .acc-menu .list-group-item {
-    border: 0;
-    border-radius: 10px;
-    margin: 4px 8px;
-    font-weight: 600;
-    color: #0f172a;
-    display: flex;
-    align-items: center;
-    gap: .6rem;
+border: 0;
+border-radius: 10px;
+margin: 4px 8px;
+font-weight: 600;
+color: #0f172a;
+display: flex;
+align-items: center;
+gap: .6rem;
 }
 
 .acc-menu .list-group-item.active,
 .acc-menu .list-group-item:hover {
-    background: #F1F8E9;
-    color: #2e7d32;
+background: #F1F8E9;
+color: #2e7d32;
 }
 
 .acc-menu i {
-    width: 20px;
-    text-align: center;
+width: 20px;
+text-align: center;
 }
 
 /* Content */
 .acc-content {
-    padding: 20px;
+padding: 20px;
 }
 
 .section-title {
-    font-weight: 800;
-    font-size: 1.1rem;
+font-weight: 800;
+font-size: 1.1rem;
 }
 
 /* Profile form card */
 .form-card {
-    border: 1px solid #e9eef3;
-    border-radius: 16px;
-    background: #fff;
-    padding: 18px;
+border: 1px solid #e9eef3;
+border-radius: 16px;
+background: #fff;
+padding: 18px;
 }
 
 .preview-avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #8BC34A;
-    background: #fff;
+width: 120px;
+height: 120px;
+border-radius: 50%;
+object-fit: cover;
+border: 3px solid #8BC34A;
+background: #fff;
 }
 
 /* Empty states */
 .empty {
-    padding: 24px;
-    background: #f8fafc;
-    border: 1px dashed #dfe7ef;
-    border-radius: 12px;
-    color: #475569;
+padding: 24px;
+background: #f8fafc;
+border: 1px dashed #dfe7ef;
+border-radius: 12px;
+color: #475569;
 }
 
 .chip {
-    display: inline-flex;
-    align-items: center;
-    padding: .4rem .7rem;
-    border-radius: 999px;
-    border: 1px solid #e6ebf0;
-    background: #fff;
-    gap: .4rem;
-    font-weight: 600;
+display: inline-flex;
+align-items: center;
+padding: .4rem .7rem;
+border-radius: 999px;
+border: 1px solid #e6ebf0;
+background: #fff;
+gap: .4rem;
+font-weight: 600;
 }
 
 /* Switch row */
 .switch-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #f1f5f9;
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 10px 0;
+border-bottom: 1px solid #f1f5f9;
 }
 
 .switch-row:last-child {
-    border-bottom: 0;
+border-bottom: 0;
 }
 
 /* Toast override */
 .toast-container {
-    z-index: 1055;
+z-index: 1055;
 }
 
 .btn-success-soft {
-    background: #e8f5e9;
-    color: #2e7d32;
-    border: 1px solid #c8e6c9;
+background: #e8f5e9;
+color: #2e7d32;
+border: 1px solid #c8e6c9;
 }
 
 .btn-success-soft:hover {
-    background: #dcedc8;
+background: #dcedc8;
 }
 
 @media (max-width: 991.98px) {
-    .acc-content {
-        padding: 12px;
-    }
+.acc-content {
+    padding: 12px;
+}
 }

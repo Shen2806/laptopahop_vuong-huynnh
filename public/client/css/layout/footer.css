@@ -1,25 +1,25 @@
 
-    .footer .btn-link {
-        color: rgba(255, 255, 255, 0.7);
-        text-decoration: none;
-        transition: 0.3s;
-    }
+.footer .btn-link {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: 0.3s;
+}
 
-    .footer .btn-link:hover {
-        color: #8BC34A;
-        padding-left: 5px;
-    }
+.footer .btn-link:hover {
+    color: #8BC34A;
+    padding-left: 5px;
+}
 
-    .btn-social {
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: 0.3s;
-    }
+.btn-social {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
 
-    .btn-social:hover {
-        background: #8BC34A;
-        color: #000;
-    }
+.btn-social:hover {
+    background: #8BC34A;
+    color: #000;
+}

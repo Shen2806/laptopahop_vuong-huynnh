@@ -205,6 +205,7 @@ const STYLE_GUIDE_VI = `
 const LAPTOP_CHEATSHEET = `
 • CPU: U/P tiết kiệm điện cho văn phòng; H/HX cho gaming/đồ họa. Ưu tiên i5/R5 trở lên; i7/R7 cho gaming/creator.
 • GPU: iGPU < RTX 3050 < 4050 (6GB) < 4060 (8GB) < 4070+. VRAM quan trọng cho dựng phim/3D.
+• Khi so sánh GPU: giải thích theo 3 ý — (1) mạnh/yếu tương đối, (2) phù hợp loại game/công việc nào, (3) có đáng nâng cấp hay không trong tầm giá.
 • RAM: 16GB là "mốc an tâm" cho gaming/IT/đồ họa; ưu tiên dual-channel; 8GB chỉ nên cho văn phòng cơ bản.
 • SSD: 512GB phổ biến; 1TB nếu edit video/đồ họa nhiều.
 • Màn hình: 144Hz+ cho gaming; 2K/4K & 100% sRGB/DCI-P3 cho đồ họa; OLED đẹp nhưng lưu ý PWM/burn-in ở mức vừa phải.
@@ -281,15 +282,20 @@ async function buildLeadText(
     const desc = describeFilters(f);
     const count = products.length;
     const hasBudget = typeof f.min === 'number' || typeof f.max === 'number';
-    let lead = `Mình lọc nhanh theo **${desc}** và gửi bạn ${count} lựa chọn đáng cân nhắc.`;
+
+    // Lead chuyên nghiệp hơn, không nói "mình lọc"
+    let lead = `Dưới đây là ${count} lựa chọn laptop phù hợp với **${desc}**.`;
     if (!hasBudget) {
-        lead += ` Vì bạn chưa nêu ngân sách, mình chọn các mẫu **tiêu biểu ở nhiều tầm giá** để bạn dễ so sánh.`;
+        lead += ` Danh sách bao gồm các mẫu tiêu biểu ở nhiều tầm giá để bạn dễ so sánh.`;
     }
+
     const specTxt = specsToText((f as any).specs);
-    if (specTxt) lead += ` Tiêu chí cấu hình: ${specTxt}.`;
+    if (specTxt) lead += ` Tiêu chí cấu hình khuyến nghị: ${specTxt}.`;
+
     // Đảm bảo văn phong mượt trước khi trả ra ngoài
     return polishVietnamese(lead, { persona: 'tu-van' });
 }
+
 
 function fmtMil(n?: number) { return typeof n === 'number' ? Math.round(n / 1e6) + 'tr' : ''; }
 function targetLabel(t?: string) {
@@ -369,6 +375,126 @@ function gpuRankFromText(blob = "") {
     if (gtx) return 9000 + parseInt(gtx[1], 10);
     if (/IRIS\s?XE|RADEON\s?GRAPHICS|UHD\s?GRAPHICS/.test(s)) return 2000;
     return 0;
+}
+type GpuTier =
+    | 'integrated'    // iGPU: Iris Xe, UHD, Radeon Graphics…
+    | 'entry-gaming'  // GTX 1650, RTX 3050…
+    | 'mid-gaming'    // RTX 3060/4060, RX 6600…
+    | 'high-gaming';  // RTX 4070+, RX 7700+…
+
+function gpuTierFromText(blob = ""): { tier: GpuTier; label: string; model: string } {
+    const s = blob.toUpperCase();
+    const model = extractGPU(s);
+
+    // Không thấy GPU rõ ràng ⇒ coi như iGPU
+    if (!model) {
+        return {
+            tier: 'integrated',
+            model: '',
+            label: 'GPU tích hợp, đủ cho văn phòng, học tập, xem phim; không phù hợp game nặng hay dựng phim 3D.'
+        };
+    }
+
+    // iGPU phổ biến
+    if (/IRIS\s?XE|UHD\s?GRAPHICS|RADEON\s+GRAPHICS/.test(model)) {
+        return {
+            tier: 'integrated',
+            model,
+            label: 'GPU tích hợp, phù hợp văn phòng, học online, giải trí cơ bản; không dành cho game nặng.'
+        };
+    }
+
+    const m = model.match(/\b(RTX|GTX|RX|ARC)\s?-?\s?(\d{3,4})/);
+    if (!m) {
+        // GPU rời nhưng không parse được mã cụ thể
+        return {
+            tier: 'entry-gaming',
+            model,
+            label: 'GPU rời cơ bản, chơi tốt game eSports/online nhẹ ở 1080p; chưa lý tưởng cho game AAA nặng.'
+        };
+    }
+
+    const series = m[1];
+    const num = parseInt(m[2], 10);
+    let tier: GpuTier = 'entry-gaming';
+
+    if (series === 'RTX') {
+        if (num >= 4070) tier = 'high-gaming';
+        else if (num >= 4060) tier = 'mid-gaming';
+        else tier = 'entry-gaming'; // 3050, 4050…
+    } else if (series === 'GTX') {
+        tier = num >= 1660 ? 'entry-gaming' : 'integrated';
+    } else if (series === 'RX') {
+        if (num >= 7700) tier = 'high-gaming';
+        else if (num >= 6600) tier = 'mid-gaming';
+        else tier = 'entry-gaming';
+    } else { // ARC, v.v.
+        tier = 'entry-gaming';
+    }
+
+    let label: string;
+    switch (tier) {
+        case 'integrated':
+            label = 'GPU tích hợp, phù hợp văn phòng, học tập, xem phim; không dành cho game 3D nặng.';
+            break;
+        case 'entry-gaming':
+            label = 'GPU gaming phổ thông, chơi tốt game eSports/online như LoL, Valorant ở 1080p với thiết lập vừa.';
+            break;
+        case 'mid-gaming':
+            label = 'GPU gaming tầm trung, cân được đa số game hiện nay ở 1080p/2K với thiết lập hợp lý; cũng ổn cho dựng phim cơ bản.';
+            break;
+        case 'high-gaming':
+            label = 'GPU gaming cao cấp, phù hợp game AAA nặng, dựng phim/3D và công việc đồ hoạ chuyên sâu.';
+            break;
+    }
+
+    return { tier, label, model };
+}
+function buildGpuComparisonSummary(a: any, b: any): string {
+    const ba = blobOf(a);
+    const bb = blobOf(b);
+
+    const rankA = gpuRankFromText(ba);
+    const rankB = gpuRankFromText(bb);
+
+    const infoA = gpuTierFromText(ba);
+    const infoB = gpuTierFromText(bb);
+
+    const nameA = a.name || 'máy #1';
+    const nameB = b.name || 'máy #2';
+
+    // Cả hai đều kiểu iGPU / không rõ card
+    if (!rankA && !rankB && infoA.tier === 'integrated' && infoB.tier === 'integrated') {
+        return 'Cả hai máy đều dùng GPU tích hợp, chủ yếu phù hợp văn phòng, học tập, xem phim; không dành cho game 3D nặng.';
+    }
+
+    // Một con có GPU rời, một con iGPU ⇒ chênh rõ
+    if (infoA.tier !== 'integrated' && infoB.tier === 'integrated') {
+        return `${nameA} có GPU rời (${infoA.model || 'card rời'}), phù hợp chơi game/đồ họa hơn rõ rệt so với ${nameB} chỉ dùng GPU tích hợp.`;
+    }
+    if (infoB.tier !== 'integrated' && infoA.tier === 'integrated') {
+        return `${nameB} có GPU rời (${infoB.model || 'card rời'}), phù hợp chơi game/đồ họa hơn rõ rệt so với ${nameA} chỉ dùng GPU tích hợp.`;
+    }
+
+    // Cả hai đều GPU rời ⇒ so theo rank & tier
+    const diff = Math.abs(rankA - rankB);
+    const aStronger = rankA >= rankB;
+    const strongerName = aStronger ? nameA : nameB;
+    const strongerInfo = aStronger ? infoA : infoB;
+    const weakerInfo = aStronger ? infoB : infoA;
+
+    // Gần như ngang nhau
+    if (diff < 200) {
+        return `Hai máy dùng GPU cùng phân khúc, hiệu năng thực tế không chênh lệch quá nhiều; bạn nên ưu tiên thêm các yếu tố khác như CPU, RAM, màn hình hoặc trọng lượng.`;
+    }
+
+    // Khác tier
+    if (strongerInfo.tier !== weakerInfo.tier) {
+        return `${strongerName} có GPU ở phân khúc ${strongerInfo.tier.replace('-', ' ')}, mạnh hơn một bậc so với GPU ${weakerInfo.tier.replace('-', ' ')} của máy còn lại — phù hợp hơn nếu bạn ưu tiên game nặng hoặc dựng phim/đồ hoạ.`;
+    }
+
+    // Cùng tier nhưng card mạnh hơn
+    return `${strongerName} có GPU mạnh hơn trong cùng phân khúc, phù hợp nếu bạn muốn khung hình ổn định hơn khi chơi game hoặc dư hiệu năng cho vài năm tới.`;
 }
 
 function screenRank(blob = "") {
@@ -466,6 +592,8 @@ function buildCompareReport(a: any, b: any) {
         `- **Văn phòng/di chuyển nhiều:** chọn **${picks.office}**\n` +
         `- **Sinh viên IT/lập trình:** chọn **${picks.it}**`;
 
+    const gpuSummary = buildGpuComparisonSummary(a, b);
+
     const reply =
         `**So sánh chi tiết**
 - **#1 ${a.name}** — ${aLine} — ${productPriceText(a)}
@@ -476,12 +604,13 @@ function buildCompareReport(a: any, b: any) {
 - GPU: ${extractGPU(ba) || 'không rõ'} vs ${extractGPU(bb) || 'không rõ'}
 - RAM/SSD: ${a.ramGB || '?'}GB / ${a.storageGB || '?'}GB vs ${b.ramGB || '?'}GB / ${b.storageGB || '?'}GB
 - Màn hình: ${extractScreen(ba) || 'không rõ'} vs ${extractScreen(bb) || 'không rõ'}
+${gpuSummary ? `- Nhận xét GPU: ${gpuSummary}\n` : ''}
 
 **Nên chọn gì theo mục đích**
 ${recUse}
 
- **Kết luận nhanh:** Ưu tiên **${winner === 'A' ? ('#1 ' + a.name) : ('#2 ' + b.name)}** ` +
-        `(${recWhy.slice(0, 3).join(', ') || 'hiệu năng/tổng thể tốt hơn'}).`
+**Kết luận nhanh:** Ưu tiên **${winner === 'A' ? ('#1 ' + a.name) : ('#2 ' + b.name)}** ` +
+        `(${recWhy.slice(0, 3).join(', ') || 'hiệu năng/tổng thể tốt hơn'}).`;
 
     return { reply, winner, picks };
 }

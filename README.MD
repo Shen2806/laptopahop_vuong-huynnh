@@ -1,5 +1,11 @@
 ### MINHVUONG - QUOCHUYNH KLTN
 
+### Để khởi chạy dự án dùng câu lệnh 
+--> npm install
+### sau tới chạy dự án dùng lệnh : 
+--> npm run dev
+
+
 // kế hoạch cần hoàn thành of QH ( 03/09/2025 )
 
 1. bạn làm các file giao diện tui đã tạo sẵn sao cho đẹp mắt, dễ nhìn, màu sắc hài hòa 
